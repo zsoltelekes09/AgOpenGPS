@@ -152,7 +152,7 @@
             this.btnGo.Text = "Go";
             this.btnGo.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnGo.UseVisualStyleBackColor = true;
-            this.btnGo.Click += new System.EventHandler(this.btnGo_Click);
+            this.btnGo.Click += new System.EventHandler(this.BtnGo_Click);
             // 
             // btnDriveOrExt
             // 
@@ -165,7 +165,7 @@
             this.btnDriveOrExt.TabIndex = 212;
             this.btnDriveOrExt.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDriveOrExt.UseVisualStyleBackColor = true;
-            this.btnDriveOrExt.Click += new System.EventHandler(this.btnDriveOrExt_Click);
+            this.btnDriveOrExt.Click += new System.EventHandler(this.BtnDriveOrExt_Click);
             // 
             // btnLoadMultiBoundaryFromGE
             // 
@@ -227,16 +227,19 @@
             // 
             // btnDelete
             // 
-            this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDelete.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDelete.Image = global::AgOpenGPS.Properties.Resources.BoundaryDelete;
-            this.btnDelete.Location = new System.Drawing.Point(655, 240);
-            this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(78, 68);
-            this.btnDelete.TabIndex = 65;
-            this.btnDelete.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnDelete.UseVisualStyleBackColor = true;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            this.button4.CausesValidation = false;
+            this.button4.Location = new System.Drawing.Point(530, 100);
+            this.button4.Margin = new System.Windows.Forms.Padding(0);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(40, 280);
+            this.button4.TabIndex = 209;
+            this.button4.TabStop = false;
+            this.button4.UseCompatibleTextRendering = true;
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Mouse_Down);
+            this.button4.MouseLeave += new System.EventHandler(this.Mouse_Leave);
+            this.button4.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Mouse_Move);
+            this.button4.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Mouse_Up);
             // 
             // btnSerialCancel
             // 
@@ -290,7 +293,7 @@
             0,
             0,
             131072});
-            this.nudBndOffset.Enter += new System.EventHandler(this.nudBndOffset_Enter);
+            this.nudBndOffset.Enter += new System.EventHandler(this.NudBndOffset_Enter);
             // 
             // label1
             // 
@@ -376,7 +379,6 @@
             this.Name = "FormBoundary";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Start or Delete A Boundary";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.FormBoundary_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudBndOffset)).EndInit();

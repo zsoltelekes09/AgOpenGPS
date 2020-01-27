@@ -69,8 +69,8 @@
             this.nudMinTurnRadius.Size = new System.Drawing.Size(124, 46);
             this.nudMinTurnRadius.TabIndex = 411;
             this.nudMinTurnRadius.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudMinTurnRadius.ValueChanged += new System.EventHandler(this.nudMinTurnRadius_ValueChanged);
-            this.nudMinTurnRadius.Enter += new System.EventHandler(this.nudMinTurnRadius_Enter);
+            this.nudMinTurnRadius.ValueChanged += new System.EventHandler(this.NudMinTurnRadius_ValueChanged);
+            this.nudMinTurnRadius.Enter += new System.EventHandler(this.NudMinTurnRadius_Enter);
             // 
             // btnSwapAB
             // 
@@ -83,7 +83,7 @@
             this.btnSwapAB.Size = new System.Drawing.Size(67, 62);
             this.btnSwapAB.TabIndex = 7;
             this.btnSwapAB.UseVisualStyleBackColor = true;
-            this.btnSwapAB.Click += new System.EventHandler(this.btnSwapAB_Click);
+            this.btnSwapAB.Click += new System.EventHandler(this.BtnSwapAB_Click);
             // 
             // btnCancel
             // 
@@ -100,7 +100,7 @@
             this.btnCancel.Size = new System.Drawing.Size(67, 62);
             this.btnCancel.TabIndex = 0;
             this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -118,7 +118,7 @@
             this.bntOK.TabIndex = 1;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = false;
-            this.bntOK.Click += new System.EventHandler(this.bntOk_Click);
+            this.bntOK.Click += new System.EventHandler(this.BntOk_Click);
             // 
             // btnAdjLeft
             // 
@@ -133,7 +133,7 @@
             this.btnAdjLeft.Size = new System.Drawing.Size(73, 54);
             this.btnAdjLeft.TabIndex = 4;
             this.btnAdjLeft.UseVisualStyleBackColor = false;
-            this.btnAdjLeft.Click += new System.EventHandler(this.btnAdjLeft_Click);
+            this.btnAdjLeft.Click += new System.EventHandler(this.BtnAdjLeft_Click);
             // 
             // btnAdjRight
             // 
@@ -148,7 +148,7 @@
             this.btnAdjRight.Size = new System.Drawing.Size(73, 54);
             this.btnAdjRight.TabIndex = 5;
             this.btnAdjRight.UseVisualStyleBackColor = false;
-            this.btnAdjRight.Click += new System.EventHandler(this.btnAdjRight_Click);
+            this.btnAdjRight.Click += new System.EventHandler(this.BtnAdjRight_Click);
             // 
             // btnContourPriority
             // 
@@ -165,7 +165,7 @@
             this.btnContourPriority.TabIndex = 6;
             this.btnContourPriority.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnContourPriority.UseVisualStyleBackColor = false;
-            this.btnContourPriority.Click += new System.EventHandler(this.btnContourPriority_Click);
+            this.btnContourPriority.Click += new System.EventHandler(this.BtnContourPriority_Click);
             // 
             // btnLeftHalfWidth
             // 
@@ -180,7 +180,7 @@
             this.btnLeftHalfWidth.Size = new System.Drawing.Size(73, 45);
             this.btnLeftHalfWidth.TabIndex = 2;
             this.btnLeftHalfWidth.UseVisualStyleBackColor = false;
-            this.btnLeftHalfWidth.Click += new System.EventHandler(this.btnLeftHalfWidth_Click);
+            this.btnLeftHalfWidth.Click += new System.EventHandler(this.BtnLeftHalfWidth_Click);
             // 
             // btnRightHalfWidth
             // 
@@ -195,7 +195,7 @@
             this.btnRightHalfWidth.Size = new System.Drawing.Size(73, 45);
             this.btnRightHalfWidth.TabIndex = 3;
             this.btnRightHalfWidth.UseVisualStyleBackColor = false;
-            this.btnRightHalfWidth.Click += new System.EventHandler(this.btnRightHalfWidth_Click);
+            this.btnRightHalfWidth.Click += new System.EventHandler(this.BtnRightHalfWidth_Click);
             // 
             // label2
             // 

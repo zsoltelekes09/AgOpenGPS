@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -41,28 +34,28 @@ namespace AgOpenGPS
             label3.Text = "\u00BD";
         }
 
-        private void nudMinTurnRadius_Enter(object sender, EventArgs e)
+        private void NudMinTurnRadius_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudMinTurnRadius_ValueChanged(object sender, EventArgs e)
+        private void NudMinTurnRadius_ValueChanged(object sender, EventArgs e)
         {
             snapAdj = (double)nudMinTurnRadius.Value * 0.01;
         }
 
-        private void btnAdjRight_Click(object sender, EventArgs e)
+        private void BtnAdjRight_Click(object sender, EventArgs e)
         {
             mf.ABLine.MoveABLine(snapAdj);
         }
 
-        private void btnAdjLeft_Click(object sender, EventArgs e)
+        private void BtnAdjLeft_Click(object sender, EventArgs e)
         {
             mf.ABLine.MoveABLine(-snapAdj);
         }
 
-        private void bntOk_Click(object sender, EventArgs e)
+        private void BntOk_Click(object sender, EventArgs e)
         {
             mf.ABLine.isEditing = false;
 
@@ -91,7 +84,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             mf.ABLine.isEditing = false;
             int last = mf.ABLine.numABLineSelected;
@@ -109,7 +102,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnSwapAB_Click(object sender, EventArgs e)
+        private void BtnSwapAB_Click(object sender, EventArgs e)
         {
             mf.ABLine.abHeading += Math.PI;
             if (mf.ABLine.abHeading > glm.twoPI) mf.ABLine.abHeading -= glm.twoPI;
@@ -127,7 +120,7 @@ namespace AgOpenGPS
             tboxHeading.Text = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 3).ToString("N3");
         }
 
-        private void btnBPoint_Click(object sender, EventArgs e)
+        private void BtnBPoint_Click(object sender, EventArgs e)
         {
             mf.ABLine.SetABLineByBPoint();
             tboxHeading.Text = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 3).ToString("N3");
@@ -138,7 +131,7 @@ namespace AgOpenGPS
             tboxHeading.Text = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 3).ToString("N3");
         }
 
-        private void tboxHeading_Enter(object sender, EventArgs e)
+        private void TboxHeading_Enter(object sender, EventArgs e)
         {
             tboxHeading.Text = "";
 
@@ -157,7 +150,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnContourPriority_Click(object sender, EventArgs e)
+        private void BtnContourPriority_Click(object sender, EventArgs e)
         {
             if (mf.ABLine.isABLineSet)
             {
@@ -165,7 +158,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnRightHalfWidth_Click(object sender, EventArgs e)
+        private void BtnRightHalfWidth_Click(object sender, EventArgs e)
         {
             double dist = mf.tool.toolWidth - mf.tool.toolOverlap;
 
@@ -173,7 +166,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnLeftHalfWidth_Click(object sender, EventArgs e)
+        private void BtnLeftHalfWidth_Click(object sender, EventArgs e)
         {
             double dist = mf.tool.toolWidth - mf.tool.toolOverlap;
 

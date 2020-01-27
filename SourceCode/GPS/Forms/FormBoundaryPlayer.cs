@@ -13,7 +13,6 @@ namespace AgOpenGPS
         {
             mf = callingForm as FormGPS;
 
-
             InitializeComponent();
 
             //btnStop.Text = gStr.gsDone;
@@ -39,8 +38,11 @@ namespace AgOpenGPS
                 mf.bnd.bndArr[mf.bnd.boundarySelected].FixBoundaryLine(mf.bnd.boundarySelected, mf.tool.toolWidth);
                 mf.bnd.bndArr[mf.bnd.boundarySelected].PreCalcBoundaryLines();
                 mf.bnd.bndArr[mf.bnd.boundarySelected].isSet = true;
-                mf.bnd.bndArr[mf.bnd.boundarySelected].CalculateBoundaryArea();
                 mf.fd.UpdateFieldBoundaryGUIAreas();
+
+                mf.bnd.bndArr[mf.bnd.boundarySelected].CalculateBoundaryArea();
+                if (mf.bnd.boundarySelected == 0) mf.bnd.bndArr[mf.bnd.boundarySelected].isOwnField = true;
+                else mf.bnd.bndArr[mf.bnd.boundarySelected].isOwnField = false;
             }
 
             //stop it all for adding

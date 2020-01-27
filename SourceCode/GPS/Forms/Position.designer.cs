@@ -1,5 +1,6 @@
 ﻿//Please, if you use this, share the improvements
 
+using AgOpenGPS.Properties;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +10,7 @@ namespace AgOpenGPS
     public partial class FormGPS
     {
         //very first fix to setup grid etc
-        public bool isFirstFixPositionSet = false, isGPSPositionInitialized = false;
+        public bool isGPSPositionInitialized = false;
 
         //string to record fixes for elevation maps
         public StringBuilder sbFix = new StringBuilder();
@@ -32,22 +33,18 @@ namespace AgOpenGPS
         public vec3 tankPos = new vec3(0, 0, 0);
         public vec2 hitchPos = new vec2(0, 0);
 
-        //history
-        public vec2 prevFix = new vec2(0, 0);
-
         //headings
-        public double fixHeading = 0.0, camHeading = 0.0, gpsHeading = 0.0, prevGPSHeading = 0.0;
+        public double fixHeading = 0.0, camHeading = 0.0, gpsHeading = 0.0;
 
         //storage for the cos and sin of heading
         public double cosSectionHeading = 1.0, sinSectionHeading = 0.0;
 
         //a distance between previous and current fix
-        private double distance = 0.0;
         public double treeSpacingCounter = 0.0;
-        public int treeTrigger = 0;
+        public bool treeTrigger = false;
 
         //how far travelled since last section was added, section points
-        double sectionTriggerDistance = 0, sectionTriggerStepDistance = 0;
+        double sectionTriggerStepDistance = 0;
         public vec2 prevSectionPos = new vec2(0, 0);
 
         public vec2 prevBoundaryPos = new vec2(0, 0);
@@ -81,25 +78,26 @@ namespace AgOpenGPS
 
         //step position - slow speed spinner killer
         private int totalFixSteps = 10, currentStepFix = 0;
-        private vec3 vHold;
         public vec3[] stepFixPts = new vec3[60];
         public double distanceCurrentStepFix = 0, fixStepDist, minFixStepDist = 0;
-        bool isFixHolding = false, isFixHoldLoaded = false;
 
         private double nowHz = 0;
 
-        //called by watchdog timer every 10 ms, returns true if new valid fix
-        private bool ScanForNMEA()
+
+        //called by timer every 15 ms
+        private void ScanForNMEA_Tick(object sender, EventArgs e)
         {
-            //update the recv string so it can display at least something
-            recvSentenceSettings = pn.rawBuffer;
+            NMEAWatchdog.Enabled = false;
 
             //parse any data from pn.rawBuffer
             pn.ParseNMEA();
 
-            //time for a frame update with new valid nmea data
-            if (pn.updatedGGA | pn.updatedOGI | pn.updatedRMC)
+            //time for a frame update with new valid data
+            if (pn.UpdatedLatLon)
             {
+                //reset  flag
+                pn.UpdatedLatLon = false;
+
                 //Measure the frequency of the GPS updates
                 swHz.Stop();
                 nowHz = ((double)System.Diagnostics.Stopwatch.Frequency) / (double)swHz.ElapsedTicks;
@@ -111,33 +109,31 @@ namespace AgOpenGPS
                 swHz.Reset();
                 swHz.Start();
 
-                //reset  flags
-                pn.updatedGGA = false;
-                pn.updatedOGI = false;
-                pn.updatedRMC = false;
 
                 //update all data for new frame
                 UpdateFixPosition();
-
-                //Update the port connection counter - is reset every time new sentence is valid and ready
-                recvCounter++;
-
-                //new position updated
-                return true;
+                recvCounter = 0;
+                if (toolStripBtnGPSStength.Image.Height != 38)
+                {
+                    toolStripBtnGPSStength.Image = Resources.GPSSignalGood;
+                }
             }
-            else
+            else if (recvCounter++ > 133 && toolStripBtnGPSStength.Image.Height != 40)
             {
-                return false;
+                toolStripBtnGPSStength.Image = Resources.GPSSignalPoor;
+                lblEasting.Text = "-";
+                lblNorthing.Text = gStr.gsNoGPS;
             }
+            NMEAWatchdog.Enabled = true;
         }
 
-        public double rollUsed;
+        public double rollUsed, dist = 0;
         private double offset = 0;
-        public double headlandDistanceDelta = 0, boundaryDistanceDelta = 0;
+        public double headlandDistanceDelta = 0;
 
         private void UpdateFixPosition()
         {
-            //start the watch and time till it gets back here
+            //start the watch
             swFrame.Reset();
             swFrame.Start();
 
@@ -172,7 +168,7 @@ namespace AgOpenGPS
 
             rollUsed = 0;
 
-            if (ahrs.isRollFromBrick | ahrs.isRollFromAutoSteer | ahrs.isRollFromGPS | ahrs.isRollFromExtUDP)
+            if ((ahrs.isRollFromBrick | ahrs.isRollFromAutoSteer | ahrs.isRollFromGPS | ahrs.isRollFromExtUDP) && ahrs.rollX16 != 9999)
             {
                 rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
 
@@ -185,120 +181,62 @@ namespace AgOpenGPS
                 pn.fix.northing = (Math.Sin(-fixHeading) * rollCorrectionDistance) + pn.fix.northing;
             }
 
-            //pitchDistance = (pitch * vehicle.antennaHeight);
-            //pn.fix.easting = (Math.Sin(fixHeading) * pitchDistance) + pn.fix.easting;
-            //pn.fix.northing = (Math.Cos(fixHeading) * pitchDistance) + pn.fix.northing;
-
             #endregion Roll
 
             #region Step Fix
 
-            //**** heading of the vec3 structure is used for distance in Step fix!!!!!
+            testtest.Restart();
+            testtest.Start();
+
+
 
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = glm.Distance(pn.fix, stepFixPts[0]);
 
             //tree spacing
-            if (vehicle.treeSpacing != 0 && section[0].isSectionOn) treeSpacingCounter += (distanceCurrentStepFix * 100);
-
-            //keep the distance below spacing
-            if (treeSpacingCounter > vehicle.treeSpacing && vehicle.treeSpacing != 0)
+            if (vehicle.treeSpacing != 0 && section[0].isSectionOn && (treeSpacingCounter += (distanceCurrentStepFix * 100)) > vehicle.treeSpacing )
             {
-                if (treeTrigger == 0) treeTrigger = 1;
-                else treeTrigger = 0;
-                while (treeSpacingCounter > vehicle.treeSpacing) treeSpacingCounter -= vehicle.treeSpacing;
+                treeTrigger = !treeTrigger;
+                treeSpacingCounter %= vehicle.treeSpacing;//keep the distance below spacing
             }
 
-            fixStepDist = distanceCurrentStepFix;
 
-            //if  min distance isn't exceeded, keep adding old fixes till it does
-            if (distanceCurrentStepFix <= minFixStepDist)
+
+            if (distanceCurrentStepFix > minFixStepDist / totalFixSteps)
             {
-                for (currentStepFix = 0; currentStepFix < totalFixSteps; currentStepFix++)
-                {
-                    fixStepDist += stepFixPts[currentStepFix].heading;
-                    if (fixStepDist > minFixStepDist)
-                    {
-                        //if we reached end, keep the oldest and stay till distance is exceeded
-                        if (currentStepFix < (totalFixSteps - 1)) currentStepFix++;
-                        isFixHolding = false;
-                        break;
-                    }
-                    else isFixHolding = true;
-                }
-            }
-
-            // only takes a single fix to exceeed min distance
-            else currentStepFix = 0;
-
-            //if total distance is less then the addition of all the fixes, keep last one as reference
-            if (isFixHolding)
-            {
-                if (isFixHoldLoaded == false)
-                {
-                    vHold = stepFixPts[(totalFixSteps - 1)];
-                    isFixHoldLoaded = true;
-                }
-
-                //cycle thru like normal
                 for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
 
-                //fill in the latest distance and fix
-                stepFixPts[0].heading = glm.Distance(pn.fix, stepFixPts[0]);
+                //**** heading of the vec3 structure is used for distance in Step fix!!!!!
+                stepFixPts[0].heading = distanceCurrentStepFix;
                 stepFixPts[0].easting = pn.fix.easting;
                 stepFixPts[0].northing = pn.fix.northing;
 
-                //reload the last position that was triggered.
-                stepFixPts[(totalFixSteps - 1)].heading = glm.Distance(vHold, stepFixPts[(totalFixSteps - 1)]);
-                stepFixPts[(totalFixSteps - 1)].easting = vHold.easting;
-                stepFixPts[(totalFixSteps - 1)].northing = vHold.northing;
-            }
-
-            else //distance is exceeded, time to do all calcs and next frame
-            {
-                //positions and headings 
+                if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser -= 3000; ;//userDistance can be reset
                 CalculatePositionHeading();
-
-                //get rid of hold position
-                isFixHoldLoaded = false;
-
-                //don't add the total distance again
-                stepFixPts[(totalFixSteps - 1)].heading = 0;
-
-                //grab sentences for logging
-                if (isLogNMEA) pn.logNMEASentence.Append(recvSentenceSettings);
-
-                //To prevent drawing high numbers of triangles, determine and test before drawing vertex
-                sectionTriggerDistance = glm.Distance(pn.fix, prevSectionPos);
-
-                //section on off and points, contour points
-                if (sectionTriggerDistance > sectionTriggerStepDistance && isJobStarted)
-                {
-                    AddSectionContourPathPoints();
-
-                    //grab fix and elevation
-                    if (isLogElevation) sbFix.Append(pn.fix.easting.ToString("N2") + "," + pn.fix.northing.ToString("N2") + ","
-                                                        + pn.altitude.ToString("N2") + ","
-                                                        + pn.latitude + "," + pn.longitude + "\r\n");
-                }
-
-                //test if travelled far enough for new boundary point
-                double boundaryDistance = glm.Distance(pn.fix, prevBoundaryPos);
-                if (boundaryDistance > 1) AddBoundaryAndPerimiterPoint();
-
-                //calc distance travelled since last GPS fix
-                distance = glm.Distance(pn.fix, prevFix);
-                if ((fd.distanceUser += distance) > 3000) fd.distanceUser = 0; ;//userDistance can be reset
-
-                //most recent fixes are now the prev ones
-                prevFix.easting = pn.fix.easting; prevFix.northing = pn.fix.northing;
-
-                //load up history with valid data
-                for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
-                stepFixPts[0].heading = glm.Distance(pn.fix, stepFixPts[0]);
-                stepFixPts[0].easting = pn.fix.easting;
-                stepFixPts[0].northing = pn.fix.northing;
             }
+
+            //test if travelled far enough for new boundary point
+            if (glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryAndPerimiterPoint();
+
+            //grab sentences for logging
+            if (isLogNMEA) pn.logNMEASentence.Append(recvSentenceSettings);
+
+            //test if travelled far enough for new Section point, To prevent drawing high numbers of triangles
+            if (isJobStarted && glm.Distance(pn.fix, prevSectionPos) > sectionTriggerStepDistance)
+            {
+                AddSectionContourPathPoints();
+                //grab fix and elevation
+                if (isLogElevation) sbFix.Append(pn.fix.easting.ToString("N2") + "," + pn.fix.northing.ToString("N2") + ","
+                                                    + pn.altitude.ToString("N2") + ","
+                                                    + pn.latitude + "," + pn.longitude + "\r\n");
+            }
+            testtest.Stop();
+        
+
+
+
+
+
             #endregion fix
 
             #region AutoSteer
@@ -528,18 +466,26 @@ namespace AgOpenGPS
             switch (headingFromSource)
             {
                 case "Fix":
-                    gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix].easting, pn.fix.northing - stepFixPts[currentStepFix].northing);
-                    if (gpsHeading < 0) gpsHeading += glm.twoPI;
-                    fixHeading = gpsHeading;
+                    fixStepDist = 0;
+                    for (currentStepFix = 0; currentStepFix < totalFixSteps; currentStepFix++)
+                    {
+                        fixStepDist += stepFixPts[currentStepFix].heading;
+                        if (fixStepDist > minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
+                        {
+                            gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix].easting, pn.fix.northing - stepFixPts[currentStepFix].northing);
+                            if (gpsHeading < 0) gpsHeading += glm.twoPI;
+                            fixHeading = gpsHeading;
 
-                    //determine fix positions and heading in degrees for glRotate opengl methods.
-                    int camStep = currentStepFix * 4;
-                    if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
-                    camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
-                    if (camHeading < 0) camHeading += glm.twoPI;
-                    camHeading = glm.toDegrees(camHeading);
+                            //determine fix positions and heading in degrees for glRotate opengl methods.
+                            int camStep = currentStepFix * 4;
+                            if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
+                            camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
+                            if (camHeading < 0) camHeading += glm.twoPI;
+                            camHeading = glm.toDegrees(toolPos.heading);
+                            break;
+                        }
+                    }
                     break;
-
                 case "GPS":
                     //use NMEA headings for camera and tractor graphic
                     fixHeading = glm.toRadians(pn.headingTrue);
@@ -972,13 +918,16 @@ namespace AgOpenGPS
                             isLeftIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].leftPoint);
                             isRightIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].rightPoint);
 
-                            for (int i = 1; i < bnd.bndArr.Count; i++)
+                            for (int i = 0; i < bnd.bndArr.Count; i++)
                             {
-                                //inner boundaries should normally NOT have point inside
-                                if (bnd.bndArr[i].isSet)
+                                if (!bnd.bndArr[i].isOwnField)
                                 {
-                                    isLeftIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
-                                    isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                                    //skip unnecessary boundaries
+                                    if (bnd.bndArr[i].OuterField == bnd.LastBoundary || bnd.bndArr[i].OuterField == -1)
+                                    {
+                                        isLeftIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
+                                        isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                                    }
                                 }
                             }
 
@@ -986,16 +935,22 @@ namespace AgOpenGPS
                             if (isLeftIn && isRightIn) section[j].isInsideBoundary = true;
                             else section[j].isInsideBoundary = false;
                         }
-
                         else
                         {
                             //grab the right of previous section, its the left of this section
                             isLeftIn = isRightIn;
-                            isRightIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].rightPoint);
-                            for (int i = 1; i < bnd.bndArr.Count; i++)
+                            isRightIn = bnd.bndArr[bnd.LastBoundary].IsPointInsideBoundary(section[j].rightPoint);
+                            for (int i = 0; i < bnd.bndArr.Count; i++)
                             {
-                                //inner boundaries should normally NOT have point inside
-                                if (bnd.bndArr[i].isSet) isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                                if (!bnd.bndArr[i].isOwnField)
+                                {
+                                    //skip unnecessary boundaries
+                                    if (bnd.bndArr[i].OuterField == bnd.LastBoundary || bnd.bndArr[i].OuterField == -1)
+                                    {
+                                        //inner boundaries should normally NOT have point inside
+                                        isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                                    }
+                                }
                             }
 
                             if (isLeftIn && isRightIn) section[j].isInsideBoundary = true;
@@ -1027,120 +982,114 @@ namespace AgOpenGPS
         //the start of first few frames to initialize entire program
         private void InitializeFirstFewGPSPositions()
         {
-            if (!isFirstFixPositionSet)
+            //reduce the huge utm coordinates
+            pn.utmEast = (int)(pn.fix.easting);
+            pn.utmNorth = (int)(pn.fix.northing);
+            pn.fix.easting = (int)pn.fix.easting - pn.utmEast;
+            pn.fix.northing = (int)pn.fix.northing - pn.utmNorth;
+
+
+            //calculate the central meridian of current zone
+            pn.centralMeridian = -177 + ((pn.zone - 1) * 6);
+
+            //Azimuth Error - utm declination
+            pn.convergenceAngle = Math.Atan(Math.Sin(glm.toRadians(pn.latitude)) * Math.Tan(glm.toRadians(pn.longitude - pn.centralMeridian)));
+            lblConvergenceAngle.Text = Math.Round(glm.toDegrees(pn.convergenceAngle), 2).ToString();
+
+            //Draw a grid once we know where in the world we are.
+            worldGrid.CreateWorldGrid(0, 0);
+
+
+
+            //in radians
+            fixHeading = Math.Atan2(pn.fix.easting - stepFixPts[totalFixSteps - 1].easting, pn.fix.northing - stepFixPts[totalFixSteps - 1].northing);
+            if (fixHeading < 0) fixHeading += glm.twoPI;
+            toolPos.heading = fixHeading;
+
+            //send out initial zero settings
+            //set up the modules
+            mc.ResetAllModuleCommValues();
+
+            AutoSteerSettingsOutToPort();
+
+            IsBetweenSunriseSunset(pn.latitude, pn.longitude);
+
+            //set display accordingly
+            isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
+
+            lblSunrise.Text = sunrise.ToString("HH:mm");
+            lblSunset.Text = sunset.ToString("HH:mm");
+
+            if (isAutoDayNight)
             {
-                //reduce the huge utm coordinates
-                pn.utmEast = (int)(pn.fix.easting);
-                pn.utmNorth = (int)(pn.fix.northing);
-                pn.fix.easting = pn.fix.easting - pn.utmEast;
-                pn.fix.northing = pn.fix.northing - pn.utmNorth;
-
-                //calculate the central meridian of current zone
-                pn.centralMeridian = -177 + ((pn.zone - 1) * 6);
-
-                //Azimuth Error - utm declination
-                pn.convergenceAngle = Math.Atan(Math.Sin(glm.toRadians(pn.latitude)) * Math.Tan(glm.toRadians(pn.longitude - pn.centralMeridian)));
-                lblConvergenceAngle.Text = Math.Round(glm.toDegrees(pn.convergenceAngle), 2).ToString();
-
-                //Draw a grid once we know where in the world we are.
-                isFirstFixPositionSet = true;
-                worldGrid.CreateWorldGrid(pn.fix.northing, pn.fix.easting);
-
-                //most recent fixes
-                prevFix.easting = pn.fix.easting;
-                prevFix.northing = pn.fix.northing;
-
-                stepFixPts[0].easting = pn.fix.easting;
-                stepFixPts[0].northing = pn.fix.northing;
-                stepFixPts[0].heading = 0;
-
-                //run once and return
-                isFirstFixPositionSet = true;
-
-                //set up the modules
-                mc.ResetAllModuleCommValues();
-
-                AutoSteerSettingsOutToPort();
-
-                return;
+                isDay = isDayTime;
+                isDay = !isDay;
+                SwapDayNightMode();
             }
-
-            else
-            {
-                //most recent fixes
-                prevFix.easting = pn.fix.easting; prevFix.northing = pn.fix.northing;
-
-                //load up history with valid data
-                for (int i = totalFixSteps - 1; i > 0; i--)
-                {
-                    stepFixPts[i].easting = stepFixPts[i - 1].easting;
-                    stepFixPts[i].northing = stepFixPts[i - 1].northing;
-                    stepFixPts[i].heading = stepFixPts[i - 1].heading;
-                }
-
-                stepFixPts[0].heading = glm.Distance(pn.fix, stepFixPts[0]);
-                stepFixPts[0].easting = pn.fix.easting;
-                stepFixPts[0].northing = pn.fix.northing;
-
-                //keep here till valid data
-                if (startCounter > (totalFixSteps/2.0)) isGPSPositionInitialized = true;
-
-                //in radians
-                fixHeading = Math.Atan2(pn.fix.easting - stepFixPts[totalFixSteps - 1].easting, pn.fix.northing - stepFixPts[totalFixSteps - 1].northing);
-                if (fixHeading < 0) fixHeading += glm.twoPI;
-                toolPos.heading = fixHeading;
-
-                //send out initial zero settings
-                if (isGPSPositionInitialized)
-                {
-                    //set up the modules
-                    mc.ResetAllModuleCommValues();
-
-                    AutoSteerSettingsOutToPort();
-
-                    IsBetweenSunriseSunset(pn.latitude, pn.longitude);
-
-                    //set display accordingly
-                    isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
-
-                    lblSunrise.Text = sunrise.ToString("HH:mm");
-                    lblSunset.Text = sunset.ToString("HH:mm");
-
-                    if (isAutoDayNight)
-                    {
-                        isDay = isDayTime;
-                        isDay = !isDay;
-                        SwapDayNightMode();
-                    }
-                }
-                return;
-            }
+            isGPSPositionInitialized = true;
+            return;
         }
 
         public bool IsInsideGeoFence()
         {
-            //first where are we, must be inside outer and outside of inner geofence non drive thru turn borders
-            if (gf.geoFenceArr[0].IsPointInGeoFenceArea(pivotAxlePos))
+            if (bnd.bndArr.Count > 0)
             {
-                for (int i = 1; i < bnd.bndArr.Count; i++)
+                if (bnd.bndArr.Count > bnd.LastBoundary && bnd.LastBoundary >= 0 && gf.geoFenceArr[bnd.LastBoundary].IsPointInGeoFenceArea(pivotAxlePos))
                 {
-                    //make sure not inside a non drivethru boundary
-                    if (!bnd.bndArr[i].isSet) continue;
-                    if (bnd.bndArr[i].isDriveThru) continue;
-                    if (gf.geoFenceArr[i].IsPointInGeoFenceArea(pivotAxlePos))
+                    for (int j = 0; j < bnd.bndArr.Count; j++)
                     {
-                        distancePivotToTurnLine = -3333;
-                        return false;
+                        //make sure not inside a non drivethru boundary
+                        if (!bnd.bndArr[j].isSet || bnd.bndArr[j].isOwnField || bnd.bndArr[j].isDriveThru) continue;
+
+                        //skip unnecessary boundaries
+                        if (bnd.bndArr[j].OuterField == bnd.LastBoundary || bnd.bndArr[j].OuterField == -1)
+                        {
+                            if (gf.geoFenceArr[j].IsPointInGeoFenceArea(pivotAxlePos))
+                            {
+                                distancePivotToTurnLine = -3333;
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+                else
+                {
+                    for (int i = 0; i < bnd.bndArr.Count; i++)
+                    {
+                        if (bnd.bndArr[i].isSet && bnd.bndArr[i].isOwnField)
+                        {
+                            if (gf.geoFenceArr[i].IsPointInGeoFenceArea(pivotAxlePos))
+                            {
+                                for (int j = 0; j < bnd.bndArr.Count; j++)
+                                {
+                                    //make sure not inside a non drivethru boundary
+                                    if (!bnd.bndArr[j].isSet || bnd.bndArr[j].isOwnField || bnd.bndArr[j].isDriveThru) continue;
+
+                                    //skip unnecessary boundaries
+                                    if (bnd.bndArr[j].OuterField == bnd.LastBoundary || bnd.bndArr[j].OuterField == -1)
+                                    {
+                                        if (gf.geoFenceArr[j].IsPointInGeoFenceArea(pivotAxlePos))
+                                        {
+                                            distancePivotToTurnLine = -3333;
+                                            return false;
+                                        }
+                                    }
+                                }
+                                bnd.LastBoundary = i;
+                                return true;
+                            }
+                        }
                     }
                 }
+                distancePivotToTurnLine = -3333;
+                bnd.LastBoundary = -1;
+                return false;
             }
             else
             {
-                distancePivotToTurnLine = -3333;
-                return false;
+                return true;
             }
-            //we are safely inside outer, outside inner boundaries
-            return true;
         }       
 
         // intense math section....   the lat long converted to utm   *********************************************************

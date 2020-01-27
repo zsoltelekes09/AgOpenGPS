@@ -23,6 +23,8 @@ namespace AgOpenGPS
     {
         #region // Class Props and instances
 
+        FormTimedMessage form = new FormTimedMessage();
+
         //list of vec3 points of Dubins shortest path between 2 points - To be converted to RecPt
         public List<vec3> flagDubinsList = new List<vec3>();
 
@@ -67,12 +69,7 @@ namespace AgOpenGPS
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         private readonly Stopwatch swFrame = new Stopwatch();
-
-        private readonly Stopwatch swDraw = new Stopwatch();
-        //swDraw.Reset();
-        //swDraw.Start();
-        //swDraw.Stop();
-        //label3.Text = ((double) swDraw.ElapsedTicks / (double) System.Diagnostics.Stopwatch.Frequency * 1000).ToString();
+        private readonly Stopwatch testtest = new Stopwatch();
 
         //Time to do fix position update and draw routine
 
@@ -93,22 +90,12 @@ namespace AgOpenGPS
         //whether or not to use Stanley control
         public bool isStanleyUsed = true;
 
-        //used to update the screen status bar etc
-        private int displayUpdateHalfSecondCounter = 0, displayUpdateOneSecondCounter = 0, displayUpdateOneFifthCounter = 0, displayUpdateThreeSecondCounter = 0;
-
-        private int threeSecondCounter = 0, threeSeconds = 0;
-        private int oneSecondCounter = 0, oneSecond = 0;
-        private int oneHalfSecondCounter = 0, oneHalfSecond = 0;
-        private int oneFifthSecondCounter = 0, oneFifthSecond = 0;
-
         public int pbarSteer, pbarRelay, pbarUDP;
 
         public double nudNumber = 0;
 
         //used by filePicker Form to return picked file and directory
         public string filePickerFileAndDirectory;
-
-        //private int fiveSecondCounter = 0, fiveSeconds = 0;
 
         //the autoManual drive button. Assume in Auto
         public bool isInAutoDrive = true;
@@ -513,17 +500,22 @@ namespace AgOpenGPS
             baudRateGPS = Settings.Default.setPort_baudRate;
             portNameGPS = Settings.Default.setPort_portNameGPS;
 
-            //try and open
-            SerialPortOpenGPS();
+            baudRateGPS2 = Settings.Default.setPort_baudRate2;
+            portNameGPS2 = Settings.Default.setPort_portNameGPS2;
 
-            if (sp.IsOpen)
+
+
+            if (Settings.Default.setMenu_isSimulatorOn)
             {
-                simulatorOnToolStripMenuItem.Checked = false;
-                panelSim.Visible = false;
-                timerSim.Enabled = false;
-
-                Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
-                Settings.Default.Save();
+                simulatorOnToolStripMenuItem.Checked = true;
+                panelSim.Visible = true;
+                timerSim.Enabled = true;
+            }
+            else
+            {
+                //try and open
+                SerialPortOpenGPS();
+                SerialPortOpenGPS2();
             }
 
             //same for SectionRelay port
@@ -1420,10 +1412,10 @@ namespace AgOpenGPS
             fd.workedAreaTotal = 0;
 
             //reset boundaries
-            bnd.ResetBoundaries();
+            bnd.bndArr.Clear();
 
             //reset turn lines
-            turn.ResetTurnLines();
+            turn.turnArr.Clear();
 
             //reset GUI areas
             fd.UpdateFieldBoundaryGUIAreas();
@@ -1446,10 +1438,9 @@ namespace AgOpenGPS
             //bring up dialog if no job active, close job if one is
             if (!isJobStarted)
             {
-                if (toolStripBtnGPSStength.Image.Height == 64)
+                if (toolStripBtnGPSStength.Image.Height == 40)
                 {
-                    var form = new FormTimedMessage(3000, gStr.gsNoGPS, gStr.gsGPSSourceOff);
-                    form.Show();
+                    TimedMessageBox(3000, gStr.gsNoGPS, gStr.gsGPSSourceOff);
                     return;
                 }
 
@@ -1743,22 +1734,20 @@ namespace AgOpenGPS
                 MessageBox.Show("Error in WriteErrorLog: " + ex.Message, "Error Logging", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-
         //message box pops up with info then goes away
         public void TimedMessageBox(int timeout, string s1, string s2)
         {
-            var form = new FormTimedMessage(timeout, s1, s2);
-            form.Show();
+            form.SetTimedMessage(timeout, s1, s2, this);
         }
     }//class FormGPS
 }//namespace AgOpenGPS
 
 /*The order is:
  *
- * The watchdog timer times out and runs this function tmrWatchdog_tick().
+ * The watchdog timer times out and runs this function ScanForNMEA_Tick().
  * 50 times per second so statusUpdateCounter counts to 25 and updates strip menu etc at 2 hz
  * it also makes sure there is new sentences showing up otherwise it shows **** No GGA....
- * saveCounter ticks 2 x per second, used at end of draw routine every minute to save a backup of field
+ * saveCounter ticks 1 x per second, used at end of draw routine every minute to save a backup of field
  * then ScanForNMEA function checks for a complete sentence if contained in pn.rawbuffer
  * if not it comes right back and waits for next watchdog trigger and starts all over
  * if a new sentence is there, UpdateFix() is called

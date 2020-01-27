@@ -143,7 +143,7 @@
             this.btnSelectCurve.Size = new System.Drawing.Size(82, 85);
             this.btnSelectCurve.TabIndex = 321;
             this.btnSelectCurve.UseVisualStyleBackColor = false;
-            this.btnSelectCurve.Click += new System.EventHandler(this.btnSelectCurve_Click);
+            this.btnSelectCurve.Click += new System.EventHandler(this.BtnSelectCurve_Click);
             // 
             // btnSelectABLine
             // 
@@ -160,7 +160,7 @@
             this.btnSelectABLine.Size = new System.Drawing.Size(82, 85);
             this.btnSelectABLine.TabIndex = 322;
             this.btnSelectABLine.UseVisualStyleBackColor = false;
-            this.btnSelectABLine.Click += new System.EventHandler(this.btnSelectABLine_Click);
+            this.btnSelectABLine.Click += new System.EventHandler(this.BtnSelectABLine_Click);
             // 
             // panel1
             // 
@@ -185,7 +185,7 @@
             this.btnDeleteCurve.Size = new System.Drawing.Size(88, 78);
             this.btnDeleteCurve.TabIndex = 325;
             this.btnDeleteCurve.UseVisualStyleBackColor = false;
-            this.btnDeleteCurve.Click += new System.EventHandler(this.btnDeleteCurve_Click);
+            this.btnDeleteCurve.Click += new System.EventHandler(this.BtnDeleteCurve_Click);
             // 
             // btnDeleteABLine
             // 
@@ -202,7 +202,7 @@
             this.btnDeleteABLine.Size = new System.Drawing.Size(88, 78);
             this.btnDeleteABLine.TabIndex = 326;
             this.btnDeleteABLine.UseVisualStyleBackColor = false;
-            this.btnDeleteABLine.Click += new System.EventHandler(this.btnDeleteABLine_Click);
+            this.btnDeleteABLine.Click += new System.EventHandler(this.BtnDeleteABLine_Click);
             // 
             // lblNumCu
             // 
@@ -268,7 +268,7 @@
             this.btnCancelTouch.Size = new System.Drawing.Size(64, 63);
             this.btnCancelTouch.TabIndex = 331;
             this.btnCancelTouch.UseVisualStyleBackColor = false;
-            this.btnCancelTouch.Click += new System.EventHandler(this.btnCancelTouch_Click);
+            this.btnCancelTouch.Click += new System.EventHandler(this.BtnCancelTouch_Click);
             // 
             // label1
             // 

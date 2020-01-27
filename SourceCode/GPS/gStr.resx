@@ -264,6 +264,12 @@
   <data name="gsBounds" xml:space="preserve">
     <value>Bounds</value>
   </data>
+  <data name="gsYes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="gsNo" xml:space="preserve">
+    <value>No</value>
+  </data>
   <data name="gsBuildingMapWait" xml:space="preserve">
     <value>Building Map, Please Wait</value>
   </data>

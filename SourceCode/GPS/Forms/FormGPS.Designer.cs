@@ -106,7 +106,6 @@
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.simulatorOnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.tmrWatchdog = new System.Windows.Forms.Timer(this.components);
             this.lblNorthing = new System.Windows.Forms.Label();
             this.lblEasting = new System.Windows.Forms.Label();
             this.lblSpeed = new System.Windows.Forms.Label();
@@ -284,6 +283,10 @@
             this.btnZoomOut = new ProXoft.WinForms.RepeatButton();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.HalfSecondUpdate = new System.Windows.Forms.Timer(this.components);
+            this.OneSecondUpdate = new System.Windows.Forms.Timer(this.components);
+            this.ThreeSecondUpdate = new System.Windows.Forms.Timer(this.components);
+            this.NMEAWatchdog = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStripOpenGL.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStripFlag.SuspendLayout();
@@ -910,11 +913,6 @@
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(282, 6);
-            // 
-            // tmrWatchdog
-            // 
-            this.tmrWatchdog.Interval = 15;
-            this.tmrWatchdog.Tick += new System.EventHandler(this.tmrWatchdog_tick);
             // 
             // lblNorthing
             // 
@@ -3442,6 +3440,30 @@
             this.label4.Size = new System.Drawing.Size(44, 19);
             this.label4.TabIndex = 324;
             this.label4.Text = "22.6";
+            //
+            // HalfSecondUpdate
+            // 
+            this.HalfSecondUpdate.Enabled = true;
+            this.HalfSecondUpdate.Interval = 500;
+            this.HalfSecondUpdate.Tick += new System.EventHandler(this.HalfSecond_Update);
+            // 
+            // OneSecondUpdate
+            // 
+            this.OneSecondUpdate.Enabled = true;
+            this.OneSecondUpdate.Interval = 1000;
+            this.OneSecondUpdate.Tick += new System.EventHandler(this.OneSecond_Update);
+            // 
+            // ThreeSecondUpdate
+            // 
+            this.ThreeSecondUpdate.Enabled = true;
+            this.ThreeSecondUpdate.Interval = 2000;
+            this.ThreeSecondUpdate.Tick += new System.EventHandler(this.ThreeSecond_Update);
+            // 
+            // NMEAWatchdog
+            // 
+            this.NMEAWatchdog.Enabled = true;
+            this.NMEAWatchdog.Interval = 15;
+            this.NMEAWatchdog.Tick += new System.EventHandler(this.ScanForNMEA_Tick);
             // 
             // FormGPS
             // 
@@ -3519,7 +3541,6 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.Timer tmrWatchdog;
         private System.Windows.Forms.Button btnSection1Man;
         private System.Windows.Forms.Button btnSection2Man;
         private System.Windows.Forms.Button btnSection3Man;
@@ -3770,6 +3791,10 @@
         private System.Windows.Forms.Label lblLift;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Timer HalfSecondUpdate;
+        private System.Windows.Forms.Timer OneSecondUpdate;
+        private System.Windows.Forms.Timer ThreeSecondUpdate;
+        private System.Windows.Forms.Timer NMEAWatchdog;
     }
 }
 

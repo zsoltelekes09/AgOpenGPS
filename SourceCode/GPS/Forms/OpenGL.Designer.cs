@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -21,7 +20,7 @@ namespace AgOpenGPS
         int mouseX = 0, mouseY = 0;
         public double offX, offY;
         public double lookaheadActual, test2;
-        private int zoomUpdateCounter = 0;
+        private bool zoomUpdateCounter = false;
 
         //data buffer for pixels read from off screen buffer
         byte[] grnPixels = new byte[125001];
@@ -35,7 +34,7 @@ namespace AgOpenGPS
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.CullFace(CullFaceMode.Back);
             SetZoom();
-            tmrWatchdog.Enabled = true;
+            NMEAWatchdog.Enabled = true;
         }
 
         //oglMain needs a resize
@@ -353,9 +352,9 @@ namespace AgOpenGPS
                 //draw the zoom window
                 if (isJobStarted)
                 {
-                    if (threeSeconds != zoomUpdateCounter)
+                    if (zoomUpdateCounter == true && panelBatman.Visible)
                     {
-                        zoomUpdateCounter = threeSeconds;
+                        zoomUpdateCounter = false;
                         oglZoom.Refresh();
                     }
                 }
@@ -449,28 +448,19 @@ namespace AgOpenGPS
             }
 
             //draw bright green on back buffer
-            if (bnd.bndArr.Count > 0)
+            if (bnd.bndArr.Count > bnd.LastBoundary && bnd.LastBoundary >= 0)
             {
-                ////draw the bnd line 
-                int ptCount = bnd.bndArr[0].bndLine.Count;
+                ////draw the perimeter line so far
+                int ptCount = bnd.bndArr[bnd.LastBoundary].bndLine.Count;
                 if (ptCount > 1)
                 {
                     GL.LineWidth(2);
                     GL.Color3(0.0f, 0.99f, 0.0f);
                     GL.Begin(PrimitiveType.LineStrip);
-                    for (int h = 0; h < ptCount; h++) GL.Vertex3(bnd.bndArr[0].bndLine[h].easting, bnd.bndArr[0].bndLine[h].northing, 0);
+                    for (int h = 0; h < ptCount; h++) GL.Vertex3(bnd.bndArr[bnd.LastBoundary].bndLine[h].easting, bnd.bndArr[bnd.LastBoundary].bndLine[h].northing, 0);
                     GL.End();
                 }
             }
-
-            //int ptCount = hdArr.hdLine.Count;
-            //GL.LineWidth(1);
-            //GL.Color3(0.96555f, 0.9232f, 0.50f);
-            ////GL.PointSize(4);
-            //GL.Begin(PrimitiveType.LineStrip);
-            //for (int h = 0; h < ptCount; h++) GL.Vertex3(hdLine[h].easting, hdLine[h].northing, 0);
-            //GL.Vertex3(hdLine[0].easting, hdLine[0].northing, 0);
-            //GL.End();
 
             GL.Flush();
 
@@ -753,9 +743,9 @@ namespace AgOpenGPS
             RelayOutToPort(mc.relayData, CModuleComm.pgnSentenceLength);
 
             //if a couple minute has elapsed save the field in case of crash and to be able to resume            
-            if (saveCounter > 59)       //2 counts per second X 52 seconds = 120 counts per minute.
+            if (saveCounter > 59)       //1 counts per second X 60 seconds = 60 counts per minute.
             {
-                tmrWatchdog.Enabled = false;
+                NMEAWatchdog.Enabled = false;
 
                 if (isJobStarted && toolStripBtnGPSStength.Image.Height == 63)
                 {
@@ -799,7 +789,7 @@ namespace AgOpenGPS
                 isSavingFile = false;
 
                 //go see if data ready for draw and position updates
-                tmrWatchdog.Enabled = true;
+                NMEAWatchdog.Enabled = true;
 
 
             }
@@ -1808,19 +1798,46 @@ namespace AgOpenGPS
             //min max of the boundary
             if (bnd.bndArr.Count > 0)
             {
-                int bndCnt = bnd.bndArr[0].bndLine.Count;
-                for (int i = 0; i < bndCnt; i++)
+                if (bnd.bndArr.Count > bnd.LastBoundary && bnd.LastBoundary >= 0)
                 {
-                    double x = bnd.bndArr[0].bndLine[i].easting;
-                    double y = bnd.bndArr[0].bndLine[i].northing;
-
-                    //also tally the max/min of field x and z
-                    if (minFieldX > x) minFieldX = x;
-                    if (maxFieldX < x) maxFieldX = x;
-                    if (minFieldY > y) minFieldY = y;
-                    if (maxFieldY < y) maxFieldY = y;
+                    int bndCnt = bnd.bndArr[bnd.LastBoundary].bndLine.Count;
+                    for (int i = 0; i < bndCnt; i++)
+                    {
+                        double x = bnd.bndArr[bnd.LastBoundary].bndLine[i].easting;
+                        double y = bnd.bndArr[bnd.LastBoundary].bndLine[i].northing;
+                        //also tally the max/min of field x and z
+                        if (minFieldX > x) minFieldX = x;
+                        if (maxFieldX < x) maxFieldX = x;
+                        if (minFieldY > y) minFieldY = y;
+                        if (maxFieldY < y) maxFieldY = y;
+                    }
                 }
+                else
+                {
+                    for (int i = 0; i < bnd.bndArr.Count; i++)
+                    {
+                        if (bnd.bndArr[i].isSet && bnd.bndArr[i].isOwnField)
+                        {
+                            int bndCnt = bnd.bndArr[i].bndLine.Count;
+                            for (int j = 0; j < bndCnt; j++)
+                            {
+                                double x = bnd.bndArr[i].bndLine[j].easting;
+                                double y = bnd.bndArr[i].bndLine[j].northing;
 
+                                //also tally the max/min of field x and z
+                                if (minFieldX > x) minFieldX = x;
+                                if (maxFieldX < x) maxFieldX = x;
+                                if (minFieldY > y) minFieldY = y;
+                                if (maxFieldY < y) maxFieldY = y;
+                            }
+                        }
+                    }
+                    double zoom = 500;
+                    if (minFieldX < pivotAxlePos.easting - zoom) minFieldX = pivotAxlePos.easting - zoom;
+                    if (maxFieldX > pivotAxlePos.easting + zoom) maxFieldX = pivotAxlePos.easting + zoom;
+                    if (minFieldY < pivotAxlePos.northing - zoom) minFieldY = pivotAxlePos.northing - zoom;
+                    if (maxFieldY > pivotAxlePos.northing + zoom) maxFieldY = pivotAxlePos.northing + zoom;
+                }
             }
             else
             {
@@ -1893,80 +1910,5 @@ namespace AgOpenGPS
             //lblZooom.Text = ((int)(maxFieldDistance)).ToString();
 
         }
-
-        //else
-        //{
-        //    GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-        //    GL.LoadIdentity();
-
-        //    //back the camera up
-        //    GL.CullFace(CullFaceMode.Front);
-        //    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-        //    GL.Enable(EnableCap.Blend);
-
-        //    GL.Translate(0, 0,-250);
-        //    GL.Enable(EnableCap.Texture2D);
-
-        //    GL.BindTexture(TextureTarget.Texture2D, texture[7]);        // Select Our Texture
-        //    GL.Color4(0.952f, 0.70f, 0.23f, 0.6);
-
-        //    GL.Begin(PrimitiveType.Quads);              // Build Quad From A Triangle Strip
-        //    {
-        //        GL.TexCoord2(0, 0);
-        //        GL.Vertex2(-128, 128);
-
-        //        GL.TexCoord2(1, 0);
-        //        GL.Vertex2(128, 128);
-
-        //        GL.TexCoord2(1, 1);
-        //        GL.Vertex2(128, -128);
-
-        //        GL.TexCoord2(0, 1);
-        //        GL.Vertex2(-128, -128);
-        //    }
-        //    GL.End();
-
-        //    GL.BindTexture(TextureTarget.Texture2D, texture[8]);        // Select Our Texture
-        //    double angle = 0;
-        //    if (isMetric)
-        //    {
-        //        double aveSpd = 0;
-        //        for (int c = 0; c < 10; c++) aveSpd += avgSpeed[c];
-        //        aveSpd *= 0.1;
-        //        if (aveSpd > 20) aveSpd = 20;
-        //        angle = (aveSpd - 10) * -15;
-        //    }
-        //    else
-        //    {
-        //        double aveSpd = 0;
-        //        for (int c = 0; c < 10; c++) aveSpd += avgSpeed[c];
-        //        aveSpd *= 0.0621371;
-        //        angle = (aveSpd - 10) * -15;
-        //        if (aveSpd > 20) aveSpd = 20;
-        //    }
-
-        //    GL.Color3(0.952f, 0.70f, 0.23f);
-
-        //    GL.Rotate(angle, 0, 0, 1);
-        //    GL.Begin(PrimitiveType.Quads);              // Build Quad From A Triangle Strip
-        //    {
-        //        GL.TexCoord2(0, 0);
-        //        GL.Vertex2(-80, 80);
-
-        //        GL.TexCoord2(1, 0);
-        //        GL.Vertex2(80, 80);
-
-        //        GL.TexCoord2(1, 1);
-        //        GL.Vertex2(80, -80);
-
-        //        GL.TexCoord2(0, 1);
-        //        GL.Vertex2(-80, -80);
-        //    }
-        //    GL.End();
-
-        //    GL.Disable(EnableCap.Texture2D);
-        //    GL.CullFace(CullFaceMode.Back);
-        //    GL.Disable(EnableCap.Blend);
-        //}
     }
 }

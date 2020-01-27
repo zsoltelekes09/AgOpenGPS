@@ -55,13 +55,12 @@ namespace AgOpenGPS
         //                else
         //                {
         //                    //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-        //                    var form2 = new FormTimedMessage(2000, gStr.gsNoNameEntered, gStr.gsEnterUniqueABCurveName);
-        //                    form2.Show();
+        //                    TimedMessageBox(2000, gStr.gsNoNameEntered, gStr.gsEnterUniqueABCurveName);
         //                }
         //            }
         //            else
         //            {
-        //                var form2 = new FormTimedMessage(2000, gStr.gsNoABCurveCreated, gStr.gsCompleteAnABCurveLineFirst);
+        //                TimedMessageBox(2000, gStr.gsNoABCurveCreated, gStr.gsCompleteAnABCurveLineFirst);
         //                form2.Show();
         //            }
         //        }
@@ -156,6 +155,8 @@ namespace AgOpenGPS
                             writer.WriteLine(curve.curveArr[i].Name);
 
                             //write out the aveheading
+                            //writer.WriteLine(curve.curveArr[i].spiralmode.ToString(CultureInfo.InvariantCulture));
+                            //writer.WriteLine(curve.curveArr[i].circlemode.ToString(CultureInfo.InvariantCulture));
                             writer.WriteLine(curve.curveArr[i].aveHeading.ToString(CultureInfo.InvariantCulture));
 
                             //write out the points of ref line
@@ -240,6 +241,24 @@ namespace AgOpenGPS
                             curve.curveArr[curve.numCurveLines].Name = reader.ReadLine();
                             // get the average heading
                             line = reader.ReadLine();
+                            if (line == "True" || line == "False")
+                            {
+                                curve.curveArr[curve.numCurveLines].spiralmode = bool.Parse(line);
+                                line = reader.ReadLine();
+                            }
+                            else
+                            {
+                                curve.curveArr[curve.numCurveLines].spiralmode = false;
+                            }
+                            if (line == "True" || line == "False")
+                            {
+                                curve.curveArr[curve.numCurveLines].circlemode = bool.Parse(line);
+                                line = reader.ReadLine();
+                            }
+                            else
+                            {
+                                curve.curveArr[curve.numCurveLines].circlemode = false;
+                            }
                             curve.curveArr[curve.numCurveLines].aveHeading = double.Parse(line, CultureInfo.InvariantCulture);
 
                             line = reader.ReadLine();
@@ -271,8 +290,7 @@ namespace AgOpenGPS
                     }
                     catch (Exception er)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsCurveLineFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsCurveLineFileIsCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Curve Line" + er.ToString());
                     }
                 }
@@ -382,8 +400,7 @@ namespace AgOpenGPS
                     }
                     catch (Exception er)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsABLineFileIsCorrupt, "Please delete it!!!");
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsABLineFileIsCorrupt, "Please delete it!!!");
                         WriteErrorLog("FieldOpen, Loading ABLine, Corrupt ABLine File" + er);
                     }
                 }
@@ -518,8 +535,7 @@ namespace AgOpenGPS
                 }
 
                 //little show to say saved and where
-                var form = new FormTimedMessage(3000, gStr.gsSavedInFolder, dirVehicle);
-                form.Show();
+                TimedMessageBox(3000, gStr.gsSavedInFolder, dirVehicle);
             }
 
         }
@@ -564,8 +580,7 @@ namespace AgOpenGPS
                         if (words[0] != "Version")
 
                         {
-                            var form = new FormTimedMessage(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                            form.Show();
+                            TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                             return false;
                         }
 
@@ -575,8 +590,7 @@ namespace AgOpenGPS
 
                         if (fileVersion < 4.0)
                         {
-                            var form = new FormTimedMessage(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                            form.Show();
+                            TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                             return false;
                         }
 
@@ -923,8 +937,7 @@ namespace AgOpenGPS
                 }
 
                 //little show to say saved and where
-                var form = new FormTimedMessage(3000, gStr.gsSavedInFolder, dirTool);
-                form.Show();
+                TimedMessageBox(3000, gStr.gsSavedInFolder, dirTool);
             }
 
         }
@@ -969,8 +982,7 @@ namespace AgOpenGPS
                         if (words[0] != "Version")
 
                         {
-                            var form = new FormTimedMessage(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                            form.Show();
+                            TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                             return false;
                         }
 
@@ -980,8 +992,7 @@ namespace AgOpenGPS
 
                         if (fileVersion < 4.0)
                         {
-                            var form = new FormTimedMessage(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                            form.Show();
+                            TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                             return false;
                         }
 
@@ -1245,8 +1256,7 @@ namespace AgOpenGPS
                 }
 
                 //little show to say saved and where
-                var form = new FormTimedMessage(3000, gStr.gsSavedInFolder, dirEnvironment);
-                form.Show();
+                TimedMessageBox(3000, gStr.gsSavedInFolder, dirEnvironment);
             }
         }
 
@@ -1290,8 +1300,7 @@ namespace AgOpenGPS
                         if (words[0] != "Version")
 
                         {
-                            var form = new FormTimedMessage(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                            form.Show();
+                            TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                             return false;
                         }
 
@@ -1301,8 +1310,7 @@ namespace AgOpenGPS
 
                         if (fileVersion < 4.0)
                         {
-                            var form = new FormTimedMessage(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                            form.Show();
+                            TimedMessageBox(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                             return false;
                         }
 
@@ -1571,9 +1579,8 @@ namespace AgOpenGPS
                 {
                     WriteErrorLog("While Opening Field" + e.ToString());
 
-                    var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                    TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
 
-                    form.Show();
                     JobClose();
                     return;
                 }
@@ -1624,8 +1631,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Sections.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingSectionFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingSectionFile, gStr.gsButFieldIsLoaded);
                 //return;
             }
             else
@@ -1678,8 +1684,7 @@ namespace AgOpenGPS
                     {
                         WriteErrorLog("Section file" + e.ToString());
 
-                        var form = new FormTimedMessage(2000, gStr.gsSectionFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsSectionFileIsCorrupt, gStr.gsButFieldIsLoaded);
                     }
                 }
             }
@@ -1689,8 +1694,7 @@ namespace AgOpenGPS
                     fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Contour.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingContourFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingContourFile, gStr.gsButFieldIsLoaded);
                 //return;
             }
             
@@ -1730,8 +1734,7 @@ namespace AgOpenGPS
                     {
                         WriteErrorLog("Loading Contour file" + e.ToString());
 
-                        var form = new FormTimedMessage(2000, gStr.gsContourFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsContourFileIsCorrupt, gStr.gsButFieldIsLoaded);
                     }
                 }
             }
@@ -1743,8 +1746,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Flags.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingFlagsFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingFlagsFile, gStr.gsButFieldIsLoaded);
             }
 
             else
@@ -1807,8 +1809,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsFlagFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsFlagFileIsCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("FieldOpen, Loading Flags, Corrupt Flag File" + e.ToString());
                     }
                 }
@@ -1819,8 +1820,7 @@ namespace AgOpenGPS
                 fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Boundary.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingBoundaryFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingBoundaryFile, gStr.gsButFieldIsLoaded);
             }
             else
             {
@@ -1856,6 +1856,22 @@ namespace AgOpenGPS
                                 bnd.bndArr[k].isDriveAround = bool.Parse(line);
                                 line = reader.ReadLine(); //number of points
                             }
+                            //Check for latest boundary files, then above line string is num of points
+                            bool turnheading = false;
+
+                            if (line == "True" || line == "False")
+                            {
+                                bnd.bndArr[k].isOwnField = bool.Parse(line);
+                                line = reader.ReadLine(); //number of points
+
+                                bnd.bndArr[k].OuterField = int.Parse(line);
+                                line = reader.ReadLine(); //number of points
+                            }
+                            else if (k == 0)
+                            {
+                                //turnheading = true;
+                                bnd.bndArr[k].isOwnField = true;
+                            }
 
                             int numPoints = int.Parse(line);
 
@@ -1871,10 +1887,10 @@ namespace AgOpenGPS
                                     double.Parse(words[1], CultureInfo.InvariantCulture),
                                     double.Parse(words[2], CultureInfo.InvariantCulture));
 
-                                    //if (turnheading)
-                                    //{
-                                    //    vecPt.heading = vecPt.heading + Math.PI;
-                                    //}
+                                    if (turnheading)
+                                    {
+                                        vecPt.heading = vecPt.heading + Math.PI;
+                                    }
                                     bnd.bndArr[k].bndLine.Add(vecPt);
                                 }
 
@@ -1901,8 +1917,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
 
@@ -1959,8 +1974,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, "Headland File is Corrupt", "But Field is Loaded");
-                        form.Show();
+                        TimedMessageBox(2000, "Headland File is Corrupt", "But Field is Loaded");
                         WriteErrorLog("Load Headland Loop" + e.ToString());
                     }
                 }
@@ -2007,8 +2021,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsRecordedPathFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsRecordedPathFileIsCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Recorded Path" + e.ToString());
                     }
                 }
@@ -2028,8 +2041,7 @@ namespace AgOpenGPS
 
             if (!isJobStarted)
             {
-                using (var form = new FormTimedMessage(3000, gStr.gsFieldNotOpen, gStr.gsCreateNewField))
-                { form.Show(); }
+                TimedMessageBox(3000, gStr.gsFieldNotOpen, gStr.gsCreateNewField);
                 return;
             }
             string myFileName, dirField;
@@ -2076,8 +2088,7 @@ namespace AgOpenGPS
 
             //if (!isJobStarted)
             //{
-            //    using (var form = new FormTimedMessage(3000, "Ooops, Job Not Started", "Start a Job First"))
-            //    { form.Show(); }
+            //    TimedMessageBox(3000, "Ooops, Job Not Started", "Start a Job First")
             //    return;
             //}
 
@@ -2238,7 +2249,8 @@ namespace AgOpenGPS
                 {
                     writer.WriteLine(bnd.bndArr[i].isDriveThru);
                     writer.WriteLine(bnd.bndArr[i].isDriveAround);
-                    //writer.WriteLine(bnd.bndArr[i].isOwnField);
+                    writer.WriteLine(bnd.bndArr[i].isOwnField);
+                    writer.WriteLine(bnd.bndArr[i].OuterField);
 
                     writer.WriteLine(bnd.bndArr[i].bndLine.Count.ToString(CultureInfo.InvariantCulture));
                     if (bnd.bndArr[i].bndLine.Count > 0)

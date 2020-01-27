@@ -380,13 +380,13 @@ namespace AgOpenGPS
             System.Diagnostics.Process.Start(mf.fieldsDirectory + mf.currentFieldDirectory + "\\CurrentPosition.KML");
         }
 
-        private void nudBndOffset_Enter(object sender, EventArgs e)
+        private void NudBndOffset_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void btnGo_Click(object sender, EventArgs e)
+        private void BtnGo_Click(object sender, EventArgs e)
         {
             mf.bnd.createBndOffset = (double)nudBndOffset.Value;
             mf.bnd.isBndBeingMade = true;
@@ -438,7 +438,7 @@ namespace AgOpenGPS
                 }
 
                 //start to read the file
-                string line = null;
+                string line;
                 string coordinates = null;
                 int startIndex;
                 int i = 0;
@@ -466,13 +466,13 @@ namespace AgOpenGPS
                                     if (endIndex == -1)
                                     {
                                         //just add the line
-                                        if (startIndex == -1) coordinates = coordinates + line.Substring(0);
-                                        else coordinates = coordinates + line.Substring(startIndex + 13);
+                                        if (startIndex == -1) coordinates += line.Substring(0);
+                                        else coordinates += line.Substring(startIndex + 13);
                                     }
                                     else
                                     {
-                                        if (startIndex == -1) coordinates = coordinates + line.Substring(0, endIndex);
-                                        else coordinates = coordinates + line.Substring(startIndex + 13, endIndex - (startIndex + 13));
+                                        if (startIndex == -1) coordinates += line.Substring(0, endIndex);
+                                        else coordinates += line.Substring(startIndex + 13, endIndex - (startIndex + 13));
                                         break;
                                     }
                                     line = reader.ReadLine();
@@ -550,7 +550,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnDriveOrExt_Click(object sender, EventArgs e)
+        private void BtnDriveOrExt_Click(object sender, EventArgs e)
         {
             if (btnLoadBoundaryFromGE.Visible == true)
             {

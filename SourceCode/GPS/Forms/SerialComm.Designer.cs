@@ -1,11 +1,12 @@
-﻿//Please, if you use this, share the improvements
-
-using System.IO.Ports;
+﻿using System.IO.Ports;
 using System;
 using System.Windows.Forms;
-using System.Drawing;
 using System.Globalization;
 using AgOpenGPS.Properties;
+using System.Text;
+using System.Threading;
+using System.IO;
+using System.Linq;
 
 namespace AgOpenGPS
 {
@@ -13,6 +14,9 @@ namespace AgOpenGPS
     {
         public static string portNameGPS = "COM GPS";
         public static int baudRateGPS = 4800;
+
+        public static string portNameGPS2 = "COM GPS";
+        public static int baudRateGPS2 = 4800;
 
         public static string portNameRelaySection = "COM Sect";
         public static int baudRateRelaySection = 38400;
@@ -32,13 +36,22 @@ namespace AgOpenGPS
         public bool wasAutoSteerConnectedLastRun = false;
 
         //serial port gps is connected to
-        public SerialPort sp = new SerialPort(portNameGPS, baudRateGPS, Parity.None, 8, StopBits.One);
+        public SerialPort SerialGPS = new SerialPort(portNameGPS, baudRateGPS, Parity.None, 8, StopBits.One);
+        public SerialPort SerialGPS2 = new SerialPort(portNameGPS2, baudRateGPS2, Parity.None, 8, StopBits.One);
 
         //serial port Arduino is connected to
         public SerialPort spRelay = new SerialPort(portNameRelaySection, baudRateRelaySection, Parity.None, 8, StopBits.One);
 
         //serial port AutoSteer is connected to
         public SerialPort spAutoSteer = new SerialPort(portNameAutoSteer, baudRateAutoSteer, Parity.None, 8, StopBits.One);
+
+
+        public byte[] rawBuffer = new byte[500];
+        public byte[] Header = { 0xB5, 0x62 };
+        public int BytesRead = 0;
+        public int MessageLength = 0;
+        int CK_A = 0, CK_B = 0;
+
 
         #region AutoSteerPort // --------------------------------------------------------------------
 
@@ -169,8 +182,50 @@ namespace AgOpenGPS
             }
         }
 
+
+
+
         //called by the AutoSteer module delegate every time a chunk is rec'd
         public double actualSteerAngleDisp = 0;
+
+
+        //the delegate for thread
+        private delegate void LineReceivedEventHandlerAutoSteer(string sentence);
+
+        //Arduino serial port receive in its own thread
+        private void sp_DataReceivedAutoSteer(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            if (spAutoSteer.IsOpen)
+            {
+                if (!Properties.Settings.Default.setAS_isJRK)
+                {
+                    try
+                    {
+                        string sentence = spAutoSteer.ReadLine();
+                        this.BeginInvoke(new LineReceivedEventHandlerAutoSteer(SerialLineReceivedAutoSteer), sentence);
+                    }
+                    //this is bad programming, it just ignores errors until its hooked up again.
+                    catch (Exception ex)
+                    {
+                        WriteErrorLog("AutoSteer Recv" + ex.ToString());
+                    }
+
+                }
+                else   //get 2 byte feedback from pololu
+                {
+                    byte[] buffer = new byte[2];
+                    spAutoSteer.Read(buffer, 0, 2);
+                    int feedback = buffer[0] + 256 * buffer[1];
+
+                    actualSteerAngleDisp = feedback - 2047;
+                    //andreas ortner changed this one
+                    //actualSteerAngleDisp -= (Properties.Settings.Default.setAS_steerAngleOffset - 127) * 5;
+                    actualSteerAngleDisp += (Properties.Settings.Default.setAS_steerAngleOffset - 127) * 5;
+                    actualSteerAngleDisp /= Properties.Settings.Default.setAS_countsPerDegree;
+                    actualSteerAngleDisp *= 100;
+                }
+            }
+        }
 
         private void SerialLineReceivedAutoSteer(string sentence)
         {
@@ -200,49 +255,6 @@ namespace AgOpenGPS
                 int.TryParse(words[4], out mc.steerSwitchValue);
                 mc.workSwitchValue = mc.steerSwitchValue & 1;
                 mc.steerSwitchValue = mc.steerSwitchValue & 2;
-            }
-        }
-
-        //the delegate for thread
-        private delegate void LineReceivedEventHandlerAutoSteer(string sentence);
-
-        //Arduino serial port receive in its own thread
-        private void sp_DataReceivedAutoSteer(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        {
-            if (spAutoSteer.IsOpen)
-            {
-                
-
-
-                if (!Properties.Settings.Default.setAS_isJRK)
-                {
-                    try
-                    {
-                        //System.Threading.Thread.Sleep(25);
-                        string sentence = spAutoSteer.ReadLine();
-                        this.BeginInvoke(new LineReceivedEventHandlerAutoSteer(SerialLineReceivedAutoSteer), sentence);
-                    }
-                    //this is bad programming, it just ignores errors until its hooked up again.
-                    catch (Exception ex)
-                    {
-                        WriteErrorLog("AutoSteer Recv" + ex.ToString());
-                    }
-
-                }
-                else   //get 2 byte feedback from pololu
-
-                {
-
-
-                    byte[] buffer = new byte[2];
-                    spAutoSteer.Read(buffer, 0, 2);
-                    int feedback = buffer[0] + 256 * buffer[1];
-
-                    actualSteerAngleDisp = feedback - 2047;
-                    actualSteerAngleDisp += (Properties.Settings.Default.setAS_steerAngleOffset - 127) * 5;
-                    actualSteerAngleDisp /= Properties.Settings.Default.setAS_countsPerDegree;
-                    actualSteerAngleDisp *= 100;                               
-                }
             }
         }
 
@@ -352,7 +364,7 @@ namespace AgOpenGPS
         public void RelayOutToPort(byte[] items, int numItems)
         {
             //load the uturn byte with the accumulated spacing
-            if (vehicle.treeSpacing != 0) mc.relayData[mc.rdTree] = unchecked((byte)treeTrigger);
+            if (vehicle.treeSpacing != 0) mc.relayData[mc.rdTree] = unchecked((byte)((treeTrigger == true) ? 1 : 0));
 
             //grab the youturn byte
             mc.relayData[mc.rdUTurn] = mc.machineControlData[mc.cnYouTurn];
@@ -403,9 +415,8 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    //System.Threading.Thread.Sleep(25);
                     string sentence = spRelay.ReadLine();
-                    this.BeginInvoke(new LineReceivedEventHandlerRelay(SerialLineReceivedRelay), sentence);                    
+                    this.BeginInvoke(new LineReceivedEventHandlerRelay(SerialLineReceivedRelay), sentence);
                     if (spRelay.BytesToRead > 32) spRelay.DiscardInBuffer();
                 }
                 //this is bad programming, it just ignores errors until its hooked up again.
@@ -473,64 +484,199 @@ namespace AgOpenGPS
 
         #region GPS SerialPort //--------------------------------------------------------------------------
 
-        //called by the GPS delegate every time a chunk is rec'd
-        private void SerialLineReceived(string sentence)
-        {
-            //spit it out no matter what it says
-            pn.rawBuffer += sentence;
-            //recvSentenceSettings = sbNMEAFromGPS.ToString();
-        }
-
-        private delegate void LineReceivedEventHandler(string sentence);
-
         //serial port receive in its own thread
         private void sp_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            if (sp.IsOpen)
+            if (SerialGPS.IsOpen)
             {
                 try
                 {
-                    //give it a sec to spit it out
-                    //System.Threading.Thread.Sleep(2000);
+                    if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "UBX")
+                    {
 
-                    //read whatever is in port
-                    string sentence = sp.ReadExisting();
-                    this.BeginInvoke(new LineReceivedEventHandler(SerialLineReceived), sentence);
+
+                        while (SerialGPS.BytesToRead > 0)
+                        {
+
+
+                            SerialGPS.Read(rawBuffer, BytesRead, 1);
+
+                            if (BytesRead < 2)
+                            {
+                                if (Header[BytesRead] == rawBuffer[BytesRead])
+                                {
+                                    CK_A = 0;
+                                    CK_B = 0;
+                                    BytesRead++;
+                                }
+                                else
+                                {
+                                    BytesRead = 0;
+                                }
+                            }
+                            else
+                            {
+                                if (BytesRead == 5)
+                                {
+                                    MessageLength = BitConverter.ToInt16(rawBuffer, 4);
+                                }
+
+                                if (BytesRead < MessageLength + 6)
+                                {
+                                    CK_A = CK_A + rawBuffer[BytesRead];
+                                    CK_A &= 0xFf;
+                                    CK_B = CK_B + CK_A;
+                                    CK_B &= 0xFf;
+                                }
+                                BytesRead++;
+                                if (BytesRead > (MessageLength + 7))//here ck_B is set
+                                {
+                                    if (CK_A == rawBuffer[MessageLength + 6] && CK_B == rawBuffer[MessageLength + 7])
+                                    {
+                                        string sentence = "";
+
+                                        if (0x01 == rawBuffer[2] && 0x3C == rawBuffer[3])//UBX-NAV-RELPOSNED
+                                        {
+                                            long itow = BitConverter.ToInt32(rawBuffer, 10);
+                                            byte rr = rawBuffer[66];
+                                            if ((rr & (1 << 0)) != 0 && (rr & (1 << 2)) != 0)//gnssFixOK && relPosValid
+                                            {
+                                                double heading = BitConverter.ToInt32(rawBuffer, 30) * 0.00001;
+                                                int roll = (int)(Math.Atan2(BitConverter.ToInt32(rawBuffer, 22) + BitConverter.ToInt32(rawBuffer, 40) / 100, 100) * Math.PI / (double)180 * 16);
+
+                                                //• UBX - NAV - RELPOSNED: The carrSoln flag will be set to 1 for RTK float and 2 for RTK fixed.
+                                                //bit 3 & 4
+                                                //not sure if this is right
+                                                if ((rr & (1 << 3)) != 0)
+                                                {
+                                                    //pn.fixQuality = 4;
+                                                    sentence = "$UBX-RELPOSNED,3," + heading.ToString("N4") + "," + roll.ToString("N4") + "," +itow.ToString() + "*";
+                                                }
+                                                else if ((rr & (1 << 4)) != 0)
+                                                {
+                                                    //pn.fixQuality = 3;
+                                                    sentence = "$UBX-RELPOSNED,4," + heading.ToString("N4") + "," + roll.ToString("N4") + "," + itow.ToString() + "*";
+                                                }
+                                                else
+                                                {
+                                                    //pn.fixQuality = 2;
+                                                    sentence = "$UBX-RELPOSNED,3," + heading.ToString("N4") + "," + roll.ToString("N4") + "," + itow.ToString() + "*";
+                                                }
+                                            }
+                                            else sentence = "$UBX-RELPOSNED,0,0,0," + itow.ToString() + "*";
+                                        }
+                                        else if (0x01 == rawBuffer[2] && 0x14 == rawBuffer[3])//UBX-NAV-HPPOSLLH
+                                        {
+                                            sentence = "$UBX-HPPOSLLH,0,0,0,0*";
+                                            if ((rawBuffer[9] & (1 << 0)) == 0)
+                                            {
+                                                long itow = BitConverter.ToInt32(rawBuffer, 10);
+
+
+
+                                                double longitude = (rawBuffer[30] * 0.01 + BitConverter.ToInt32(rawBuffer, 14)) * 0.0000001;
+                                                double latitude = (rawBuffer[31] * 0.01 + BitConverter.ToInt32(rawBuffer, 18)) * 0.0000001;
+                                                double altitude = (rawBuffer[32] * 0.01 + BitConverter.ToInt32(rawBuffer, 22)) / 1000.0;
+                                                sentence = "$UBX-HPPOSLLH,1," + longitude.ToString("N7") + "," + latitude.ToString("N7") + "," + altitude.ToString("N7") + "," + itow.ToString() + "*";
+                                            }
+                                        }
+
+
+
+                                        if (sentence != "")
+                                        {
+                                            int sum = 0, inx;
+                                            char[] sentence_chars = sentence.ToCharArray();
+                                            char tmp;
+
+                                            for (inx = 1; ; inx++)
+                                            {
+                                                tmp = sentence_chars[inx];
+                                                if (tmp == '*') break;
+                                                sum ^= tmp;
+                                            }
+                                            this.BeginInvoke((MethodInvoker)(() => pn.rawBuffer += (sentence + String.Format("{0:X2}", sum) + "\r\n")));
+                                        }
+                                    }
+                                    MessageLength = 0;
+                                    BytesRead = 0;
+
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string sentence = SerialGPS.ReadExisting();
+                        //this.BeginInvoke(new LineReceivedEventHandler(SerialLineReceived), sentence);
+
+                        this.BeginInvoke((MethodInvoker)(() => pn.rawBuffer += sentence));
+                    }
                 }
                 catch (Exception ex)
                 {
                     WriteErrorLog("GPS Data Recv" + ex.ToString());
-
-                    //MessageBox.Show(ex.Message + "\n\r" + "\n\r" + "Go to Settings -> COM Ports to Fix", "ComPort Failure!");
                 }
             }
         }
+
+        //called by the GPS delegate every time a chunk is rec'd
+        private delegate void LineReceivedEventHandler(string sentence);
+        public void SerialLineReceived(string sentence)
+        {
+            //spit it out no matter what it says
+            pn.rawBuffer += sentence;
+        }
+
+        //serial port receive in its own thread
+        private void sp_DataReceived2(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            if (SerialGPS2.IsOpen)
+            {
+                try
+                {
+                    if (SerialGPS2.BytesToRead > 0)
+                    {
+                        int intBuffer = SerialGPS2.BytesToRead;
+                        byte[] rawBuffer2 = new byte[intBuffer];
+                        SerialGPS2.Read(rawBuffer2, 0, intBuffer);
+                        if (SerialGPS.IsOpen)
+                        {
+                            SerialGPS.Write(rawBuffer2, 0, intBuffer);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WriteErrorLog("GPS Data Recv" + ex.ToString());
+                }
+            }
+        }
+
 
         public void SerialPortOpenGPS()
         {
             //close it first
             SerialPortCloseGPS();
 
-            if (sp.IsOpen)
+            if (Properties.Settings.Default.setMenu_isSimulatorOn)
             {
                 simulatorOnToolStripMenuItem.Checked = false;
                 panelSim.Visible = false;
                 timerSim.Enabled = false;
-
                 Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
                 Settings.Default.Save();
             }
 
-
-            if (!sp.IsOpen)
+            if (!SerialGPS.IsOpen)
             {
-                sp.PortName = portNameGPS;
-                sp.BaudRate = baudRateGPS;
-                sp.DataReceived += sp_DataReceived;
-                sp.WriteTimeout = 1000;
+                SerialGPS.PortName = portNameGPS;
+                SerialGPS.BaudRate = baudRateGPS;
+                SerialGPS.DataReceived += sp_DataReceived;
+                SerialGPS.WriteTimeout = 1000;
             }
 
-            try { sp.Open(); }
+            try { SerialGPS.Open(); }
             catch (Exception)
             {
                 //MessageBox.Show(exc.Message + "\n\r" + "\n\r" + "Go to Settings -> COM Ports to Fix", "No Serial Port Active");
@@ -544,13 +690,13 @@ namespace AgOpenGPS
                 //SettingsPageOpen(0);
             }
 
-            if (sp.IsOpen)
+            if (SerialGPS.IsOpen)
             {
                 //btnOpenSerial.Enabled = false;
 
                 //discard any stuff in the buffers
-                sp.DiscardOutBuffer();
-                sp.DiscardInBuffer();
+                SerialGPS.DiscardOutBuffer();
+                SerialGPS.DiscardInBuffer();
 
                 //update port status label
                 //stripPortGPS.Text = portNameGPS + " " + baudRateGPS.ToString();
@@ -562,12 +708,43 @@ namespace AgOpenGPS
             }
         }
 
+        public void SerialPortOpenGPS2()
+        {
+            //close it first
+            SerialPortCloseGPS2();
+
+
+
+            if (!SerialGPS2.IsOpen)
+            {
+                SerialGPS2.PortName = portNameGPS2;
+                SerialGPS2.BaudRate = baudRateGPS2;
+                SerialGPS2.DataReceived += sp_DataReceived2;
+                SerialGPS2.WriteTimeout = 1000;
+            }
+
+            try { SerialGPS2.Open(); }
+            catch (Exception)
+            {
+            }
+
+            if (SerialGPS2.IsOpen)
+            {
+                SerialGPS2.DiscardOutBuffer();
+                SerialGPS2.DiscardInBuffer();
+
+                Properties.Settings.Default.setPort_portNameGPS2 = portNameGPS2;
+                Properties.Settings.Default.setPort_baudRate2 = baudRateGPS2;
+                Properties.Settings.Default.Save();
+
+            }
+        }
         public void SerialPortCloseGPS()
         {
             //if (sp.IsOpen)
             {
-                sp.DataReceived -= sp_DataReceived;
-                try { sp.Close(); }
+                SerialGPS.DataReceived -= sp_DataReceived;
+                try { SerialGPS.Close(); }
                 catch (Exception e)
                 {
                     WriteErrorLog("Closing GPS Port" + e.ToString());
@@ -578,7 +755,21 @@ namespace AgOpenGPS
                 //stripPortGPS.Text = " * * " + baudRateGPS.ToString();
                 //stripPortGPS.ForeColor = Color.ForestGreen;
                 //stripOnlineGPS.Value = 1;
-                sp.Dispose();
+                SerialGPS.Dispose();
+            }
+        }
+        public void SerialPortCloseGPS2()
+        {
+            //if (sp.IsOpen)
+            {
+                SerialGPS2.DataReceived -= sp_DataReceived2;
+                try { SerialGPS2.Close(); }
+                catch (Exception e)
+                {
+                    WriteErrorLog("Closing GPS Port 2" + e.ToString());
+                    MessageBox.Show(e.Message, "Connection already terminated?");
+                };
+                SerialGPS2.Dispose();
             }
         }
 

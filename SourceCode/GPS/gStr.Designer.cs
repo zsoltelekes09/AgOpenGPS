@@ -419,7 +419,14 @@ namespace AgOpenGPS {
                 return ResourceManager.GetString("gsBaud", resourceCulture);
             }
         }
-        
+        public static string gsBaud2
+        {
+            get
+            {
+                return ResourceManager.GetString("gsBaud2", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Begin.
         /// </summary>
@@ -2365,6 +2372,15 @@ namespace AgOpenGPS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        public static string gsNo {
+            get {
+                return ResourceManager.GetString("gsNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No AB Curve Created.
         /// </summary>
         public static string gsNoABCurveCreated {
@@ -2777,16 +2793,25 @@ namespace AgOpenGPS {
                 return ResourceManager.GetString("gsPolygonsOn", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Port.
         /// </summary>
-        public static string gsPort {
-            get {
+        public static string gsPort
+        {
+            get
+            {
                 return ResourceManager.GetString("gsPort", resourceCulture);
             }
         }
-        
+        public static string gsPort2
+        {
+            get
+            {
+                return ResourceManager.GetString("gsPort2", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Ports.
         /// </summary>
@@ -4127,6 +4152,15 @@ namespace AgOpenGPS {
         public static string gsYaw_ {
             get {
                 return ResourceManager.GetString("gsYaw_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        public static string gsYes {
+            get {
+                return ResourceManager.GetString("gsYes", resourceCulture);
             }
         }
         

@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -43,28 +36,28 @@ namespace AgOpenGPS
             mf.layoutPanelRight.Enabled = false;
         }
 
-        private void nudMinTurnRadius_Enter(object sender, EventArgs e)
+        private void NudMinTurnRadius_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudMinTurnRadius_ValueChanged(object sender, EventArgs e)
+        private void NudMinTurnRadius_ValueChanged(object sender, EventArgs e)
         {
             snapAdj = (double)nudMinTurnRadius.Value * 0.01;
         }
 
-        private void btnAdjRight_Click(object sender, EventArgs e)
+        private void BtnAdjRight_Click(object sender, EventArgs e)
         {
             mf.curve.MoveABCurve(snapAdj);
         }
 
-        private void btnAdjLeft_Click(object sender, EventArgs e)
+        private void BtnAdjLeft_Click(object sender, EventArgs e)
         {
             mf.curve.MoveABCurve(-snapAdj);
         }
 
-        private void bntOk_Click(object sender, EventArgs e)
+        private void BntOk_Click(object sender, EventArgs e)
         {
             mf.curve.isEditing = false;
 
@@ -93,7 +86,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             mf.curve.isEditing = false;
             int last = mf.curve.numCurveLineSelected;
@@ -116,7 +109,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnSwapAB_Click(object sender, EventArgs e)
+        private void BtnSwapAB_Click(object sender, EventArgs e)
         {
             int cnt = mf.curve.refList.Count;
             if (cnt > 0)
@@ -143,7 +136,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnContourPriority_Click(object sender, EventArgs e)
+        private void BtnContourPriority_Click(object sender, EventArgs e)
         {
             if (mf.curve.isBtnCurveOn)
             {
@@ -151,7 +144,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnRightHalfWidth_Click(object sender, EventArgs e)
+        private void BtnRightHalfWidth_Click(object sender, EventArgs e)
         {
             double dist = mf.tool.toolWidth - mf.tool.toolOverlap;
 
@@ -159,7 +152,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnLeftHalfWidth_Click(object sender, EventArgs e)
+        private void BtnLeftHalfWidth_Click(object sender, EventArgs e)
         {
             double dist = mf.tool.toolWidth - mf.tool.toolOverlap;
 

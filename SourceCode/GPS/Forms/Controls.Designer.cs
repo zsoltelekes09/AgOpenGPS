@@ -185,8 +185,7 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    var form = new FormTimedMessage(2000,(gStr.gsNoGuidanceLines),(gStr.gsTurnOnContourOrMakeABLine));
-                    form.Show();
+                    TimedMessageBox(2000, gStr.gsNoGuidanceLines, gStr.gsTurnOnContourOrMakeABLine);
                 }
             }
         }
@@ -194,8 +193,7 @@ namespace AgOpenGPS
         {
             if (ct.isContourBtnOn)
             {
-                var form = new FormTimedMessage(2000, (gStr.gsContourOn), (gStr.gsTurnOffContourFirst));
-                form.Show();
+                TimedMessageBox(2000, gStr.gsContourOn, gStr.gsTurnOffContourFirst);
                 return;
             }
 
@@ -434,8 +432,7 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    var form = new FormTimedMessage(2000, (gStr.gsNoGuidanceLines), (gStr.gsTurnOnContourOrMakeABLine));
-                    form.Show();
+                    TimedMessageBox(2000, gStr.gsNoGuidanceLines, gStr.gsTurnOnContourOrMakeABLine);
                 }
             }
         }
@@ -463,8 +460,7 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    var form = new FormTimedMessage(2000, (gStr.gsNoGuidanceLines), (gStr.gsTurnOnContourOrMakeABLine));
-                    form.Show();
+                    TimedMessageBox(2000, gStr.gsNoGuidanceLines, gStr.gsTurnOnContourOrMakeABLine);
                 }
             }
 
@@ -494,8 +490,8 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    var form = new FormTimedMessage(2000, (gStr.gsNoGuidanceLines), (gStr.gsTurnOnContourOrMakeABLine));
-                    form.Show();
+
+                    TimedMessageBox(2000, gStr.gsNoGuidanceLines, gStr.gsTurnOnContourOrMakeABLine);
                 }
             }
         }
@@ -922,7 +918,7 @@ namespace AgOpenGPS
             }
             else
             {
-                var form = new FormTimedMessage(1500, gStr.gsNoABLineActive, gStr.gsPleaseEnterABLine);
+                TimedMessageBox(1500, gStr.gsNoABLineActive, gStr.gsPleaseEnterABLine);
                 return;
             }
         }
@@ -948,8 +944,7 @@ namespace AgOpenGPS
             }
             else
             {
-                var form = new FormTimedMessage(1500, gStr.gsNoABLineActive, gStr.gsPleaseEnterABLine);
-                form.Show();
+                TimedMessageBox(1500, gStr.gsNoABLineActive, gStr.gsPleaseEnterABLine);
                 layoutPanelRight.Enabled = true;
                 ABLine.isEditing = false;
                 return;
@@ -1010,109 +1005,7 @@ namespace AgOpenGPS
                 else btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
             }
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            string fileAndDirectory;
-            {
-                //create the dialog instance
-                OpenFileDialog ofd = new OpenFileDialog
-                {
-                    //set the filter to text KML only
-                    Filter = "KML files (*.KML)|*.KML",
 
-                    //the initial directory, fields, for the open dialog
-                    InitialDirectory = fieldsDirectory + currentFieldDirectory
-                };
-
-                //was a file selected
-                if (ofd.ShowDialog() == DialogResult.Cancel) return;
-                else fileAndDirectory = ofd.FileName;
-            }
-
-            //start to read the file
-            string line = null;
-            string coordinates = null;
-            int startIndex;
-            //int i = 0;
-
-            using (System.IO.StreamReader reader = new System.IO.StreamReader(fileAndDirectory))
-            {
-                try
-                {
-                    while (!reader.EndOfStream)
-                    {
-                        line = reader.ReadLine();
-
-                        startIndex = line.IndexOf("<coordinates>");
-
-                        if (startIndex != -1)
-                        {
-                            while (true)
-                            {
-                                int endIndex = line.IndexOf("</coordinates>");
-
-                                if (endIndex == -1)
-                                {
-                                    //just add the line
-                                    if (startIndex == -1) coordinates = coordinates + line.Substring(0);
-                                    else coordinates = coordinates + line.Substring(startIndex + 13);
-                                }
-                                else
-                                {
-                                    if (startIndex == -1) coordinates = coordinates + line.Substring(0, endIndex);
-                                    else coordinates = coordinates + line.Substring(startIndex + 13, endIndex - (startIndex + 13));
-                                    break;
-                                }
-                                line = reader.ReadLine();
-                                line = line.Trim();
-                                startIndex = -1;
-                            }
-
-                            line = coordinates;
-                            char[] delimiterChars = { ' ', '\t', '\r', '\n' };
-                            
-                            string[] numberSets = line.Split(delimiterChars);
-
-
-                            //at least 3 points
-                            if (numberSets.Length > 1)
-                            {
-                                double latK, lonK;
-                                string[] item = numberSets[1].Split(',');
-
-                                double.TryParse(item[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out lonK);
-                                double.TryParse(item[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out latK);
-                                double[] xy = pn.DecDeg2UTM(latK, lonK);
-
-                                //match new fix to current position
-                                double easting = xy[0] - pn.utmEast;
-                                double northing = xy[1] - pn.utmNorth;
-
-                                double east = easting;
-                                double nort = northing;
-
-                                //fix the azimuth error
-                                easting = (Math.Cos(-pn.convergenceAngle) * east) - (Math.Sin(-pn.convergenceAngle) * nort);
-                                northing = (Math.Sin(-pn.convergenceAngle) * east) + (Math.Cos(-pn.convergenceAngle) * nort);
-
-                                //add the point to boundary
-                                vec3 bndPt = new vec3(easting, northing, 0);
-                                //mf.bnd.bndArr[i].bndLine.Add(bndPt);
-                                int nextflag = flagPts.Count + 1;
-                                CFlag flagPt = new CFlag(latK, lonK, easting, northing, 0, flagColor, nextflag);
-                                flagPts.Add(flagPt);
-                                //FileSaveFlags();
-
-                            }
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-            }
-        }
         private void btnFullScreen_Click(object sender, EventArgs e)
         {
             isFullScreen = !isFullScreen;
@@ -1401,8 +1294,7 @@ namespace AgOpenGPS
             }
             else
             {
-                var form = new FormTimedMessage(1500, gStr.gsFieldNotOpen, gStr.gsStartNewField);
-                form.Show();
+                TimedMessageBox(1500, gStr.gsFieldIsOpen, gStr.gsStartNewField);
             }
         }
         private void treePlantToolStrip_Click(object sender, EventArgs e)
@@ -1585,8 +1477,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
 
@@ -1632,17 +1523,79 @@ namespace AgOpenGPS
 
             if (result == DialogResult.OK)
             {
-                MessageBox.Show(gStr.gsProgramWillExitPleaseRestart, gStr.gsProgramWillExitPleaseRestart);
-                if (isJobStarted) JobClose();
-                Application.Exit();
+
+
+
+                if (isJobStarted)
+                {
+                    FileOpenField("Resume");
+                }
+                else
+                {
+
+                    pn.latitude = sim.latitude;
+                    pn.longitude = sim.longitude;
+
+                    double[] xy = pn.DecDeg2UTM(pn.latitude, pn.longitude);
+
+                    pn.actualEasting = xy[0];
+                    pn.actualNorthing = xy[1];
+
+                    //reset the offsets
+                    pn.utmEast = (int)pn.actualEasting;
+                    pn.utmNorth = (int)pn.actualNorthing;
+
+                    pn.fix.easting = (int)pn.actualEasting - pn.utmEast;
+                    pn.fix.northing = (int)pn.actualNorthing - pn.utmNorth;
+
+
+                    worldGrid.CreateWorldGrid(0, 0);
+
+                    pn.zone = Math.Floor((pn.longitude + 180.0) * 0.16666666666666666666666666666667) + 1;
+
+                    //calculate the central meridian of current zone
+                    pn.centralMeridian = -177 + ((pn.zone - 1) * 6);
+
+                    //Azimuth Error - utm declination
+                    pn.convergenceAngle = Math.Atan(Math.Sin(glm.toRadians(pn.latitude))
+                                                * Math.Tan(glm.toRadians(pn.longitude - pn.centralMeridian)));
+                    lblConvergenceAngle.Text = Math.Round(glm.toDegrees(pn.convergenceAngle), 3).ToString();
+
+
+                    //reset so it doesnt jump for program?
+
+                    stepFixPts[0].easting = pn.fix.easting;
+                    stepFixPts[0].northing = pn.fix.northing;
+                    stepFixPts[0].heading = 0;
+                }
+
+
+
+
+                //Reset the sim
+                sim.steerAngleScrollBar = 0;
+                hsbarSteerAngle.Value = 300;
+                btnResetSteerAngle.Text = 0.ToString("N1");
+                sim.headingTrue = 0;
+                sim.stepDistance = 0.2;
+                sim.speed = 0.6;
+                hsbarStepDistance.Value = 1;
+
+
+
+                //MessageBox.Show(gStr.gsProgramWillExitPleaseRestart, gStr.gsProgramWillExitPleaseRestart);
+                //if (isJobStarted) JobClose();
+                //Application.Exit();
+
+                //Application.Restart();
+                //Environment.Exit(0);
             }
         }
         private void topMenuLoadVehicle_Click(object sender, EventArgs e)
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             if (FileOpenVehicle())
@@ -1669,8 +1622,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             if (FileOpenTool())
@@ -1692,8 +1644,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
 
@@ -1831,8 +1782,8 @@ namespace AgOpenGPS
         }
         private void simulatorOnToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            if (sp.IsOpen)
+            
+            if (SerialGPS.IsOpen)
             {
                 simulatorOnToolStripMenuItem.Checked = false;
                 panelSim.Visible = false;
@@ -1851,17 +1802,19 @@ namespace AgOpenGPS
                 {
                     panelSim.Visible = true;
                     timerSim.Enabled = true;
-                    DialogResult result3 = MessageBox.Show(gStr.gsAgOpenGPSWillExitPlzRestart, gStr.gsTurningOnSimulator ,MessageBoxButtons.OK);
-                    Application.Exit();
+                    TimedMessageBox(2000, gStr.gsTurningOnSimulator, gStr.gsTurningOnSimulator);
+                    //DialogResult result3 = MessageBox.Show(gStr.gsAgOpenGPSWillExitPlzRestart, gStr.gsTurningOnSimulator ,MessageBoxButtons.OK);
+                    //Application.Exit();
 
                 }
                 else
                 {
                     panelSim.Visible = false;
                     timerSim.Enabled = false;
-                    //TimedMessageBox(3000, "Simulator Turning Off", "Application will Exit");
-                    DialogResult result3 = MessageBox.Show(gStr.gsAgOpenGPSWillExitPlzRestart, gStr.gsTurningOffSimulator, MessageBoxButtons.OK);
-                    Application.Exit();
+                    TimedMessageBox(2000, gStr.gsTurningOffSimulator, gStr.gsTurningOffSimulator);
+
+                    //DialogResult result3 = MessageBox.Show(gStr.gsAgOpenGPSWillExitPlzRestart, gStr.gsTurningOffSimulator, MessageBoxButtons.OK);
+                    //Application.Exit();
                 }
             }
 
@@ -2109,10 +2062,10 @@ namespace AgOpenGPS
         }
 
         //Sim controls
-        private void timerSim_Tick(object sender, EventArgs e)
+        private void timerSim_Tick(object sender, EventArgs e) 
         {
             //if a GPS is connected disable sim
-            if (!sp.IsOpen)
+            if (!SerialGPS.IsOpen)
             {
                 if (isAutoSteerBtnOn && (guidanceLineDistanceOff != 32000)) sim.DoSimTick(guidanceLineSteerAngle * 0.01);
                 else if (recPath.isDrivingRecordedPath) sim.DoSimTick(guidanceLineSteerAngle * 0.01);
@@ -2133,10 +2086,18 @@ namespace AgOpenGPS
         {
             sim.steerAngleScrollBar = 0;
             hsbarSteerAngle.Value = 300;
-            btnResetSteerAngle.Text = sim.steerAngleScrollBar.ToString("N1");
+            btnResetSteerAngle.Text = 0.ToString("N1");
         }
         private void btnResetSim_Click(object sender, EventArgs e)
         {
+            sim.steerAngleScrollBar = 0;
+            hsbarSteerAngle.Value = 300;
+            btnResetSteerAngle.Text = 0.ToString("N1");
+            sim.headingTrue = 0;
+            sim.stepDistance = 0.2;
+            sim.speed = 0.6;
+            hsbarStepDistance.Value = 1;
+
             sim.latitude = Properties.Settings.Default.setGPS_SimLatitude;
             sim.longitude = Properties.Settings.Default.setGPS_SimLongitude;
         }
@@ -2146,8 +2107,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("en");
@@ -2159,8 +2119,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("de");
@@ -2172,8 +2131,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("ru");
@@ -2184,8 +2142,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("nl");
@@ -2196,8 +2153,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("es");
@@ -2208,8 +2164,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("fr");
@@ -2220,8 +2175,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("it");
@@ -2232,8 +2186,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("uk");
@@ -2244,8 +2197,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                var form = new FormTimedMessage(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
             SetLanguage("sk");

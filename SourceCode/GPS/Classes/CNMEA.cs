@@ -1,6 +1,4 @@
-﻿//Please, if you use this, share the improvements
-
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text;
 
@@ -138,7 +136,7 @@ Field	Meaning
         public double zone;
         public double centralMeridian, convergenceAngle;
 
-        public bool updatedGGA, updatedOGI, updatedRMC;
+        public bool UpdatedLatLon;
 
         public string rawBuffer = "";
         private string[] words;
@@ -202,6 +200,8 @@ Field	Meaning
             fix.easting = (Math.Cos(-convergenceAngle) * east) - (Math.Sin(-convergenceAngle) * nort);
             fix.northing = (Math.Sin(-convergenceAngle) * east) + (Math.Cos(-convergenceAngle) * nort);
 
+            UpdatedLatLon = true;
+
             //east = fix.easting;
             //nort = fix.northing;
 
@@ -210,7 +210,7 @@ Field	Meaning
             //fix.northing = (Math.Sin(convergenceAngle) * east) + (Math.Cos(convergenceAngle) * nort);
         }
 
-        public void ParseNMEA()
+        public void ParseNMEA() 
         {
             if (rawBuffer == null) return;
 
@@ -237,7 +237,6 @@ Field	Meaning
             dollar = rawBuffer.IndexOf("$", StringComparison.Ordinal);
             if (cr == -1 || dollar == -1) return;
 
-            //mf.recvSentenceSettings = rawBuffer;
 
             //now we have a complete sentence or more somewhere in the portData
             while (true)
@@ -245,6 +244,7 @@ Field	Meaning
                 //extract the next NMEA single sentence
                 nextNMEASentence = Parse();
                 if (nextNMEASentence == null) return;
+                mf.recvSentenceSettings += nextNMEASentence;
 
                 //parse them accordingly
                 words = nextNMEASentence.Split(',');
@@ -257,6 +257,9 @@ Field	Meaning
                 if (words[0] == "$PAOGI") ParseOGI();
                 if (words[0] == "$PTNL") ParseAVR();
                 if (words[0] == "$GNTRA") ParseTRA();
+                if (words[0] == "$UBX-RELPOSNED") ParseRELPOSNED();
+                if (words[0] == "$UBX-HPPOSLLH") ParsePPOSLLH();
+                if (words[0] == "$UBX-PVT") ParsePVT();
 
             }// while still data
         }
@@ -265,6 +268,46 @@ Field	Meaning
         private double P = 1.0;
         private readonly double varRoll = 0.1; // variance, smaller, more faster filtering
         private readonly double varProcess = 0.0003;
+
+
+        // Returns a valid NMEA sentence from the pile from portData
+        public string Parse()
+        {
+            string sentence;
+            do
+            {
+                //double check for valid sentence
+                // Find start of next sentence
+                int start = rawBuffer.IndexOf("$", StringComparison.Ordinal);
+                if (start == -1) return null;
+                rawBuffer = rawBuffer.Substring(start);
+
+                // Find end of sentence
+                int end = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
+                if (end == -1) return null;
+
+                //the NMEA sentence to be parsed
+                sentence = rawBuffer.Substring(0, end + 1);
+
+                //remove the processed sentence from the rawBuffer
+                rawBuffer = rawBuffer.Substring(end + 1);
+            }
+
+            //if sentence has valid checksum, its all good
+            while (!ValidateChecksum(sentence));
+
+            //do we want to log? Grab before pieces are missing
+            if (mf.isLogNMEA && nmeaCntr++ > 3)
+            {
+                logNMEASentence.Append(sentence);
+                nmeaCntr = 0;
+            }
+
+            // Remove trailing checksum and \r\n and return
+            sentence = sentence.Substring(0, sentence.IndexOf("*", StringComparison.Ordinal));
+
+            return sentence;
+        }
 
         private void ParseAVR()
         {
@@ -318,44 +361,71 @@ Field	Meaning
                 }
             }
         }
-
-        // Returns a valid NMEA sentence from the pile from portData
-        public string Parse()
+        private void ParseRELPOSNED()
         {
-            string sentence;
-            do
+            if (!String.IsNullOrEmpty(words[1]))
             {
-                //double check for valid sentence
-                // Find start of next sentence
-                int start = rawBuffer.IndexOf("$", StringComparison.Ordinal);
-                if (start == -1) return null;
-                rawBuffer = rawBuffer.Substring(start);
+                //sentence = "$UBX-RELPOSNED,4,heading,roll";
+                if (words[1] == "0")//bad quality
+                {
+                    //headingHDT = 9999;
+                    mf.ahrs.rollX16 = 9999;
+                    //UpdatedHeading = true;
+                }
+                else
+                {
+                    double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out headingHDT);
+                    double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
 
-                // Find end of sentence
-                int end = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
-                if (end == -1) return null;
+                    mf.ahrs.rollX16 = (int)(nRoll * 16);
+                    //UpdatedHeading = true;
+                }
 
-                //the NMEA sentence to be parsed
-                sentence = rawBuffer.Substring(0, end + 1);
 
-                //remove the processed sentence from the rawBuffer
-                rawBuffer = rawBuffer.Substring(end + 1);
+                // double.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
+
             }
-
-            //if sentence has valid checksum, its all good
-            while (!ValidateChecksum(sentence));
-
-            //do we want to log? Grab before pieces are missing
-            if (mf.isLogNMEA && nmeaCntr++ > 3)
+        }
+        private void ParsePVT()
+        {
+            if (!String.IsNullOrEmpty(words[1]))
             {
-                logNMEASentence.Append(sentence);
-                nmeaCntr = 0;
+                //sentence = "$UBX-PVT,1,satellitesTracked,pdop,fixtype"
+                if (words[1] != "0")
+                {
+                    int.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
+                    //fixQuality
+
+                    //satellites tracked
+                    int.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
+
+                    //hdop
+                    double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out hdop);
+                }
+
+
+                // double.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
+
             }
+        }
+        private void ParsePPOSLLH()
+        {
+            if (!String.IsNullOrEmpty(words[1]))//bad quality
+            {
+                if (words[1] == "0")
+                {
+                }
+                else
+                {
+                    int.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
+                    //sentence = "$UBX-HPPOSLLH,1,longitude,latitude,altitude";
+                    double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out longitude);
+                    double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
+                    double.TryParse(words[4], NumberStyles.Float, CultureInfo.InvariantCulture, out altitude);
 
-            // Remove trailing checksum and \r\n and return
-            sentence = sentence.Substring(0, sentence.IndexOf("*", StringComparison.Ordinal));
-
-            return sentence;
+                    UpdateNorthingEasting();
+                }
+            }
         }
 
         //The indivdual sentence parsing
@@ -413,8 +483,6 @@ Field	Meaning
                 //age of differential
                 double.TryParse(words[11], NumberStyles.Float, CultureInfo.InvariantCulture, out ageDiff);
 
-                updatedGGA = true;
-                mf.recvCounter = 0;
             }
         }
 
@@ -492,9 +560,6 @@ Field	Meaning
                 //is imu valid fusion
                 isValidIMU = words[18] == "T";
 
-                //update the watchdog
-                mf.recvCounter = 0;
-                updatedOGI = true;
 
                 //average the speed
                 mf.avgSpeed[mf.ringCounter] = speed;
@@ -549,9 +614,8 @@ Field	Meaning
                 double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
                 // Console.WriteLine(nRoll);
 
-                int trasolution;
 
-                int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out trasolution);
+                int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out int trasolution);
                 if (trasolution != 4) nRoll = 0;
                 // Console.WriteLine(trasolution);
                 if (mf.ahrs.isRollFromGPS)
@@ -628,8 +692,6 @@ Field	Meaning
                     }
                 }
 
-                mf.recvCounter = 0;
-                updatedRMC = true;
 
                 mf.avgSpeed[mf.ringCounter] = speed;
                 if (mf.ringCounter++ > 8) mf.ringCounter = 0;
@@ -724,7 +786,7 @@ Field	Meaning
         public double[] DecDeg2UTM(double latitude, double longitude)
         {
             //only calculate the zone once!
-            if (!mf.isFirstFixPositionSet) zone = Math.Floor((longitude + 180.0) * 0.16666666666666666666666666666667) + 1;
+            if (!mf.isGPSPositionInitialized) zone = Math.Floor((longitude + 180.0) * 0.16666666666666666666666666666667) + 1;
 
             double[] xy = MapLatLonToXY(latitude * 0.01745329251994329576923690766743,
                                         longitude * 0.01745329251994329576923690766743,
@@ -786,7 +848,6 @@ Field	Meaning
 //                    }
 
 //                    //update the receive counter that detects loss of communication
-//                    mainForm.recvCounter = 0;
 //                    //update that RMC data is newly updated
 //                    updatedRMC = true;
 //                }//end $GPRMC

@@ -28,6 +28,8 @@ namespace AgOpenGPS
             isSet = false;
             isDriveAround = false;
             isDriveThru = false;
+            isOwnField = false;
+            OuterField = -1;
         }
 
         //list of coordinates of boundary line
@@ -40,7 +42,8 @@ namespace AgOpenGPS
         public double area;
 
         //boundary variables
-        public bool isSet, isDriveAround, isDriveThru;
+        public int OuterField;
+        public bool isSet, isOwnField, isDriveAround, isDriveThru;
 
         public void CalculateBoundaryHeadings()
         {
@@ -93,7 +96,7 @@ namespace AgOpenGPS
             if (bndNum == 0)
             {
                 //outside an outer boundary means its wound clockwise
-                if (!IsPointInsideBoundary(point)) ReverseWinding();
+                if (IsPointInsideBoundary(point)) ReverseWinding();
             }
             else
             {
@@ -250,7 +253,7 @@ namespace AgOpenGPS
             GL.LineWidth(2);
             int ptCount = bndLine.Count;
             //if (isDriveThru) GL.Color3(0.25f, 0.752f, 0.860f);
-            //else 
+            //else
             GL.Begin(PrimitiveType.Lines);
             for (int h = 0; h < ptCount; h++) GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
             //GL.Color3(0.95f, 0.972f, 0.90f);

@@ -12,7 +12,7 @@ namespace AgOpenGPS
         /// <summary>
         /// array of boundaries
         /// </summary>
-        /// 
+        ///
         public List<CBoundaryLines> bndArr = new List<CBoundaryLines>();
         public List<vec3> bndBeingMadePts = new List<vec3>();
 
@@ -26,16 +26,17 @@ namespace AgOpenGPS
         public CBoundary(FormGPS _f)
         {
             mf = _f;
-            boundarySelected = 0;
+            boundarySelected = -1;
             scanWidth = 1.0;
             boxLength = 2000;
-             //boundaries array
-    }
+            LastBoundary = 0;
+            //boundaries array
+        }
 
         // the list of possible bounds points
         public List<vec4> bndClosestList = new List<vec4>();
 
-        public int boundarySelected, closestBoundaryNum;
+        public int boundarySelected, LastBoundary, closestBoundaryNum;
 
         //generated box for finding closest point
         public vec2 boxA = new vec2(9000, 9000), boxB = new vec2(9000, 9002);
@@ -91,34 +92,39 @@ namespace AgOpenGPS
             //determine if point is inside bounding box
             bndClosestList.Clear();
             vec4 inBox;
-            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+            for (int i = 0; i < bndArr.Count; i++)
             {
                 //skip the drive thru
-                if (bndArr[i].isDriveThru) continue;
+                if (!bndArr[i].isOwnField && bndArr[i].isDriveThru) continue;
 
-                ptCount = bndArr[i].bndLine.Count;
-                for (int p = 0; p < ptCount; p++)
+                //skip unnecessary boundaries
+                if (bndArr[i].OuterField == LastBoundary || bndArr[i].OuterField == -1)
                 {
-                    if ((((boxB.easting - boxA.easting) * (bndArr[i].bndLine[p].northing - boxA.northing))
-                            - ((boxB.northing - boxA.northing) * (bndArr[i].bndLine[p].easting - boxA.easting))) < 0) { continue; }
 
-                    if ((((boxD.easting - boxC.easting) * (bndArr[i].bndLine[p].northing - boxC.northing))
-                            - ((boxD.northing - boxC.northing) * (bndArr[i].bndLine[p].easting - boxC.easting))) < 0) { continue; }
+                    ptCount = bndArr[i].bndLine.Count;
+                    for (int p = 0; p < ptCount; p++)
+                    {
+                        if ((((boxB.easting - boxA.easting) * (bndArr[i].bndLine[p].northing - boxA.northing))
+                                - ((boxB.northing - boxA.northing) * (bndArr[i].bndLine[p].easting - boxA.easting))) < 0) { continue; }
 
-                    if ((((boxC.easting - boxB.easting) * (bndArr[i].bndLine[p].northing - boxB.northing))
-                            - ((boxC.northing - boxB.northing) * (bndArr[i].bndLine[p].easting - boxB.easting))) < 0) { continue; }
+                        if ((((boxD.easting - boxC.easting) * (bndArr[i].bndLine[p].northing - boxC.northing))
+                                - ((boxD.northing - boxC.northing) * (bndArr[i].bndLine[p].easting - boxC.easting))) < 0) { continue; }
 
-                    if ((((boxA.easting - boxD.easting) * (bndArr[i].bndLine[p].northing - boxD.northing))
-                            - ((boxA.northing - boxD.northing) * (bndArr[i].bndLine[p].easting - boxD.easting))) < 0) { continue; }
+                        if ((((boxC.easting - boxB.easting) * (bndArr[i].bndLine[p].northing - boxB.northing))
+                                - ((boxC.northing - boxB.northing) * (bndArr[i].bndLine[p].easting - boxB.easting))) < 0) { continue; }
 
-                    //it's in the box, so add to list
-                    inBox.easting = bndArr[i].bndLine[p].easting;
-                    inBox.northing = bndArr[i].bndLine[p].northing;
-                    inBox.heading = bndArr[i].bndLine[p].heading;
-                    inBox.index = i;
+                        if ((((boxA.easting - boxD.easting) * (bndArr[i].bndLine[p].northing - boxD.northing))
+                                - ((boxA.northing - boxD.northing) * (bndArr[i].bndLine[p].easting - boxD.easting))) < 0) { continue; }
 
-                    //which boundary/headland is it from
-                    bndClosestList.Add(inBox);
+                        //it's in the box, so add to list
+                        inBox.easting = bndArr[i].bndLine[p].easting;
+                        inBox.northing = bndArr[i].bndLine[p].northing;
+                        inBox.heading = bndArr[i].bndLine[p].heading;
+                        inBox.index = i;
+
+                        //which boundary/headland is it from
+                        bndClosestList.Add(inBox);
+                    }
                 }
             }
 

@@ -1,12 +1,9 @@
 ﻿//Please, if you use this, share the improvements
 
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using AgOpenGPS.Properties;
-using Microsoft.Win32;
-using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
@@ -1166,7 +1163,7 @@ namespace AgOpenGPS
         private void DoNTRIPSecondRoutine()
         {
             //count up the ntrip clock only if everything is alive
-            if (startCounter > 50 && recvCounter < 20 && isNTRIP_RequiredOn)
+            if (startCounter > 50 && recvCounter < 134 && isNTRIP_RequiredOn)
             {
                 IncrementNTRIPWatchDog();
             }
@@ -1223,298 +1220,212 @@ namespace AgOpenGPS
             }
         }
 
-        //Timer triggers at 10 msec, and is THE clock of the whole program
-        //Timer stopped while parsing nmea
-        private void tmrWatchdog_tick(object sender, EventArgs e)
+        private void HalfSecond_Update(object sender, EventArgs e)
         {
-            //Check for a newline char, if none then just return
-            int cr = pn.rawBuffer.IndexOf("\n", StringComparison.Ordinal);
-            if (cr == -1) return;
-
-            //go see if data ready for draw and position updates
-            tmrWatchdog.Enabled = false;
-
-            //did we get a new fix position?
-            if (ScanForNMEA())
+            if (hd.isOn)
             {
-                if (threeSecondCounter++ >= fixUpdateHz * 2)
+                hd.FindHeadlandDistance();
+                if (hd.isToolUp)
                 {
-                    threeSecondCounter = 0;
-                    threeSeconds++;
+                    lblHeadLeftDist.BackColor = Color.Salmon;
+                    lblHeadRightDist.BackColor = Color.Salmon;
                 }
-                if (oneSecondCounter++ >= fixUpdateHz)
+                else
                 {
-                    oneSecondCounter = 0;
-                    oneSecond++;
-                }
-                if (oneHalfSecondCounter++ >= fixUpdateHz / 2)
-                {
-                    oneHalfSecondCounter = 0;
-                    oneHalfSecond++;
-                }
-                if (oneFifthSecondCounter++ >= fixUpdateHz / 5)
-                {
-                    oneFifthSecondCounter = 0;
-                    oneFifthSecond++;
-                }
-                
-                /////////////////////////////////////////////////////////   333333333333333  ////////////////////////////////////////
-                //every 3 second update status
-                if (displayUpdateThreeSecondCounter != threeSeconds)
-                {
-                    //reset the counter
-                    displayUpdateThreeSecondCounter = threeSeconds;
-
-                    //check to make sure the grid is big enough
-                    worldGrid.checkZoomWorldGrid(pn.fix.northing, pn.fix.easting);
-
-                    if (panelBatman.Visible)
-                    {
-                        if (isMetric)
-                        {
-                            lblAltitude.Text = Altitude;
-                        }
-                        else //imperial
-                        {
-                            lblAltitude.Text = AltitudeFeet;
-                        }       
-                        
-                        lblSats.Text = SatsTracked;
-                        lblZone.Text = pn.zone.ToString();
-                    }
-
-                    if (isMetric)
-                    {
-                        lblTotalFieldArea.Text = fd.AreaBoundaryLessInnersHectares;
-                        lblTotalAppliedArea.Text = fd.WorkedHectares;
-                        lblWorkRemaining.Text = fd.WorkedAreaRemainHectares;
-                        lblPercentRemaining.Text = fd.WorkedAreaRemainPercentage;
-                        lblTimeRemaining.Text = fd.TimeTillFinished;
-
-                        lblAreaAppliedMinusOverlap.Text = ((fd.actualAreaCovered * glm.m2ha).ToString("N2"));
-                        lblAreaMinusActualApplied.Text = (((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ha).ToString("N2"));
-                        lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
-                        lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ha).ToString("N3"));
-
-                        btnManualOffOn.Text = fd.AreaBoundaryLessInnersHectares;
-                        lblEqSpec.Text = (Math.Round(tool.toolWidth, 2)).ToString() + " m  " + vehicleFileName + toolFileName;
-                    }
-                    else //imperial
-                    {
-                        lblTotalFieldArea.Text = fd.AreaBoundaryLessInnersAcres;
-                        lblTotalAppliedArea.Text = fd.WorkedAcres;
-                        lblWorkRemaining.Text = fd.WorkedAreaRemainAcres;
-                        lblPercentRemaining.Text = fd.WorkedAreaRemainPercentage;
-                        lblTimeRemaining.Text = fd.TimeTillFinished;
-
-                        lblAreaAppliedMinusOverlap.Text = ((fd.actualAreaCovered * glm.m2ac).ToString("N2"));
-                        lblAreaMinusActualApplied.Text = (((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ac).ToString("N2"));
-                        lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
-                        lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ac).ToString("N3"));
-
-                        btnManualOffOn.Text = fd.AreaBoundaryLessInnersAcres;
-                        lblEqSpec.Text =  (Math.Round(tool.toolWidth * glm.m2ft, 2)).ToString() + " ft  " + vehicleFileName + toolFileName;
-                    }
-
-                    //not Metric/Standard units sensitive
-                    if (ABLine.isBtnABLineOn) btnABLine.Text = "# " + PassNumber;
-                    else btnABLine.Text = "";
-
-                    if (curve.isBtnCurveOn) btnCurve.Text = "# " + CurveNumber;
-                    else btnCurve.Text = "";
-
-                    //update the online indicator 63 green red 64
-                    if (recvCounter > 20 && toolStripBtnGPSStength.Image.Height != 64)
-                    {
-                        //stripOnlineGPS.Value = 1;
-                        lblEasting.Text = "-";
-                        lblNorthing.Text = gStr.gsNoGPS;
-                        //lblZone.Text = "-";
-                        toolStripBtnGPSStength.Image = Resources.GPSSignalPoor;
-                    }
-                    else if (recvCounter < 20 && toolStripBtnGPSStength.Image.Height != 63)
-                    {
-                        //stripOnlineGPS.Value = 100;
-                        toolStripBtnGPSStength.Image = Resources.GPSSignalGood;
-                    }
-
-                    lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
-                }//end every 3 seconds
-
-
-
-                //every second update all status ///////////////////////////   1 1 1 1 1 1 ////////////////////////////
-                if (displayUpdateOneSecondCounter != oneSecond)
-                {
-                    //reset the counter
-                    displayUpdateOneSecondCounter = oneSecond;
-
-                    //counter used for saving field in background
-                    saveCounter++;
-
-                    if (panelBatman.Visible)
-                    {
-                        //both
-                        lblLatitude.Text = Latitude;
-                        lblLongitude.Text = Longitude;
-
-                        pbarRelayComm.Value = pbarRelay;
-
-                        lblRoll.Text = RollInDegrees;
-                        lblYawHeading.Text = GyroInDegrees;
-                        lblGPSHeading.Text = GPSHeading;
-
-                        //up in the menu a few pieces of info
-                        if (isJobStarted)
-                        {
-                            lblEasting.Text = "E:" + (pn.fix.easting).ToString("N2");
-                            lblNorthing.Text = "N:" + (pn.fix.northing).ToString("N2");
-                        }
-                        else
-                        {
-                            lblEasting.Text = "E:" + (pn.actualEasting).ToString("N2");
-                            lblNorthing.Text = "N:" + (pn.actualNorthing).ToString("N2");
-                        }
-
-                        lblUturnByte.Text = Convert.ToString(mc.autoSteerData[mc.sdYouTurnByte], 2).PadLeft(6, '0');
-                    }
-
-                    if (ABLine.isBtnABLineOn && !ct.isContourBtnOn)
-                    {
-                        btnEditHeadingB.Text = ((int)(ABLine.moveDistance * 100)).ToString();
-                    }
-                    if (curve.isBtnCurveOn && !ct.isContourBtnOn)
-                    {
-                        btnEditHeadingB.Text = ((int)(curve.moveDistance * 100)).ToString();
-                    }
-
-                    pbarAutoSteerComm.Value = pbarSteer;
-                    pbarUDPComm.Value = pbarUDP;
-
-                    if (mc.steerSwitchValue == 0)
-                    {
-                        this.AutoSteerToolBtn.BackColor = System.Drawing.Color.LightBlue;
-                    }
-                    else
-                    {
-                        this.AutoSteerToolBtn.BackColor = System.Drawing.Color.Transparent;
-                    }
-
-                    
-                    //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
-                    if (isJobStarted && ahrs.isAutoSteerAuto && !recPath.isDrivingRecordedPath && 
-                        (ABLine.isBtnABLineOn || ct.isContourBtnOn || curve.isBtnCurveOn))
-                    {
-                        if (mc.steerSwitchValue == 0)
-                        {
-                            if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                        }
-                        else
-                        {
-                            if ( isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                        }
-                    }
-
-                    //Make sure it is off when it should
-                    if ((!ABLine.isBtnABLineOn && !ct.isContourBtnOn && !curve.isBtnCurveOn && isAutoSteerBtnOn) || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn)) btnAutoSteer.PerformClick();
-
-                    //do all the NTRIP routines
-                    DoNTRIPSecondRoutine();
-
-                    //the main formgps window
-                    if (isMetric)  //metric or imperial
-                    {
-                        //Hectares on the master section soft control and sections
-                        btnSectionOffAutoOn.Text = fd.WorkedHectares;
-                        lblSpeed.Text = SpeedKPH;
-
-                        //status strip values
-                        distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares2;
-
-                        btnContour.Text = XTE; //cross track error
-
-                    }
-                    else  //Imperial Measurements
-                    {
-                        //acres on the master section soft control and sections
-                        btnSectionOffAutoOn.Text = fd.WorkedAcres;
-                        lblSpeed.Text = SpeedMPH;
-
-                        //status strip values
-                        distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
-                        btnContour.Text = InchXTE; //cross track error
-                    }
-
-                    //statusbar flash red undefined headland
-                    if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent
-                        || !mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato)
-                    {
-                        if (!mc.isOutOfBounds)
-                        {
-                            statusStripBottom.BackColor = Color.Transparent;
-                        }
-                        else
-                        {
-                            statusStripBottom.BackColor = Color.Tomato;
-                        }
-                    }
+                    lblHeadLeftDist.BackColor = Color.LightSeaGreen;
+                    lblHeadRightDist.BackColor = Color.LightSeaGreen;
                 }
 
-                //every half of a second update all status  ////////////////    0.5  0.5   0.5    0.5    /////////////////
-                if (displayUpdateHalfSecondCounter != oneHalfSecond)
+                lblHeadLeftDist.Text = hd.leftToolDistance.ToString("N2");
+                lblHeadRightDist.Text = hd.rightToolDistance.ToString("N2");
+            }
+
+            lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
+            lblLift.Text = mc.pgn[mc.azRelayData][mc.rdHydLift].ToString();
+
+            if (guidanceLineDistanceOff == 32020 | guidanceLineDistanceOff == 32000)
+            {
+                steerAnglesToolStripDropDownButton1.Text = "Off \r\n" + ActualSteerAngle;
+            }
+            else
+            {
+                steerAnglesToolStripDropDownButton1.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
+            }
+            lblHz.Text = NMEAHz + "Hz " + (int)(frameTime) + "\r\n" + FixQuality + HzTime.ToString("N1") + " Hz " + testtest.ElapsedTicks.ToString();
+        }
+
+        private void OneSecond_Update(object sender, EventArgs e)
+        {
+            //counter used for saving field in background
+            saveCounter++;
+
+            if (panelBatman.Visible)
+            {
+                pbarRelayComm.Value = pbarRelay;
+                //both
+                lblLatitude.Text = Latitude;
+                lblLongitude.Text = Longitude;
+
+                lblRoll.Text = RollInDegrees;
+                lblYawHeading.Text = GyroInDegrees;
+                lblGPSHeading.Text = GPSHeading;
+
+                //up in the menu a few pieces of info
+                if (isJobStarted)
                 {
-                    //reset the counter
-                    displayUpdateHalfSecondCounter = oneHalfSecond;
-
-                    if (hd.isOn)
-                    {
-                        //if (hd.isOn)
-                        //lblUpDown.Text = hd.FindHeadlandDistance().ToString();
-                        hd.FindHeadlandDistance();
-                        if (hd.isToolUp)
-                        {
-                            lblHeadLeftDist.BackColor = Color.Salmon;
-                            lblHeadRightDist.BackColor = Color.Salmon;
-                        }
-                        else
-                        {
-                            lblHeadLeftDist.BackColor = Color.LightSeaGreen;
-                            lblHeadRightDist.BackColor = Color.LightSeaGreen;
-                        }
-
-                        lblHeadLeftDist.Text = hd.leftToolDistance.ToString("N2");
-                        lblHeadRightDist.Text = hd.rightToolDistance.ToString("N2");
-                    }
-
-                    lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
-                    lblLift.Text = mc.pgn[mc.azRelayData][mc.rdHydLift].ToString();
-                    
-                } //end every 1/2 second
-
-                //every fifth second update  ///////////////////////////   FIFTH Fifth ////////////////////////////
-                if (displayUpdateOneFifthCounter != oneFifthSecond)
+                    lblEasting.Text = "E:" + (pn.fix.easting).ToString("N2");
+                    lblNorthing.Text = "N:" + (pn.fix.northing).ToString("N2");
+                }
+                else
                 {
-                    //reset the counter
-                    displayUpdateOneFifthCounter = oneFifthSecond;
-
-                    if (guidanceLineDistanceOff == 32020 | guidanceLineDistanceOff == 32000)
-                    {
-                        steerAnglesToolStripDropDownButton1.Text = "Off \r\n" + ActualSteerAngle;
-                    }
-                    else
-                    {
-                        steerAnglesToolStripDropDownButton1.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
-                    }
-
-                    lblHz.Text = NMEAHz + "Hz " + (int)(frameTime) + "\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
+                    lblEasting.Text = "E:" + (pn.actualEasting).ToString("N2");
+                    lblNorthing.Text = "N:" + (pn.actualNorthing).ToString("N2");
                 }
 
-            } //there was a new GPS update
+                lblUturnByte.Text = Convert.ToString(mc.autoSteerData[mc.sdYouTurnByte], 2).PadLeft(6, '0');
+            }
 
-            //start timer again and wait for new fix
-            tmrWatchdog.Enabled = true;
+            if (ABLine.isBtnABLineOn && !ct.isContourBtnOn)
+            {
+                btnEditHeadingB.Text = ((int)(ABLine.moveDistance * 100)).ToString();
+            }
+            if (curve.isBtnCurveOn && !ct.isContourBtnOn)
+            {
+                btnEditHeadingB.Text = ((int)(curve.moveDistance * 100)).ToString();
+            }
 
-        }//wait till timer fires again.  
+            pbarAutoSteerComm.Value = pbarSteer;
+            pbarUDPComm.Value = pbarUDP;
+
+            if (mc.steerSwitchValue == 0)
+            {
+                this.AutoSteerToolBtn.BackColor = System.Drawing.Color.LightBlue;
+            }
+            else
+            {
+                this.AutoSteerToolBtn.BackColor = System.Drawing.Color.Transparent;
+            }
+
+
+            //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
+            if (isJobStarted && ahrs.isAutoSteerAuto && !recPath.isDrivingRecordedPath &&
+                (ABLine.isBtnABLineOn || ct.isContourBtnOn || curve.isBtnCurveOn))
+            {
+                if (mc.steerSwitchValue == 0)
+                {
+                    if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                }
+                else
+                {
+                    if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                }
+            }
+
+            //do all the NTRIP routines
+            DoNTRIPSecondRoutine();
+
+            //the main formgps window
+            if (isMetric)  //metric or imperial
+            {
+                //Hectares on the master section soft control and sections
+                btnSectionOffAutoOn.Text = fd.WorkedHectares;
+                lblSpeed.Text = SpeedKPH;
+
+                //status strip values
+                distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares2;
+
+                btnContour.Text = XTE; //cross track error
+
+            }
+            else  //Imperial Measurements
+            {
+                //acres on the master section soft control and sections
+                btnSectionOffAutoOn.Text = fd.WorkedAcres;
+                lblSpeed.Text = SpeedMPH;
+
+                //status strip values
+                distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
+                btnContour.Text = InchXTE; //cross track error
+            }
+
+            //statusbar flash red undefined headland
+            if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent)
+            {
+                statusStripBottom.BackColor = Color.Tomato;
+            }
+            else if (!mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato)
+            {
+                statusStripBottom.BackColor = Color.Transparent;
+            }
+
+            lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
+        }
+
+
+        public int testint = 0;
+        private void ThreeSecond_Update(object sender, EventArgs e)
+        {
+            zoomUpdateCounter = true;
+            //check to make sure the grid is big enough
+            worldGrid.checkZoomWorldGrid(pn.fix.northing, pn.fix.easting);
+
+            if (panelBatman.Visible)
+            {
+                if (isMetric)
+                {
+                    lblAltitude.Text = Altitude;
+                }
+                else //imperial
+                {
+                    lblAltitude.Text = AltitudeFeet;
+                }
+
+                lblSats.Text = SatsTracked;
+                lblZone.Text = pn.zone.ToString();
+            }
+
+            if (isMetric)
+            {
+                lblTotalFieldArea.Text = fd.AreaBoundaryLessInnersHectares;
+                lblTotalAppliedArea.Text = fd.WorkedHectares;
+                lblWorkRemaining.Text = fd.WorkedAreaRemainHectares;
+                lblPercentRemaining.Text = fd.WorkedAreaRemainPercentage;
+                lblTimeRemaining.Text = fd.TimeTillFinished;
+
+                lblAreaAppliedMinusOverlap.Text = ((fd.actualAreaCovered * glm.m2ha).ToString("N2"));
+                lblAreaMinusActualApplied.Text = (((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ha).ToString("N2"));
+                lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
+                lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ha).ToString("N3"));
+
+                btnManualOffOn.Text = fd.AreaBoundaryLessInnersHectares;
+                lblEqSpec.Text = (Math.Round(tool.toolWidth, 2)).ToString() + " m  " + vehicleFileName + toolFileName;
+            }
+            else //imperial
+            {
+                lblTotalFieldArea.Text = fd.AreaBoundaryLessInnersAcres;
+                lblTotalAppliedArea.Text = fd.WorkedAcres;
+                lblWorkRemaining.Text = fd.WorkedAreaRemainAcres;
+                lblPercentRemaining.Text = fd.WorkedAreaRemainPercentage;
+                lblTimeRemaining.Text = fd.TimeTillFinished;
+
+                lblAreaAppliedMinusOverlap.Text = ((fd.actualAreaCovered * glm.m2ac).ToString("N2"));
+                lblAreaMinusActualApplied.Text = (((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ac).ToString("N2"));
+                lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
+                lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ac).ToString("N3"));
+
+                btnManualOffOn.Text = fd.AreaBoundaryLessInnersAcres;
+                lblEqSpec.Text = (Math.Round(tool.toolWidth * glm.m2ft, 2)).ToString() + " ft  " + vehicleFileName + toolFileName;
+            }
+
+            //not Metric/Standard units sensitive
+            if (ABLine.isBtnABLineOn) btnABLine.Text = "# " + PassNumber;
+            else btnABLine.Text = "";
+
+            if (curve.isCurveBtnOn) btnCurve.Text = "# " + CurveNumber;
+            else btnCurve.Text = "";
+
+            //toolStripBtnGPSStength.ImageTransparentColor
+        }
 
         #region Properties // ---------------------------------------------------------------------
 
@@ -1571,16 +1482,6 @@ namespace AgOpenGPS
         }
         public string SetSteerAngle { get { return ((double)(guidanceLineSteerAngle) * 0.01).ToString("N1") + "\u00B0"; } }
         public string ActualSteerAngle { get { return ((double)(actualSteerAngleDisp) * 0.01).ToString("N1") + "\u00B0"; } }
-
-        public string FixHeading { get { return Math.Round(fixHeading, 4).ToString(); } }
-
-        public string LookAhead { get { return ((int)(section[0].sectionLookAhead)).ToString(); } }
-        public string StepFixNum { get { return (currentStepFix).ToString(); } }
-        public string CurrentStepDistance { get { return Math.Round(distanceCurrentStepFix, 3).ToString(); } }
-        public string TotalStepDistance { get { return Math.Round(fixStepDist, 3).ToString(); } }
-
-        public string WorkSwitchValue { get { return mc.workSwitchValue.ToString(); } }
-        public string AgeDiff { get { return pn.ageDiff.ToString(); } }
 
         //Metric and Imperial Properties
         public string SpeedMPH

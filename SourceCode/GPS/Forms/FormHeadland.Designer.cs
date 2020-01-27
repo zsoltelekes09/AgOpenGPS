@@ -67,7 +67,7 @@
             this.oglSelf.Load += new System.EventHandler(this.oglSelf_Load);
             this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.oglSelf_Paint);
             this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.oglSelf_MouseDown);
-            this.oglSelf.Resize += new System.EventHandler(this.oglSelf_Resize);
+            this.oglSelf.Resize += new System.EventHandler(this.OglSelf_Resize);
             // 
             // timer1
             // 

@@ -140,7 +140,7 @@ namespace AgOpenGPS
             var foos = new List<vec3>(hdArr);
 
             int lineCount = foos.Count;
-            double distance = 0;
+            double distance;
 
             //int headCount = mf.bndArr[inTurnNum].bndLine.Count;
             int bndCount = curBnd.Count;
@@ -400,8 +400,6 @@ namespace AgOpenGPS
                 }
 
                 isA = true;
-
-                int[] dubs = new int[4];
 
                 int A1 = Math.Abs(A - C);
                 int B1 = Math.Abs(A - D);
@@ -698,7 +696,7 @@ namespace AgOpenGPS
             GL.ClearColor(0.23122f, 0.2318f, 0.2315f, 1.0f);
         }
 
-        private void oglSelf_Resize(object sender, EventArgs e)
+        private void OglSelf_Resize(object sender, EventArgs e)
         {
             oglSelf.MakeCurrent();
             GL.MatrixMode(MatrixMode.Projection);

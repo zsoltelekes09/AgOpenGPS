@@ -39,7 +39,7 @@ namespace AgOpenGPS
             tboxHeading.Enabled = false;
             tboxABLineName.Text = "";
             tboxABLineName.Enabled = false;
-            
+
             //small window
             ShowFullPanel(true);
 
@@ -161,7 +161,7 @@ namespace AgOpenGPS
 
                 lvLines.Enabled = false;
                 btnAddToFile.Focus();
-                tboxABLineName.Text = (Math.Round(glm.toDegrees(mf.ABLine.abHeading), 1)).ToString(CultureInfo.InvariantCulture) 
+                tboxABLineName.Text = (Math.Round(glm.toDegrees(mf.ABLine.abHeading), 1)).ToString(CultureInfo.InvariantCulture)
                     + "\u00B0" +
                     mf.FindDirection(mf.ABLine.abHeading) + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
             }
@@ -309,15 +309,13 @@ namespace AgOpenGPS
                 else
                 {
                     //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                    var form2 = new FormTimedMessage(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
-                    form2.Show();
+                    mf.TimedMessageBox(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
                 }
             }
             else
             {
                 //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                var form2 = new FormTimedMessage(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
-                form2.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
             }
 
             tboxABLineName.Clear();
@@ -364,15 +362,13 @@ namespace AgOpenGPS
                 else
                 {
                     //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                    var form2 = new FormTimedMessage(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
-                    form2.Show();
+                    mf.TimedMessageBox(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
                 }
             }
             else
             {
                 //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                var form2 = new FormTimedMessage(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
-                form2.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
             }
 
             tboxABLineName.Clear();
@@ -520,7 +516,7 @@ namespace AgOpenGPS
                 btnAddToFile.Visible = true;
                 btnAddAndGo.Visible = true;
 
-                btnAPoint.Visible = false ;
+                btnAPoint.Visible = false;
                 btnBPoint.Visible = false;
                 btnUpABHeadingBy1.Visible = false;
                 btnDnABHeadingBy1.Visible = false;

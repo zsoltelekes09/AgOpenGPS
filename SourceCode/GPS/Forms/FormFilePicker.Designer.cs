@@ -35,7 +35,6 @@
             this.btnByDistance = new System.Windows.Forms.Button();
             this.btnOpenExistingLv = new System.Windows.Forms.Button();
             this.btnDeleteAB = new System.Windows.Forms.Button();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // lvLines
@@ -113,10 +112,6 @@
             this.btnDeleteAB.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDeleteAB.Click += new System.EventHandler(this.btnDeleteAB_Click);
             // 
-            // timer1
-            // 
-            this.timer1.Interval = 300;
-            // 
             // FormFilePicker
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
@@ -146,6 +141,5 @@
         private System.Windows.Forms.Button btnByDistance;
         private System.Windows.Forms.Button btnOpenExistingLv;
         private System.Windows.Forms.Button btnDeleteAB;
-        private System.Windows.Forms.Timer timer1;
     }
 }

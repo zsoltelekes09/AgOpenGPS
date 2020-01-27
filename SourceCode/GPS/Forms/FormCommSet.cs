@@ -36,6 +36,8 @@ namespace AgOpenGPS
             lblCurrentPort.Text = gStr.gsPort;
             lblCurrentAutoSteerPort.Text = gStr.gsPort;
             lblCurrentBaud.Text = gStr.gsBaud;
+            lblCurrentPort2.Text = gStr.gsPort;
+            lblCurrentBaud2.Text = gStr.gsBaud;
 
         }
 
@@ -44,12 +46,13 @@ namespace AgOpenGPS
             if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "GGA") rbtnGGA.Checked = true;
             else if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "RMC") rbtnRMC.Checked = true;
             else if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "OGI") rbtnOGI.Checked = true;
+            else if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "UBX") rbtnUBX.Checked = true;
 
             cboxNMEAHz.Text = Properties.Settings.Default.setPort_NMEAHz.ToString();
             usejrk.Checked = Properties.Settings.Default.setAS_isJRK  ;
 
             //check if GPS port is open or closed and set buttons accordingly
-            if (mf.sp.IsOpen)
+            if (mf.SerialGPS.IsOpen)
             {
                 cboxBaud.Enabled = false;
                 cboxPort.Enabled = false;
@@ -62,6 +65,21 @@ namespace AgOpenGPS
                 cboxPort.Enabled = true;
                 btnCloseSerial.Enabled = false;
                 btnOpenSerial.Enabled = true;
+            }
+
+            if (mf.SerialGPS2.IsOpen)
+            {
+                cboxBaud2.Enabled = false;
+                cboxPort2.Enabled = false;
+                btnCloseSerial2.Enabled = true;
+                btnOpenSerial2.Enabled = false;
+            }
+            else
+            {
+                cboxBaud2.Enabled = true;
+                cboxPort2.Enabled = true;
+                btnCloseSerial2.Enabled = false;
+                btnOpenSerial2.Enabled = true;
             }
 
             //check if Arduino port is open or closed and set buttons accordingly
@@ -94,17 +112,21 @@ namespace AgOpenGPS
 
             //load the port box with valid port names
             cboxPort.Items.Clear();
+            cboxPort2.Items.Clear();
             cboxArdPort.Items.Clear();
             cboxASPort.Items.Clear();
             foreach (String s in System.IO.Ports.SerialPort.GetPortNames())
             {
                 cboxPort.Items.Add(s);
+                cboxPort2.Items.Add(s);
                 cboxArdPort.Items.Add(s);
                 cboxASPort.Items.Add(s);
             }
 
-            lblCurrentBaud.Text = mf.sp.BaudRate.ToString();
-            lblCurrentPort.Text = mf.sp.PortName;
+            lblCurrentBaud.Text = mf.SerialGPS.BaudRate.ToString();
+            lblCurrentPort.Text = mf.SerialGPS.PortName;
+            lblCurrentBaud2.Text = mf.SerialGPS2.BaudRate.ToString();
+            lblCurrentPort2.Text = mf.SerialGPS2.PortName;
             lblCurrentArduinoPort.Text = mf.spRelay.PortName;
             lblCurrentAutoSteerPort.Text = mf.spAutoSteer.PortName;
         }
@@ -200,13 +222,13 @@ namespace AgOpenGPS
         // GPS Serial Port
         private void cboxBaud_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            mf.sp.BaudRate = Convert.ToInt32(cboxBaud.Text);
+            mf.SerialGPS.BaudRate = Convert.ToInt32(cboxBaud.Text);
             FormGPS.baudRateGPS = Convert.ToInt32(cboxBaud.Text);
         }
 
         private void cboxPort_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            mf.sp.PortName = cboxPort.Text;
+            mf.SerialGPS.PortName = cboxPort.Text;
             FormGPS.portNameGPS = cboxPort.Text;
         }
 
@@ -219,21 +241,17 @@ namespace AgOpenGPS
 
         private void btnOpenSerial_Click(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.setMenu_isSimulatorOn)
-            {
-                MessageBox.Show(gStr.gsGotoTopMenuDisplayTouchSimulator + "\n\r" + gStr.gsApplicationWillRestart, gStr.gsSimulatorOnMustbeOFF, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            else
+            //else
             {
                 mf.SerialPortOpenGPS();
-                if (mf.sp.IsOpen)
+                if (mf.SerialGPS.IsOpen)
                 {
                     cboxBaud.Enabled = false;
                     cboxPort.Enabled = false;
                     btnCloseSerial.Enabled = true;
                     btnOpenSerial.Enabled = false;
-                    lblCurrentBaud.Text = mf.sp.BaudRate.ToString();
-                    lblCurrentPort.Text = mf.sp.PortName;
+                    lblCurrentBaud.Text = mf.SerialGPS.BaudRate.ToString();
+                    lblCurrentPort.Text = mf.SerialGPS.PortName;
                 }
                 else
                 {
@@ -248,7 +266,7 @@ namespace AgOpenGPS
         private void btnCloseSerial_Click(object sender, EventArgs e)
         {
             mf.SerialPortCloseGPS();
-            if (mf.sp.IsOpen)
+            if (mf.SerialGPS.IsOpen)
             {
                 cboxBaud.Enabled = false;
                 cboxPort.Enabled = false;
@@ -274,6 +292,9 @@ namespace AgOpenGPS
 
             cboxPort.Items.Clear();
             foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) { cboxPort.Items.Add(s); }
+
+            cboxPort2.Items.Clear();
+            foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) { cboxPort2.Items.Add(s); }
         }
 
         #endregion PortSettings //----------------------------------------------------------------
@@ -316,6 +337,59 @@ namespace AgOpenGPS
             Properties.Settings.Default.setAS_isJRK = usejrk.Checked;
             Properties.Settings.Default.Save();
             mf.isJRK = Properties.Settings.Default.setAS_isJRK;
+        }
+        private void cboxPort_SelectedIndexChanged_2(object sender, EventArgs e)
+        {
+            mf.SerialGPS2.PortName = cboxPort2.Text;
+            FormGPS.portNameGPS2 = cboxPort2.Text;
+        }
+
+        private void cboxBaud_SelectedIndexChanged_2(object sender, EventArgs e)
+        {
+            mf.SerialGPS2.BaudRate = Convert.ToInt32(cboxBaud2.Text);
+            FormGPS.baudRateGPS2 = Convert.ToInt32(cboxBaud2.Text);
+        }
+
+        private void btnOpenSerial_Click2(object sender, EventArgs e)
+        {
+            {
+                mf.SerialPortOpenGPS2();
+                if (mf.SerialGPS2.IsOpen)
+                {
+                    cboxBaud2.Enabled = false;
+                    cboxPort2.Enabled = false;
+                    btnCloseSerial2.Enabled = true;
+                    btnOpenSerial2.Enabled = false;
+                    lblCurrentBaud2.Text = mf.SerialGPS2.BaudRate.ToString();
+                    lblCurrentPort2.Text = mf.SerialGPS2.PortName;
+                }
+                else
+                {
+                    cboxBaud2.Enabled = true;
+                    cboxPort2.Enabled = true;
+                    btnCloseSerial2.Enabled = false;
+                    btnOpenSerial2.Enabled = true;
+                }
+            }
+        }
+
+        private void btnCloseSerial_Click2(object sender, EventArgs e)
+        {
+            mf.SerialPortCloseGPS2();
+            if (mf.SerialGPS2.IsOpen)
+            {
+                cboxBaud2.Enabled = false;
+                cboxPort2.Enabled = false;
+                btnCloseSerial2.Enabled = true;
+                btnOpenSerial2.Enabled = false;
+            }
+            else
+            {
+                cboxBaud2.Enabled = true;
+                cboxPort2.Enabled = true;
+                btnCloseSerial2.Enabled = false;
+                btnOpenSerial2.Enabled = true;
+            }
         }
     } //class
 } //namespace

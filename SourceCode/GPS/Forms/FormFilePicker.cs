@@ -86,7 +86,6 @@ namespace AgOpenGPS
         private void FormFilePicker_Load(object sender, EventArgs e)
         {
             isOrderByName = true;
-            timer1.Enabled = true;
             ListViewItem itm;
 
             string[] dirs = Directory.GetDirectories(mf.fieldsDirectory);
@@ -127,7 +126,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                            mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
                         }
                     }
 
@@ -156,11 +155,6 @@ namespace AgOpenGPS
 
                 this.chDistance.Text = "Distance";
                 this.chDistance.Width = 150;
-            }
-            else
-            {
-                //var form2 = new FormTimedMessage(2000, gStr.gsNoFieldsCreated, gStr.gsCreateNewFieldFirst);
-                //form2.Show();
             }
         }
     }

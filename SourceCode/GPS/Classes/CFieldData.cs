@@ -75,8 +75,8 @@ namespace AgOpenGPS
 
         public string WorkedAreaRemainAcres { get { return ((areaBoundaryOuterLessInner - workedAreaTotal) * glm.m2ac).ToString("N2"); } }
 
-        //overlap strings          
-        
+        //overlap strings
+
         public string WorkedAreaRemainPercentage
         {
             get
@@ -119,17 +119,23 @@ namespace AgOpenGPS
 
         public void UpdateFieldBoundaryGUIAreas()
         {
+            areaOuterBoundary = 0;
+            areaBoundaryOuterLessInner = areaOuterBoundary;
 
-            if (mf.bnd.bndArr.Count > 0)
+            if (mf.bnd.bndArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary >= 0)
             {
-                areaOuterBoundary = mf.bnd.bndArr[0].area;
-                areaBoundaryOuterLessInner = areaOuterBoundary;
+                areaOuterBoundary += mf.bnd.bndArr[mf.bnd.LastBoundary].area;
+                areaBoundaryOuterLessInner += areaOuterBoundary;
 
-                for (int i = 1; i < mf.bnd.bndArr.Count; i++)
+                for (int i = 0; i < mf.bnd.bndArr.Count; i++)
                 {
-                    if (mf.bnd.bndArr[i].isSet) areaBoundaryOuterLessInner -= mf.bnd.bndArr[i].area;
+                    if (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary)
+                    {
+                            areaBoundaryOuterLessInner -= mf.bnd.bndArr[i].area;
+                    }
                 }
             }
+
         }
     }
 }

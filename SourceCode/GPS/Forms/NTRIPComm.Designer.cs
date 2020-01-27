@@ -219,9 +219,13 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    if (sp.IsOpen)
+                    if (SerialGPS2.IsOpen)
                     {
-                        sp.Write(data, 0, data.Length);
+                        SerialGPS2.Write(data, 0, data.Length);
+                    }
+                    else if (SerialGPS.IsOpen)
+                    {
+                        SerialGPS.Write(data, 0, data.Length);
                     }
                 }
                 catch (Exception ex)
@@ -329,7 +333,8 @@ namespace AgOpenGPS
             }
             catch (Exception)
             {
-                //MessageBox.Show( this, ex.Message, "Unusual error druing Recieve!" );
+
+                MessageBox.Show( "Unusual error during Recieve!" );
             }
         }
 

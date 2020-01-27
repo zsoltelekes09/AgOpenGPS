@@ -72,7 +72,7 @@ namespace AgOpenGPS
             textboxSender.Text = Regex.Replace(textboxSender.Text, "[^0-9a-zA-Z ]", "");
             textboxSender.SelectionStart = cursorPosition;
 
-            lblFilename.Text = tboxFieldName.Text.Trim() + "_" + tboxTask.Text.Trim() 
+            lblFilename.Text = tboxFieldName.Text.Trim() + "_" + tboxTask.Text.Trim()
                 + "_" + tboxVehicle.Text.Trim() + "_" + DateTime.Now.ToString("yyyy.MMM.dd HH_mm", CultureInfo.InvariantCulture);
         }
 
@@ -94,7 +94,7 @@ namespace AgOpenGPS
 
         private void btnTemplate_Click(object sender, EventArgs e)
         {
-            using (var form = new FormFilePicker( mf))
+            using (FormFilePicker form = new FormFilePicker(mf))
             {
                 var result = form.ShowDialog();
 
@@ -236,9 +236,7 @@ namespace AgOpenGPS
                     catch (Exception ex)
                     {
                         mf.WriteErrorLog("While Opening Field" + ex);
-
-                        var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
-                        form.Show();
+                        mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
                         mf.JobClose();
                         return;
                     }

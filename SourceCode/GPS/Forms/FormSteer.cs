@@ -316,7 +316,7 @@ namespace AgOpenGPS
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            lblSteerAngle.Text = (mf.actualSteerAngleDisp*0.01).ToString("N2");
+            lblSteerAngle.Text = (mf.actualSteerAngleDisp * 0.01).ToString("N2");
 
             if (Math.Abs(mf.actualSteerAngleDisp) > 4600) mf.actualSteerAngleDisp = 0;
             double angleSteer = mf.actualSteerAngleDisp * 0.01;
@@ -325,12 +325,12 @@ namespace AgOpenGPS
 
             if (mf.actualSteerAngleDisp < 0)
             {
-                pbarSteerLeft.Value = (int)(-angleSteer*2);
+                pbarSteerLeft.Value = (int)(-angleSteer * 2);
                 pbarSteerRight.Value = 0;
             }
             else
             {
-                pbarSteerRight.Value = (int)angleSteer*2;
+                pbarSteerRight.Value = (int)angleSteer * 2;
                 pbarSteerLeft.Value = 0;
             }
         }
