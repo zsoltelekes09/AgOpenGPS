@@ -12,10 +12,12 @@ namespace AgOpenGPS
             lblMessage2.Text = str2;
             timer1.Interval = timeInMsec;
             Width = str2.Length * 15 + 120;
+
+            this.Left = callingForm.Width / 2 - this.Width/2;
+            this.Top = 53;
+
             this.Show();
             this.Focus();
-            this.Left = callingForm.Left + callingForm.Width / 2 - this.Width/2;
-            this.Top = callingForm.Top + callingForm.Height / 2 - this.Height/2;
             timer1.Start();
         }
 

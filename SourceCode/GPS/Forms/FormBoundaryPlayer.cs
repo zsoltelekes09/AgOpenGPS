@@ -28,39 +28,37 @@ namespace AgOpenGPS
                 mf.bnd.bndArr.Add(new CBoundaryLines());
                 mf.turn.turnArr.Add(new CTurnLines());
                 mf.gf.geoFenceArr.Add(new CGeoFenceLines());
+                mf.hd.headArr.Add(new CHeadLines());
 
                 for (int i = 0; i < mf.bnd.bndBeingMadePts.Count; i++)
                 {
-                    mf.bnd.bndArr[mf.bnd.boundarySelected].bndLine.Add(mf.bnd.bndBeingMadePts[i]);
+                    mf.bnd.bndArr[mf.bnd.bndArr.Count-1].bndLine.Add(mf.bnd.bndBeingMadePts[i]);
                 }
 
-                mf.bnd.bndArr[mf.bnd.boundarySelected].PreCalcBoundaryLines();
-                mf.bnd.bndArr[mf.bnd.boundarySelected].FixBoundaryLine(mf.bnd.boundarySelected, mf.tool.toolWidth);
-                mf.bnd.bndArr[mf.bnd.boundarySelected].PreCalcBoundaryLines();
-                mf.bnd.bndArr[mf.bnd.boundarySelected].isSet = true;
-                mf.fd.UpdateFieldBoundaryGUIAreas();
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.bnd.bndArr.Count - 1, mf.tool.toolWidth);
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
 
-                mf.bnd.bndArr[mf.bnd.boundarySelected].CalculateBoundaryArea();
-                if (mf.bnd.boundarySelected == 0) mf.bnd.bndArr[mf.bnd.boundarySelected].isOwnField = true;
-                else mf.bnd.bndArr[mf.bnd.boundarySelected].isOwnField = false;
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
+                if (mf.bnd.bndArr.Count == 1) mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].isOwnField = true;
+                else mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].isOwnField = false;
+
+                mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
+                mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
+
+                mf.fd.UpdateFieldBoundaryGUIAreas();
+                mf.mazeGrid.BuildMazeGridArray();
+
+                mf.CalculateMinMax();
+                mf.FileSaveBoundary();
             }
 
             //stop it all for adding
             mf.bnd.isOkToAddPoints = false;
             mf.bnd.isBndBeingMade = false;
 
-            //turn lines made from boundaries
-            mf.CalculateMinMax();
-            mf.FileSaveBoundary();
-            mf.turn.BuildTurnLines();
-            mf.gf.BuildGeoFenceLines();
-            //mf.hd.BuildSingleSpaceHeadLines();
-
-            //Task.Run(() => mf.mazeGrid.BuildMazeGridArray());
-            mf.mazeGrid.BuildMazeGridArray();
 
             mf.bnd.bndBeingMadePts.Clear();
-            //close window
             Close();
         }
 
@@ -124,7 +122,7 @@ namespace AgOpenGPS
         {
         
             mf.bnd.isOkToAddPoints = true;
-                mf.AddBoundaryAndPerimiterPoint();
+            mf.AddBoundaryAndPerimiterPoint();
             mf.bnd.isOkToAddPoints = false;
             lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
 

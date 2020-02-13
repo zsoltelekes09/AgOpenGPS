@@ -237,11 +237,10 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < tramList.Count; i++)
                 {
-                    int middle = 0;
                     GL.Color4(0.8630f, 0.93692f, 0.8260f, 0.752);
                     if (tramList[i].Count > 1)
                     {
-                        middle = tramList[i].Count - 1;
+                        int middle = tramList[i].Count - 1;
                         mf.font.DrawText3D(tramList[i][middle].easting, tramList[i][middle].northing, (i + 1).ToString());
                         mf.font.DrawText3D(tramList[i][0].easting, tramList[i][0].northing, (i + 1).ToString());
 
@@ -291,9 +290,9 @@ namespace AgOpenGPS
                     P1.easting =  (hsin * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + tramRef[j].easting;
                     P1.northing = (hcos * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + tramRef[j].northing;
 
-                    if (isBndExist)
+                    if (mf.bnd.bndArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary > -1)
                     {
-                        if (mf.bnd.bndArr[0].IsPointInsideBoundary(P1))
+                        if (mf.bnd.bndArr[mf.bnd.LastBoundary].IsPointInsideBoundary(P1))
                         {
                             tramArr.Add(P1);
                             P1.easting =  (hsin * mf.tram.wheelTrack) + P1.easting;
@@ -314,11 +313,6 @@ namespace AgOpenGPS
 
             tramRef?.Clear();
             //outside tram
-
-            if (mf.bnd.bndArr.Count == 0 || mf.tram.passes != 0)
-            {                               
-                //return;
-            }
         }
 
         public void GetCurrentABLine(vec3 pivot, vec3 steer)

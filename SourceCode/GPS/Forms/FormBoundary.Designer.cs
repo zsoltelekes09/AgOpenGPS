@@ -122,7 +122,6 @@
             // 
             // btnLeftRight
             // 
-            this.btnLeftRight.Enabled = false;
             this.btnLeftRight.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.btnLeftRight.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLeftRight.Image = global::AgOpenGPS.Properties.Resources.BoundaryLeft;
@@ -137,7 +136,6 @@
             // 
             this.btnGo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnGo.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnGo.Enabled = false;
             this.btnGo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.btnGo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGo.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -173,7 +171,7 @@
             this.btnLoadMultiBoundaryFromGE.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLoadMultiBoundaryFromGE.Image = global::AgOpenGPS.Properties.Resources.BoundaryLoadMultiFromGE;
             this.btnLoadMultiBoundaryFromGE.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnLoadMultiBoundaryFromGE.Location = new System.Drawing.Point(461, 470);
+            this.btnLoadMultiBoundaryFromGE.Location = new System.Drawing.Point(446, 469);
             this.btnLoadMultiBoundaryFromGE.Name = "btnLoadMultiBoundaryFromGE";
             this.btnLoadMultiBoundaryFromGE.Size = new System.Drawing.Size(91, 84);
             this.btnLoadMultiBoundaryFromGE.TabIndex = 211;
@@ -188,7 +186,7 @@
             this.btnLoadBoundaryFromGE.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLoadBoundaryFromGE.Image = global::AgOpenGPS.Properties.Resources.BoundaryLoadFromGE;
             this.btnLoadBoundaryFromGE.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnLoadBoundaryFromGE.Location = new System.Drawing.Point(324, 470);
+            this.btnLoadBoundaryFromGE.Location = new System.Drawing.Point(307, 469);
             this.btnLoadBoundaryFromGE.Name = "btnLoadBoundaryFromGE";
             this.btnLoadBoundaryFromGE.Size = new System.Drawing.Size(91, 84);
             this.btnLoadBoundaryFromGE.TabIndex = 210;
@@ -227,19 +225,16 @@
             // 
             // btnDelete
             // 
-            this.button4.CausesValidation = false;
-            this.button4.Location = new System.Drawing.Point(530, 100);
-            this.button4.Margin = new System.Windows.Forms.Padding(0);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(40, 280);
-            this.button4.TabIndex = 209;
-            this.button4.TabStop = false;
-            this.button4.UseCompatibleTextRendering = true;
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Mouse_Down);
-            this.button4.MouseLeave += new System.EventHandler(this.Mouse_Leave);
-            this.button4.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Mouse_Move);
-            this.button4.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Mouse_Up);
+            this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDelete.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDelete.Image = global::AgOpenGPS.Properties.Resources.BoundaryDelete;
+            this.btnDelete.Location = new System.Drawing.Point(655, 240);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(78, 68);
+            this.btnDelete.TabIndex = 65;
+            this.btnDelete.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // btnSerialCancel
             // 

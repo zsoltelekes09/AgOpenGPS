@@ -12,11 +12,7 @@ namespace AgOpenGPS
         //the list of constants and multiples of the boundary
         public List<vec2> calcList = new List<vec2>();
 
-        public void ResetGeoFence()
-        {
-            calcList?.Clear();
-            geoFenceLine?.Clear();
-        }
+        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
         public bool IsPointInGeoFenceArea(vec3 testPointv2)
         {
@@ -24,13 +20,16 @@ namespace AgOpenGPS
             int j = geoFenceLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < geoFenceLine.Count; j = i++)
+            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
             {
-                if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
-                || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
+                    || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                    {
+                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -42,13 +41,16 @@ namespace AgOpenGPS
             int j = geoFenceLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < geoFenceLine.Count; j = i++)
+            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
             {
-                if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
-                || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
+                    || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                    {
+                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -72,11 +74,11 @@ namespace AgOpenGPS
         {
             //count the points from the boundary
             int lineCount = geoFenceLine.Count;
-            double distance = 0;
 
             //int headCount = mf.bndArr[inTurnNum].bndLine.Count;
             int bndCount = curBnd.Count;
 
+            double distance;
             //remove the points too close to boundary
             for (int i = 0; i < bndCount; i++)
             {
@@ -136,8 +138,17 @@ namespace AgOpenGPS
             calcList.Clear();
             vec2 constantMultiple = new vec2(0, 0);
 
+            Northingmin = Northingmax = geoFenceLine[0].northing;
+            Eastingmin = Eastingmax = geoFenceLine[0].easting;
+
+
             for (int i = 0; i < geoFenceLine.Count; j = i++)
             {
+                if (Northingmin > geoFenceLine[i].northing) Northingmin = geoFenceLine[i].northing;
+                if (Northingmax < geoFenceLine[i].northing) Northingmax = geoFenceLine[i].northing;
+                if (Eastingmin > geoFenceLine[i].easting) Eastingmin = geoFenceLine[i].easting;
+                if (Eastingmax < geoFenceLine[i].easting) Eastingmax = geoFenceLine[i].easting;
+
                 //check for divide by zero
                 if (Math.Abs(geoFenceLine[i].northing - geoFenceLine[j].northing) < double.Epsilon)
                 {

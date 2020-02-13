@@ -191,15 +191,13 @@ namespace AgOpenGPS
                 mf.curve.refList.CopyTo(arr);
                 mf.curve.refList.Clear();
 
-                mf.curve.aveLineHeading += Math.PI;
-                if (mf.curve.aveLineHeading < 0) mf.curve.aveLineHeading += glm.twoPI;
-                if (mf.curve.aveLineHeading > glm.twoPI) mf.curve.aveLineHeading -= glm.twoPI;
+                mf.curve.aveLineHeading = (mf.curve.aveLineHeading + Math.PI) % glm.twoPI;
 
                 for (int i = 1; i < cnt; i++)
                 {
                     vec3 pt3 = arr[i];
                     pt3.heading += Math.PI;
-                    if (pt3.heading > glm.twoPI) pt3.heading -= glm.twoPI;
+                    pt3.heading %= glm.twoPI;
                     if (pt3.heading < 0) pt3.heading += glm.twoPI;
                     mf.curve.refList.Add(pt3);
                 }

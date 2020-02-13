@@ -58,7 +58,7 @@ namespace AgOpenGPS
 
             bool isBndExist = mf.bnd.bndArr.Count != 0;
 
-            if (isBndExist)
+            if (mf.bnd.bndArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary > -1)
             {
                 CreateBndTramRef();
                 CreateOuterTram();
@@ -74,7 +74,7 @@ namespace AgOpenGPS
         public void CreateBndTramRef()
         {
             //count the points from the boundary
-            int ptCount = mf.bnd.bndArr[0].bndLine.Count;
+            int ptCount = mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine.Count;
             outArr?.Clear();
 
             //outside point
@@ -82,21 +82,22 @@ namespace AgOpenGPS
 
             double distSq = ((tramWidth * 0.5) - halfWheelTrack) * ((tramWidth * 0.5) - halfWheelTrack) * 0.97;
             bool fail = false;
-
+            
+            int ChangeDirection = mf.bnd.bndArr[mf.bnd.LastBoundary].isOwnField ? -1 : 1;
             //make the boundary tram outer array
             for (int i = 0; i < ptCount; i++)
             {
                 //calculate the point inside the boundary
-                pt3.easting = mf.bnd.bndArr[0].bndLine[i].easting -
-                    (Math.Sin(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack));
+                pt3.easting = mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine[i].easting -
+                    (Math.Sin(glm.PIBy2 + mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack)) * ChangeDirection;
 
-                pt3.northing = mf.bnd.bndArr[0].bndLine[i].northing -
-                    (Math.Cos(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack));
+                pt3.northing = mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine[i].northing -
+                    (Math.Cos(glm.PIBy2 + mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack)) * ChangeDirection;
 
                 for (int j = 0; j < ptCount; j++)
                 {
                     double check = glm.DistanceSquared(pt3.northing, pt3.easting,
-                                        mf.bnd.bndArr[0].bndLine[j].northing, mf.bnd.bndArr[0].bndLine[j].easting);
+                                        mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine[j].northing, mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine[j].easting);
                     if (check < distSq)
                     {
                         fail = true;
@@ -106,7 +107,7 @@ namespace AgOpenGPS
 
                 if (!fail)
                 {
-                    pt3.heading = mf.bnd.bndArr[0].bndLine[i].heading;
+                    pt3.heading = mf.bnd.bndArr[mf.bnd.LastBoundary].bndLine[i].heading;
                     outArr.Add(pt3);
                 }
                 fail = false;
@@ -136,6 +137,7 @@ namespace AgOpenGPS
 
             int cnt = mf.tram.outArr.Count;
 
+            int ChangeDirection = mf.bnd.bndArr[mf.bnd.LastBoundary].isOwnField ? -1 : 1;
             if (cnt > 0)
             {
                 vec2 pt = new vec2();
@@ -148,10 +150,10 @@ namespace AgOpenGPS
                     tramBndArr.Add(pt);
 
                     pt2.easting = mf.tram.outArr[i].easting -
-                        (Math.Sin(glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack);
+                        (Math.Sin(glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack) * ChangeDirection;
 
                     pt2.northing = mf.tram.outArr[i].northing -
-                        (Math.Cos(glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack);
+                        (Math.Cos(glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack) * ChangeDirection;
                     tramBndArr.Add(pt2);
                 }
             }

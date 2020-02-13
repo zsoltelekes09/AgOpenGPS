@@ -14,11 +14,7 @@ namespace AgOpenGPS
 
         public List<bool> isDrawList = new List<bool>();
 
-        public void ResetHead()
-        {
-            calcList?.Clear();
-            hdLine?.Clear();
-        }
+        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
         public bool IsPointInHeadArea(vec3 testPointv2)
         {
@@ -26,13 +22,16 @@ namespace AgOpenGPS
             int j = hdLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < hdLine.Count; j = i++)
+            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
             {
-                if ((hdLine[i].northing < testPointv2.northing && hdLine[j].northing >= testPointv2.northing)
-                || (hdLine[j].northing < testPointv2.northing && hdLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < hdLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((hdLine[i].northing < testPointv2.northing && hdLine[j].northing >= testPointv2.northing)
+                    || (hdLine[j].northing < testPointv2.northing && hdLine[i].northing >= testPointv2.northing))
+                    {
+                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -44,13 +43,16 @@ namespace AgOpenGPS
             int j = hdLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < hdLine.Count; j = i++)
+            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
             {
-                if ((hdLine[i].northing < testPointv2.northing && hdLine[j].northing >= testPointv2.northing)
-                || (hdLine[j].northing < testPointv2.northing && hdLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < hdLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((hdLine[i].northing < testPointv2.northing && hdLine[j].northing >= testPointv2.northing)
+                    || (hdLine[j].northing < testPointv2.northing && hdLine[i].northing >= testPointv2.northing))
+                    {
+                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -113,8 +115,16 @@ namespace AgOpenGPS
             calcList.Clear();
             vec2 constantMultiple = new vec2(0, 0);
 
+            Northingmin = Northingmax = hdLine[0].northing;
+            Eastingmin = Eastingmax = hdLine[0].easting;
+
             for (int i = 0; i < hdLine.Count; j = i++)
             {
+                if (Northingmin > hdLine[0].northing) Northingmin = hdLine[0].northing;
+                if (Northingmax < hdLine[0].northing) Northingmax = hdLine[0].northing;
+                if (Eastingmin > hdLine[0].easting) Eastingmin = hdLine[0].easting;
+                if (Eastingmax < hdLine[0].easting) Eastingmax = hdLine[0].easting;
+
                 //check for divide by zero
                 if (Math.Abs(hdLine[i].northing - hdLine[j].northing) < double.Epsilon)
                 {

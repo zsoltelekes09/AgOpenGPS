@@ -129,7 +129,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < mf.bnd.bndArr.Count; i++)
                 {
-                    if (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary)
+                    if (!mf.bnd.bndArr[i].isOwnField && (mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary || mf.bnd.bndArr[i].OuterField == -1))
                     {
                             areaBoundaryOuterLessInner -= mf.bnd.bndArr[i].area;
                     }

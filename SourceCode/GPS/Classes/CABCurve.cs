@@ -237,11 +237,10 @@ namespace AgOpenGPS
             {
                 for (int i = 0; i < tramList.Count; i++)
                 {
-                    int middle = 0;
                     GL.Color4(0.8630f, 0.93692f, 0.8260f, 0.752);
                     if (tramList[i].Count > 0)
                     {
-                        middle = tramList[i].Count - 1;
+                        int middle = tramList[i].Count - 1;
                         mf.font.DrawText3D(tramList[i][middle].easting, tramList[i][middle].northing, (i + 1).ToString());
                         mf.font.DrawText3D(tramList[i][0].easting, tramList[i][0].northing, (i + 1).ToString());
                     }
@@ -256,8 +255,6 @@ namespace AgOpenGPS
             tramArr?.Clear();
 
             vec2 tramLineP1;
-
-            bool isBndExist = mf.bnd.bndArr.Count != 0;
 
             double pass = 0.5;
             double headingCalc = aveLineHeading + glm.PIBy2;
@@ -274,9 +271,9 @@ namespace AgOpenGPS
                     tramLineP1.easting = (hsin * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + refList[j].easting;
                     tramLineP1.northing = (hcos * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + refList[j].northing;
 
-                    if (isBndExist)
+                    if (mf.bnd.bndArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary > -1)
                     {
-                        if (mf.bnd.bndArr[0].IsPointInsideBoundary(tramLineP1))
+                        if (mf.bnd.bndArr[mf.bnd.LastBoundary].IsPointInsideBoundary(tramLineP1))
                         {
                             tramArr.Add(tramLineP1);
 
@@ -425,7 +422,6 @@ namespace AgOpenGPS
 
                     curList?.Clear();
                     double circumference = (glm.twoPI * s) / (boundaryTriggerDistance * 0.1);
-
                     for (double round = glm.twoPI * (howManyPathsAway - 2); round <= (glm.twoPI * (howManyPathsAway + 2) + 0.00001); round += (glm.twoPI / circumference))
                     {
                         double x = s * (Math.Cos(round) + (round / Math.PI) * Math.Sin(round));
@@ -450,7 +446,6 @@ namespace AgOpenGPS
 
                         //first point needs last, first, second points
                         vec3 pt3 = arr[0];
-                        pt3 = arr[0];
                         pt3.heading = Math.Atan2(arr[1].easting - arr[cnt - 1].easting, arr[1].northing - arr[cnt - 1].northing);
                         if (pt3.heading < 0) pt3.heading += glm.twoPI;
                         curList.Add(pt3);
@@ -510,7 +505,6 @@ namespace AgOpenGPS
 
                         //first point needs last, first, second points
                         vec3 pt3 = arr[0];
-                        pt3 = arr[0];
                         pt3.heading = Math.Atan2(arr[1].easting - arr[cnt - 1].easting, arr[1].northing - arr[cnt - 1].northing);
                         if (pt3.heading < 0) pt3.heading += glm.twoPI;
                         curList.Add(pt3);
@@ -619,20 +613,26 @@ namespace AgOpenGPS
 
                 howManyPathsAway = Math.Round(minDistance / widthMinusOverlap, 0, MidpointRounding.AwayFromZero);
 
-                curveNumber = howManyPathsAway;
-                if (distanceFromRefLine < 0) curveNumber = -curveNumber;
-
-                //double toolOffset = mf.tool.toolOffset;
-
-                //build the current line
-                curList?.Clear();
-                for (int i = 0; i < ptCount2; i++)
+                if (oldhowManyPathsAway != howManyPathsAway)
                 {
-                    var point = new vec3(
-                        refList[i].easting + (Math.Sin(piSide + aveLineHeading) * ((widthMinusOverlap * howManyPathsAway))),
-                        refList[i].northing + (Math.Cos(piSide + aveLineHeading) * ((widthMinusOverlap * howManyPathsAway))),
-                        refList[i].heading);
-                    curList.Add(point);
+                    oldhowManyPathsAway = howManyPathsAway;
+
+
+                    curveNumber = howManyPathsAway;
+                    if (distanceFromRefLine < 0) curveNumber = -curveNumber;
+
+                    //double toolOffset = mf.tool.toolOffset;
+
+                    //build the current line
+                    curList?.Clear();
+                    for (int i = 0; i < ptCount2; i++)
+                    {
+                        var point = new vec3(
+                            refList[i].easting + (Math.Sin(piSide + aveLineHeading) * ((widthMinusOverlap * howManyPathsAway))),
+                            refList[i].northing + (Math.Cos(piSide + aveLineHeading) * ((widthMinusOverlap * howManyPathsAway))),
+                            refList[i].heading);
+                        curList.Add(point);
+                    }
                 }
             }
 

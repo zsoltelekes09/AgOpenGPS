@@ -4,28 +4,12 @@ using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
-    //public class vec3
-    //{
-    //    public double easting { get; set; }
-    //    public double northing { get; set; }
-    //    public double heading { get; set; }
-
-    //    //constructor
-    //    public vec3(double _easting, double _northing, double _heading)
-    //    {
-    //        easting = _easting;
-    //        northing = _northing;
-    //        heading = _heading;
-    //    }
-    //}
-
     public class CBoundaryLines
     {
         //constructor
         public CBoundaryLines()
         {
             area = 0;
-            isSet = false;
             isDriveAround = false;
             isDriveThru = false;
             isOwnField = false;
@@ -38,12 +22,14 @@ namespace AgOpenGPS
         //the list of constants and multiples of the boundary
         public List<vec2> calcList = new List<vec2>();
 
+        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
+
         //area variable
         public double area;
 
         //boundary variables
         public int OuterField;
-        public bool isSet, isOwnField, isDriveAround, isDriveThru;
+        public bool isOwnField, isDriveAround, isDriveThru;
 
         public void CalculateBoundaryHeadings()
         {
@@ -78,9 +64,6 @@ namespace AgOpenGPS
 
         public void FixBoundaryLine(int bndNum, double spacing)
         {
-            //count the points from the boundary
-            int ptCount = bndLine.Count;
-
             //boundary point spacing based on eq width
             spacing *= 0.25;
 
@@ -88,22 +71,11 @@ namespace AgOpenGPS
             if (spacing > 3) spacing = 3;
 
             //first find out which side is inside the boundary
-            double oneSide = glm.PIBy2;
-            vec3 point = new vec3(bndLine[2].easting - (Math.Sin(oneSide + bndLine[2].heading) * 2.0),
-            bndLine[2].northing - (Math.Cos(oneSide + bndLine[2].heading) * 2.0), 0.0);
+            vec3 point = new vec3(bndLine[2].easting - (Math.Sin(glm.PIBy2 + bndLine[2].heading) * 2.0),
+            bndLine[2].northing - (Math.Cos(glm.PIBy2 + bndLine[2].heading) * 2.0), 0.0);
 
             //make sure boundaries are wound correctly
-            if (bndNum == 0)
-            {
-                //outside an outer boundary means its wound clockwise
-                if (IsPointInsideBoundary(point)) ReverseWinding();
-            }
-            else
-            {
-                //inside an inner boundary means its wound clockwise
-                if (IsPointInsideBoundary(point)) ReverseWinding();
-                spacing *= 0.66;
-            }
+            if (IsPointInsideBoundary(point)) ReverseWinding();
 
             //make sure distance isn't too small between points on headland
             int bndCount = bndLine.Count;
@@ -188,8 +160,16 @@ namespace AgOpenGPS
             calcList.Clear();
             vec2 constantMultiple = new vec2(0, 0);
 
+            Northingmin = Northingmax = bndLine[0].northing;
+            Eastingmin = Eastingmax = bndLine[0].easting;
+
             for (int i = 0; i < bndLine.Count; j = i++)
             {
+                if (Northingmin > bndLine[i].northing) Northingmin = bndLine[i].northing;
+                if (Northingmax < bndLine[i].northing) Northingmax = bndLine[i].northing;
+                if (Eastingmin > bndLine[i].easting) Eastingmin = bndLine[i].easting;
+                if (Eastingmax < bndLine[i].easting) Eastingmax = bndLine[i].easting;
+
                 //check for divide by zero
                 if (Math.Abs(bndLine[i].northing - bndLine[j].northing) < 0.00000000001)
                 {
@@ -215,13 +195,16 @@ namespace AgOpenGPS
             int j = bndLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < bndLine.Count; j = i++)
+            if (testPointv3.northing > Northingmin || testPointv3.northing < Northingmax || testPointv3.easting > Eastingmin || testPointv3.easting < Eastingmax)
             {
-                if ((bndLine[i].northing < testPointv3.northing && bndLine[j].northing >= testPointv3.northing)
-                || (bndLine[j].northing < testPointv3.northing && bndLine[i].northing >= testPointv3.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < bndLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv3.northing * calcList[i].northing) + calcList[i].easting < testPointv3.easting);
+                    if ((bndLine[i].northing < testPointv3.northing && bndLine[j].northing >= testPointv3.northing)
+                    || (bndLine[j].northing < testPointv3.northing && bndLine[i].northing >= testPointv3.northing))
+                    {
+                        oddNodes ^= ((testPointv3.northing * calcList[i].northing) + calcList[i].easting < testPointv3.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -233,13 +216,16 @@ namespace AgOpenGPS
             int j = bndLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < bndLine.Count; j = i++)
+            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
             {
-                if ((bndLine[i].northing < testPointv2.northing && bndLine[j].northing >= testPointv2.northing)
-                || (bndLine[j].northing < testPointv2.northing && bndLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < bndLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((bndLine[i].northing < testPointv2.northing && bndLine[j].northing >= testPointv2.northing)
+                    || (bndLine[j].northing < testPointv2.northing && bndLine[i].northing >= testPointv2.northing))
+                    {
+                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.

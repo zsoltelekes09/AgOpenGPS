@@ -47,7 +47,6 @@ namespace AgOpenGPS
             //clear out existing path of vec3 points
             dubinsShortestPathList.Clear();
 
-            int pathsCnt = pathDataList.Count;
             if (pathDataList.Count > 0)
             {
                 int cnt = pathDataList[0].pathCoordinates.Count;

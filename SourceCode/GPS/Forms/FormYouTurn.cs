@@ -812,8 +812,10 @@ namespace AgOpenGPS
         {
             if (mf.ABLine.isABLineSet)
             {
-                var form = new FormYouTurnRecord(mf);
-                form.Show();
+                using (var form = new FormYouTurnRecord(mf))
+                {
+                    form.Show();
+                }
                 Close();
             }
             else { mf.TimedMessageBox(3000, "No AB Lines", "Start AB Line Guidance"); }
@@ -1171,8 +1173,8 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.set_youUseDubins = mf.yt.isUsingDubinsTurn;
 
             Properties.Vehicle.Default.set_youTurnDistance = mf.yt.youTurnStartOffset;
-            Properties.Vehicle.Default.set_youTriggerDistance = mf.yt.triggerDistanceOffset;
-            Properties.Vehicle.Default.set_geoFenceDistance = mf.yt.geoFenceDistance;
+
+
             //mf.hl.boxLength = 3.0 * mf.yt.triggerDistanceOffset;
 
             StringBuilder sbEntry = new StringBuilder();
@@ -1225,12 +1227,22 @@ namespace AgOpenGPS
             //save it all
             Properties.Vehicle.Default.Save();
             Close();
-            mf.turn.BuildTurnLines();
-            mf.gf.BuildGeoFenceLines();
-            //mf.hd.BuildSingleSpaceHeadLines();
 
-            mf.mazeGrid.BuildMazeGridArray();
-            //mf.rateMap.BuildRateMap();
+
+
+            if (Properties.Vehicle.Default.set_youTriggerDistance != mf.yt.triggerDistanceOffset)
+            {
+                Properties.Vehicle.Default.set_youTriggerDistance = mf.yt.triggerDistanceOffset;
+                mf.turn.BuildTurnLines(-1);
+            }
+
+
+            if (Properties.Vehicle.Default.set_geoFenceDistance != mf.yt.geoFenceDistance)
+            {
+                Properties.Vehicle.Default.set_geoFenceDistance = mf.yt.geoFenceDistance;
+                mf.gf.BuildGeoFenceLines(-1);
+                mf.mazeGrid.BuildMazeGridArray();
+            }
 
             mf.yt.ResetCreatedYouTurn();
         }

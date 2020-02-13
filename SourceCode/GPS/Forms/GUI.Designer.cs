@@ -25,7 +25,7 @@ namespace AgOpenGPS
         public bool isIn3D = true, isMetric = true, isLightbarOn = true, isGridOn, isFullScreen;
         public bool isUTurnAlwaysOn, isCompassOn, isSpeedoOn, isAutoDayNight, isSideGuideLines = true;
         public bool isPureDisplayOn = true, isSkyOn = true, isRollMeterOn = false;
-        public bool isDay = true, isDayTime = true, isSimple;
+        public bool isDay = true, isDayTime = true;
 
         //master Manual and Auto, 3 states possible
         public enum btnStates { Off, Auto, On }
@@ -65,8 +65,6 @@ namespace AgOpenGPS
             //isDay = Properties.Settings.Default.setDisplay_isDayMode;
             isDay = !isDay;
             SwapDayNightMode();
-
-            isSimple = Properties.Settings.Default.setDisplay_isSimple;
 
             //metric settings
             isMetric = Settings.Default.setMenu_isMetric;
@@ -172,19 +170,8 @@ namespace AgOpenGPS
             //boundaryToolStripBtn.Enabled = false;
             toolStripBtnDropDownBoundaryTools.Enabled = false;
 
-            if (isNTRIP_RequiredOn)
+            if (!isNTRIP_TurnedOn)
             {
-                btnStartStopNtrip.Visible = true;
-                lblNTRIPSeconds.Visible = true;
-                lblWatch.Visible = true;
-                NTRIPBytesMenu.Visible = true;
-                pbarNtripMenu.Visible = true;
-            }
-            else
-            {
-                btnStartStopNtrip.Visible = false;
-                lblNTRIPSeconds.Visible = false;
-                lblWatch.Visible = false;
                 NTRIPBytesMenu.Visible = false;
                 pbarNtripMenu.Visible = false;
             }
@@ -251,13 +238,38 @@ namespace AgOpenGPS
 
             //if (panelSim.Left < 75) panelSim.Left = 75;
 
-            if (!isSimple)
+            if (Settings.Default.setDisplay_isSimple)
             {
-                steerChartTool.Visible = true;
-                youTurnStripBtn.Visible = true;
+                steerChartTool.Visible = false;
+                youTurnStripBtn.Visible = false;
+                toolToolbottomStripBtn.Visible = false;
+                vehicleToolStripBtn.Visible = false;
+                AutoSteerToolBtn.Visible = false;
+                toolStripMenuRecPath.Visible = false;
+                toolStripDropDownButton3.Visible = false;
+                toolStripStatusLabel2.Visible = false;
+                pbarUDPComm.Visible = false;
+            }
+            else
+            {
+                if (Width > 1400)
+                {
+                    steerChartTool.Visible = true;
+                }
+                else
+                {
+                    steerChartTool.Visible = false;
+                }
+                if (Width > 1100)
+                {
+                    youTurnStripBtn.Visible = true;
+                }
+                else
+                {
+                    youTurnStripBtn.Visible = false;
+                }
                 toolToolbottomStripBtn.Visible = true;
                 vehicleToolStripBtn.Visible = true;
-                steerChartTool.Visible = true;
                 AutoSteerToolBtn.Visible = true;
                 toolStripMenuRecPath.Visible = true;
                 toolStripDropDownButton3.Visible = true;
@@ -265,22 +277,14 @@ namespace AgOpenGPS
                 pbarUDPComm.Visible = true;
             }
 
-
             if (Width > 1100)
             {
-                youTurnStripBtn.Visible = true;
-                //ZoomExtentsStripBtn.Visible = true;
-                //stripEqWidth.Visible = false;
                 lblDateTime.Visible = true;
             }
             else
             {
-                youTurnStripBtn.Visible = false;
-                //ZoomExtentsStripBtn.Visible = false;
-                //stripEqWidth.Visible = false;
                 lblDateTime.Visible = false;
             }
-
 
             if (Width > 1200)
             {
@@ -291,31 +295,6 @@ namespace AgOpenGPS
             {
                 snapLeftBigStrip.Visible = false;
                 snapRightBigStrip.Visible = false;
-            }
-
-            if (Width > 1400)
-            {
-                steerChartTool.Visible = true;
-            }
-            else
-            {
-                steerChartTool.Visible = false;
-            }
-            
-
-            if (isSimple)
-            {
-                steerChartTool.Visible = false;
-                youTurnStripBtn.Visible = false;
-                toolToolbottomStripBtn.Visible = false;
-                vehicleToolStripBtn.Visible = false;
-                steerChartTool.Visible = false;
-                AutoSteerToolBtn.Visible = false;
-                toolStripMenuRecPath.Visible = false;
-                toolStripDropDownButton3.Visible = false;
-                toolStripStatusLabel2.Visible = false;
-                pbarUDPComm.Visible = false;
-
             }
         }
 
@@ -368,9 +347,8 @@ namespace AgOpenGPS
             {
                 //Batman mini-panel shows
                 //if (panelSim.Left < 390) panelSim.Left = 390;
-                oglMain.Left = statusStripLeft.Width + panelBatman.Width;
 
-                if (isSimple)
+                if (Settings.Default.setDisplay_isSimple)
                 {
                     oglMain.Width = Width - statusStripLeft.Width - panelBatman.Width - 110;
                     if (isFullScreen) oglMain.Width += 20;
@@ -380,6 +358,8 @@ namespace AgOpenGPS
                     oglMain.Width = Width - statusStripLeft.Width - panelBatman.Width - 198;
                     if (isFullScreen) oglMain.Width += 20;
                 }
+
+                oglMain.Left = statusStripLeft.Width + panelBatman.Width;
 
                 panelBatman.Left = statusStripLeft.Width;
 
@@ -397,7 +377,7 @@ namespace AgOpenGPS
             {
                 //no side panel
                 oglMain.Left = statusStripLeft.Width;
-                if (isSimple)
+                if (Settings.Default.setDisplay_isSimple)
                 {
                     oglMain.Width = Width - (statusStripLeft.Width) - 110;
                     if (isFullScreen) oglMain.Width += 20;
@@ -408,7 +388,7 @@ namespace AgOpenGPS
                     if (isFullScreen) oglMain.Width += 20;
                 }
                 panelBatman.Visible = false;
-                
+
                 panelSim.Left = 80;
 
                 panelFieldData.Width = oglMain.Width + 2;
@@ -478,6 +458,15 @@ namespace AgOpenGPS
             btnSection14Man.Size = new System.Drawing.Size(buttonWidth, buttonHeight);
             btnSection15Man.Size = new System.Drawing.Size(buttonWidth, buttonHeight);
             btnSection16Man.Size = new System.Drawing.Size(buttonWidth, buttonHeight);
+
+
+
+
+
+
+
+
+
 
             switch (tool.numOfSections)
             {
@@ -1160,68 +1149,12 @@ namespace AgOpenGPS
             yt.ResetYouTurn();
         }
 
-        private void DoNTRIPSecondRoutine()
-        {
-            //count up the ntrip clock only if everything is alive
-            if (startCounter > 50 && recvCounter < 134 && isNTRIP_RequiredOn)
-            {
-                IncrementNTRIPWatchDog();
-            }
-
-            //Have we connection
-            if (isNTRIP_RequiredOn && !isNTRIP_Connected && !isNTRIP_Connecting)
-            {
-                if (!isNTRIP_Starting && ntripCounter > 20)
-                {
-                    StartNTRIP();
-                }
-            }
-
-            if (isNTRIP_Connecting)
-            {
-                if (ntripCounter > 28)
-                {
-                    TimedMessageBox(2000, gStr.gsSocketConnectionProblem, gStr.gsNotConnectingToCaster);
-                    ReconnectRequest();
-                }
-                if (clientSocket != null && clientSocket.Connected)
-                {
-                    //TimedMessageBox(2000, "NTRIP Not Connected", " At the StartNTRIP() ");
-                    //ReconnectRequest();
-                    //return;
-                    SendAuthorization();
-                }
-
-            }
-
-            if (isNTRIP_RequiredOn)
-            {
-                //update byte counter and up counter
-                if (ntripCounter > 59) lblNTRIPSeconds.Text = (ntripCounter / 60) + " Mins";
-                else if (ntripCounter < 60 && ntripCounter > 22) lblNTRIPSeconds.Text = ntripCounter + " Secs";
-                else lblNTRIPSeconds.Text = gStr.gsConnectingIn + " " + (Math.Abs(ntripCounter - 22));
-
-                pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
-                NTRIPBytesMenu.Text = ((tripBytes) * 0.001).ToString("###,###,###") + " kb";
-
-                //watchdog for Ntrip
-                if (isNTRIP_Connecting) lblWatch.Text = gStr.gsAuthourizing;
-                else
-                {
-                    if (NTRIP_Watchdog > 10) lblWatch.Text = gStr.gsWaiting;
-                    else lblWatch.Text = gStr.gsListening;
-                }
-
-                if (sendGGAInterval > 0 && isNTRIP_Sending)
-                {
-                    lblWatch.Text = gStr.gsSendingGGA;
-                    isNTRIP_Sending = false;
-                }
-            }
-        }
-
         private void HalfSecond_Update(object sender, EventArgs e)
         {
+            testHalfSecond.Restart();
+            testHalfSecond.Start();
+
+            HalfSecondUpdate.Enabled = false;
             if (hd.isOn)
             {
                 hd.FindHeadlandDistance();
@@ -1239,7 +1172,6 @@ namespace AgOpenGPS
                 lblHeadLeftDist.Text = hd.leftToolDistance.ToString("N2");
                 lblHeadRightDist.Text = hd.rightToolDistance.ToString("N2");
             }
-
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
             lblLift.Text = mc.pgn[mc.azRelayData][mc.rdHydLift].ToString();
 
@@ -1251,11 +1183,24 @@ namespace AgOpenGPS
             {
                 steerAnglesToolStripDropDownButton1.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
             }
-            lblHz.Text = NMEAHz + "Hz " + (int)(frameTime) + "\r\n" + FixQuality + HzTime.ToString("N1") + " Hz " + testtest.ElapsedTicks.ToString();
+
+            testHalfSecond1 = testHalfSecond.ElapsedMilliseconds;
+
+
+            lblHz.Text = NMEAHz + "Hz " + (int)(frameTime) + "\r\n" + FixQuality + HzTime.ToString("N1") + " Hz " + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();//+ testtest.ElapsedTicks.ToString() + 
+
+
+            HalfSecondUpdate.Enabled = true;
         }
 
+        public string testtest2 = "";
         private void OneSecond_Update(object sender, EventArgs e)
         {
+            testOneSecond.Restart();
+            testOneSecond.Start();
+
+            OneSecondUpdate.Enabled = false;
+            //OneSecondUpdate.Tick
             //counter used for saving field in background
             saveCounter++;
 
@@ -1322,7 +1267,59 @@ namespace AgOpenGPS
             }
 
             //do all the NTRIP routines
-            DoNTRIPSecondRoutine();
+            if (isNTRIP_TurnedOn)
+            {
+                //increment once every second
+                ntripCounter++;
+
+                //Thinks is connected but not receiving anything // 30sec maybe a bit much?
+                if (NTRIP_Watchdog++ > 10 && isNTRIP_Connected) ReconnectRequest();
+
+                //Have we connection
+                if (!isNTRIP_Connected && !isNTRIP_Connecting)
+                {
+                    if (ntripCounter > 20) StartNTRIP();
+                }
+
+                if (isNTRIP_Connecting)
+                {
+                    if (ntripCounter > 25)//give it 5 seconds
+                    {
+                        TimedMessageBox(2000, gStr.gsSocketConnectionProblem, gStr.gsNotConnectingToCaster);
+                        ReconnectRequest();
+                    }
+                    if (clientSocket != null && clientSocket.Connected)
+                    {
+                        SendAuthorization();
+                    }
+                }
+
+
+                //update byte counter and up counter
+                if (ntripCounter > 20) lblNTRIPSeconds.Text = string.Format("{0:00}:{1:00}", ((ntripCounter-21) / 60), (Math.Abs(ntripCounter-21)) % 60);
+                else lblNTRIPSeconds.Text = gStr.gsConnectingIn + " " + (Math.Abs(ntripCounter - 21));
+
+
+
+                pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
+                NTRIPBytesMenu.Text = ((tripBytes) * 0.001).ToString("###,###,###") + " kb";
+
+                //watchdog for Ntrip
+                if (isNTRIP_Connecting) lblWatch.Text = gStr.gsAuthourizing;
+                else
+                {
+                    if (NTRIP_Watchdog > 10) lblWatch.Text = gStr.gsWaiting;
+                    else lblWatch.Text = gStr.gsListening;
+                }
+
+                if (sendGGAInterval > 0 && isNTRIP_Sending)
+                {
+                    lblWatch.Text = gStr.gsSendingGGA;
+                    isNTRIP_Sending = false;
+                }
+
+
+            }
 
             //the main formgps window
             if (isMetric)  //metric or imperial
@@ -1359,12 +1356,21 @@ namespace AgOpenGPS
             }
 
             lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
-        }
+
+            OneSecondUpdate.Enabled = true;
+
+
+            testOneSecond1 = testOneSecond.ElapsedMilliseconds;
+    }
 
 
         public int testint = 0;
         private void ThreeSecond_Update(object sender, EventArgs e)
         {
+            testThreeSecond.Restart();
+            testThreeSecond.Start();
+
+            ThreeSecondUpdate.Enabled = false;
             zoomUpdateCounter = true;
             //check to make sure the grid is big enough
             worldGrid.checkZoomWorldGrid(pn.fix.northing, pn.fix.easting);
@@ -1421,10 +1427,14 @@ namespace AgOpenGPS
             if (ABLine.isBtnABLineOn) btnABLine.Text = "# " + PassNumber;
             else btnABLine.Text = "";
 
-            if (curve.isCurveBtnOn) btnCurve.Text = "# " + CurveNumber;
+            if (curve.isBtnCurveOn) btnCurve.Text = "# " + CurveNumber;
             else btnCurve.Text = "";
 
             //toolStripBtnGPSStength.ImageTransparentColor
+            ThreeSecondUpdate.Enabled = true;
+
+
+            testThreeSecond1 = testThreeSecond.ElapsedMilliseconds;
         }
 
         #region Properties // ---------------------------------------------------------------------

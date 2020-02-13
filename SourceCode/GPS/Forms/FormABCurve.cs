@@ -657,7 +657,7 @@ namespace AgOpenGPS
                     {
                         mf.curve.ResetCurveLine();
                         if (mf.isAutoSteerBtnOn) mf.btnAutoSteer.PerformClick();
-                        if (mf.yt.isYouTurnBtnOn) mf.btnEnableAutoYouTurn.PerformClick();
+                        if (mf.yt.isYouTurnBtnOn) mf.btnAutoYouTurn.PerformClick();
                     }
 
                     mf.FileSaveCurveLines();
@@ -682,6 +682,59 @@ namespace AgOpenGPS
             else
             {
                 return;
+            }
+        }
+        private void btnCancelMain_Click(object sender, EventArgs e)
+        {
+            mf.curve.numCurveLines = mf.curve.curveArr.Count;
+            if (mf.curve.numCurveLineSelected > mf.curve.numCurveLines) mf.curve.numCurveLineSelected = mf.curve.numCurveLines;
+
+            if (mf.curve.numCurveLineSelected < originalSelected)
+            {
+                mf.curve.numCurveLineSelected = 0;
+            }
+            else mf.curve.numCurveLineSelected = originalSelected;
+
+            if (mf.curve.numCurveLineSelected > 0)
+            {
+                int idx = mf.curve.numCurveLineSelected - 1;
+                mf.curve.aveLineHeading = mf.curve.curveArr[idx].aveHeading;
+
+                mf.curve.refList?.Clear();
+                for (int i = 0; i < mf.curve.curveArr[idx].curvePts.Count; i++)
+                {
+                    mf.curve.refList.Add(mf.curve.curveArr[idx].curvePts[i]);
+                }
+
+                if (mf.curve.refList.Count < 3)
+                {
+                    mf.btnCurve.PerformClick();
+                    mf.curve.ResetCurveLine();
+                    mf.DisableYouTurnButtons();
+                }
+                else
+                {
+                    mf.curve.isCurveSet = true;
+                }
+                Close();
+            }
+            else
+            {
+                mf.curve.moveDistance = 0;
+                mf.curve.isOkToAddPoints = false;
+                mf.curve.isCurveSet = false;
+                mf.curve.refList?.Clear();
+                mf.curve.isCurveSet = false;
+                mf.DisableYouTurnButtons();
+                //mf.btnContourPriority.Enabled = false;
+                //mf.curve.ResetCurveLine();
+                mf.curve.isBtnCurveOn = false;
+                mf.btnCurve.Image = Properties.Resources.CurveOff;
+                if (mf.isAutoSteerBtnOn) mf.btnAutoSteer.PerformClick();
+                if (mf.yt.isYouTurnBtnOn) mf.btnAutoYouTurn.PerformClick();
+
+                mf.curve.numCurveLineSelected = 0;
+                Close();
             }
         }
     }

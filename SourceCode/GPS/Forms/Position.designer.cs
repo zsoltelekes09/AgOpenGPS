@@ -50,7 +50,7 @@ namespace AgOpenGPS
         public vec2 prevBoundaryPos = new vec2(0, 0);
 
         //are we still getting valid data from GPS, resets to 0 in NMEA OGI block, watchdog 
-        public int recvCounter = 20;
+        public int recvCounter = 134;
 
         //Everything is so wonky at the start
         int startCounter = 0;
@@ -89,9 +89,14 @@ namespace AgOpenGPS
         {
             NMEAWatchdog.Enabled = false;
 
+            testNMEA.Restart();
+            testNMEA.Start();
+
+
             //parse any data from pn.rawBuffer
             pn.ParseNMEA();
 
+            testNMEA1 = testNMEA.ElapsedMilliseconds;
             //time for a frame update with new valid data
             if (pn.UpdatedLatLon)
             {
@@ -130,7 +135,7 @@ namespace AgOpenGPS
         public double rollUsed, dist = 0;
         private double offset = 0;
         public double headlandDistanceDelta = 0;
-
+        public double lasttest = 0;
         private void UpdateFixPosition()
         {
             //start the watch
@@ -185,24 +190,15 @@ namespace AgOpenGPS
 
             #region Step Fix
 
-            testtest.Restart();
-            testtest.Start();
-
 
 
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = glm.Distance(pn.fix, stepFixPts[0]);
 
-            //tree spacing
-            if (vehicle.treeSpacing != 0 && section[0].isSectionOn && (treeSpacingCounter += (distanceCurrentStepFix * 100)) > vehicle.treeSpacing )
-            {
-                treeTrigger = !treeTrigger;
-                treeSpacingCounter %= vehicle.treeSpacing;//keep the distance below spacing
-            }
 
 
 
-            if (distanceCurrentStepFix > minFixStepDist / totalFixSteps)
+            if (distanceCurrentStepFix > 0.1)//minFixStepDist / totalFixSteps)
             {
                 for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
 
@@ -211,15 +207,32 @@ namespace AgOpenGPS
                 stepFixPts[0].easting = pn.fix.easting;
                 stepFixPts[0].northing = pn.fix.northing;
 
-                if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser -= 3000; ;//userDistance can be reset
                 CalculatePositionHeading();
+                if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser -= 3000; ;//userDistance can be reset
+
+                double test = Math.Atan2(stepFixPts[0].easting - stepFixPts[1].easting, stepFixPts[0].northing - stepFixPts[1].northing);
+
+                double angle = test - lasttest;
+                while (angle > Math.PI) angle -= glm.twoPI;
+                while (angle < -Math.PI) angle += glm.twoPI;
+                //if (angle < -glm.PIBy2 || angle > glm.PIBy2)
+                if (angle < -1 || angle > 1)
+                {
+                    //System.Windows.Forms.MessageBox.Show("change".ToString());
+                }
+                lasttest = test;
+
             }
 
             //test if travelled far enough for new boundary point
             if (glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryAndPerimiterPoint();
 
-            //grab sentences for logging
-            if (isLogNMEA) pn.logNMEASentence.Append(recvSentenceSettings);
+            //tree spacing
+            if (vehicle.treeSpacing != 0 && section[0].isSectionOn && (treeSpacingCounter += (distanceCurrentStepFix * 100)) > vehicle.treeSpacing)
+            {
+                treeTrigger = !treeTrigger;
+                treeSpacingCounter %= vehicle.treeSpacing;//keep the distance below spacing
+            }
 
             //test if travelled far enough for new Section point, To prevent drawing high numbers of triangles
             if (isJobStarted && glm.Distance(pn.fix, prevSectionPos) > sectionTriggerStepDistance)
@@ -230,12 +243,9 @@ namespace AgOpenGPS
                                                     + pn.altitude.ToString("N2") + ","
                                                     + pn.latitude + "," + pn.longitude + "\r\n");
             }
-            testtest.Stop();
-        
 
-
-
-
+            //grab sentences for logging
+            if (isLogNMEA) pn.logNMEASentence.Append(recvSentenceSettings[0]);// not sure :O
 
             #endregion fix
 
@@ -449,7 +459,7 @@ namespace AgOpenGPS
             oglMain.MakeCurrent();
             oglMain.Refresh();
 
-            //end of UppdateFixPosition
+            //end of UpdateFixPosition
 
             swFrame.Stop();
 
@@ -467,24 +477,29 @@ namespace AgOpenGPS
             {
                 case "Fix":
                     fixStepDist = 0;
-                    for (currentStepFix = 0; currentStepFix < totalFixSteps; currentStepFix++)
+                    for (currentStepFix = 0; currentStepFix < totalFixSteps -1; currentStepFix++)
                     {
                         fixStepDist += stepFixPts[currentStepFix].heading;
-                        if (fixStepDist > minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
+                        if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
                         {
-                            gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix].easting, pn.fix.northing - stepFixPts[currentStepFix].northing);
+                            gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
                             if (gpsHeading < 0) gpsHeading += glm.twoPI;
                             fixHeading = gpsHeading;
 
                             //determine fix positions and heading in degrees for glRotate opengl methods.
-                            int camStep = currentStepFix * 4;
+                            int camStep = (currentStepFix + 1) * 2;
                             if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
                             camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
                             if (camHeading < 0) camHeading += glm.twoPI;
-                            camHeading = glm.toDegrees(toolPos.heading);
+
+
+
+                            camHeading = glm.toDegrees(gpsHeading);
                             break;
                         }
                     }
+
+
                     break;
                 case "GPS":
                     //use NMEA headings for camera and tractor graphic
@@ -505,7 +520,7 @@ namespace AgOpenGPS
             if (ahrs.isHeadingFromBrick | ahrs.isHeadingFromAutoSteer | ahrs.isHeadingFromPAOGI | ahrs.isHeadingFromExtUDP)
             {
                 //current gyro angle in radians
-                double correctionHeading = (glm.toRadians((double)ahrs.correctionHeadingX16 * 0.0625));
+                double correctionHeading = glm.toRadians((double)ahrs.correctionHeadingX16 * 0.0625);
 
                 //Difference between the IMU heading and the GPS heading
                 double gyroDelta = (correctionHeading + gyroCorrection) - gpsHeading;
@@ -518,28 +533,22 @@ namespace AgOpenGPS
                     if (gyroDelta > glm.PIBy2) { gyroDelta = glm.twoPI - gyroDelta; }
                     else { gyroDelta = (glm.twoPI + gyroDelta) * -1.0; }
                 }
-                if (gyroDelta > glm.twoPI) gyroDelta -= glm.twoPI;
-                if (gyroDelta < -glm.twoPI) gyroDelta += glm.twoPI;
+                gyroDelta %= glm.twoPI;
 
                 //if the gyro and last corrected fix is < 10 degrees, super low pass for gps
                 if (Math.Abs(gyroDelta) < 0.18)
                 {
                     //a bit of delta and add to correction to current gyro
-                    gyroCorrection += (gyroDelta * (0.25 / fixUpdateHz));
-                    if (gyroCorrection > glm.twoPI) gyroCorrection -= glm.twoPI;
-                    if (gyroCorrection < -glm.twoPI) gyroCorrection += glm.twoPI;
+                    gyroCorrection += (gyroDelta * (0.25 / fixUpdateHz)) % glm.twoPI;
                 }
                 else
                 {
                     //a bit of delta and add to correction to current gyro
-                    gyroCorrection += (gyroDelta * (2.0 / fixUpdateHz));
-                    if (gyroCorrection > glm.twoPI) gyroCorrection -= glm.twoPI;
-                    if (gyroCorrection < -glm.twoPI) gyroCorrection += glm.twoPI;
+                    gyroCorrection += (gyroDelta * (2.0 / fixUpdateHz)) % glm.twoPI;
                 }
 
                 //determine the Corrected heading based on gyro and GPS
-                gyroCorrected = correctionHeading + gyroCorrection;
-                if (gyroCorrected > glm.twoPI) gyroCorrected -= glm.twoPI;
+                gyroCorrected = (correctionHeading + gyroCorrection) % glm.twoPI;
                 if (gyroCorrected < 0) gyroCorrected += glm.twoPI;
 
                 fixHeading = gyroCorrected;
@@ -679,31 +688,11 @@ namespace AgOpenGPS
 
             if (bnd.isOkToAddPoints)
             {
-                if (bnd.isDrawRightSide)
-                {
-                    //Right side
-                    //vec3 point = new vec3(cosSectionHeading * (section[tool.numOfSections - 1].positionRight) + toolPos.easting,
-                    //    sinSectionHeading * (section[tool.numOfSections - 1].positionRight) + toolPos.northing, toolPos.heading);
-                    vec3 point = new vec3(
-                        pivotAxlePos.easting + (Math.Sin(pivotAxlePos.heading - glm.PIBy2) * -bnd.createBndOffset),
-                        pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - glm.PIBy2) * -bnd.createBndOffset), 
-                        pivotAxlePos.heading);
-                    bnd.bndBeingMadePts.Add(point);
-                }
-
-                //draw on left side
-                else
-                {
-                    //Right side
-                    //vec3 point = new vec3(cosSectionHeading * (section[0].positionLeft) + toolPos.easting,
-                    //    sinSectionHeading * (section[0].positionLeft) + toolPos.northing, toolPos.heading);
-                    vec3 point = new vec3(
-                        pivotAxlePos.easting + (Math.Sin(pivotAxlePos.heading - glm.PIBy2) * bnd.createBndOffset),
-                        pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - glm.PIBy2) * bnd.createBndOffset), 
-                        pivotAxlePos.heading);
-
-                    bnd.bndBeingMadePts.Add(point);
-                }
+                vec3 point = new vec3(
+                    pivotAxlePos.easting + (Math.Sin(pivotAxlePos.heading - glm.PIBy2) * (bnd.isDrawRightSide ? - bnd.createBndOffset : + bnd.createBndOffset)),
+                    pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - glm.PIBy2) * (bnd.isDrawRightSide ? - bnd.createBndOffset : + bnd.createBndOffset)),
+                    pivotAxlePos.heading);
+                bnd.bndBeingMadePts.Add(point);
             }
         }
 
@@ -873,93 +862,53 @@ namespace AgOpenGPS
             section[tool.numOfSections].isInsideBoundary = true;
 
             //determine if section is in boundary using the section left/right positions
-            bool isLeftIn = true, isRightIn = true;
+            bool isLeftIn = false, isRightIn = false;
+
+
+
             for (int j = 0; j < tool.numOfSections; j++)
             {
                 if (bnd.bndArr.Count > 0)
                 {
-                    //is a headland
-                    if ( hd.isOn)
+                    isLeftIn = isRightIn;//grab the right of previous section, its the left of this section
+                    isRightIn = false;
+                    for (int i = ((bnd.LastBoundary >= bnd.bndArr.Count) || bnd.LastBoundary == -1) ? 0 : bnd.LastBoundary; i < bnd.bndArr.Count; i++)
                     {
-                        if (j == 0)
+                        if (bnd.bndArr[i].isOwnField)
                         {
-                            //only one first left point, the rest are all rights moved over to left
-                            isLeftIn = hd.headArr[0].IsPointInHeadArea(section[j].leftPoint);
-                            isRightIn = hd.headArr[0].IsPointInHeadArea(section[j].rightPoint);
+                            if (j == 0) isLeftIn |= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? hd.headArr[i].IsPointInHeadArea(section[j].leftPoint) : bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
+                            isRightIn |= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? hd.headArr[i].IsPointInHeadArea(section[j].rightPoint) : bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
 
-                            //merge the two sides into in or out
-                            if (!isLeftIn && !isRightIn) section[j].isInsideBoundary = false;
-                            else section[j].isInsideBoundary = true;
+
                         }
+                        if (bnd.LastBoundary > -1) break;
 
-                        else
-                        {
-                            //grab the right of previous section, its the left of this section
-                            isLeftIn = isRightIn;
-                            isRightIn = hd.headArr[0].IsPointInHeadArea(section[j].rightPoint);
-                            for (int i = 1; i < hd.headArr.Count; i++)
-                            {
-                                //inner boundaries should normally NOT have point inside
-                                //if (hd.headArr[i].isSet) isRightIn &= !hd.headArr[i].IsPointInHeadArea(section[j].rightPoint);
-                            }
 
-                            if (!isLeftIn && !isRightIn) section[j].isInsideBoundary = false;
-                            else section[j].isInsideBoundary = true;
-                        }
-                        section[tool.numOfSections].isInsideBoundary &= section[j].isInsideBoundary;
                     }
 
-                    //only outside boundary
-                    else
+                    if (isRightIn == false)
                     {
-                        if (j == 0)
-                        {
-                            //only one first left point, the rest are all rights moved over to left
-                            isLeftIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].leftPoint);
-                            isRightIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].rightPoint);
 
-                            for (int i = 0; i < bnd.bndArr.Count; i++)
-                            {
-                                if (!bnd.bndArr[i].isOwnField)
-                                {
-                                    //skip unnecessary boundaries
-                                    if (bnd.bndArr[i].OuterField == bnd.LastBoundary || bnd.bndArr[i].OuterField == -1)
-                                    {
-                                        isLeftIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
-                                        isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
-                                    }
-                                }
-                            }
+                        isRightIn = false;
 
-                            //merge the two sides into in or out
-                            if (isLeftIn && isRightIn) section[j].isInsideBoundary = true;
-                            else section[j].isInsideBoundary = false;
-                        }
-                        else
-                        {
-                            //grab the right of previous section, its the left of this section
-                            isLeftIn = isRightIn;
-                            isRightIn = bnd.bndArr[bnd.LastBoundary].IsPointInsideBoundary(section[j].rightPoint);
-                            for (int i = 0; i < bnd.bndArr.Count; i++)
-                            {
-                                if (!bnd.bndArr[i].isOwnField)
-                                {
-                                    //skip unnecessary boundaries
-                                    if (bnd.bndArr[i].OuterField == bnd.LastBoundary || bnd.bndArr[i].OuterField == -1)
-                                    {
-                                        //inner boundaries should normally NOT have point inside
-                                        isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
-                                    }
-                                }
-                            }
-
-                            if (isLeftIn && isRightIn) section[j].isInsideBoundary = true;
-                            else section[j].isInsideBoundary = false;
-                        }
-                        section[tool.numOfSections].isInsideBoundary &= section[j].isInsideBoundary;
                     }
+                    if (isLeftIn || isRightIn)
+                    {
+                        for (int i = 0; i < bnd.bndArr.Count; i++)
+                        {
+                            if (!bnd.bndArr[i].isOwnField && (bnd.LastBoundary == -1 || bnd.bndArr[i].OuterField == bnd.LastBoundary || bnd.bndArr[i].OuterField == -1))
+                            {
+                                //if (j == 0) isLeftIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
+                                //isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                                if (j == 0) isLeftIn &= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? !hd.headArr[i].IsPointInHeadArea(section[j].leftPoint) : !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
+                                isRightIn &= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? !hd.headArr[i].IsPointInHeadArea(section[j].rightPoint) : !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                            }
+                        }
+                    }
+                    //merge the two sides into in or out
+                    section[j].isInsideBoundary = (!isLeftIn && !isRightIn) ? false : true;
+                    section[tool.numOfSections].isInsideBoundary &= section[j].isInsideBoundary;
                 }
-
                 //no boundary created so always inside
                 else
                 {
@@ -988,7 +937,6 @@ namespace AgOpenGPS
             pn.fix.easting = (int)pn.fix.easting - pn.utmEast;
             pn.fix.northing = (int)pn.fix.northing - pn.utmNorth;
 
-
             //calculate the central meridian of current zone
             pn.centralMeridian = -177 + ((pn.zone - 1) * 6);
 
@@ -1006,8 +954,8 @@ namespace AgOpenGPS
             if (fixHeading < 0) fixHeading += glm.twoPI;
             toolPos.heading = fixHeading;
 
-            //send out initial zero settings
-            //set up the modules
+                //send out initial zero settings
+                //set up the modules
             mc.ResetAllModuleCommValues();
 
             AutoSteerSettingsOutToPort();
@@ -1017,15 +965,15 @@ namespace AgOpenGPS
             //set display accordingly
             isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
 
-            lblSunrise.Text = sunrise.ToString("HH:mm");
-            lblSunset.Text = sunset.ToString("HH:mm");
+                lblSunrise.Text = sunrise.ToString("HH:mm");
+                lblSunset.Text = sunset.ToString("HH:mm");
 
-            if (isAutoDayNight)
-            {
-                isDay = isDayTime;
-                isDay = !isDay;
-                SwapDayNightMode();
-            }
+                if (isAutoDayNight)
+                {
+                    isDay = isDayTime;
+                    isDay = !isDay;
+                    SwapDayNightMode();
+                }
             isGPSPositionInitialized = true;
             return;
         }
@@ -1039,7 +987,7 @@ namespace AgOpenGPS
                     for (int j = 0; j < bnd.bndArr.Count; j++)
                     {
                         //make sure not inside a non drivethru boundary
-                        if (!bnd.bndArr[j].isSet || bnd.bndArr[j].isOwnField || bnd.bndArr[j].isDriveThru) continue;
+                        if (bnd.bndArr[j].isOwnField || bnd.bndArr[j].isDriveThru) continue;
 
                         //skip unnecessary boundaries
                         if (bnd.bndArr[j].OuterField == bnd.LastBoundary || bnd.bndArr[j].OuterField == -1)
@@ -1057,14 +1005,14 @@ namespace AgOpenGPS
                 {
                     for (int i = 0; i < bnd.bndArr.Count; i++)
                     {
-                        if (bnd.bndArr[i].isSet && bnd.bndArr[i].isOwnField)
+                        if (bnd.bndArr[i].isOwnField)
                         {
                             if (gf.geoFenceArr[i].IsPointInGeoFenceArea(pivotAxlePos))
                             {
                                 for (int j = 0; j < bnd.bndArr.Count; j++)
                                 {
                                     //make sure not inside a non drivethru boundary
-                                    if (!bnd.bndArr[j].isSet || bnd.bndArr[j].isOwnField || bnd.bndArr[j].isDriveThru) continue;
+                                    if (bnd.bndArr[j].isOwnField || bnd.bndArr[j].isDriveThru) continue;
 
                                     //skip unnecessary boundaries
                                     if (bnd.bndArr[j].OuterField == bnd.LastBoundary || bnd.bndArr[j].OuterField == -1)

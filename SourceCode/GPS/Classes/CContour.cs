@@ -162,11 +162,7 @@ namespace AgOpenGPS
 
             for (int j = 0; j < mf.bnd.bndArr.Count; j++)
             {
-                if (!mf.bnd.bndArr[j].isSet) continue;
-
-
-
-                int ChangeDirection = ((mf.bnd.bndArr[j].isOwnField == true) ? -1 : 1);
+                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? -1 : 1;
 
             //totalHeadWidth = (mf.vehicle.toolWidth - mf.vehicle.toolOverlap) * 0.5 + 0.2 + (mf.vehicle.toolWidth - mf.vehicle.toolOverlap);
 
@@ -183,7 +179,6 @@ namespace AgOpenGPS
                     point.easting = mf.bnd.bndArr[j].bndLine[i].easting - (signPass * Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.northing = mf.bnd.bndArr[j].bndLine[i].northing - (signPass * Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading - Math.PI;
-                    if (point.heading < -glm.twoPI) point.heading += glm.twoPI;
 
                     //only add if inside actual field boundary
                     ptList.Add(point);

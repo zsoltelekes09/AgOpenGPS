@@ -69,7 +69,11 @@ namespace AgOpenGPS
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         private readonly Stopwatch swFrame = new Stopwatch();
-        private readonly Stopwatch testtest = new Stopwatch();
+        private readonly Stopwatch testHalfSecond = new Stopwatch();
+        private readonly Stopwatch testOneSecond = new Stopwatch();
+        private readonly Stopwatch testThreeSecond = new Stopwatch();
+        private readonly Stopwatch testNMEA = new Stopwatch();
+        public long testHalfSecond1 = 0, testOneSecond1 = 0, testThreeSecond1 = 0, testNMEA1 = 0;
 
         //Time to do fix position update and draw routine
 
@@ -85,7 +89,7 @@ namespace AgOpenGPS
         private int saveCounter = 1;
 
         //for the NTRIP CLient counting
-        private int ntripCounter = 10;
+        private int ntripCounter = 0;
 
         //whether or not to use Stanley control
         public bool isStanleyUsed = true;
@@ -488,7 +492,7 @@ namespace AgOpenGPS
             toolFileName = Vehicle.Default.setVehicle_toolName;
             envFileName = Vehicle.Default.setVehicle_envName;
 
-            fixUpdateHz = Properties.Settings.Default.setPort_NMEAHz;
+            fixUpdateHz = Settings.Default.setPort_NMEAHz;
             fixUpdateTime = 1 / (double)fixUpdateHz;
 
             //get the abLines directory, if not exist, create
@@ -545,18 +549,22 @@ namespace AgOpenGPS
             //triangleResolution = Settings.Default.setDisplay_triangleResolution;
 
             //start udp server if required
-            if (Properties.Settings.Default.setUDP_isOn) StartUDPServer();
+            if (Settings.Default.setUDP_isOn) StartUDPServer();
 
             //start NTRIP if required
-            if (Properties.Settings.Default.setNTRIP_isOn)
+            if (Settings.Default.setNTRIP_isOn)
             {
-                isNTRIP_RequiredOn = true;
+                isNTRIP_TurnedOn = true;
                 btnStartStopNtrip.Text = gStr.gsStop;
+                lblWatch.Text = gStr.gsWaiting;
             }
             else
             {
-                isNTRIP_RequiredOn = false;
+                isNTRIP_TurnedOn = false;
+                lblNTRIPSeconds.Text = gStr.gsOffline;
                 btnStartStopNtrip.Text = gStr.gsStart;
+                lblWatch.Text = gStr.gsStopped;
+
             }
 
             //remembered window position
@@ -999,15 +1007,15 @@ namespace AgOpenGPS
                 }
             }
 
-            if (hd.headArr[0].hdLine.Count > 0)
+            if (hd.headArr.Count > 0)
             {
                 hd.isOn = true;
-                btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
+                btnHeadlandOnOff.Image = Resources.HeadlandOn;
             }
             else
             {
                 hd.isOn = false;
-                btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
+                btnHeadlandOnOff.Image = Resources.HeadlandOff;
             }
         }
 
@@ -1192,7 +1200,6 @@ namespace AgOpenGPS
 
                 AutoSteerSettingsOutToPort();
             isJobStarted = true;
-            startCounter = 0;
 
             btnManualOffOn.Enabled = true;
             manualBtnState = btnStates.Off;
@@ -1276,7 +1283,7 @@ namespace AgOpenGPS
             bnd.bndArr?.Clear();
             gf.geoFenceArr?.Clear();
             turn.turnArr?.Clear();
-            hd.headArr[0].hdLine?.Clear();
+            hd.headArr?.Clear();
 
             layoutPanelRight.Enabled = false;
             //boundaryToolStripBtn.Enabled = false;
@@ -1738,6 +1745,15 @@ namespace AgOpenGPS
         public void TimedMessageBox(int timeout, string s1, string s2)
         {
             form.SetTimedMessage(timeout, s1, s2, this);
+
+            form.TopLevel = false;
+            this.Controls.Add(form);
+            //form.Show();
+
+            this.Controls.GetChildIndex(form);
+
+
+            //Form2.SetTimedMessage();
         }
     }//class FormGPS
 }//namespace AgOpenGPS

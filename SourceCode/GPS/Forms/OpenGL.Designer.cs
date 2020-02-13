@@ -244,14 +244,7 @@ namespace AgOpenGPS
                 bnd.DrawBoundaryLines();
 
                 //draw the turnLines
-                if (yt.isYouTurnBtnOn)
-                {
-                    if (!ABLine.isEditing && !curve.isEditing && !ct.isContourBtnOn)
-                    {
-                        turn.DrawTurnLines();
-                    }
-                }
-                else if (!yt.isYouTurnBtnOn && isUTurnAlwaysOn)
+                if (yt.isYouTurnBtnOn || isUTurnAlwaysOn)
                 {
                     if (!ABLine.isEditing && !curve.isEditing && !ct.isContourBtnOn)
                     {
@@ -482,8 +475,7 @@ namespace AgOpenGPS
             }
 
             //if only one section, or going slow no need for super section 
-            if (tool.numOfSections == 1 | pn.speed < vehicle.slowSpeedCutoff)
-                tool.isSuperSectionAllowedOn = false;
+            if (tool.numOfSections == 1 | pn.speed < vehicle.slowSpeedCutoff) tool.isSuperSectionAllowedOn = false;
 
             //clamp the height after looking way ahead, this is for switching off super section only
             rpHeight = Math.Abs(rpHeight) * 2.0;
@@ -593,8 +585,8 @@ namespace AgOpenGPS
                                 end += tool.rpWidth;
                             }
 
-                        //minimum apllied conditions met
-                        GetMeOutaHere:
+                            //minimum apllied conditions met
+                            GetMeOutaHere:
 
                             start = 0; end = 0; skip = 0;
                             start = section[j].rpSectionPosition - section[0].rpSectionPosition;
@@ -623,7 +615,7 @@ namespace AgOpenGPS
                                 end += tool.rpWidth;
                             }
 
-                        GetMeOutaHereNow:
+                            GetMeOutaHereNow:
 
                             //if out of boundary, turn it off
                             if (!section[j].isInsideBoundary)
@@ -667,8 +659,8 @@ namespace AgOpenGPS
                                 end += tool.rpWidth;
                             }
 
-                        //minimum apllied conditions met
-                        GetMeOutaHere:
+                            //minimum apllied conditions met
+                            GetMeOutaHere:
                             start = 0;
                         }
                     }
@@ -743,7 +735,7 @@ namespace AgOpenGPS
             RelayOutToPort(mc.relayData, CModuleComm.pgnSentenceLength);
 
             //if a couple minute has elapsed save the field in case of crash and to be able to resume            
-            if (saveCounter > 59)       //1 counts per second X 60 seconds = 60 counts per minute.
+            if (saveCounter > 59)       //1 count per second X 60 seconds = 60 counts per minute.
             {
                 NMEAWatchdog.Enabled = false;
 
@@ -1805,6 +1797,7 @@ namespace AgOpenGPS
                     {
                         double x = bnd.bndArr[bnd.LastBoundary].bndLine[i].easting;
                         double y = bnd.bndArr[bnd.LastBoundary].bndLine[i].northing;
+
                         //also tally the max/min of field x and z
                         if (minFieldX > x) minFieldX = x;
                         if (maxFieldX < x) maxFieldX = x;
@@ -1814,29 +1807,34 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    for (int i = 0; i < bnd.bndArr.Count; i++)
-                    {
-                        if (bnd.bndArr[i].isSet && bnd.bndArr[i].isOwnField)
-                        {
-                            int bndCnt = bnd.bndArr[i].bndLine.Count;
-                            for (int j = 0; j < bndCnt; j++)
-                            {
-                                double x = bnd.bndArr[i].bndLine[j].easting;
-                                double y = bnd.bndArr[i].bndLine[j].northing;
+                    //for (int i = 0; i < bnd.bndArr.Count; i++)
+                    //{
+                    //    if (bnd.bndArr[i].isOwnField)
+                    //    {
+                    //        int bndCnt = bnd.bndArr[i].bndLine.Count;
+                    //        for (int j = 0; j < bndCnt; j++)
+                    //        {
+                    //            double x = bnd.bndArr[i].bndLine[j].easting;
+                    //            double y = bnd.bndArr[i].bndLine[j].northing;
+                    //
+                    //            //also tally the max/min of field x and z
+                    //            if (minFieldX > x) minFieldX = x;
+                    //            if (maxFieldX < x) maxFieldX = x;
+                    //            if (minFieldY > y) minFieldY = y;
+                    //            if (maxFieldY < y) maxFieldY = y;
+                    //        }
+                    //    }
+                    //}
+                    double zoom = 400;
+                    //if (minFieldX < pivotAxlePos.easting - zoom) minFieldX = pivotAxlePos.easting - zoom;
+                    //if (maxFieldX > pivotAxlePos.easting + zoom) maxFieldX = pivotAxlePos.easting + zoom;
+                    //if (minFieldY < pivotAxlePos.northing - zoom) minFieldY = pivotAxlePos.northing - zoom;
+                    //if (maxFieldY > pivotAxlePos.northing + zoom) maxFieldY = pivotAxlePos.northing + zoom;
 
-                                //also tally the max/min of field x and z
-                                if (minFieldX > x) minFieldX = x;
-                                if (maxFieldX < x) maxFieldX = x;
-                                if (minFieldY > y) minFieldY = y;
-                                if (maxFieldY < y) maxFieldY = y;
-                            }
-                        }
-                    }
-                    double zoom = 500;
-                    if (minFieldX < pivotAxlePos.easting - zoom) minFieldX = pivotAxlePos.easting - zoom;
-                    if (maxFieldX > pivotAxlePos.easting + zoom) maxFieldX = pivotAxlePos.easting + zoom;
-                    if (minFieldY < pivotAxlePos.northing - zoom) minFieldY = pivotAxlePos.northing - zoom;
-                    if (maxFieldY > pivotAxlePos.northing + zoom) maxFieldY = pivotAxlePos.northing + zoom;
+                    minFieldX = pivotAxlePos.easting - zoom;
+                    maxFieldX = pivotAxlePos.easting + zoom;
+                    minFieldY = pivotAxlePos.northing - zoom;
+                    maxFieldY = pivotAxlePos.northing + zoom;
                 }
             }
             else

@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using System.Drawing;
 using System.Globalization;
+using AgOpenGPS.Properties;
 
 // Declare the delegate prototype to send data back to the form
 delegate void UpdateRTCM_Data(byte[] data);
@@ -39,24 +35,17 @@ namespace AgOpenGPS
         private int toUDP_Port = 0;
         private int NTRIP_Watchdog = 100;
 
-        public bool isNTRIP_RequiredOn = false;
+        public bool isNTRIP_TurnedOn = false;
         public bool isNTRIP_Connected = false;
-        public bool isNTRIP_Starting = false;
         public bool isNTRIP_Connecting = false;
         public bool isNTRIP_Sending = false;
         public bool isRunGGAInterval = false;
 
-        private void NTRIPtick(object o, EventArgs e)
-        {
-            SendGGA();
-        }
-
         private void ReconnectRequest()
         {
             //TimedMessageBox(2000, "NTRIP Not Connected", " Reconnect Request");
-            ntripCounter = 10;
+            ntripCounter = 16;
             isNTRIP_Connected = false;
-            isNTRIP_Starting = false;
             isNTRIP_Connecting = false;
 
             //if we had a timer already, kill it
@@ -64,19 +53,6 @@ namespace AgOpenGPS
             {
                 tmr.Dispose();
             }
-        }
-
-        private void IncrementNTRIPWatchDog()
-        {
-            //increment once every second
-            ntripCounter++;
-
-            //Thinks is connected but not receiving anything
-            if (NTRIP_Watchdog++ > 30 && isNTRIP_Connected) ReconnectRequest();
-
-            //Once all connected set the timer GGA to NTRIP Settings
-            if (sendGGAInterval > 0 && ntripCounter == 40) tmr.Interval = sendGGAInterval * 1000;
-            
         }
 
         //set up connection to Caster
@@ -108,14 +84,6 @@ namespace AgOpenGPS
                 tmr.Dispose();
             }
 
-            //create new timer at fast rate to start
-            if (sendGGAInterval > 0)
-            {
-                this.tmr = new System.Windows.Forms.Timer();
-                this.tmr.Interval = 5000;
-                this.tmr.Tick += new EventHandler(NTRIPtick);
-            }
-
             try
             {
                 // Close the socket if it is still open
@@ -143,6 +111,17 @@ namespace AgOpenGPS
                 ReconnectRequest();
                 return;
             }
+
+            //Once all connected set the timer GGA to NTRIP Settings
+            if (sendGGAInterval > 0)
+            {
+                tmr = new System.Windows.Forms.Timer();
+                tmr.Interval = 5000;
+                tmr.Tick += new EventHandler(SendGGA);
+            }
+
+
+
 
             isNTRIP_Connecting = true;
             //make sure connection is made
@@ -193,7 +172,6 @@ namespace AgOpenGPS
                 }
                 //say its connected
                 isNTRIP_Connected = true;
-                isNTRIP_Starting = false;
                 isNTRIP_Connecting = false;
 
                 btnStartStopNtrip.Text = gStr.gsStop;
@@ -249,11 +227,12 @@ namespace AgOpenGPS
             }
         }
 
-        public void SendGGA()
+        public void SendGGA(object o, EventArgs e)
         {
             //timer may have brought us here so return if not connected
-            if (!isNTRIP_Connected)
-                return;
+            if (!isNTRIP_Connected) return;
+
+            tmr.Interval = sendGGAInterval * 1000;
             // Check we are connected
             if (clientSocket == null || !clientSocket.Connected)
             {
@@ -367,11 +346,8 @@ namespace AgOpenGPS
                 clientSocket.Close();
                 System.Threading.Thread.Sleep(500);
 
-                TimedMessageBox(2000, gStr.gsNTRIPOff, gStr.gsClickStartToResume);
+                //TimedMessageBox(2000, gStr.gsNTRIPOff, gStr.gsClickStartToResume);
                 ReconnectRequest();
-
-                //Also stop the requests now
-                isNTRIP_RequiredOn = false;
             }
 
         }
@@ -384,11 +360,11 @@ namespace AgOpenGPS
                 clientSocket.Close();
                 System.Threading.Thread.Sleep(500);
 
-                TimedMessageBox(2000, gStr.gsNTRIPRestarting, gStr.gsResumingWithNewSettings);
+                //TimedMessageBox(2000, gStr.gsNTRIPRestarting, gStr.gsResumingWithNewSettings);
                 ReconnectRequest();
 
                 //Continue to restart
-                isNTRIP_RequiredOn = true;
+                isNTRIP_TurnedOn = true;
             }
         }
 

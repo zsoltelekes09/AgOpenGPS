@@ -280,7 +280,7 @@
             this.tboxNMEASerial.Multiline = true;
             this.tboxNMEASerial.Name = "tboxNMEASerial";
             this.tboxNMEASerial.ReadOnly = true;
-            this.tboxNMEASerial.Size = new System.Drawing.Size(453, 56);
+            this.tboxNMEASerial.Size = new System.Drawing.Size(453, 60);
             this.tboxNMEASerial.TabIndex = 107;
             // 
             // tboxSerialFromRelay

@@ -3,10 +3,6 @@ using System;
 using System.Windows.Forms;
 using System.Globalization;
 using AgOpenGPS.Properties;
-using System.Text;
-using System.Threading;
-using System.IO;
-using System.Linq;
 
 namespace AgOpenGPS
 {
@@ -30,7 +26,7 @@ namespace AgOpenGPS
 
         //used to decide to autoconnect section arduino this run
         public bool wasRateRelayConnectedLastRun = false;
-        public string recvSentenceSettings = "InitalSetting";
+        public string[] recvSentenceSettings = new string[4];
 
         //used to decide to autoconnect autosteer arduino this run
         public bool wasAutoSteerConnectedLastRun = false;
@@ -51,7 +47,10 @@ namespace AgOpenGPS
         public int BytesRead = 0;
         public int MessageLength = 0;
         int CK_A = 0, CK_B = 0;
-
+        public double HeadDif = 0;
+        public double DualGPSDistance = 0;
+        public bool EnableLatLon = true;
+        public long lastitow = 0;
 
         #region AutoSteerPort // --------------------------------------------------------------------
 
@@ -247,6 +246,7 @@ namespace AgOpenGPS
                 //parse the values
                 if (ahrs.isHeadingFromAutoSteer)
                 {
+
                     int.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.correctionHeadingX16);
                 }
 
@@ -538,46 +538,71 @@ namespace AgOpenGPS
                                         if (0x01 == rawBuffer[2] && 0x3C == rawBuffer[3])//UBX-NAV-RELPOSNED
                                         {
                                             long itow = BitConverter.ToInt32(rawBuffer, 10);
-                                            byte rr = rawBuffer[66];
-                                            if ((rr & (1 << 0)) != 0 && (rr & (1 << 2)) != 0)//gnssFixOK && relPosValid
-                                            {
-                                                double heading = BitConverter.ToInt32(rawBuffer, 30) * 0.00001;
-                                                int roll = (int)(Math.Atan2(BitConverter.ToInt32(rawBuffer, 22) + BitConverter.ToInt32(rawBuffer, 40) / 100, 100) * Math.PI / (double)180 * 16);
+                                            Int16 rr = BitConverter.ToInt16(rawBuffer, 66);
 
-                                                //• UBX - NAV - RELPOSNED: The carrSoln flag will be set to 1 for RTK float and 2 for RTK fixed.
-                                                //bit 3 & 4
-                                                //not sure if this is right
-                                                if ((rr & (1 << 3)) != 0)
-                                                {
-                                                    //pn.fixQuality = 4;
-                                                    sentence = "$UBX-RELPOSNED,3," + heading.ToString("N4") + "," + roll.ToString("N4") + "," +itow.ToString() + "*";
-                                                }
-                                                else if ((rr & (1 << 4)) != 0)
-                                                {
-                                                    //pn.fixQuality = 3;
-                                                    sentence = "$UBX-RELPOSNED,4," + heading.ToString("N4") + "," + roll.ToString("N4") + "," + itow.ToString() + "*";
-                                                }
-                                                else
-                                                {
-                                                    //pn.fixQuality = 2;
-                                                    sentence = "$UBX-RELPOSNED,3," + heading.ToString("N4") + "," + roll.ToString("N4") + "," + itow.ToString() + "*";
-                                                }
+
+                                            //• UBX - NAV - RELPOSNED: The carrSoln flag will be set to 1 for RTK float and 2 for RTK fixed.//this is from first gps source!
+                                                    //1 0000 1101                //1 0001 0101
+                                            if (( (rr & 0x10D) == 0x10D) || ((rr & 0x115) == 0x115))//gnssFixOK && relPosValid && float/fix
+                                            {
+
+
+                                                pn.headingHDT = (BitConverter.ToInt32(rawBuffer, 30) * 0.00001) + HeadDif;
+                                                ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2(BitConverter.ToInt32(rawBuffer, 22) + BitConverter.ToInt32(rawBuffer, 40) / 100, DualGPSDistance * 10.0)) * 16);
+
+
+
+                                                recvSentenceSettings[3] = recvSentenceSettings[2];
+                                                recvSentenceSettings[2] = recvSentenceSettings[1];
+                                                recvSentenceSettings[1] = recvSentenceSettings[0];
+                                                recvSentenceSettings[0] = "UBX-RELPOSNED, Heading = " + pn.headingHDT.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + (ahrs.rollX16/16).ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+
+
+
+
+
+                                                //double heading = (BitConverter.ToInt32(rawBuffer, 30) * 0.00001) + HeadDif;
+                                                //int roll = (int)(glm.toRadians(Math.Atan2(BitConverter.ToInt32(rawBuffer, 22) + BitConverter.ToInt32(rawBuffer, 40) / 100, DualGPSDistance * 10.0)) * 16);
+
+
+                                                //sentence = "$UBX-RELPOSNED,1," + heading.ToString("N4", CultureInfo.InvariantCulture) + "," + roll.ToString("N4", CultureInfo.InvariantCulture) + "," +itow.ToString() + "*";
                                             }
-                                            else sentence = "$UBX-RELPOSNED,0,0,0," + itow.ToString() + "*";
+                                            else //Bad Quality
+                                            {
+                                                //sentence = "$UBX-RELPOSNED,0,0,0," + itow.ToString() + "*";
+                                            }
                                         }
                                         else if (0x01 == rawBuffer[2] && 0x14 == rawBuffer[3])//UBX-NAV-HPPOSLLH
                                         {
-                                            sentence = "$UBX-HPPOSLLH,0,0,0,0*";
                                             if ((rawBuffer[9] & (1 << 0)) == 0)
                                             {
                                                 long itow = BitConverter.ToInt32(rawBuffer, 10);
-
-
-
                                                 double longitude = (rawBuffer[30] * 0.01 + BitConverter.ToInt32(rawBuffer, 14)) * 0.0000001;
                                                 double latitude = (rawBuffer[31] * 0.01 + BitConverter.ToInt32(rawBuffer, 18)) * 0.0000001;
-                                                double altitude = (rawBuffer[32] * 0.01 + BitConverter.ToInt32(rawBuffer, 22)) / 1000.0;
-                                                sentence = "$UBX-HPPOSLLH,1," + longitude.ToString("N7") + "," + latitude.ToString("N7") + "," + altitude.ToString("N7") + "," + itow.ToString() + "*";
+                                                double altitude = (rawBuffer[33] * 0.1 + BitConverter.ToInt32(rawBuffer, 26)) * 1000.0;
+                                                sentence = "$UBX-HPPOSLLH,1," + longitude.ToString("N7", CultureInfo.InvariantCulture) + "," + latitude.ToString("N7", CultureInfo.InvariantCulture) + "," + altitude.ToString("N7", CultureInfo.InvariantCulture) + "," + itow.ToString() + "*";
+                                            }
+                                        }
+                                        else if (0x01 == rawBuffer[2] && 0x07 == rawBuffer[3])//UBX-NAV-PVT
+                                        {
+                                            //if ((rawBuffer[9] & (1 << 0)) == 0)
+                                            {
+                                                long itow = BitConverter.ToInt32(rawBuffer, 6);
+
+                                                byte numSV = rawBuffer[29];
+                                                double longitude = BitConverter.ToInt32(rawBuffer, 30) * 0.0000001;//to deg
+                                                double latitude = BitConverter.ToInt32(rawBuffer, 34) * 0.0000001;//to deg
+                                                double altitude = BitConverter.ToInt32(rawBuffer, 42) * 1000.0;//to meters
+
+
+                                                double gSpeed = BitConverter.ToInt32(rawBuffer, 66) * 0.0036;//to km/h
+                                                double headMot = BitConverter.ToInt32(rawBuffer, 70) * 0.00001;//to deg
+                                                double gSpeedAcc = BitConverter.ToInt32(rawBuffer, 74) * 0.0036;//to km/h
+                                                double headMotAcc = BitConverter.ToInt32(rawBuffer, 78) * 0.00001;//to deg
+                                                double pDOP = BitConverter.ToInt32(rawBuffer, 78) * 0.01;
+
+
+                                                sentence = "$UBX-pvt,1," + longitude.ToString("N7", CultureInfo.InvariantCulture) + "," + latitude.ToString("N7", CultureInfo.InvariantCulture) + "," + altitude.ToString("N7", CultureInfo.InvariantCulture) + "," + itow.ToString() + "*";
                                             }
                                         }
 
@@ -653,6 +678,164 @@ namespace AgOpenGPS
             }
         }
 
+        public void ReadGPSData()
+        {
+            if (SerialGPS.IsOpen)
+            {
+                try
+                {
+                    if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "UBX")
+                    {
+                        while (SerialGPS.BytesToRead > 0)
+                        {
+                            SerialGPS.Read(rawBuffer, BytesRead, 1);
+
+                            if (BytesRead < 2)
+                            {
+                                if (Header[BytesRead] == rawBuffer[BytesRead])
+                                {
+                                    CK_A = 0;
+                                    CK_B = 0;
+                                    BytesRead++;
+                                }
+                                else
+                                {
+                                    BytesRead = 0;
+                                }
+                            }
+                            else
+                            {
+                                if (BytesRead == 5)
+                                {
+                                    MessageLength = BitConverter.ToInt16(rawBuffer, 4);
+                                }
+
+                                if (BytesRead < MessageLength + 6)
+                                {
+                                    CK_A = CK_A + rawBuffer[BytesRead];
+                                    CK_A &= 0xFf;
+                                    CK_B = CK_B + CK_A;
+                                    CK_B &= 0xFf;
+                                }
+                                BytesRead++;
+                                if (BytesRead > (MessageLength + 7))//here ck_B is set
+                                {
+                                    if (CK_A == rawBuffer[MessageLength + 6] && CK_B == rawBuffer[MessageLength + 7])
+                                    {
+                                        if (0x01 == rawBuffer[2] && 0x3C == rawBuffer[3])//UBX-NAV-RELPOSNED
+                                        {
+                                            Int16 rr = BitConverter.ToInt16(rawBuffer, 66);
+                                            //• UBX - NAV - RELPOSNED: The carrSoln flag will be set to 1 for RTK float and 2 for RTK fixed.//this is from first gps source!
+                                            //1 0000 1101                //1 0001 0101
+                                            long itow = BitConverter.ToInt32(rawBuffer, 10);
+                                            if (((rr & 0x10D) == 0x10D) || ((rr & 0x115) == 0x115))//gnssFixOK && relPosValid && carrSoln float/fix && relPosHeadingValid
+                                            {
+                                                EnableLatLon = true;
+                                                pn.headingHDT = (BitConverter.ToInt32(rawBuffer, 30) * 0.00001) + HeadDif;
+                                                ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2(BitConverter.ToInt32(rawBuffer, 22) + BitConverter.ToInt32(rawBuffer, 40) / 100, DualGPSDistance * 10.0)) * 16);
+
+
+
+
+                                                recvSentenceSettings[3] = recvSentenceSettings[1];
+                                                //recvSentenceSettings[2] = recvSentenceSettings[1];
+                                                //recvSentenceSettings[1] = recvSentenceSettings[0];
+
+                                                if (lastitow + 200 == itow) recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.headingHDT.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + pn.nRoll.ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                                                else recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.headingHDT.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + pn.nRoll.ToString("N4", CultureInfo.InvariantCulture) + ", itow = False";
+                                            }
+                                            else //Bad Quality
+                                            {
+                                                if ((rr & 0x10D) == 0x10D) EnableLatLon = false;
+
+                                                ahrs.rollX16 = 9999;
+                                                pn.headingHDT = 9999;
+                                                recvSentenceSettings[3] = recvSentenceSettings[1];
+                                                recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
+                                            }
+                                        }
+                                        else if (0x01 == rawBuffer[2] && 0x14 == rawBuffer[3])//UBX-NAV-HPPOSLLH
+                                        {
+                                            long itow = BitConverter.ToInt32(rawBuffer, 10);
+                                            if (EnableLatLon && rawBuffer[9] == 0x00)
+                                            {
+                                                pn.longitude = (rawBuffer[30] * 0.01 + BitConverter.ToInt32(rawBuffer, 14)) * 0.0000001;
+                                                pn.latitude = (rawBuffer[31] * 0.01 + BitConverter.ToInt32(rawBuffer, 18)) * 0.0000001;
+                                                pn.altitude = (rawBuffer[33] * 0.1 + BitConverter.ToInt32(rawBuffer, 26)) * 0.001;
+
+                                                pn.UpdateNorthingEasting();
+
+                                                //recvSentenceSettings[3] = recvSentenceSettings[2];
+                                                recvSentenceSettings[2] = recvSentenceSettings[0];
+                                                //recvSentenceSettings[1] = recvSentenceSettings[0];
+                                                recvSentenceSettings[0] = "$UBX-HPPOSLLH, Longitude = " + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                                            }
+                                            else
+                                            {
+                                                recvSentenceSettings[2] = recvSentenceSettings[0];
+                                                recvSentenceSettings[0] = "$UBX-HPPOSLLH, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
+                                            }
+                                        }
+                                        else if (0x01 == rawBuffer[2] && 0x07 == rawBuffer[3])//UBX-NAV-PVT
+                                        {
+                                            long itow = BitConverter.ToInt32(rawBuffer, 6);
+                                            if (rawBuffer[84] == 0x00)
+                                            {
+                                                pn.longitude = BitConverter.ToInt32(rawBuffer, 30) * 0.0000001;//to deg
+                                                pn.latitude = BitConverter.ToInt32(rawBuffer, 34) * 0.0000001;//to deg
+                                                pn.altitude = BitConverter.ToInt32(rawBuffer, 42) * 0.001;//to meters
+
+                                                pn.UpdateNorthingEasting();
+
+                                                pn.speed = BitConverter.ToInt32(rawBuffer, 66) * 0.0036;//to km/h
+                                                pn.satellitesTracked = rawBuffer[29];
+                                                pn.hdop = BitConverter.ToInt32(rawBuffer, 46) * 0.01;
+                                                pn.ageDiff = itow;
+
+
+                                                //average the speeds for display, not calcs
+                                                avgSpeed[ringCounter] = pn.speed;
+                                                if (ringCounter++ > 8) ringCounter = 0;
+
+                                                //EnableLatLon = true if relative position components and accuracies are valid and in moving base mode if baseline is valid
+                                                byte rr = rawBuffer[27];
+                                                if (EnableLatLon && ((rr & 0x81) == 0x81)) pn.fixQuality = 4;
+                                                else if (EnableLatLon && ((rr & 0x41) == 0x41)) pn.fixQuality = 5;
+                                                else pn.fixQuality = 1;
+
+                                                //recvSentenceSettings[3] = recvSentenceSettings[2];
+                                                //recvSentenceSettings[2] = recvSentenceSettings[1];
+                                                recvSentenceSettings[2] = recvSentenceSettings[0];
+                                                //recvSentenceSettings[1] = recvSentenceSettings[0];
+                                                recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                                            }
+                                            else
+                                            {
+                                                recvSentenceSettings[2] = recvSentenceSettings[0];
+                                                recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
+                                            }
+                                        }
+                                    }
+                                    MessageLength = 0;
+                                    BytesRead = 0;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //string sentence = SerialGPS.ReadExisting();
+                        //this.BeginInvoke(new LineReceivedEventHandler(SerialLineReceived), sentence);
+
+                        pn.rawBuffer += SerialGPS.ReadExisting();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WriteErrorLog("GPS Data Recv" + ex.ToString());
+                }
+            }
+        }
 
         public void SerialPortOpenGPS()
         {
@@ -672,7 +855,7 @@ namespace AgOpenGPS
             {
                 SerialGPS.PortName = portNameGPS;
                 SerialGPS.BaudRate = baudRateGPS;
-                SerialGPS.DataReceived += sp_DataReceived;
+                //SerialGPS.DataReceived += sp_DataReceived;
                 SerialGPS.WriteTimeout = 1000;
             }
 
@@ -743,7 +926,7 @@ namespace AgOpenGPS
         {
             //if (sp.IsOpen)
             {
-                SerialGPS.DataReceived -= sp_DataReceived;
+                //SerialGPS.DataReceived -= sp_DataReceived;
                 try { SerialGPS.Close(); }
                 catch (Exception e)
                 {

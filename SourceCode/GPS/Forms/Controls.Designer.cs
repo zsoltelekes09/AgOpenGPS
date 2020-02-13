@@ -15,27 +15,27 @@ namespace AgOpenGPS
 
         private void btnStartStopNtrip_Click(object sender, EventArgs e)
         {
-            if (Properties.Settings.Default.setNTRIP_isOn)
+            isNTRIP_TurnedOn = !isNTRIP_TurnedOn;
+            ntripCounter = 15;
+            if (!isNTRIP_TurnedOn)
             {
-                if (isNTRIP_RequiredOn)
-                {
-                    ShutDownNTRIP();
-                    btnStartStopNtrip.Text = gStr.gsStart;
-                    lblWatch.Text = gStr.gsStopped;
-                    lblNTRIPSeconds.Text = gStr.gsOffline;
-                    isNTRIP_RequiredOn = false;
-                }
-                else
-                {
-                    isNTRIP_RequiredOn = true;
-                    btnStartStopNtrip.Text = gStr.gsStop;
-                    lblWatch.Text = gStr.gsWaiting;
-                }
+                ShutDownNTRIP();
+                lblNTRIPSeconds.Text = gStr.gsOffline;
+                btnStartStopNtrip.Text = gStr.gsStart;
+                lblWatch.Text = gStr.gsStopped;
+                NTRIPBytesMenu.Visible = false;
+                pbarNtripMenu.Visible = false;
             }
             else
             {
-                TimedMessageBox(2000, gStr.gsTurnONNtripClient, gStr.gsNTRIPClientNotSetUp);
+                btnStartStopNtrip.Text = gStr.gsStop;
+                lblWatch.Text = gStr.gsWaiting;
+                NTRIPBytesMenu.Visible = true;
+                pbarNtripMenu.Visible = true;
             }
+
+            Properties.Settings.Default.setNTRIP_isOn = isNTRIP_TurnedOn;
+            Properties.Settings.Default.Save();
         }
         private void btnManualAutoDrive_Click(object sender, EventArgs e)
         {
@@ -998,7 +998,7 @@ namespace AgOpenGPS
         }
         private void btnHeadlandOnOff_Click(object sender, EventArgs e)
         {
-            if (hd.headArr[0].hdLine.Count > 0)
+            if (hd.headArr.Count > 0)
             {
                 hd.isOn = !hd.isOn;
                 if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
@@ -1433,7 +1433,9 @@ namespace AgOpenGPS
         {
             using (var form = new FormToolSettings(this, 0))
             {
+
                 var result = form.ShowDialog();
+
                 if (result == DialogResult.OK)
                 {
                 }
@@ -1460,9 +1462,7 @@ namespace AgOpenGPS
         }
         private void simplifyToolStrip_Click(object sender, EventArgs e)
         {
-            isSimple = !isSimple;
-
-            Settings.Default.setDisplay_isSimple = isSimple;
+            Settings.Default.setDisplay_isSimple = !Settings.Default.setDisplay_isSimple;
             Settings.Default.Save();
             SwapBatmanPanels();
             FixPanelsAndMenus();
@@ -2044,10 +2044,9 @@ namespace AgOpenGPS
                 return;
             }
 
-            //if (bnd.bndArr[0].isSet && (ABLine.isABLineSet | curve.isCurveSet))
+            //if (ABLine.isABLineSet | curve.isCurveSet)
             //{
             //    //field too small
-            //    //if (bnd.bndArr[0].bndLine.Count < 4) { TimedMessageBox(3000, "!!!!", gStr.gsBoundaryTooSmall); return; }
             //    //using (var form = new FormHeadland(this))
             //    //{
             //    //    var result = form.ShowDialog();

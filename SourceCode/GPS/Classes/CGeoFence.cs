@@ -42,7 +42,7 @@ namespace AgOpenGPS
                 {
                     for (int t = 0; t < mf.bnd.bndArr.Count; t++)
                     {
-                        if (!mf.bnd.bndArr[t].isSet || mf.bnd.bndArr[t].isDriveThru || mf.bnd.bndArr[t].isOwnField) continue;
+                        if (mf.bnd.bndArr[t].isDriveThru || mf.bnd.bndArr[t].isOwnField) continue;
                         //skip unnecessary boundaries
                         if (mf.bnd.bndArr[t].OuterField == mf.bnd.LastBoundary || mf.bnd.bndArr[t].OuterField == -1)
                         {
@@ -139,65 +139,67 @@ namespace AgOpenGPS
 
         public bool IsPointInsideGeoFences(vec3 pt)
         {
-            //if inside outer boundary, then potentially add
-            if (geoFenceArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary >= 0 && geoFenceArr[mf.bnd.LastBoundary].IsPointInGeoFenceArea(pt))
+
+
+            bool test = false;
+
+            for (int b = 0; b < mf.bnd.bndArr.Count; b++)
             {
-                for (int b = 0; b < mf.bnd.bndArr.Count; b++)
+                if (mf.bnd.bndArr[b].isOwnField)
                 {
-                    if (mf.bnd.bndArr[b].isSet && !mf.bnd.bndArr[b].isOwnField)
+                    if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
                     {
-                        //skip unnecessary boundaries
-                        if (mf.bnd.bndArr[b].OuterField == mf.bnd.LastBoundary || mf.bnd.bndArr[b].OuterField == -1)
+                        test = true;
+                        for (int c = 0; c < mf.bnd.bndArr.Count; c++)
                         {
-                            if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
+                            //skip unnecessary boundaries
+                            if (!mf.bnd.bndArr[c].isOwnField && (mf.bnd.bndArr[c].OuterField == b || mf.bnd.bndArr[c].OuterField == -1))
                             {
-                                //point is in an inner turn area but inside outer
-                                return false;
+                                if (geoFenceArr[c].IsPointInGeoFenceArea(pt))
+                                {
+                                    //point is in an inner area but inside outer
+                                    test = false;
+                                }
                             }
                         }
+                        break;//overlap doesnt matter if both outerbounds?
                     }
                 }
-                return true;
             }
-            else
-            {
-                return false;
-            }
+            return test;
         }
 
         public bool IsPointInsideGeoFences(vec2 pt)
         {
-            //if inside outer boundary, then potentially add
-            if (geoFenceArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary >= 0 && geoFenceArr[mf.bnd.LastBoundary].IsPointInGeoFenceArea(pt))
+            bool test = false;
+            for (int b = 0; b < mf.bnd.bndArr.Count; b++)
             {
-                for (int b = 0; b < mf.bnd.bndArr.Count; b++)
+                if (mf.bnd.bndArr[b].isOwnField)
                 {
-                    if (mf.bnd.bndArr[b].isSet && !mf.bnd.bndArr[b].isOwnField)
+                    if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
                     {
-                        //skip unnecessary boundaries
-                        if (mf.bnd.bndArr[b].OuterField == mf.bnd.LastBoundary || mf.bnd.bndArr[b].OuterField == -1)
+                        test = true;
+                        for (int c = 0; c < mf.bnd.bndArr.Count; c++)
                         {
-                            if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
+                            //skip unnecessary boundaries
+                            if (!mf.bnd.bndArr[c].isOwnField && (mf.bnd.bndArr[c].OuterField == b || mf.bnd.bndArr[c].OuterField == -1))
                             {
-                                //point is in an inner turn area but inside outer
-                                return false;
+                                if (geoFenceArr[c].IsPointInGeoFenceArea(pt))
+                                {
+                                    //point is in an inner area but inside outer
+                                    test = false;
+                                }
                             }
                         }
+                        break;//overlap doesnt matter if both outerbounds?
                     }
                 }
-                return true;
             }
-            else
-            {
-                return false;
-            }
+            return test;
         }
 
-        public void BuildGeoFenceLines()
+        public void BuildGeoFenceLines(int Num)
         {
-            //update the GUI values for boundaries
-            //mf.fd.UpdateFieldBoundaryGUIAreas();
-
             if (mf.bnd.bndArr.Count == 0)
             {
                 //mf.TimedMessageBox(1500, " No Boundary ", "No GeoFence Made");
@@ -210,19 +212,13 @@ namespace AgOpenGPS
             //determine how wide a headland space
             double totalHeadWidth = mf.yt.geoFenceDistance;
 
-            //outside boundary - count the points from the boundary
-
             //inside boundaries
-            for (int j = 0; j < mf.bnd.bndArr.Count; j++)
+            for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
             {
                 geoFenceArr[j].geoFenceLine.Clear();
-                if (!mf.bnd.bndArr[j].isSet || (!mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].isDriveThru)) continue;
+                //if (!mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].isDriveThru) continue;
 
-
-
-                int ChangeDirection = ((mf.bnd.bndArr[j].isOwnField == true) ? -1 : 1);
-
-
+                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? -1 : 1;
 
                 int ptCount = mf.bnd.bndArr[j].bndLine.Count;
 
@@ -232,11 +228,9 @@ namespace AgOpenGPS
                     point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
-                    if (point.heading < -glm.twoPI) point.heading += glm.twoPI;
 
                     //only add if outside actual field boundary
                     if ((mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (!mf.bnd.bndArr[j].isOwnField && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
-                    //if (!mf.bnd.bndArr[j].IsPointInsideBoundary(point))
                     {
                         vec2 tPnt = new vec2(point.easting, point.northing);
                         geoFenceArr[j].geoFenceLine.Add(tPnt);
@@ -244,16 +238,16 @@ namespace AgOpenGPS
                 }
                 geoFenceArr[j].FixGeoFenceLine(totalHeadWidth, mf.bnd.bndArr[j].bndLine, mf.tool.toolWidth * 0.5);
                 geoFenceArr[j].PreCalcTurnLines();
-            }
 
-            //mf.TimedMessageBox(800, "Turn Lines", "Turn limits Created");
+                if (Num > -1) break;
+            }
         }
 
         public void DrawGeoFenceLines()
         {
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (mf.bnd.bndArr[i].isSet) geoFenceArr[i].DrawGeoFenceLine();
+                geoFenceArr[i].DrawGeoFenceLine();
             }
         }
     }

@@ -36,7 +36,7 @@ namespace AgOpenGPS
         public vec2 boxC = new vec2(9001, 9001), boxD = new vec2(9002, 9003);
 
         //point at the farthest turn segment from pivotAxle
-        public vec3 closestTurnPt = new vec3(-10000, -10000, 9);
+        public vec3 closestTurnPt = new vec3();
 
 
         public void FindClosestTurnPoint(bool isYouTurnRight, vec3 fromPt, double headAB)
@@ -60,7 +60,8 @@ namespace AgOpenGPS
                 {
                     for (int t = 0; t < mf.bnd.bndArr.Count; t++)
                     {
-                        if (!mf.bnd.bndArr[t].isSet || mf.bnd.bndArr[t].isOwnField || mf.bnd.bndArr[t].isDriveThru || mf.bnd.bndArr[t].isDriveAround) continue;
+                        if (mf.bnd.bndArr[t].isOwnField || mf.bnd.bndArr[t].isDriveThru || mf.bnd.bndArr[t].isDriveAround) continue;
+
                         //skip unnecessary boundaries
                         if (mf.bnd.bndArr[t].OuterField == mf.bnd.LastBoundary || mf.bnd.bndArr[t].OuterField == -1)
                         {
@@ -228,41 +229,9 @@ namespace AgOpenGPS
             }
         }
 
-        public bool PointInsideWorkArea(vec2 pt)
+        public void BuildTurnLines(int Num)
         {
-            //if inside outer boundary, then potentially add
-            if (turnArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary >= 0 && turnArr[mf.bnd.LastBoundary].IsPointInTurnWorkArea(pt))
-            {
-                for (int b = 0; b < mf.bnd.bndArr.Count; b++)
-                {
-                    if (!mf.bnd.bndArr[b].isOwnField && mf.bnd.bndArr[b].OuterField == mf.bnd.LastBoundary || mf.bnd.bndArr[b].OuterField == -1)
-                    {
-                        if (turnArr[b].IsPointInTurnWorkArea(pt))
-                        {
-                            //point is in an inner turn area but inside outer
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void BuildTurnLines()
-        {
-            //update the GUI values for boundaries
-            mf.fd.UpdateFieldBoundaryGUIAreas();
-
-            if (mf.bnd.bndArr.Count == 0)
-            {
-                mf.TimedMessageBox(1500, "No Boundaries", "No Turn Lines Made");
-                return;
-            }
-
+            if (mf.bnd.bndArr.Count == 0) return;
             //to fill the list of line points
             vec3 point = new vec3();
 
@@ -270,12 +239,12 @@ namespace AgOpenGPS
             double totalHeadWidth = mf.yt.triggerDistanceOffset;
 
             //inside boundaries
-            for (int j = 0; j < mf.bnd.bndArr.Count; j++)
+            for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
             {
                 turnArr[j].turnLine.Clear();
-                if (!mf.bnd.bndArr[j].isSet || (!mf.bnd.bndArr[j].isOwnField && (mf.bnd.bndArr[j].isDriveThru || mf.bnd.bndArr[j].isDriveAround))) continue;
+                //if (!mf.bnd.bndArr[j].isOwnField && (mf.bnd.bndArr[j].isDriveThru || mf.bnd.bndArr[j].isDriveAround)) continue;
 
-                int ChangeDirection = ((mf.bnd.bndArr[j].isOwnField == true) ? -1 : 1);
+                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? -1 : 1;
 
                 int ptCount = mf.bnd.bndArr[j].bndLine.Count;
 
@@ -285,7 +254,6 @@ namespace AgOpenGPS
                     point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
-                    if (point.heading < -glm.twoPI) point.heading += glm.twoPI;
 
                     //only add if outside actual field boundary
                     if ((mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (!mf.bnd.bndArr[j].isOwnField && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
@@ -296,6 +264,8 @@ namespace AgOpenGPS
                 }
                 turnArr[j].FixTurnLine(totalHeadWidth, mf.bnd.bndArr[j].bndLine, mf.tool.toolWidth * 0.4);
                 turnArr[j].PreCalcTurnLines();
+
+                if (Num > -1) break;
             }
 
             //mf.TimedMessageBox(800, "Turn Lines", "Turn limits Created");
@@ -309,15 +279,9 @@ namespace AgOpenGPS
 
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].isDriveAround) continue;
-                ////draw the turn line oject
-                int ptCount = mf.turn.turnArr[i].turnLine.Count;
-                if (ptCount < 1) continue;
+                if (!mf.bnd.bndArr[i].isOwnField && (mf.bnd.bndArr[i].isDriveAround || mf.bnd.bndArr[i].isDriveThru)) continue;
 
-                GL.Begin(PrimitiveType.LineStrip);
-                for (int h = 0; h < ptCount; h++) GL.Vertex3(mf.turn.turnArr[i].turnLine[h].easting, mf.turn.turnArr[i].turnLine[h].northing, 0);
-                GL.Vertex3(mf.turn.turnArr[i].turnLine[0].easting, mf.turn.turnArr[i].turnLine[0].northing, 0);
-                GL.End();
+                if (mf.bnd.LastBoundary >= 0 && (i == mf.bnd.LastBoundary || (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == -1) || mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary)) mf.turn.turnArr[i].DrawTurnLine();
             }
         }
 

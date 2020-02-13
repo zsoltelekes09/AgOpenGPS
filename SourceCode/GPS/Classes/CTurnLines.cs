@@ -4,21 +4,6 @@ using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
-    //public class CTurnPt
-    //{
-    //    public double easting { get; set; }
-    //    public double northing { get; set; }
-    //    public double heading { get; set; }
-
-    //    //constructor
-    //    public CTurnPt(double _easting, double _northing, double _heading)
-    //    {
-    //        easting = _easting;
-    //        northing = _northing;
-    //        heading = _heading;
-    //    }
-    //}
-
     public class CTurnLines
     {
         //list of coordinates of boundary line
@@ -26,6 +11,8 @@ namespace AgOpenGPS
 
         //the list of constants and multiples of the boundary
         public List<vec2> calcList = new List<vec2>();
+
+        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
         public void CalculateTurnHeadings()
         {
@@ -56,12 +43,6 @@ namespace AgOpenGPS
             pt3.heading = Math.Atan2(arr[0].easting - arr[cnt - 1].easting, arr[0].northing - arr[cnt - 1].northing);
             if (pt3.heading < 0) pt3.heading += glm.twoPI;
             turnLine.Add(pt3);
-        }
-
-        public void ResetTurn()
-        {
-            calcList?.Clear();
-            turnLine?.Clear();
         }
 
         public void FixTurnLine(double totalHeadWidth, List<vec3> curBnd, double spacing)
@@ -137,8 +118,21 @@ namespace AgOpenGPS
             calcList.Clear();
             vec2 constantMultiple = new vec2(0, 0);
 
+            Northingmin = Northingmax = turnLine[0].northing;
+            Eastingmin = Eastingmax = turnLine[0].easting;
+
             for (int i = 0; i < turnLine.Count; j = i++)
             {
+
+                if (Northingmin > turnLine[i].northing) Northingmin = turnLine[i].northing;
+
+                if (Northingmax < turnLine[i].northing) Northingmax = turnLine[i].northing;
+
+                if (Eastingmin > turnLine[i].easting) Eastingmin = turnLine[i].easting;
+
+                if (Eastingmax < turnLine[i].easting) Eastingmax = turnLine[i].easting;
+
+
                 //check for divide by zero
                 if (Math.Abs(turnLine[i].northing - turnLine[j].northing) < 0.00000000001)
                 {
@@ -164,13 +158,16 @@ namespace AgOpenGPS
             int j = turnLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < turnLine.Count; j = i++)
+            if (testPointv3.northing > Northingmin || testPointv3.northing < Northingmax || testPointv3.easting > Eastingmin || testPointv3.easting < Eastingmax)
             {
-                if ((turnLine[i].northing < testPointv3.northing && turnLine[j].northing >= testPointv3.northing)
-                || (turnLine[j].northing < testPointv3.northing && turnLine[i].northing >= testPointv3.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv3.northing * calcList[i].northing) + calcList[i].easting < testPointv3.easting);
+                    if ((turnLine[i].northing < testPointv3.northing && turnLine[j].northing >= testPointv3.northing)
+                    || (turnLine[j].northing < testPointv3.northing && turnLine[i].northing >= testPointv3.northing))
+                    {
+                        oddNodes ^= ((testPointv3.northing * calcList[i].northing) + calcList[i].easting < testPointv3.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -182,13 +179,16 @@ namespace AgOpenGPS
             int j = turnLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < turnLine.Count; j = i++)
+            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
             {
-                if ((turnLine[i].northing < testPointv2.northing && turnLine[j].northing >= testPointv2.northing)
-                || (turnLine[j].northing < testPointv2.northing && turnLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((turnLine[i].northing < testPointv2.northing && turnLine[j].northing >= testPointv2.northing)
+                    || (turnLine[j].northing < testPointv2.northing && turnLine[i].northing >= testPointv2.northing))
+                    {
+                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -199,10 +199,7 @@ namespace AgOpenGPS
             ////draw the turn line oject
             int ptCount = turnLine.Count;
             if (ptCount < 1) return;
-            GL.LineWidth(1);
-            GL.Color3(0.8555f, 0.9232f, 0.60f);
-            GL.PointSize(2);
-            GL.Begin(PrimitiveType.Points);
+            GL.Begin(PrimitiveType.LineStrip);
             for (int h = 0; h < ptCount; h++) GL.Vertex3(turnLine[h].easting, turnLine[h].northing, 0);
             GL.Vertex3(turnLine[0].easting, turnLine[0].northing, 0);
             GL.End();

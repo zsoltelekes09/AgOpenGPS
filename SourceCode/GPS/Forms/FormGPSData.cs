@@ -45,7 +45,9 @@ namespace AgOpenGPS
             tboxSerialToRelay.Text = mf.mc.relayData[0] + "," + mf.mc.relayData[1]
                  + "," + mf.mc.relayData[2] + "," + mf.mc.relayData[3] //relay and speed x 4
                  + "," + mf.mc.relayData[4] + "," + mf.mc.relayData[5] + "," + mf.mc.relayData[6]; //setpoint hi lo
-            tboxNMEASerial.Text = mf.recvSentenceSettings;
+
+            tboxNMEASerial.Lines = mf.recvSentenceSettings;
+
             //tboxNMEASerial.Text = mainForm.pn.rawBuffer;
 
             tboxSerialFromAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;

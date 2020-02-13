@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenTK.Graphics.OpenGL;
 
 namespace AgOpenGPS
 {
@@ -34,32 +33,24 @@ namespace AgOpenGPS
             leftToolDistance = 99999;
             rightToolDistance = 99999;
             isToolUp = true;
-            headArr.Add(new CHeadLines());
 
         }
 
         public bool FindHeadlandDistance()
         {
-            if (headArr[0].hdLine.Count == 0)
+            if (mf.bnd.LastBoundary > -1 && headArr.Count > mf.bnd.LastBoundary)
             {
-                leftToolDistance = 99999;
-                rightToolDistance = 99999;
-                return false;
-            }
-            else
-            {
-
                 leftToolDistance = 999999;
                 rightToolDistance = 999999;
 
                 double minDistA = 1000000, minDistB = 1000000;
 
-                int ptCount = headArr[0].hdLine.Count;
-
+                int ptCount = headArr[mf.bnd.LastBoundary].hdLine.Count;
+                if (ptCount == 0) return false;
                 //find the closest 2 points to current fix
                 for (int t = 0; t < ptCount; t++)
                 {
-                    double dist = glm.DistanceSquared(mf.section[0].leftPoint, headArr[0].hdLine[t]);
+                    double dist = glm.DistanceSquared(mf.section[0].leftPoint, headArr[mf.bnd.LastBoundary].hdLine[t]);
                     if (dist < minDistA)
                     {
                         minDistB = minDistA;
@@ -77,8 +68,8 @@ namespace AgOpenGPS
                 //just need to make sure the points continue ascending or heading switches all over the place
                 if (A > B) { Q = A; A = B; B = Q; }
 
-                double dx = headArr[0].hdLine[B].easting - headArr[0].hdLine[A].easting;
-                double dz = headArr[0].hdLine[B].northing - headArr[0].hdLine[A].northing;
+                double dx = headArr[mf.bnd.LastBoundary].hdLine[B].easting - headArr[mf.bnd.LastBoundary].hdLine[A].easting;
+                double dz = headArr[mf.bnd.LastBoundary].hdLine[B].northing - headArr[mf.bnd.LastBoundary].hdLine[A].northing;
 
                 if (Math.Abs(dx) < Double.Epsilon && Math.Abs(dz) < Double.Epsilon) return false;
 
@@ -86,8 +77,8 @@ namespace AgOpenGPS
                 //double abHeading = curList[A].heading;
 
                 //how far from current AB Line is fix
-                leftToolDistance = ((dz * mf.section[0].leftPoint.easting) - (dx * mf.section[0].leftPoint.northing) + (headArr[0].hdLine[B].easting
-                            * headArr[0].hdLine[A].northing) - (headArr[0].hdLine[B].northing * headArr[0].hdLine[A].easting))
+                leftToolDistance = ((dz * mf.section[0].leftPoint.easting) - (dx * mf.section[0].leftPoint.northing) + (headArr[mf.bnd.LastBoundary].hdLine[B].easting
+                            * headArr[mf.bnd.LastBoundary].hdLine[A].northing) - (headArr[mf.bnd.LastBoundary].hdLine[B].northing * headArr[mf.bnd.LastBoundary].hdLine[A].easting))
                                 / Math.Sqrt((dz * dz) + (dx * dx));
 
                 //are we on the right side or not
@@ -101,7 +92,7 @@ namespace AgOpenGPS
 
                 for (int t = 0; t < ptCount; t++)
                 {
-                    double dist = glm.DistanceSquared(mf.section[mf.tool.numOfSections-1].rightPoint, headArr[0].hdLine[t]);
+                    double dist = glm.DistanceSquared(mf.section[mf.tool.numOfSections-1].rightPoint, headArr[mf.bnd.LastBoundary].hdLine[t]);
                     if (dist < minDistA)
                     {
                         minDistB = minDistA;
@@ -119,8 +110,8 @@ namespace AgOpenGPS
                 //just need to make sure the points continue ascending or heading switches all over the place
                 if (C > D) { Q = C; C = D; D = Q; }
 
-                dx = headArr[0].hdLine[D].easting - headArr[0].hdLine[C].easting;
-                dz = headArr[0].hdLine[D].northing - headArr[0].hdLine[C].northing;
+                dx = headArr[mf.bnd.LastBoundary].hdLine[D].easting - headArr[mf.bnd.LastBoundary].hdLine[C].easting;
+                dz = headArr[mf.bnd.LastBoundary].hdLine[D].northing - headArr[mf.bnd.LastBoundary].hdLine[C].northing;
 
                 if (Math.Abs(dx) < Double.Epsilon && Math.Abs(dz) < Double.Epsilon) return false;
 
@@ -128,8 +119,8 @@ namespace AgOpenGPS
                 //double abHeading = curList[C].heading;
 
                 //how far from current AB Line is fix
-                rightToolDistance = ((dz * mf.section[mf.tool.numOfSections - 1].rightPoint.easting) - (dx * mf.section[mf.tool.numOfSections - 1].rightPoint.northing) + (headArr[0].hdLine[D].easting
-                            * headArr[0].hdLine[C].northing) - (headArr[0].hdLine[D].northing * headArr[0].hdLine[C].easting))
+                rightToolDistance = ((dz * mf.section[mf.tool.numOfSections - 1].rightPoint.easting) - (dx * mf.section[mf.tool.numOfSections - 1].rightPoint.northing) + (headArr[mf.bnd.LastBoundary].hdLine[D].easting
+                            * headArr[mf.bnd.LastBoundary].hdLine[C].northing) - (headArr[mf.bnd.LastBoundary].hdLine[D].northing * headArr[mf.bnd.LastBoundary].hdLine[C].easting))
                                 / Math.Sqrt((dz * dz) + (dx * dx));
 
                 //are we on the right side or not
@@ -195,32 +186,23 @@ namespace AgOpenGPS
 
                 return isToolUp;
             }
+            else
+            {
+                leftToolDistance = 99999;
+                rightToolDistance = 99999;
+                return false;
+            }
         }
 
         public void DrawHeadLines()
         {
-            //for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (headArr[0].hdLine.Count > 0 && isOn) headArr[0].DrawHeadLine(mf.ABLine.lineWidth);
+                if (mf.bnd.LastBoundary >= 0 || (i == mf.bnd.LastBoundary || (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == -1) || mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary))
+                {
+                    if (headArr[i].hdLine.Count > 0) headArr[i].DrawHeadLine(mf.ABLine.lineWidth);
+                }
             }
-
-            //GL.LineWidth(4.0f);
-            //GL.Color3(0.9219f, 0.2f, 0.970f);
-            //GL.Begin(PrimitiveType.Lines);
-            //{
-            //    GL.Vertex3(headArr[0].hdLine[A].easting, headArr[0].hdLine[A].northing, 0);
-            //    GL.Vertex3(headArr[0].hdLine[B].easting, headArr[0].hdLine[B].northing, 0);
-            //    GL.Vertex3(headArr[0].hdLine[C].easting, headArr[0].hdLine[C].northing, 0);
-            //    GL.Vertex3(headArr[0].hdLine[D].easting, headArr[0].hdLine[D].northing, 0);
-            //}
-            //GL.End();
-
-            //GL.PointSize(6.0f);
-            //GL.Color3(0.219f, 0.932f, 0.970f);
-            //GL.Begin(PrimitiveType.Points);
-            //GL.Vertex3(downL.easting, downL.northing, 0);
-            //GL.Vertex3(downR.easting, downR.northing, 0);
-            //GL.End();
         }
 
         //public bool IsPointInsideHeadLine(vec3 pt)
@@ -230,7 +212,6 @@ namespace AgOpenGPS
         //    {
         //        for (int b = 1; b < mf.bnd.bndArr.Count; b++)
         //        {
-        //            if (mf.bnd.bndArr[b].isSet)
         //            {
         //                if (headArr[b].IsPointInHeadArea(pt))
         //                {
@@ -250,11 +231,10 @@ namespace AgOpenGPS
         public bool IsPointInsideHeadLine(vec2 pt)
         {
             //if inside outer boundary, then potentially add
-            if (headArr.Count > 0 && headArr[0].IsPointInHeadArea(pt))
+            if (mf.bnd.LastBoundary > -1 && headArr.Count > mf.bnd.LastBoundary && headArr[mf.bnd.LastBoundary].IsPointInHeadArea(pt))
             {
                 //for (int b = 1; b < mf.bnd.bndArr.Count; b++)
                 //{
-                //    if (mf.bnd.bndArr[b].isSet)
                 //    {
                 //        if (headArr[b].IsPointInHeadArea(pt))
                 //        {

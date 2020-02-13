@@ -85,7 +85,11 @@ namespace AgOpenGPS
 
             //sbSendText.Append(sbOGI.ToString());
             mf.pn.rawBuffer += sbSendText.ToString();
-            mf.recvSentenceSettings = sbSendText.ToString();
+
+            //mf.recvSentenceSettings[3] = mf.recvSentenceSettings[2];
+            //mf.recvSentenceSettings[2] = mf.recvSentenceSettings[1];
+            //mf.recvSentenceSettings[1] = mf.recvSentenceSettings[0];
+            //mf.recvSentenceSettings[0] = sbSendText.ToString();
 
             sbSendText.Clear();
         }

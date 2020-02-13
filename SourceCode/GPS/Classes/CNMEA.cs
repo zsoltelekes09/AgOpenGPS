@@ -156,7 +156,7 @@ Field	Meaning
         public double headingTrue, headingHDT, hdop, ageDiff;
 
         //imu
-        public double nRoll, nPitch, nYaw, nAngularVelocity;
+        public double nRoll, nYaw, nAngularVelocity;
 
         public bool isValidIMU;
         public int fixQuality;
@@ -210,8 +210,10 @@ Field	Meaning
             //fix.northing = (Math.Sin(convergenceAngle) * east) + (Math.Cos(convergenceAngle) * nort);
         }
 
-        public void ParseNMEA() 
+        public void ParseNMEA()
         {
+            mf.ReadGPSData();
+
             if (rawBuffer == null) return;
 
             //find end of a sentence
@@ -223,7 +225,7 @@ Field	Meaning
             if (dollar == -1) return;
 
             //if the $ isn't first, get rid of the tail of corrupt sentence
-            if (dollar >= cr) rawBuffer = rawBuffer.Substring(dollar);
+            if (dollar > cr) rawBuffer = rawBuffer.Substring(dollar);
 
             cr = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
             if (cr == -1) return; // No end found, wait for more data
@@ -244,7 +246,6 @@ Field	Meaning
                 //extract the next NMEA single sentence
                 nextNMEASentence = Parse();
                 if (nextNMEASentence == null) return;
-                mf.recvSentenceSettings += nextNMEASentence;
 
                 //parse them accordingly
                 words = nextNMEASentence.Split(',');
@@ -257,8 +258,6 @@ Field	Meaning
                 if (words[0] == "$PAOGI") ParseOGI();
                 if (words[0] == "$PTNL") ParseAVR();
                 if (words[0] == "$GNTRA") ParseTRA();
-                if (words[0] == "$UBX-RELPOSNED") ParseRELPOSNED();
-                if (words[0] == "$UBX-HPPOSLLH") ParsePPOSLLH();
                 if (words[0] == "$UBX-PVT") ParsePVT();
 
             }// while still data
@@ -288,6 +287,11 @@ Field	Meaning
 
                 //the NMEA sentence to be parsed
                 sentence = rawBuffer.Substring(0, end + 1);
+
+                mf.recvSentenceSettings[3] = mf.recvSentenceSettings[2];
+                mf.recvSentenceSettings[2] = mf.recvSentenceSettings[1];
+                mf.recvSentenceSettings[1] = mf.recvSentenceSettings[0];
+                mf.recvSentenceSettings[0] = sentence.Replace('\n', ' ');
 
                 //remove the processed sentence from the rawBuffer
                 rawBuffer = rawBuffer.Substring(end + 1);
@@ -361,37 +365,17 @@ Field	Meaning
                 }
             }
         }
-        private void ParseRELPOSNED()
-        {
-            if (!String.IsNullOrEmpty(words[1]))
-            {
-                //sentence = "$UBX-RELPOSNED,4,heading,roll";
-                if (words[1] == "0")//bad quality
-                {
-                    //headingHDT = 9999;
-                    mf.ahrs.rollX16 = 9999;
-                    //UpdatedHeading = true;
-                }
-                else
-                {
-                    double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out headingHDT);
-                    double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
 
-                    mf.ahrs.rollX16 = (int)(nRoll * 16);
-                    //UpdatedHeading = true;
-                }
-
-
-                // double.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
-
-            }
-        }
         private void ParsePVT()
         {
             if (!String.IsNullOrEmpty(words[1]))
             {
                 //sentence = "$UBX-PVT,1,satellitesTracked,pdop,fixtype"
-                if (words[1] != "0")
+                if (words[1] == "0")
+                {
+
+                }
+                else
                 {
                     int.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
                     //fixQuality
@@ -408,27 +392,7 @@ Field	Meaning
 
             }
         }
-        private void ParsePPOSLLH()
-        {
-            if (!String.IsNullOrEmpty(words[1]))//bad quality
-            {
-                if (words[1] == "0")
-                {
-                }
-                else
-                {
-                    int.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
-                    //sentence = "$UBX-HPPOSLLH,1,longitude,latitude,altitude";
-                    double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out longitude);
-                    double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
-                    double.TryParse(words[4], NumberStyles.Float, CultureInfo.InvariantCulture, out altitude);
 
-                    UpdateNorthingEasting();
-                }
-            }
-        }
-
-        //The indivdual sentence parsing
         private void ParseGGA()
         {
             //$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M ,  ,*47
@@ -545,7 +509,7 @@ Field	Meaning
                 if (mf.ahrs.isRollFromGPS) mf.ahrs.rollX16 = (int)(nRoll * 16);
 
                 //pitch
-                double.TryParse(words[15], NumberStyles.Float, CultureInfo.InvariantCulture, out nPitch);
+                //double.TryParse(words[15], NumberStyles.Float, CultureInfo.InvariantCulture, out nPitch);
 
                 //yaw
                 double.TryParse(words[16], NumberStyles.Float, CultureInfo.InvariantCulture, out nYaw);

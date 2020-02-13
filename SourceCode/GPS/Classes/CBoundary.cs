@@ -29,7 +29,7 @@ namespace AgOpenGPS
             boundarySelected = -1;
             scanWidth = 1.0;
             boxLength = 2000;
-            LastBoundary = 0;
+            LastBoundary = -1;
             //boundaries array
         }
 
@@ -160,6 +160,8 @@ namespace AgOpenGPS
 
             for (int i = 0; i < bndArr.Count; i++)
             {
+                if (boundarySelected == i) GL.Color3(1.0f, 0.0f, 0.0f);
+                else GL.Color3(0.95f, 0.5f, 0.250f);
                 bndArr[i].DrawBoundaryLine();
             }
 
@@ -206,11 +208,6 @@ namespace AgOpenGPS
                 for (int h = 0; h < bndBeingMadePts.Count; h++) GL.Vertex3(bndBeingMadePts[h].easting, bndBeingMadePts[h].northing, 0);
                 GL.End();
             }
-        }
-
-        public void ResetBoundaries()
-        {
-            bndArr.Clear();
         }
 
         //draws the derived closest point
