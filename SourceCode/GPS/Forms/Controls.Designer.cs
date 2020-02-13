@@ -226,7 +226,7 @@ namespace AgOpenGPS
             else if (curve.isBtnCurveOn && curve.numCurveLines > 0)
             {
                 curve.moveDistance = 0;
-
+                curve.oldhowManyPathsAway = -99999;
                 curve.numCurveLineSelected++;
                 if (curve.numCurveLineSelected > curve.numCurveLines) curve.numCurveLineSelected = 1;
 

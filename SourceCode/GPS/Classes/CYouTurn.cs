@@ -1049,18 +1049,15 @@ namespace AgOpenGPS
                 isABSameAsFixHeading = mf.curve.isSameWay;
 
                 double head = crossingCurvePoint.heading;//90
-                //double delta = mf.curve.deltaOfRefAndAveHeadings;
-                double delta = 1;
+                double delta = mf.curve.deltaOfRefAndAveHeadings;
 
                 if (!isABSameAsFixHeading) head += Math.PI;
 
-                //headland angle relative to vehicle heading to head along the boundary left or right
 
-                boundaryAngleOffPerpendicular = glm.PIBy2 + (mf.turn.closestTurnPt.heading - head);
 
+                boundaryAngleOffPerpendicular = glm.PIBy2 + (crossingTurnLinePoint.heading - head);
                 if (boundaryAngleOffPerpendicular > Math.PI) boundaryAngleOffPerpendicular -= glm.twoPI;
                 if (boundaryAngleOffPerpendicular < -Math.PI) boundaryAngleOffPerpendicular += glm.twoPI;
-
 
                 CDubins dubYouTurnPath = new CDubins();
                 CDubins.turningRadius = mf.vehicle.minTurningRadius;
@@ -1071,47 +1068,27 @@ namespace AgOpenGPS
                 double turnOffset;
 
                 //calculate the true width
-                if (!isTurnRight) turnOffset = ((widthMinusOverlap * rowSkipsWidth) + toolOffset);
-                else turnOffset = ((widthMinusOverlap * rowSkipsWidth) - toolOffset);
+                if (!isTurnRight) turnOffset = delta * ((widthMinusOverlap * rowSkipsWidth) + toolOffset);
+                else turnOffset = delta * ((widthMinusOverlap * rowSkipsWidth) - toolOffset);
 
-                //to compensate for AB Curve overlap
-                turnOffset *= delta;
-
-                //diagonally across
-
-
-
-                double turnRadius = turnOffset * (1 / Math.Cos(boundaryAngleOffPerpendicular));
-
-
-
-                //double turnRadius = turnOffset * Math.Tan(boundaryAngleOffPerpendicular);
-
-                //start point of Dubins
-
+                double turnRadius = turnOffset * Math.Tan(boundaryAngleOffPerpendicular);
 
                 var start = new vec3(crossingCurvePoint.easting, crossingCurvePoint.northing, head);
-                
+
                 var goal = new vec3();
                 if (!isTurnRight)//this is actualy right
                 {
-                    //goal.northing = (crossingCurvePoint.northing - (Math.Cos(head - glm.PIBy2) * turnOffset)) - Math.Cos(head) * turnRadius;
-                    //goal.easting = (crossingCurvePoint.easting - (Math.Sin(head - glm.PIBy2) * turnOffset)) - Math.Sin(head) * turnRadius;
-                    goal.northing = crossingCurvePoint.northing - (Math.Cos(head - glm.PIBy2) * turnRadius);
-                    goal.easting = crossingCurvePoint.easting - (Math.Sin(head - glm.PIBy2) * turnRadius);
+                    goal.northing = (crossingCurvePoint.northing - (Math.Cos(head - glm.PIBy2) * turnOffset)) - Math.Cos(head) * turnRadius;
+                    goal.easting = (crossingCurvePoint.easting - (Math.Sin(head - glm.PIBy2) * turnOffset)) - Math.Sin(head) * turnRadius;
                     goal.heading = head - Math.PI;
                 }
                 else
                 {
-                    //goal.northing = (crossingCurvePoint.northing - (Math.Cos(head + glm.PIBy2) * turnOffset)) + Math.Cos(head) * turnRadius;
-                    //goal.easting = (crossingCurvePoint.easting - (Math.Sin(head + glm.PIBy2) * turnOffset)) + Math.Sin(head) * turnRadius;
-                    goal.northing = crossingCurvePoint.northing - (Math.Cos(head + glm.PIBy2) * turnRadius);
-                    goal.easting = crossingCurvePoint.easting - (Math.Sin(head + glm.PIBy2) * turnRadius);
+                    goal.northing = (crossingCurvePoint.northing - (Math.Cos(head + glm.PIBy2) * turnOffset)) + Math.Cos(head) * turnRadius;
+                    goal.easting = (crossingCurvePoint.easting - (Math.Sin(head + glm.PIBy2) * turnOffset)) + Math.Sin(head) * turnRadius;
                     goal.heading = head + Math.PI;
                 }
-                
 
-                //var goal = new vec3(crossingCurvePoint.easting - (Math.Sin(head - glm.PIBy2) * (mf.vehicle.minTurningRadius+0.1)) - (Math.Cos(head - glm.PIBy2) * (mf.vehicle.minTurningRadius + 0.1)), crossingCurvePoint.northing - (Math.Cos(head - glm.PIBy2) * (mf.vehicle.minTurningRadius + 0.1)) - (Math.Sin(head - glm.PIBy2) * (mf.vehicle.minTurningRadius + 0.1)), head + glm.PIBy2);
 
                 //now we go the other way to turn round
                 head -= Math.PI;

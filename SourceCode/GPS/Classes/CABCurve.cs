@@ -12,7 +12,7 @@ namespace AgOpenGPS
         public bool spiralmode = false;
         public bool circlemode = false;
 
-        public double oldhowManyPathsAway = -1;
+        public double oldhowManyPathsAway = -99999;
 
         //flag for starting stop adding points
         public bool isBtnCurveOn, isOkToAddPoints, isCurveSet;

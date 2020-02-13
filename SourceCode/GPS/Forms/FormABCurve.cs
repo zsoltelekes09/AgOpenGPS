@@ -385,6 +385,7 @@ namespace AgOpenGPS
 
         private void btnCancel_Click(object sender, System.EventArgs e)
         {
+            mf.curve.oldhowManyPathsAway = -99999;
             mf.curve.moveDistance = 0;
             mf.curve.isOkToAddPoints = false;
             mf.curve.isCurveSet = false;
@@ -430,6 +431,7 @@ namespace AgOpenGPS
 
         private void btnListUse_Click(object sender, EventArgs e)
         {
+            mf.curve.oldhowManyPathsAway = -99999;
             mf.curve.moveDistance = 0;
 
             int count = lvLines.SelectedItems.Count;
