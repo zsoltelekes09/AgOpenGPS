@@ -199,9 +199,8 @@ namespace AgOpenGPS
             ////draw the turn line oject
             int ptCount = turnLine.Count;
             if (ptCount < 1) return;
-            GL.Begin(PrimitiveType.LineStrip);
+            GL.Begin(PrimitiveType.LineLoop);
             for (int h = 0; h < ptCount; h++) GL.Vertex3(turnLine[h].easting, turnLine[h].northing, 0);
-            GL.Vertex3(turnLine[0].easting, turnLine[0].northing, 0);
             GL.End();
         }
     }

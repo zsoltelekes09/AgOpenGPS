@@ -155,9 +155,6 @@ namespace AgOpenGPS
 
         public void DrawBoundaryLines()
         {
-            //draw the boundaries
-            GL.Color3(0.95f, 0.5f, 0.250f);
-
             for (int i = 0; i < bndArr.Count; i++)
             {
                 if (boundarySelected == i) GL.Color3(1.0f, 0.0f, 0.0f);
@@ -171,11 +168,10 @@ namespace AgOpenGPS
                 vec3 pivot = mf.pivotAxlePos;
                 GL.LineWidth(1);
                 GL.Color3(0.825f, 0.22f, 0.90f);
-                GL.Begin(PrimitiveType.LineStrip);
+                GL.Begin(PrimitiveType.LineLoop);
                 for (int h = 0; h < bndBeingMadePts.Count; h++) GL.Vertex3(bndBeingMadePts[h].easting, bndBeingMadePts[h].northing, 0);
-                GL.Color3(0.295f, 0.972f, 0.290f);
-                GL.Vertex3(bndBeingMadePts[0].easting, bndBeingMadePts[0].northing, 0);
                 GL.End();
+                GL.Color3(0.295f, 0.972f, 0.290f);
 
                 //line from last point to pivot marker
                 GL.Color3(0.825f, 0.842f, 0.0f);

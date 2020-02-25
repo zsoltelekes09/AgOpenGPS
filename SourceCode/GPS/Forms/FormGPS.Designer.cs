@@ -1101,7 +1101,7 @@
             this.lblLatitude.BackColor = System.Drawing.Color.Transparent;
             this.lblLatitude.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold);
             this.lblLatitude.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lblLatitude.Location = new System.Drawing.Point(38, 54);
+            this.lblLatitude.Location = new System.Drawing.Point(39, 54);
             this.lblLatitude.Name = "lblLatitude";
             this.lblLatitude.Size = new System.Drawing.Size(104, 19);
             this.lblLatitude.TabIndex = 175;
@@ -1737,7 +1737,7 @@
             // 
             // timerSim
             // 
-            this.timerSim.Interval = 200;
+            this.timerSim.Interval = 125;
             this.timerSim.Tick += new System.EventHandler(this.timerSim_Tick);
             // 
             // toolStripMenuItem2

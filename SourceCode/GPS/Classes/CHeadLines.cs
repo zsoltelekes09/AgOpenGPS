@@ -120,10 +120,10 @@ namespace AgOpenGPS
 
             for (int i = 0; i < hdLine.Count; j = i++)
             {
-                if (Northingmin > hdLine[0].northing) Northingmin = hdLine[0].northing;
-                if (Northingmax < hdLine[0].northing) Northingmax = hdLine[0].northing;
-                if (Eastingmin > hdLine[0].easting) Eastingmin = hdLine[0].easting;
-                if (Eastingmax < hdLine[0].easting) Eastingmax = hdLine[0].easting;
+                if (Northingmin > hdLine[i].northing) Northingmin = hdLine[i].northing;
+                if (Northingmax < hdLine[i].northing) Northingmax = hdLine[i].northing;
+                if (Eastingmin > hdLine[i].easting) Eastingmin = hdLine[i].easting;
+                if (Eastingmax < hdLine[i].easting) Eastingmax = hdLine[i].easting;
 
                 //check for divide by zero
                 if (Math.Abs(hdLine[i].northing - hdLine[j].northing) < double.Epsilon)

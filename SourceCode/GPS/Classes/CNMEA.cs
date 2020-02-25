@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
@@ -132,16 +133,16 @@ Field	Meaning
 
         public double latStart, lonStart;
 
-        public double actualEasting, actualNorthing;
-        public double zone;
+        public double actualEasting, actualNorthing, zone;
         public double centralMeridian, convergenceAngle;
 
-        public bool UpdatedLatLon;
+        public int DualAntennaDistance = 0;
+        public double HeadingAngleCorrection = 0;
+        public bool UpdatedLatLon, EnableHeadRoll;
+        public List<byte> rawBuffer = new List<byte>(), rawBuffer2 = new List<byte>();
 
-        public string rawBuffer = "";
+        public string nextNMEASentence = "", fixFrom;
         private string[] words;
-        private string nextNMEASentence = "";
-        public string fixFrom;
 
         //UTM coordinates
         //public double northing, easting;
@@ -170,7 +171,6 @@ Field	Meaning
 
         public StringBuilder logNMEASentence = new StringBuilder();
         private readonly FormGPS mf;
-        private int nmeaCntr = 0;
 
         public CNMEA(FormGPS f)
         {
@@ -212,63 +212,180 @@ Field	Meaning
 
         public void ParseNMEA()
         {
-            mf.ReadGPSData();
-
-            if (rawBuffer == null) return;
-
-            //find end of a sentence
-            int cr = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
-            if (cr == -1) return; // No end found, wait for more data
-
-            // Find start of next sentence
-            int dollar = rawBuffer.IndexOf("$", StringComparison.Ordinal);
-            if (dollar == -1) return;
-
-            //if the $ isn't first, get rid of the tail of corrupt sentence
-            if (dollar > cr) rawBuffer = rawBuffer.Substring(dollar);
-
-            cr = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
-            if (cr == -1) return; // No end found, wait for more data
-            dollar = rawBuffer.IndexOf("$", StringComparison.Ordinal);
-            if (dollar == -1) return;
-
-            //if the $ isn't first, get rid of the tail of corrupt sentence
-            if (dollar >= cr) rawBuffer = rawBuffer.Substring(dollar);
-
-            cr = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
-            dollar = rawBuffer.IndexOf("$", StringComparison.Ordinal);
-            if (cr == -1 || dollar == -1) return;
-
-
-            //now we have a complete sentence or more somewhere in the portData
-            while (true)
+            for (int i = 0; i < rawBuffer.Count - 5; i++)
             {
-                //extract the next NMEA single sentence
-                nextNMEASentence = Parse();
-                if (nextNMEASentence == null) return;
+                if (rawBuffer[i] == 0x24)//$
+                {
+                    if (i > 0) rawBuffer.RemoveRange(0, i);
+                    i = 0;
+                    for (int j = 2; j < rawBuffer.Count; j++)
+                    {
+                        if (rawBuffer[j] == 0x2A)//*
+                        {
+                            int sum = 0;
+                            for (int inx = 1; inx < j; inx++)
+                            {
+                                sum ^= rawBuffer[inx];// Build checksum
+                            }
 
-                //parse them accordingly
-                words = nextNMEASentence.Split(',');
-                if (words.Length < 3) return;
+                            // Calculated checksum converted to a 2 digit hex string
+                            if (String.Format("{0:X2}", sum) == Convert.ToChar(rawBuffer[j + 1]).ToString() + Convert.ToChar(rawBuffer[j + 2]).ToString())
+                            {
+                                nextNMEASentence = Encoding.ASCII.GetString(rawBuffer.GetRange(0, j).ToArray());
 
-                if (words[0] == "$GPGGA" || words[0] == "$GNGGA") ParseGGA();
-                if (words[0] == "$GPVTG" || words[0] == "$GNVTG") ParseVTG();
-                if (words[0] == "$GPRMC" || words[0] == "$GNRMC") ParseRMC();
-                if (words[0] == "$GPHDT" || words[0] == "$GNHDT") ParseHDT();
-                if (words[0] == "$PAOGI") ParseOGI();
-                if (words[0] == "$PTNL") ParseAVR();
-                if (words[0] == "$GNTRA") ParseTRA();
-                if (words[0] == "$UBX-PVT") ParsePVT();
+                                mf.recvSentenceSettings[3] = mf.recvSentenceSettings[2];
+                                mf.recvSentenceSettings[2] = mf.recvSentenceSettings[1];
+                                mf.recvSentenceSettings[1] = mf.recvSentenceSettings[0];
+                                mf.recvSentenceSettings[0] = nextNMEASentence;
 
-            }// while still data
+                                //parse them accordingly
+                                words = nextNMEASentence.Split(',');
+                                if (words.Length < 3) return;
+
+                                if (words[0] == "$GPGGA" || words[0] == "$GNGGA") ParseGGA();
+                                if (words[0] == "$GPVTG" || words[0] == "$GNVTG") ParseVTG();
+                                if (words[0] == "$GPRMC" || words[0] == "$GNRMC") ParseRMC();
+                                if (words[0] == "$GPHDT" || words[0] == "$GNHDT") ParseHDT();
+                                if (words[0] == "$PAOGI") ParseOGI();
+                                if (words[0] == "$PTNL") ParseAVR();
+                                if (words[0] == "$GNTRA") ParseTRA();
+                                mf.testNMEA1 = mf.testNMEA.ElapsedMilliseconds;
+                            }
+                            rawBuffer.RemoveRange(0, j + 2);
+                        }
+                    }
+                }
+                else if (rawBuffer.Count > 99 + i)//100 bytes
+                {
+                    if (rawBuffer[i] == 0xB5 && rawBuffer[i + 1] == 0x62 && rawBuffer[i + 2] == 0x01 && rawBuffer[i + 3] == 0x07)//UBX-PVT
+                    {
+                        if (i > 0) rawBuffer.RemoveRange(0, i);//start with Header
+
+                        int CK_A = 0;
+                        int CK_B = 0;
+
+                        for (int j = 2; j < 98; j += 1)// start with Class and end by Checksum
+                        {
+                            CK_A = (CK_A + rawBuffer[j]) & 0xFF;
+                            CK_B = (CK_B + CK_A) & 0xFF;
+                        }
+
+                        if (rawBuffer[98] == CK_A && rawBuffer[99] == CK_B)
+                        {
+                            long itow = rawBuffer[6] | (rawBuffer[7] << 8) | (rawBuffer[8] << 16) | (rawBuffer[9] << 24);
+
+                            if (rawBuffer[84] == 0x00)
+                            {
+                                if ((rawBuffer[27] & 0x81) == 0x81)
+                                {
+                                    fixQuality = 4;
+                                    EnableHeadRoll = true;
+                                }
+                                else if ((rawBuffer[27] & 0x41) == 0x41)
+                                {
+                                    fixQuality = 5;
+                                    EnableHeadRoll = true;
+                                }
+                                else
+                                {
+                                    fixQuality = 1;
+                                    EnableHeadRoll = false;
+                                }
+
+                                satellitesTracked = rawBuffer[29];
+
+                                longitude = (rawBuffer[30] | (rawBuffer[31] << 8) | (rawBuffer[32] << 16) | (rawBuffer[33] << 24)) * 0.0000001;//to deg
+                                latitude = (rawBuffer[34] | (rawBuffer[35] << 8) | (rawBuffer[36] << 16) | (rawBuffer[37] << 24)) * 0.0000001;//to deg
+                                altitude = (rawBuffer[42] | (rawBuffer[43] << 8) | (rawBuffer[44] << 16) | (rawBuffer[45] << 24)) * 0.001;//to meters
+
+                                hdop = (rawBuffer[46] | (rawBuffer[47] << 8) | (rawBuffer[48] << 16) | (rawBuffer[49] << 24)) * 0.01;
+
+                                UpdateNorthingEasting();
+
+                                speed = (rawBuffer[66] | (rawBuffer[67] << 8) | (rawBuffer[68] << 16) | (rawBuffer[69] << 24)) * 0.0036;//to km/h
+
+                                //average the speeds for display, not calcs
+                                mf.avgSpeed[mf.ringCounter] = speed;
+                                if (mf.ringCounter++ > 8) mf.ringCounter = 0;
+
+                                mf.recvSentenceSettings[2] = mf.recvSentenceSettings[0];
+                                mf.recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                            }
+                            else
+                            {
+                                mf.recvSentenceSettings[2] = mf.recvSentenceSettings[0];
+                                mf.recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
+                            }
+                        }
+                        mf.testNMEA1 = mf.testNMEA.ElapsedMilliseconds;
+                        rawBuffer.RemoveRange(0, 100);
+                    }
+                }
+            }
+            if (rawBuffer.Count > 500)
+            {
+                rawBuffer.RemoveRange(0, 250);
+            }
+
+            for (int i = 0; i < rawBuffer2.Count - 5; i++)
+            {
+                if (rawBuffer2.Count > 71 + i)//72 bytes
+                {
+                    if (rawBuffer2[i] == 0xB5 && rawBuffer2[i + 1] == 0x62 && rawBuffer2[i + 2] == 0x01 && rawBuffer2[i + 3] == 0x3C)//UBX-PVT
+                    {
+                        if (i > 0) rawBuffer2.RemoveRange(0, i);//start with Header
+
+                        int CK_A = 0;
+                        int CK_B = 0;
+
+                        for (int j = 2; j < 70; j += 1)// start with Class and end by Checksum
+                        {
+                            CK_A = (CK_A + rawBuffer2[j]) & 0xFF;
+                            CK_B = (CK_B + CK_A) & 0xFF;
+                        }
+
+                        if (rawBuffer2[70] == CK_A && rawBuffer2[71] == CK_B)
+                        {
+                            long itow = rawBuffer2[10] | (rawBuffer2[11] << 8) | (rawBuffer2[12] << 16) | (rawBuffer2[13] << 24);
+
+                            if (EnableHeadRoll && ((rawBuffer2[67] & 0x01) == 0x01) && (((rawBuffer2[66] & 0x2D) == 0x2D) || ((rawBuffer2[66] & 0x35) == 0x35)))
+                            {
+                                int relposlength = rawBuffer2[26] | (rawBuffer2[27] << 8) | (rawBuffer2[28] << 16) | (rawBuffer2[29] << 24);//in cm!
+
+                                if (DualAntennaDistance - 5 < relposlength && relposlength < DualAntennaDistance + 5)
+                                {
+                                    //save dist?
+                                }
+
+                                headingHDT = (rawBuffer2[30] | (rawBuffer2[31] << 8) | (rawBuffer2[32] << 16) | (rawBuffer2[33] << 24)) * 0.00001;
+                                mf.ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2((rawBuffer2[22] | (rawBuffer2[23] << 8) | (rawBuffer2[24] << 16) | (rawBuffer2[25] << 24)) + rawBuffer2[40] * 0.1, DualAntennaDistance)) * 16);
+
+                                //ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2(BitConverter.ToInt32(Data, 22) + BitConverter.ToInt32(Data, 40) / 100, mf.DualAntennaDistance * 10.0)) * 16);
+
+                                mf.recvSentenceSettings[3] = mf.recvSentenceSettings[1];
+                                mf.recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + headingHDT.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + nRoll.ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                            }
+                            else //Bad Quality
+                            {
+                                mf.ahrs.rollX16 = 9999;
+                                headingHDT = 9999;
+                                mf.recvSentenceSettings[3] = mf.recvSentenceSettings[1];
+                                mf.recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
+                            }
+                        }
+                        rawBuffer2.RemoveRange(0, 72);
+                    }
+                }
+            }
+
+            if (rawBuffer2.Count > 72)//message length
+            {
+                rawBuffer2.RemoveRange(0, rawBuffer2.Count - 72);
+            }
+
+
         }
-
-        private double rollK, Pc, G, Xp, Zp, XeRoll;
-        private double P = 1.0;
-        private readonly double varRoll = 0.1; // variance, smaller, more faster filtering
-        private readonly double varProcess = 0.0003;
-
-
+        /*
         // Returns a valid NMEA sentence from the pile from portData
         public string Parse()
         {
@@ -312,11 +429,53 @@ Field	Meaning
 
             return sentence;
         }
+        //checks the checksum against the string
+        public bool ValidateChecksum(string Sentence)
+        {
+            int sum = 0;
+            try
+            {
+                char[] sentenceChars = Sentence.ToCharArray();
+                // All character xor:ed results in the trailing hex checksum
+                // The checksum calc starts after '$' and ends before '*'
+                int inx;
+                for (inx = 1; ; inx++)
+                {
+                    if (inx >= sentenceChars.Length) // No checksum found
+                        return false;
+                    var tmp = sentenceChars[inx];
+                    // Indicates end of data and start of checksum
+                    if (tmp == '*') break;
+                    sum ^= tmp;    // Build checksum
+                }
+                // Calculated checksum converted to a 2 digit hex string
+                string sumStr = String.Format("{0:X2}", sum);
+
+                // Compare to checksum in sentence
+                return sumStr.Equals(Sentence.Substring(inx + 1, 2));
+            }
+            catch (Exception e)
+            {
+                mf.WriteErrorLog("Validate Checksum" + e);
+                return false;
+            }
+        }
+        */
+
+
+
+
+
+        private double rollK, Pc, G, Xp, Zp, XeRoll;
+        private double P = 1.0;
+        private readonly double varRoll = 0.1; // variance, smaller, more faster filtering
+        private readonly double varProcess = 0.0003;
 
         private void ParseAVR()
         {
             if (!String.IsNullOrEmpty(words[1]))
             {
+
                 //True heading
                 // 0 1 2 3 4 5 6 7 8 9
                 // $PTNL,AVR,145331.50,+35.9990,Yaw,-7.8209,Tilt,-0.4305,Roll,444.232,3,1.2,17 * 03
@@ -363,33 +522,6 @@ Field	Meaning
 
                     mf.ahrs.rollX16 = (int)(XeRoll * 16);
                 }
-            }
-        }
-
-        private void ParsePVT()
-        {
-            if (!String.IsNullOrEmpty(words[1]))
-            {
-                //sentence = "$UBX-PVT,1,satellitesTracked,pdop,fixtype"
-                if (words[1] == "0")
-                {
-
-                }
-                else
-                {
-                    int.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
-                    //fixQuality
-
-                    //satellites tracked
-                    int.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
-
-                    //hdop
-                    double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out hdop);
-                }
-
-
-                // double.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
-
             }
         }
 
@@ -662,37 +794,6 @@ Field	Meaning
             }
         }
 
-        //checks the checksum against the string
-        public bool ValidateChecksum(string Sentence)
-        {
-            int sum = 0;
-            try
-            {
-                char[] sentenceChars = Sentence.ToCharArray();
-                // All character xor:ed results in the trailing hex checksum
-                // The checksum calc starts after '$' and ends before '*'
-                int inx;
-                for (inx = 1; ; inx++)
-                {
-                    if (inx >= sentenceChars.Length) // No checksum found
-                        return false;
-                    var tmp = sentenceChars[inx];
-                    // Indicates end of data and start of checksum
-                    if (tmp == '*') break;
-                    sum ^= tmp;    // Build checksum
-                }
-                // Calculated checksum converted to a 2 digit hex string
-                string sumStr = String.Format("{0:X2}", sum);
-
-                // Compare to checksum in sentence
-                return sumStr.Equals(Sentence.Substring(inx + 1, 2));
-            }
-            catch (Exception e)
-            {
-                mf.WriteErrorLog("Validate Checksum" + e);
-                return false;
-            }
-        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
         private const double sm_a = 6378137.0;

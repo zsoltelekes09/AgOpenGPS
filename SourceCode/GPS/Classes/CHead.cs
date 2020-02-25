@@ -233,16 +233,16 @@ namespace AgOpenGPS
             //if inside outer boundary, then potentially add
             if (mf.bnd.LastBoundary > -1 && headArr.Count > mf.bnd.LastBoundary && headArr[mf.bnd.LastBoundary].IsPointInHeadArea(pt))
             {
-                //for (int b = 1; b < mf.bnd.bndArr.Count; b++)
-                //{
-                //    {
-                //        if (headArr[b].IsPointInHeadArea(pt))
-                //        {
-                //            //point is in an inner turn area but inside outer
-                //            return false;
-                //        }
-                //    }
-                //}
+                for (int b = 0; b < mf.bnd.bndArr.Count; b++)
+                {
+                    if (!mf.bnd.bndArr[b].isOwnField)
+                    {
+                        if (headArr[b].IsPointInHeadArea(pt))
+                        {
+                            return false;
+                        }
+                    }
+                }
                 return true;
             }
             else

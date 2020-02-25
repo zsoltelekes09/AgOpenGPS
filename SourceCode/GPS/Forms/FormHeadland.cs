@@ -576,9 +576,8 @@ namespace AgOpenGPS
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0) BuildHeadLineTemplateFromBoundary();
         }
 
-        private void Button1_Click(object sender, EventArgs e)
+        private void Next_Field_Click(object sender, EventArgs e)
         {
-
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
                 mf.hd.headArr[Boundary].hdLine?.Clear();
@@ -620,9 +619,8 @@ namespace AgOpenGPS
 
         }
 
-        private void Button2_Click(object sender, EventArgs e)
+        private void Previous_Field_Click(object sender, EventArgs e)
         {
-
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
                 mf.hd.headArr[Boundary].hdLine?.Clear();

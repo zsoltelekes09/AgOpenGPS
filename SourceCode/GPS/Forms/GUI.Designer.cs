@@ -1193,7 +1193,6 @@ namespace AgOpenGPS
             HalfSecondUpdate.Enabled = true;
         }
 
-        public string testtest2 = "";
         private void OneSecond_Update(object sender, EventArgs e)
         {
             testOneSecond.Restart();

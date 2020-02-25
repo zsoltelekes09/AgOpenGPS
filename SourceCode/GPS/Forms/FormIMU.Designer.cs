@@ -29,6 +29,10 @@
         private void InitializeComponent()
         {
             this.headingGroupBox = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.HeadFIX = new System.Windows.Forms.NumericUpDown();
+            this.HeadFIX2 = new System.Windows.Forms.NumericUpDown();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -62,6 +66,8 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
             this.headingGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX2)).BeginInit();
             this.btnRollZero.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox7.SuspendLayout();
@@ -71,6 +77,10 @@
             // 
             // headingGroupBox
             // 
+            this.headingGroupBox.Controls.Add(this.label3);
+            this.headingGroupBox.Controls.Add(this.label4);
+            this.headingGroupBox.Controls.Add(this.HeadFIX);
+            this.headingGroupBox.Controls.Add(this.HeadFIX2);
             this.headingGroupBox.Controls.Add(this.label13);
             this.headingGroupBox.Controls.Add(this.label12);
             this.headingGroupBox.Controls.Add(this.label11);
@@ -85,11 +95,69 @@
             this.headingGroupBox.TabStop = false;
             this.headingGroupBox.Text = "GPS Heading From";
             // 
+            // label3
+            // 
+            this.label3.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(0, 193);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(122, 45);
+            this.label3.TabIndex = 417;
+            this.label3.Text = "Heading Angle Correction";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label4
+            // 
+            this.label4.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(139, 193);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(120, 45);
+            this.label4.TabIndex = 416;
+            this.label4.Text = "Dual Heading dist";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // HeadFIX
+            // 
+            this.HeadFIX.BackColor = System.Drawing.Color.AliceBlue;
+            this.HeadFIX.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HeadFIX.InterceptArrowKeys = false;
+            this.HeadFIX.Location = new System.Drawing.Point(6, 241);
+            this.HeadFIX.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.HeadFIX.Name = "HeadFIX";
+            this.HeadFIX.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.HeadFIX.Size = new System.Drawing.Size(96, 46);
+            this.HeadFIX.TabIndex = 414;
+            this.HeadFIX.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.HeadFIX.ValueChanged += new System.EventHandler(this.HeadFIX_ValueChanged);
+            this.HeadFIX.Enter += new System.EventHandler(this.HeadFIX_Enter);
+            // 
+            // HeadFIX2
+            // 
+            this.HeadFIX2.BackColor = System.Drawing.Color.AliceBlue;
+            this.HeadFIX2.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HeadFIX2.InterceptArrowKeys = false;
+            this.HeadFIX2.Location = new System.Drawing.Point(153, 241);
+            this.HeadFIX2.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            this.HeadFIX2.Name = "HeadFIX2";
+            this.HeadFIX2.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.HeadFIX2.Size = new System.Drawing.Size(96, 46);
+            this.HeadFIX2.TabIndex = 415;
+            this.HeadFIX2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.HeadFIX2.ValueChanged += new System.EventHandler(this.HeadFIX2_ValueChanged);
+            this.HeadFIX2.Enter += new System.EventHandler(this.HeadFIX2_Enter);
+            // 
             // label13
             // 
             this.label13.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label13.Location = new System.Drawing.Point(115, 196);
+            this.label13.Location = new System.Drawing.Point(115, 148);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(134, 45);
             this.label13.TabIndex = 88;
@@ -99,7 +167,7 @@
             // 
             this.label12.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label12.Location = new System.Drawing.Point(115, 129);
+            this.label12.Location = new System.Drawing.Point(115, 106);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(134, 45);
             this.label12.TabIndex = 87;
@@ -119,7 +187,7 @@
             // 
             this.rbtnHeadingHDT.AutoSize = true;
             this.rbtnHeadingHDT.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbtnHeadingHDT.Location = new System.Drawing.Point(22, 189);
+            this.rbtnHeadingHDT.Location = new System.Drawing.Point(20, 148);
             this.rbtnHeadingHDT.Name = "rbtnHeadingHDT";
             this.rbtnHeadingHDT.Size = new System.Drawing.Size(75, 29);
             this.rbtnHeadingHDT.TabIndex = 2;
@@ -131,7 +199,7 @@
             // 
             this.rbtnHeadingGPS.AutoSize = true;
             this.rbtnHeadingGPS.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbtnHeadingGPS.Location = new System.Drawing.Point(22, 122);
+            this.rbtnHeadingGPS.Location = new System.Drawing.Point(22, 99);
             this.rbtnHeadingGPS.Name = "rbtnHeadingGPS";
             this.rbtnHeadingGPS.Size = new System.Drawing.Size(73, 29);
             this.rbtnHeadingGPS.TabIndex = 1;
@@ -549,6 +617,8 @@
             this.Load += new System.EventHandler(this.FormDisplaySettings_Load);
             this.headingGroupBox.ResumeLayout(false);
             this.headingGroupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX2)).EndInit();
             this.btnRollZero.ResumeLayout(false);
             this.btnRollZero.PerformLayout();
             this.groupBox6.ResumeLayout(false);
@@ -598,5 +668,9 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.NumericUpDown nudMinFixStepDistance;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.NumericUpDown HeadFIX;
+        private System.Windows.Forms.NumericUpDown HeadFIX2;
+        private System.Windows.Forms.Label label3;
     }
 }

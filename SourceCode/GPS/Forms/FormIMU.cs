@@ -43,6 +43,8 @@ namespace AgOpenGPS
             this.Text = gStr.gsIMUSettings;
 
             nudMinFixStepDistance.Controls[0].Enabled = false;
+            HeadFIX.Controls[0].Enabled = false;
+            HeadFIX2.Controls[0].Enabled = false;
         }
 
         #region EntryExit
@@ -218,6 +220,25 @@ namespace AgOpenGPS
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
+        }
+
+        private void HeadFIX_ValueChanged(object sender, EventArgs e)
+        {
+            mf.pn.HeadingAngleCorrection = (double)HeadFIX.Value;
+        }
+
+        private void HeadFIX_Enter(object sender, EventArgs e)
+        {
+            mf.KeypadToNUD((NumericUpDown)sender);
+        }
+        private void HeadFIX2_ValueChanged(object sender, EventArgs e)
+        {
+            mf.pn.DualAntennaDistance = (int)HeadFIX2.Value;
+        }
+
+        private void HeadFIX2_Enter(object sender, EventArgs e)
+        {
+            mf.KeypadToNUD((NumericUpDown)sender);
         }
 
         private void cboxHeadingPAOGI_CheckedChanged(object sender, EventArgs e)

@@ -28,9 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.oglSelf = new OpenTK.GLControl();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.nudDistance = new System.Windows.Forms.NumericUpDown();
             this.lblStart = new System.Windows.Forms.Label();
             this.lblEnd = new System.Windows.Forms.Label();
@@ -50,8 +48,8 @@
             this.btnMoveUp = new ProXoft.WinForms.RepeatButton();
             this.btnMoveDown = new ProXoft.WinForms.RepeatButton();
             this.btnDoneManualMove = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.Previous_Field = new System.Windows.Forms.Button();
+            this.Next_Field = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudSetDistance)).BeginInit();
             this.SuspendLayout();
@@ -70,12 +68,6 @@
             this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.OglSelf_Paint);
             this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OglSelf_MouseDown);
             this.oglSelf.Resize += new System.EventHandler(this.OglSelf_Resize);
-            // 
-            // timer1
-            // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 500;
-            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // nudDistance
             // 
@@ -396,25 +388,25 @@
             this.btnDoneManualMove.UseVisualStyleBackColor = false;
             this.btnDoneManualMove.Click += new System.EventHandler(this.BtnDoneManualMove_Click);
             // 
-            // button2
+            // Previous_Field
             // 
-            this.button2.Location = new System.Drawing.Point(5, 5);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(200, 50);
-            this.button2.TabIndex = 469;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.Button2_Click);
+            this.Previous_Field.Location = new System.Drawing.Point(5, 5);
+            this.Previous_Field.Name = "Previous_Field";
+            this.Previous_Field.Size = new System.Drawing.Size(200, 50);
+            this.Previous_Field.TabIndex = 469;
+            this.Previous_Field.Text = "Previous_Field";
+            this.Previous_Field.UseVisualStyleBackColor = true;
+            this.Previous_Field.Click += new System.EventHandler(this.Previous_Field_Click);
             // 
-            // button1
+            // Next_Field
             // 
-            this.button1.Location = new System.Drawing.Point(505, 5);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(200, 50);
-            this.button1.TabIndex = 468;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.Next_Field.Location = new System.Drawing.Point(505, 5);
+            this.Next_Field.Name = "Next_Field";
+            this.Next_Field.Size = new System.Drawing.Size(200, 50);
+            this.Next_Field.TabIndex = 468;
+            this.Next_Field.Text = "Next_Field";
+            this.Next_Field.UseVisualStyleBackColor = true;
+            this.Next_Field.Click += new System.EventHandler(this.Next_Field_Click);
             // 
             // FormHeadland
             // 
@@ -423,8 +415,8 @@
             this.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.ClientSize = new System.Drawing.Size(1004, 709);
             this.ControlBox = false;
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.Previous_Field);
+            this.Controls.Add(this.Next_Field);
             this.Controls.Add(this.btnDoneManualMove);
             this.Controls.Add(this.btnMoveRight);
             this.Controls.Add(this.btnMoveLeft);
@@ -462,7 +454,6 @@
         #endregion
 
         private OpenTK.GLControl oglSelf;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.NumericUpDown nudDistance;
         private System.Windows.Forms.Label lblStart;
@@ -482,7 +473,7 @@
         private ProXoft.WinForms.RepeatButton btnMoveUp;
         private ProXoft.WinForms.RepeatButton btnMoveDown;
         private System.Windows.Forms.Button btnDoneManualMove;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button Previous_Field;
+        private System.Windows.Forms.Button Next_Field;
     }
 }

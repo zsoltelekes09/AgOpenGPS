@@ -64,9 +64,12 @@ namespace AgOpenGPS
             GL.LineWidth(3);
             GL.Color3(0.96555f, 0.1232f, 0.50f);
             //GL.PointSize(4);
-            GL.Begin(PrimitiveType.LineStrip);
-            for (int h = 0; h < ptCount; h++) GL.Vertex3(geoFenceLine[h].easting, geoFenceLine[h].northing, 0);
-            GL.Vertex3(geoFenceLine[0].easting, geoFenceLine[0].northing, 0);
+
+            GL.Begin(PrimitiveType.LineLoop);
+            for (int h = 0; h < ptCount; h++)
+            {
+                GL.Vertex3(geoFenceLine[h].easting, geoFenceLine[h].northing, 0);
+            }
             GL.End();
         }
 

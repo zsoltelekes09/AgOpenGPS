@@ -49,8 +49,6 @@
             this.btnCloseSerial = new System.Windows.Forms.Button();
             this.textBoxRcv = new System.Windows.Forms.TextBox();
             this.btnOpenSerial = new System.Windows.Forms.Button();
-            this.HeadFIX = new System.Windows.Forms.NumericUpDown();
-            this.HeadFIX2 = new System.Windows.Forms.NumericUpDown();
             this.btnCloseSerialArduino = new System.Windows.Forms.Button();
             this.btnOpenSerialArduino = new System.Windows.Forms.Button();
             this.label15 = new System.Windows.Forms.Label();
@@ -75,10 +73,7 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.rbtnOGI = new System.Windows.Forms.RadioButton();
             this.rbtnRMC = new System.Windows.Forms.RadioButton();
-            this.label4 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX2)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -368,44 +363,6 @@
             this.btnOpenSerial.Text = "Connect";
             this.btnOpenSerial.UseVisualStyleBackColor = false;
             this.btnOpenSerial.Click += new System.EventHandler(this.btnOpenSerial_Click);
-            // 
-            // HeadFIX
-            // 
-            this.HeadFIX.BackColor = System.Drawing.Color.AliceBlue;
-            this.HeadFIX.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.HeadFIX.InterceptArrowKeys = false;
-            this.HeadFIX.Location = new System.Drawing.Point(793, 387);
-            this.HeadFIX.Maximum = new decimal(new int[] {
-            360,
-            0,
-            0,
-            0});
-            this.HeadFIX.Name = "HeadFIX";
-            this.HeadFIX.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.HeadFIX.Size = new System.Drawing.Size(96, 46);
-            this.HeadFIX.TabIndex = 412;
-            this.HeadFIX.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.HeadFIX.ValueChanged += new System.EventHandler(this.HeadFIX_ValueChanged);
-            this.HeadFIX.Enter += new System.EventHandler(this.HeadFIX_Enter);
-            // 
-            // HeadFIX2
-            // 
-            this.HeadFIX2.BackColor = System.Drawing.Color.AliceBlue;
-            this.HeadFIX2.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.HeadFIX2.InterceptArrowKeys = false;
-            this.HeadFIX2.Location = new System.Drawing.Point(788, 492);
-            this.HeadFIX2.Maximum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.HeadFIX2.Name = "HeadFIX2";
-            this.HeadFIX2.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.HeadFIX2.Size = new System.Drawing.Size(96, 46);
-            this.HeadFIX2.TabIndex = 412;
-            this.HeadFIX2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.HeadFIX2.ValueChanged += new System.EventHandler(this.HeadFIX2_ValueChanged);
-            this.HeadFIX2.Enter += new System.EventHandler(this.HeadFIX2_Enter);
             // 
             // btnCloseSerialArduino
             // 
@@ -703,25 +660,12 @@
             this.rbtnRMC.Text = "RMC";
             this.rbtnRMC.UseVisualStyleBackColor = true;
             // 
-            // label4
-            // 
-            this.label4.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(770, 470);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(140, 19);
-            this.label4.TabIndex = 413;
-            this.label4.Text = "Dual Heading dist";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
             // FormCommSet
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(956, 649);
             this.ControlBox = false;
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.HeadFIX);
-            this.Controls.Add(this.HeadFIX2);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.btnRescan);
@@ -737,8 +681,6 @@
             this.Load += new System.EventHandler(this.FormCommSet_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.HeadFIX2)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -795,8 +737,5 @@
         private System.Windows.Forms.Button btnOpenSerial2;
         private System.Windows.Forms.Label lblCurrentBaud2;
         private System.Windows.Forms.Label lblCurrentPort2;
-        private System.Windows.Forms.NumericUpDown HeadFIX;
-        private System.Windows.Forms.NumericUpDown HeadFIX2;
-        private System.Windows.Forms.Label label4;
     }
 }

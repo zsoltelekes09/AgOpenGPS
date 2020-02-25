@@ -39,8 +39,6 @@ namespace AgOpenGPS
             lblCurrentPort2.Text = gStr.gsPort;
             lblCurrentBaud2.Text = gStr.gsBaud;
 
-            HeadFIX.Controls[0].Enabled = false;
-            HeadFIX2.Controls[0].Enabled = false;
 
         }
 
@@ -393,28 +391,5 @@ namespace AgOpenGPS
                 btnOpenSerial2.Enabled = true;
             }
         }
-
-        private void HeadFIX_ValueChanged(object sender, EventArgs e)
-        {
-            mf.HeadDif = (double)HeadFIX.Value;
-        }
-
-        private void HeadFIX_Enter(object sender, EventArgs e)
-        {
-
-            mf.KeypadToNUD((NumericUpDown)sender);
-        }
-        private void HeadFIX2_ValueChanged(object sender, EventArgs e)
-        {
-            mf.DualGPSDistance = (double)HeadFIX2.Value;
-        }
-
-        private void HeadFIX2_Enter(object sender, EventArgs e)
-        {
-
-            mf.KeypadToNUD((NumericUpDown)sender);
-        }
-
-
     } //class
 } //namespace

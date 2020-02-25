@@ -139,7 +139,9 @@ namespace AgOpenGPS
             //if it starts with a $, its an nmea sentence
             if (data[0] == 36)
             {
-                pn.rawBuffer += Encoding.ASCII.GetString(data);
+                pn.rawBuffer.AddRange(data);
+
+                //pn.rawBuffer += Encoding.ASCII.GetString(data);
                 return;
             }
 

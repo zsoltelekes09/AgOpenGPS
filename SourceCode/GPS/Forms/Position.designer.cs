@@ -10,7 +10,7 @@ namespace AgOpenGPS
     public partial class FormGPS
     {
         //very first fix to setup grid etc
-        public bool isGPSPositionInitialized = false;
+        public bool isGPSPositionInitialized = false, UBXFormat = false;
 
         //string to record fixes for elevation maps
         public StringBuilder sbFix = new StringBuilder();
@@ -92,12 +92,8 @@ namespace AgOpenGPS
             testNMEA.Restart();
             testNMEA.Start();
 
-
-            //parse any data from pn.rawBuffer
             pn.ParseNMEA();
 
-            testNMEA1 = testNMEA.ElapsedMilliseconds;
-            //time for a frame update with new valid data
             if (pn.UpdatedLatLon)
             {
                 //reset  flag
@@ -114,7 +110,6 @@ namespace AgOpenGPS
                 swHz.Reset();
                 swHz.Start();
 
-
                 //update all data for new frame
                 UpdateFixPosition();
                 recvCounter = 0;
@@ -123,7 +118,7 @@ namespace AgOpenGPS
                     toolStripBtnGPSStength.Image = Resources.GPSSignalGood;
                 }
             }
-            else if (recvCounter++ > 133 && toolStripBtnGPSStength.Image.Height != 40)
+            else if (recvCounter++ > 133 && toolStripBtnGPSStength.Image.Height != 40)// red 2 seconds no data!
             {
                 toolStripBtnGPSStength.Image = Resources.GPSSignalPoor;
                 lblEasting.Text = "-";
@@ -195,8 +190,7 @@ namespace AgOpenGPS
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = glm.Distance(pn.fix, stepFixPts[0]);
 
-
-
+            CalculatePositionHeading();
 
             if (distanceCurrentStepFix > 0.1)//minFixStepDist / totalFixSteps)
             {
@@ -207,7 +201,6 @@ namespace AgOpenGPS
                 stepFixPts[0].easting = pn.fix.easting;
                 stepFixPts[0].northing = pn.fix.northing;
 
-                CalculatePositionHeading();
                 if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser -= 3000; ;//userDistance can be reset
 
                 double test = Math.Atan2(stepFixPts[0].easting - stepFixPts[1].easting, stepFixPts[0].northing - stepFixPts[1].northing);
@@ -510,9 +503,12 @@ namespace AgOpenGPS
 
                 case "HDT":
                     //use NMEA headings for camera and tractor graphic
-                    fixHeading = glm.toRadians(pn.headingHDT);
-                    camHeading = pn.headingHDT;
-                    gpsHeading = glm.toRadians(pn.headingHDT);
+                    if (pn.headingHDT != 9999)
+                    {
+                        fixHeading = glm.toRadians(pn.headingHDT);
+                        camHeading = pn.headingHDT;
+                        gpsHeading = glm.toRadians(pn.headingHDT);
+                    }
                     break;
             }
 

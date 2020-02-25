@@ -379,6 +379,7 @@ namespace AgOpenGPS
             oglBack.MakeCurrent();
 
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
+
             GL.LoadIdentity();					// Reset The View
 
             //back the camera up
@@ -449,7 +450,7 @@ namespace AgOpenGPS
                 {
                     GL.LineWidth(2);
                     GL.Color3(0.0f, 0.99f, 0.0f);
-                    GL.Begin(PrimitiveType.LineStrip);
+                    GL.Begin(PrimitiveType.LineLoop);
                     for (int h = 0; h < ptCount; h++) GL.Vertex3(bnd.bndArr[bnd.LastBoundary].bndLine[h].easting, bnd.bndArr[bnd.LastBoundary].bndLine[h].northing, 0);
                     GL.End();
                 }
@@ -1785,25 +1786,15 @@ namespace AgOpenGPS
             minFieldX = 9999999; minFieldY = 9999999;
             maxFieldX = -9999999; maxFieldY = -9999999;
 
-
-            //min max of the boundary
             //min max of the boundary
             if (bnd.bndArr.Count > 0)
             {
                 if (bnd.bndArr.Count > bnd.LastBoundary && bnd.LastBoundary >= 0)
                 {
-                    int bndCnt = bnd.bndArr[bnd.LastBoundary].bndLine.Count;
-                    for (int i = 0; i < bndCnt; i++)
-                    {
-                        double x = bnd.bndArr[bnd.LastBoundary].bndLine[i].easting;
-                        double y = bnd.bndArr[bnd.LastBoundary].bndLine[i].northing;
-
-                        //also tally the max/min of field x and z
-                        if (minFieldX > x) minFieldX = x;
-                        if (maxFieldX < x) maxFieldX = x;
-                        if (minFieldY > y) minFieldY = y;
-                        if (maxFieldY < y) maxFieldY = y;
-                    }
+                    minFieldY = bnd.bndArr[bnd.LastBoundary].Northingmin;
+                    maxFieldY = bnd.bndArr[bnd.LastBoundary].Northingmax;
+                    minFieldX = bnd.bndArr[bnd.LastBoundary].Eastingmin;
+                    maxFieldX = bnd.bndArr[bnd.LastBoundary].Eastingmax;
                 }
                 else
                 {
@@ -1826,11 +1817,6 @@ namespace AgOpenGPS
                     //    }
                     //}
                     double zoom = 400;
-                    //if (minFieldX < pivotAxlePos.easting - zoom) minFieldX = pivotAxlePos.easting - zoom;
-                    //if (maxFieldX > pivotAxlePos.easting + zoom) maxFieldX = pivotAxlePos.easting + zoom;
-                    //if (minFieldY < pivotAxlePos.northing - zoom) minFieldY = pivotAxlePos.northing - zoom;
-                    //if (maxFieldY > pivotAxlePos.northing + zoom) maxFieldY = pivotAxlePos.northing + zoom;
-
                     minFieldX = pivotAxlePos.easting - zoom;
                     maxFieldX = pivotAxlePos.easting + zoom;
                     minFieldY = pivotAxlePos.northing - zoom;
