@@ -41,7 +41,6 @@
             this.cboxPort2 = new System.Windows.Forms.ComboBox();
             this.cboxPort = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
             this.cboxBaud = new System.Windows.Forms.ComboBox();
             this.lblCurrentPort = new System.Windows.Forms.Label();
             this.lblCurrentBaud = new System.Windows.Forms.Label();
@@ -75,7 +74,7 @@
             // timer1
             // 
             this.timer1.Enabled = true;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // btnRescan
             // 
@@ -117,7 +116,6 @@
             this.groupBox1.Controls.Add(this.cboxPort2);
             this.groupBox1.Controls.Add(this.cboxPort);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.cboxBaud);
             this.groupBox1.Controls.Add(this.lblCurrentPort);
             this.groupBox1.Controls.Add(this.lblCurrentBaud);
@@ -164,7 +162,7 @@
             this.btnCloseSerial2.TabIndex = 73;
             this.btnCloseSerial2.Text = "Disconnect";
             this.btnCloseSerial2.UseVisualStyleBackColor = false;
-            this.btnCloseSerial2.Click += new System.EventHandler(this.btnCloseSerial_Click2);
+            this.btnCloseSerial2.Click += new System.EventHandler(this.BtnCloseSerial_Click2);
             // 
             // btnOpenSerial2
             // 
@@ -177,7 +175,7 @@
             this.btnOpenSerial2.TabIndex = 72;
             this.btnOpenSerial2.Text = "Connect";
             this.btnOpenSerial2.UseVisualStyleBackColor = false;
-            this.btnOpenSerial2.Click += new System.EventHandler(this.btnOpenSerial_Click2);
+            this.btnOpenSerial2.Click += new System.EventHandler(this.BtnOpenSerial_Click2);
             // 
             // cboxBaud2
             // 
@@ -197,7 +195,7 @@
             this.cboxBaud2.Name = "cboxBaud2";
             this.cboxBaud2.Size = new System.Drawing.Size(120, 41);
             this.cboxBaud2.TabIndex = 70;
-            this.cboxBaud2.SelectedIndexChanged += new System.EventHandler(this.cboxBaud_SelectedIndexChanged_2);
+            this.cboxBaud2.SelectedIndexChanged += new System.EventHandler(this.CboxBaud_SelectedIndexChanged_2);
             // 
             // cboxPort2
             // 
@@ -217,7 +215,7 @@
             this.cboxPort2.Name = "cboxPort2";
             this.cboxPort2.Size = new System.Drawing.Size(101, 41);
             this.cboxPort2.TabIndex = 69;
-            this.cboxPort2.SelectedIndexChanged += new System.EventHandler(this.cboxPort_SelectedIndexChanged_2);
+            this.cboxPort2.SelectedIndexChanged += new System.EventHandler(this.CboxPort_SelectedIndexChanged_2);
             // 
             // cboxPort
             // 
@@ -249,16 +247,6 @@
             this.label1.TabIndex = 41;
             this.label1.Text = "NMEA String";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // label7
-            // 
-            this.label7.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold);
-            this.label7.Location = new System.Drawing.Point(290, 71);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(100, 24);
-            this.label7.TabIndex = 68;
-            this.label7.Text = "NMEA Hz";
-            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // cboxBaud
             // 

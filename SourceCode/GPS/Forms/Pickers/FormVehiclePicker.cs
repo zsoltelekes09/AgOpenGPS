@@ -30,8 +30,7 @@ namespace AgOpenGPS
             if (Files.Length == 0)
             {
                 Close();
-                var form = new FormTimedMessage(2000, gStr.gsNoVehiclesSaved, gStr.gsSaveAVehicleFirst);
-                form.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoVehiclesSaved, gStr.gsSaveAVehicleFirst);
 
             }
 
@@ -41,7 +40,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxVeh_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxVeh_SelectedIndexChanged(object sender, EventArgs e)
         {
             mf.FileOpenVehicle(mf.vehiclesDirectory + cboxVeh.SelectedItem.ToString() + ".txt");
             Close();

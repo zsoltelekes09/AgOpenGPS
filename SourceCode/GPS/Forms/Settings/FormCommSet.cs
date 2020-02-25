@@ -275,7 +275,7 @@ namespace AgOpenGPS
         private void btnRescan_Click(object sender, EventArgs e)
         {
             cboxASPort.Items.Clear();
-            foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) {
+            foreach (String s in System.IO.Ports.SerialPort.GetPortNames())
             {
                 cboxASPort.Items.Add(s);
                 cboxArdPort.Items.Add(s);
@@ -284,9 +284,9 @@ namespace AgOpenGPS
             }
         }
 
-        #endregion PortSettings //----------------------------------------------------------------
+            #endregion PortSettings //----------------------------------------------------------------
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             //GPS phrase
             textBoxRcv.Lines = mf.recvSentenceSettings;
@@ -315,19 +315,19 @@ namespace AgOpenGPS
             Properties.Settings.Default.Save();
             mf.isJRK = Properties.Settings.Default.setAS_isJRK;
         }
-        private void cboxPort_SelectedIndexChanged_2(object sender, EventArgs e)
+        private void CboxPort_SelectedIndexChanged_2(object sender, EventArgs e)
         {
             mf.SerialGPS2.PortName = cboxPort2.Text;
             FormGPS.portNameGPS2 = cboxPort2.Text;
         }
 
-        private void cboxBaud_SelectedIndexChanged_2(object sender, EventArgs e)
+        private void CboxBaud_SelectedIndexChanged_2(object sender, EventArgs e)
         {
             mf.SerialGPS2.BaudRate = Convert.ToInt32(cboxBaud2.Text);
             FormGPS.baudRateGPS2 = Convert.ToInt32(cboxBaud2.Text);
         }
 
-        private void btnOpenSerial_Click2(object sender, EventArgs e)
+        private void BtnOpenSerial_Click2(object sender, EventArgs e)
         {
             {
                 mf.SerialPortOpenGPS2();
@@ -350,7 +350,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnCloseSerial_Click2(object sender, EventArgs e)
+        private void BtnCloseSerial_Click2(object sender, EventArgs e)
         {
             mf.SerialPortCloseGPS2();
             if (mf.SerialGPS2.IsOpen)

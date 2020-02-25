@@ -57,9 +57,8 @@ namespace AgOpenGPS
         StringBuilder sb = new StringBuilder();
         private void oglMain_Paint(object sender, PaintEventArgs e)
         {
-            if (sentenceCounter > 99)
+            if (recvCounter > 133)
             {
-                //sentenceCounter = 0;
                 GL.Enable(EnableCap.Blend);
                 GL.ClearColor(0.25122f, 0.258f, 0.275f, 1.0f);
 
@@ -77,7 +76,7 @@ namespace AgOpenGPS
                 camHeading = 0;
 
                 deadCam++;
-                GL.Rotate(deadCam/3, 0.0, 0.0, 1.0);
+                GL.Rotate(deadCam / 3, 0.0, 0.0, 1.0);
                 ////draw the guide
                 GL.Begin(PrimitiveType.Triangles);
                 GL.Color3(0.98f, 0.0f, 0.0f);
@@ -89,11 +88,11 @@ namespace AgOpenGPS
                 GL.End();                       // Done Drawing Reticle
 
                 GL.Rotate(deadCam + 90, 0.0, 0.0, 1.0);
-                font.DrawText3D(0,0, "  I'm Lost  ", 1);
+                font.DrawText3D(0, 0, "  I'm Lost  ", 1);
                 GL.Color3(0.98f, 0.98f, 0.70f);
 
                 GL.Rotate(deadCam + 180, 0.0, 0.0, 1.0);
-                font.DrawText3D(0,0, "   No GPS   ", 1);
+                font.DrawText3D(0, 0, "   No GPS   ", 1);
 
 
                 // 2D Ortho ---------------------------------------////////-------------------------------------------------
@@ -118,7 +117,7 @@ namespace AgOpenGPS
 
                 font.DrawText(edge, line, "NMEA: " + recvSentenceSettings, 1);
                 line += 30;
-                if (sp.IsOpen)
+                if (SerialGPS.IsOpen)
                 {
                     font.DrawText(edge, line, "GPS Port: Connected", 1);
                 }
@@ -371,14 +370,14 @@ namespace AgOpenGPS
                     //draw Boundaries
                     bnd.DrawBoundaryLines();
 
-                //draw the turnLines
-                if (yt.isYouTurnBtnOn || isUTurnAlwaysOn)
-                {
-                    if (!ABLine.isEditing && !curve.isEditing && !ct.isContourBtnOn)
+                    //draw the turnLines
+                    if (yt.isYouTurnBtnOn || isUTurnAlwaysOn)
                     {
-                        turn.DrawTurnLines();
+                        if (!ABLine.isEditing && !curve.isEditing && !ct.isContourBtnOn)
+                        {
+                            turn.DrawTurnLines();
+                        }
                     }
-                }
 
                     if (mc.isOutOfBounds) gf.DrawGeoFenceLines();
 
@@ -451,7 +450,8 @@ namespace AgOpenGPS
 
                     if (isRTK)
                     {
-                        if (pn.fixQuality != 5) DrawLostRTK();
+                        if (pn.fixQuality == 4 || pn.fixQuality == 5) { }
+                        else DrawLostRTK();
                     }
 
 
@@ -477,16 +477,17 @@ namespace AgOpenGPS
                     //draw the section control window off screen buffer
                     oglBack.Refresh();
 
-                //draw the zoom window
-                if (isJobStarted)
-                {
-                    if (zoomUpdateCounter == true && panelBatman.Visible)
+                    //draw the zoom window
+                    if (isJobStarted)
                     {
-                        zoomUpdateCounter = false;
-                        oglZoom.Refresh();
+                        if (zoomUpdateCounter == true && panelBatman.Visible)
+                        {
+                            zoomUpdateCounter = false;
+                            oglZoom.Refresh();
+                        }
                     }
+                    //else oglZoom.Refresh();
                 }
-                //else oglZoom.Refresh();
             }
         }
 
@@ -947,7 +948,7 @@ namespace AgOpenGPS
 
 
             //if a minute has elapsed save the field in case of crash and to be able to resume            
-            if (minuteCounter > 60 && sentenceCounter < 20)  
+            if (minuteCounter > 60 && recvCounter < 134)  
             {
                 NMEAWatchdog.Enabled = false;
 

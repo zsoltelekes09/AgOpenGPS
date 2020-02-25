@@ -30,8 +30,8 @@ namespace AgOpenGPS
             if (Files.Length == 0)
             {
                 Close();
-                var form = new FormTimedMessage(2000, gStr.gsNoEnvironmentSaved, gStr.gsSaveAnEnvironmentFirst);
-                form.Show();
+
+                mf.TimedMessageBox(2000, gStr.gsNoEnvironmentSaved, gStr.gsSaveAnEnvironmentFirst);
             }
 
             foreach (FileInfo file in Files)

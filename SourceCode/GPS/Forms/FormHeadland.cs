@@ -28,7 +28,7 @@ namespace AgOpenGPS
         public List<vec3> headLineTemplate = new List<vec3>();
 
         private vec3[] hdx2;
-        private vec3[] hdArr;
+        private vec3[] hdArr = new vec3[0];
 
         public FormHeadland(Form callingForm)
         {
@@ -814,6 +814,7 @@ namespace AgOpenGPS
             {
                 if (end-2 > start) end--;
             }
+            UpdateBoundary();
         }
 
         private void BtnEndUp_MouseDown(object sender, MouseEventArgs e)

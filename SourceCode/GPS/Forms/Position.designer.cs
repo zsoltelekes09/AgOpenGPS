@@ -114,14 +114,10 @@ namespace AgOpenGPS
                 //update all data for new frame
                 UpdateFixPosition();
                 recvCounter = 0;
-                if (toolStripBtnGPSStength.Image.Height != 38)
-                {
-                    toolStripBtnGPSStength.Image = Resources.GPSSignalGood;
-                }
             }
-            else if (recvCounter++ > 133 && toolStripBtnGPSStength.Image.Height != 40)// red 2 seconds no data!
+            else if (recvCounter++ > 133)
             {
-                toolStripBtnGPSStength.Image = Resources.GPSSignalPoor;
+                ShowNoGPSWarning();
                 lblEasting.Text = "-";
                 lblNorthing.Text = gStr.gsNoGPS;
             }
@@ -173,7 +169,7 @@ namespace AgOpenGPS
 
             rollUsed = 0;
 
-            if ((ahrs.isRollFromBrick | ahrs.isRollFromAutoSteer | ahrs.isRollFromGPS | ahrs.isRollFromExtUDP) && ahrs.rollX16 != 9999)
+            if ((ahrs.isRollFromAutoSteer | ahrs.isRollFromGPS | ahrs.isRollFromExtUDP) && ahrs.rollX16 != 9999)
             {
                 rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
 
@@ -791,30 +787,30 @@ namespace AgOpenGPS
             {
                 switch (headingFromSource)
                 {
-                case "Fix":
-                    fixStepDist = 0;
-                    for (currentStepFix = 0; currentStepFix < totalFixSteps -1; currentStepFix++)
-                    {
-                        fixStepDist += stepFixPts[currentStepFix].heading;
-                        if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
+                    case "Fix":
+                        fixStepDist = 0;
+                        for (currentStepFix = 0; currentStepFix < totalFixSteps - 1; currentStepFix++)
                         {
-                            gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
-                            if (gpsHeading < 0) gpsHeading += glm.twoPI;
-                            fixHeading = gpsHeading;
+                            fixStepDist += stepFixPts[currentStepFix].heading;
+                            if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
+                            {
+                                gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
+                                if (gpsHeading < 0) gpsHeading += glm.twoPI;
+                                fixHeading = gpsHeading;
 
-                            //determine fix positions and heading in degrees for glRotate opengl methods.
-                            int camStep = (currentStepFix + 1) * 2;
-                            if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
-                            camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
-                            if (camHeading < 0) camHeading += glm.twoPI;
+                                //determine fix positions and heading in degrees for glRotate opengl methods.
+                                int camStep = (currentStepFix + 1) * 2;
+                                if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
+                                camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
+                                if (camHeading < 0) camHeading += glm.twoPI;
 
 
 
-                            camHeading = glm.toDegrees(gpsHeading);
-                            break;
+                                camHeading = glm.toDegrees(gpsHeading);
+                                break;
+                            }
                         }
-                    }
-
+                        break;
                     case "GPS":
                         //use NMEA headings for camera and tractor graphic
                         fixHeading = glm.toRadians(pn.headingTrue);

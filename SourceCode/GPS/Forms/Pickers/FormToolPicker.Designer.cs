@@ -43,7 +43,7 @@
             this.cboxTool.Name = "cboxTool";
             this.cboxTool.Size = new System.Drawing.Size(548, 43);
             this.cboxTool.TabIndex = 212;
-            this.cboxTool.SelectedIndexChanged += new System.EventHandler(this.cboxVeh_SelectedIndexChanged);
+            this.cboxTool.SelectedIndexChanged += new System.EventHandler(this.CboxVeh_SelectedIndexChanged);
             // 
             // lblLast
             // 

@@ -49,8 +49,6 @@ namespace AgOpenGPS
         public DateTime sunrise = DateTime.Now;
         public DateTime sunset = DateTime.Now;
 
-        public uint sentenceCounter = 0;
-
         //section button states
         public enum manBtn { Off, Auto, On }
 
@@ -260,6 +258,7 @@ namespace AgOpenGPS
             else //nightmode
             {
                 btnDayNightMode.Image = Properties.Resources.WindowDayMode;
+
                 this.BackColor = nightColor;
 
                 foreach (Control c in this.Controls)
@@ -399,6 +398,8 @@ namespace AgOpenGPS
             {
                 //Batman mini-panel shows
                 //if (panelSim.Left < 390) panelSim.Left = 390;
+
+                oglMain.Left = statusStripLeft.Width + panelBatman.Width;
 
                 if (Settings.Default.setDisplay_isSimple)
                 {
@@ -1193,7 +1194,6 @@ namespace AgOpenGPS
         private void ShowNoGPSWarning()
         {
             //update main window
-            sentenceCounter = 100;
             oglMain.MakeCurrent();
             oglMain.Refresh();
         }
@@ -1202,6 +1202,8 @@ namespace AgOpenGPS
         {
             testHalfSecond.Restart();
             testHalfSecond.Start();
+
+            lblSuper.Text = section[tool.numOfSections].isInsideHeadland.ToString();
 
             HalfSecondUpdate.Enabled = false;
             if (hd.isOn)
@@ -1221,8 +1223,19 @@ namespace AgOpenGPS
                 lblHeadLeftDist.Text = hd.leftToolDistance.ToString("N2");
                 lblHeadRightDist.Text = hd.rightToolDistance.ToString("N2");
             }
+
+            //the main formgps window
+            if (isMetric)  //metric or imperial
+            {
+                lblSpeed.Text = SpeedKPH;
+                btnContour.Text = XTE; //cross track error
+            }
+            else  //Imperial Measurements
+            {
+                lblSpeed.Text = SpeedMPH;
+                btnContour.Text = InchXTE; //cross track error
+            }
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
-            lblLift.Text = mc.pgn[mc.azRelayData][mc.rdHydLift].ToString();
 
             if (guidanceLineDistanceOff == 32020 | guidanceLineDistanceOff == 32000)
             {
@@ -1234,10 +1247,8 @@ namespace AgOpenGPS
             }
 
             testHalfSecond1 = testHalfSecond.ElapsedMilliseconds;
-
-
-            lblHz.Text = NMEAHz + "Hz " + (int)(frameTime) + "\r\n" + FixQuality + HzTime.ToString("N1") + " Hz " + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();//+ testtest.ElapsedTicks.ToString() + 
-
+            lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
+            lblHz2.Text = (int)(frameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();//+ testtest.ElapsedTicks.ToString() +;//+ testtest.ElapsedTicks.ToString() + 
 
             HalfSecondUpdate.Enabled = true;
         }
@@ -1250,14 +1261,35 @@ namespace AgOpenGPS
             OneSecondUpdate.Enabled = false;
             //OneSecondUpdate.Tick
             //counter used for saving field in background
-            saveCounter++;
+            minuteCounter++;
+            tenMinuteCounter++;
+
+            if (isRTK)
+            {
+                if (pn.fixQuality == 4 || pn.fixQuality == 5)
+                {
+                    lblHz.BackColor = Color.Transparent;
+                    lblHz2.BackColor = Color.Transparent;
+                }
+                else
+                {
+                    lblHz.BackColor = Color.Salmon;
+                    lblHz2.BackColor = Color.Salmon;
+                }
+            }
+            else
+            {
+                lblHz.BackColor = Color.Transparent;
+                lblHz2.BackColor = Color.Transparent;
+            }
 
             if (panelBatman.Visible)
             {
-                pbarRelayComm.Value = pbarRelay;
                 //both
                 lblLatitude.Text = Latitude;
                 lblLongitude.Text = Longitude;
+
+                pbarMachineComm.Value = pbarMachine;
 
                 lblRoll.Text = RollInDegrees;
                 lblYawHeading.Text = GyroInDegrees;
@@ -1275,8 +1307,8 @@ namespace AgOpenGPS
                     lblNorthing.Text = "N:" + (pn.actualNorthing).ToString("N2");
                 }
 
-                        lblUturnByte.Text = Convert.ToString(mc.machineData[mc.mdUTurn], 2).PadLeft(6, '0');
-                    }
+                lblUturnByte.Text = Convert.ToString(mc.machineData[mc.mdUTurn], 2).PadLeft(6, '0');
+            }
 
             if (ABLine.isBtnABLineOn && !ct.isContourBtnOn)
             {
@@ -1292,7 +1324,7 @@ namespace AgOpenGPS
 
             if (mc.steerSwitchValue == 0)
             {
-                this.btnAutoSteer.BackColor = System.Drawing.Color.LightBlue;
+                this.btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
             }
             else
             {
@@ -1342,12 +1374,9 @@ namespace AgOpenGPS
                     }
                 }
 
-
                 //update byte counter and up counter
                 if (ntripCounter > 20) lblNTRIPSeconds.Text = string.Format("{0:00}:{1:00}", ((ntripCounter-21) / 60), (Math.Abs(ntripCounter-21)) % 60);
                 else lblNTRIPSeconds.Text = gStr.gsConnectingIn + " " + (Math.Abs(ntripCounter - 21));
-
-
 
                 pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
                 NTRIPBytesMenu.Text = ((tripBytes) * 0.001).ToString("###,###,###") + " kb";
@@ -1365,28 +1394,25 @@ namespace AgOpenGPS
                     lblWatch.Text = gStr.gsSendingGGA;
                     isNTRIP_Sending = false;
                 }
-
-
             }
 
-                    //the main formgps window
-                    if (isMetric)  //metric or imperial
-                    {
-                        //Hectares on the master section soft control and sections
-                        btnSectionOffAutoOn.Text = fd.WorkedHectares;
+            //the main formgps window
+            if (isMetric)  //metric or imperial
+            {
+                //Hectares on the master section soft control and sections
+                btnSectionOffAutoOn.Text = fd.WorkedHectares;
 
                 //status strip values
                 distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares2;
+            }
+            else  //Imperial Measurements
+            {
+                //acres on the master section soft control and sections
+                btnSectionOffAutoOn.Text = fd.WorkedAcres;
 
-                    }
-                    else  //Imperial Measurements
-                    {
-                        //acres on the master section soft control and sections
-                        btnSectionOffAutoOn.Text = fd.WorkedAcres;
-
-                        //status strip values
-                        distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
-                    }
+                //status strip values
+                distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
+            }
 
             //statusbar flash red undefined headland
             if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent)
@@ -1501,17 +1527,18 @@ namespace AgOpenGPS
         {
             get
             {
-                if (timerSim.Enabled)
-                    return "Sim: ";
-                else if (pn.fixQuality == 0) return "Invalid: ";
-                else if (pn.fixQuality == 1) return "GPS single: ";
-                else if (pn.fixQuality == 2) return "DGPS : ";
-                else if (pn.fixQuality == 3) return "PPS : ";
-                else if (pn.fixQuality == 4) return "RTK fix: ";
-                else if (pn.fixQuality == 5) return "Float: ";
-                else if (pn.fixQuality == 6) return "Estimate: ";
-                else if (pn.fixQuality == 7) return "Man IP: ";
-                else if (pn.fixQuality == 8) return "Sim: ";
+                //if (timerSim.Enabled)
+                //    return "Sim: ";
+
+                if (pn.fixQuality == 0) return "Invalid ";
+                else if (pn.fixQuality == 1) return "GPS Single ";
+                else if (pn.fixQuality == 2) return "DGPS ";
+                else if (pn.fixQuality == 3) return "PPS ";
+                else if (pn.fixQuality == 4) return "RTK Fix ";
+                else if (pn.fixQuality == 5) return "Float ";
+                else if (pn.fixQuality == 6) return "Estimate ";
+                else if (pn.fixQuality == 7) return "Man IP ";
+                else if (pn.fixQuality == 8) return "Sim ";
                 else return "Unknown: ";
             }
         }

@@ -141,7 +141,7 @@ Field	Meaning
         public bool UpdatedLatLon, EnableHeadRoll;
         public List<byte> rawBuffer = new List<byte>(), rawBuffer2 = new List<byte>();
 
-        public string nextNMEASentence = "", fixFrom;
+        public string fixFrom;
         private string[] words;
 
         //UTM coordinates
@@ -231,7 +231,7 @@ Field	Meaning
                             // Calculated checksum converted to a 2 digit hex string
                             if (String.Format("{0:X2}", sum) == Convert.ToChar(rawBuffer[j + 1]).ToString() + Convert.ToChar(rawBuffer[j + 2]).ToString())
                             {
-                                nextNMEASentence = Encoding.ASCII.GetString(rawBuffer.GetRange(0, j).ToArray());
+                                string nextNMEASentence = Encoding.ASCII.GetString(rawBuffer.GetRange(0, j).ToArray());
 
                                 mf.recvSentenceSettings[3] = mf.recvSentenceSettings[2];
                                 mf.recvSentenceSettings[2] = mf.recvSentenceSettings[1];
@@ -313,6 +313,7 @@ Field	Meaning
                             }
                             else
                             {
+                                fixQuality = 0;
                                 mf.recvSentenceSettings[2] = mf.recvSentenceSettings[0];
                                 mf.recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
                             }

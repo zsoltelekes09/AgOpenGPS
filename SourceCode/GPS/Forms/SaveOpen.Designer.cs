@@ -1263,7 +1263,6 @@ namespace AgOpenGPS
                 //little show to say saved and where
                 TimedMessageBox(3000, gStr.gsSavedInFolder, envDirectory);
         }
-        }
 
         //function to open a previously saved field
         public bool FileOpenEnvironment(string fileName)

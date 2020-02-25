@@ -180,7 +180,7 @@ namespace AgOpenGPS
                 textBox1.BackColor = SystemColors.Window;
             }
         }
-        private void btnAddAndGo_Click(object sender, EventArgs e)
+        private void BtnAddAndGo_Click(object sender, EventArgs e)
         {
             if (mf.curve.refList.Count > 0)
             {
@@ -223,7 +223,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnNewCurve_Click(object sender, EventArgs e)
+        private void BtnNewCurve_Click(object sender, EventArgs e)
         {
             ShowSavedPanel(false);
             btnNewCurve.Enabled = false;
@@ -378,7 +378,7 @@ namespace AgOpenGPS
 
             lvLines.SelectedItems.Clear();
         }
-        private void textBox1_Enter(object sender, EventArgs e)
+        private void TextBox1_Enter(object sender, EventArgs e)
         {
             textBox1.Text = "";
         }
@@ -592,7 +592,7 @@ namespace AgOpenGPS
             //if (this.Width < 300) e.Cancel = true;
         }
 
-        private void lvLines_SelectedIndexChanged(object sender, EventArgs e)
+        private void LvLines_SelectedIndexChanged(object sender, EventArgs e)
         {
             mf.curve.moveDistance = 0;
 
@@ -686,7 +686,7 @@ namespace AgOpenGPS
                 return;
             }
         }
-        private void btnCancelMain_Click(object sender, EventArgs e)
+        private void BtnCancelMain_Click(object sender, EventArgs e)
         {
             mf.curve.numCurveLines = mf.curve.curveArr.Count;
             if (mf.curve.numCurveLineSelected > mf.curve.numCurveLines) mf.curve.numCurveLineSelected = mf.curve.numCurveLines;

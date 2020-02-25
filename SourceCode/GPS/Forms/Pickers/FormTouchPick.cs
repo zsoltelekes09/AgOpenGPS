@@ -71,7 +71,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                            mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
                         }
                     }
                 }
@@ -89,7 +89,7 @@ namespace AgOpenGPS
 
         }
 
-        private void oglSelf_MouseDown(object sender, MouseEventArgs e)
+        private void OglSelf_MouseDown(object sender, MouseEventArgs e)
         {
             btnCancelTouch.Enabled = true;
 
@@ -115,7 +115,7 @@ namespace AgOpenGPS
         }
 
 
-        private void oglSelf_Paint(object sender, PaintEventArgs e)
+        private void OglSelf_Paint(object sender, PaintEventArgs e)
         {
             oglSelf.MakeCurrent();
 
@@ -139,18 +139,18 @@ namespace AgOpenGPS
             oglSelf.SwapBuffers();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             oglSelf.Refresh();
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void BtnExit_Click(object sender, EventArgs e)
         {
             
             Close();
         }
 
-        private void oglSelf_Resize(object sender, EventArgs e)
+        private void OglSelf_Resize(object sender, EventArgs e)
         {
             oglSelf.MakeCurrent();
             GL.MatrixMode(MatrixMode.Projection);
@@ -163,7 +163,7 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Modelview);
         }
 
-        private void oglSelf_Load(object sender, EventArgs e)
+        private void OglSelf_Load(object sender, EventArgs e)
         {
             oglSelf.MakeCurrent();
             GL.Enable(EnableCap.CullFace);

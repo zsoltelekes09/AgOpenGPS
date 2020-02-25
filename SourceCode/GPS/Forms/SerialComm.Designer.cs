@@ -139,16 +139,21 @@ namespace AgOpenGPS
         public double actualSteerAngleDisp = 0;
         //public double setSteerAngleDisp = 0;
 
+        private void SerialLineReceivedAutoSteer(string sentence)
+        {
+            //spit it out no matter what it says
+            mc.serialRecvAutoSteerStr = sentence;
 
+            //0 - actual steer angle*100, 1 - setpoint steer angle*100, 2 - heading in degrees * 16, 3 - roll in degrees * 16, 4 - steerSwitch position
 
             string[] words = mc.serialRecvAutoSteerStr.Split(',');
             if (words.Length == 5)
             {
                 //update the progress bar for autosteer.
-                if (pbarSteer++ > 98) pbarSteer=0;
+                if (pbarSteer++ > 98) pbarSteer = 0;
 
                 double.TryParse(words[0], NumberStyles.Float, CultureInfo.InvariantCulture, out actualSteerAngleDisp);
-               
+
 
                 //first 2 used for display mainly in autosteer window chart as strings
                 //parse the values
@@ -164,6 +169,7 @@ namespace AgOpenGPS
                 mc.steerSwitchValue = mc.steerSwitchValue & 2;
             }
         }
+
 
         //the delegate for thread
         private delegate void LineReceivedEventHandlerAutoSteer(string sentence);
@@ -201,38 +207,6 @@ namespace AgOpenGPS
                 //    actualSteerAngleDisp /= Properties.Settings.Default.setAS_countsPerDegree;
                 //    actualSteerAngleDisp *= 100;                               
                 //}
-            }
-        }
-
-        private void SerialLineReceivedAutoSteer(string sentence)
-        {
-            //spit it out no matter what it says
-            mc.serialRecvAutoSteerStr = sentence;
-
-            //0 - actual steer angle*100, 1 - setpoint steer angle*100, 2 - heading in degrees * 16, 3 - roll in degrees * 16, 4 - steerSwitch position
-
-            string[] words = mc.serialRecvAutoSteerStr.Split(',');
-            if (words.Length == 5)
-            {
-                //update the progress bar for autosteer.
-                if (pbarSteer++ > 99) pbarSteer=0;
-
-                double.TryParse(words[0], NumberStyles.Float, CultureInfo.InvariantCulture, out actualSteerAngleDisp);
-               
-
-                //first 2 used for display mainly in autosteer window chart as strings
-                //parse the values
-                if (ahrs.isHeadingFromAutoSteer)
-                {
-
-                    int.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.correctionHeadingX16);
-                }
-
-                if (ahrs.isRollFromAutoSteer) int.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.rollX16);
-
-                int.TryParse(words[4], out mc.steerSwitchValue);
-                mc.workSwitchValue = mc.steerSwitchValue & 1;
-                mc.steerSwitchValue = mc.steerSwitchValue & 2;
             }
         }
 
@@ -343,7 +317,7 @@ namespace AgOpenGPS
         public void SendOutUSBMachinePort(byte[] items, int numItems)
         {
             //load the uturn byte with the accumulated spacing
-            if (vehicle.treeSpacing != 0) mc.relayData[mc.rdTree] = unchecked((byte)((treeTrigger == true) ? 1 : 0));
+            if (vehicle.treeSpacing != 0) mc.machineData[mc.mdTree] = unchecked((byte)((treeTrigger == true) ? 1 : 0));
 
             //speed
             mc.machineData[mc.mdSpeedXFour] = unchecked((byte)(pn.speed * 4));

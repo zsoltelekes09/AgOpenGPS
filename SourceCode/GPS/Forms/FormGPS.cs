@@ -94,7 +94,7 @@ namespace AgOpenGPS
         //whether or not to use Stanley control
         public bool isStanleyUsed = true;
 
-        public int pbarSteer, pbarRelay, pbarUDP;
+        public int pbarSteer, pbarMachine, pbarUDP;
 
         public double nudNumber = 0;
 
@@ -1031,7 +1031,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void snapToCurrent_Click(object sender, EventArgs e)
+        private void SnapToCurrent_Click(object sender, EventArgs e)
         {
             if (ABLine.isBtnABLineOn)
             {
@@ -1502,11 +1502,11 @@ namespace AgOpenGPS
             //bring up dialog if no job active, close job if one is
             if (!isJobStarted)
             {
-                if (toolStripBtnGPSStength.Image.Height == 40)
-                {
-                    TimedMessageBox(3000, gStr.gsNoGPS, gStr.gsGPSSourceOff);
-                    return;
-                }
+                //if (toolStripBtnGPSStength.Image.Height == 40)
+                //{
+                //    TimedMessageBox(3000, gStr.gsNoGPS, gStr.gsGPSSourceOff);
+                //    return;
+                //}
 
                 using (var form = new FormJob(this))
                 {

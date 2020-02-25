@@ -81,7 +81,7 @@
             this.lvLines.UseCompatibleStateImageBehavior = false;
             this.lvLines.View = System.Windows.Forms.View.Tile;
             this.lvLines.Visible = false;
-            this.lvLines.SelectedIndexChanged += new System.EventHandler(this.lvLines_SelectedIndexChanged);
+            this.lvLines.SelectedIndexChanged += new System.EventHandler(this.LvLines_SelectedIndexChanged);
             // 
             // chField
             // 
@@ -101,7 +101,7 @@
             this.textBox1.TabIndex = 145;
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.textBox1.Visible = false;
-            this.textBox1.Enter += new System.EventHandler(this.textBox1_Enter);
+            this.textBox1.Enter += new System.EventHandler(this.TextBox1_Enter);
             // 
             // label2
             // 
@@ -256,7 +256,7 @@
             this.btnAddAndGo.TabIndex = 149;
             this.btnAddAndGo.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnAddAndGo.UseVisualStyleBackColor = false;
-            this.btnAddAndGo.Click += new System.EventHandler(this.btnAddAndGo_Click);
+            this.btnAddAndGo.Click += new System.EventHandler(this.BtnAddAndGo_Click);
             // 
             // btnNewCurve
             // 
@@ -273,7 +273,7 @@
             this.btnNewCurve.TabIndex = 150;
             this.btnNewCurve.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnNewCurve.UseVisualStyleBackColor = false;
-            this.btnNewCurve.Click += new System.EventHandler(this.btnNewCurve_Click);
+            this.btnNewCurve.Click += new System.EventHandler(this.BtnNewCurve_Click);
             // 
             // btnCancelMain
             // 
@@ -290,7 +290,7 @@
             this.btnCancelMain.Size = new System.Drawing.Size(78, 74);
             this.btnCancelMain.TabIndex = 422;
             this.btnCancelMain.UseVisualStyleBackColor = false;
-            this.btnCancelMain.Click += new System.EventHandler(this.btnCancelMain_Click);
+            this.btnCancelMain.Click += new System.EventHandler(this.BtnCancelMain_Click);
             // 
             // btnCancel2
             // 
@@ -308,7 +308,7 @@
             this.btnCancel2.Size = new System.Drawing.Size(82, 81);
             this.btnCancel2.TabIndex = 423;
             this.btnCancel2.UseVisualStyleBackColor = false;
-            this.btnCancel2.Click += new System.EventHandler(this.btnCancelMain_Click);
+            this.btnCancel2.Click += new System.EventHandler(this.BtnCancelMain_Click);
             // 
             // FormABCurve
             // 

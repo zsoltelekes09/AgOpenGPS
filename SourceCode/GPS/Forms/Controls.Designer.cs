@@ -1099,7 +1099,6 @@ namespace AgOpenGPS
 
             Form form = new FormGPSData(this);
             form.Show();
-
         }
         private void showStartScreenToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1143,13 +1142,8 @@ namespace AgOpenGPS
         }
         private void btnShutdown_Click(object sender, EventArgs e)
         {
-            DialogResult result3 = MessageBox.Show(gStr.gsOff,
-                    gStr.gsWaiting,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button2);
+            DialogResult result3 = MessageBox.Show(gStr.gsOff, gStr.gsWaiting, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
             if (result3 == DialogResult.Yes) Close();
-
         }
 
         private void btnReverseDirection_Click(object sender, EventArgs e)
@@ -1690,7 +1684,7 @@ namespace AgOpenGPS
 
                 //Reset the sim
                 sim.steerAngleScrollBar = 0;
-                hsbarSteerAngle.Value = 300;
+                hsbarSteerAngle.Value = 400;
                 btnResetSteerAngle.Text = 0.ToString("N1");
                 sim.headingTrue = 0;
                 sim.stepDistance = 0.2;
@@ -2285,14 +2279,14 @@ namespace AgOpenGPS
         private void btnResetSteerAngle_Click(object sender, EventArgs e)
         {
             sim.steerAngleScrollBar = 0;
-            hsbarSteerAngle.Value = 300;
+            hsbarSteerAngle.Value = 400;
             btnResetSteerAngle.Text = 0.ToString("N1");
         }
 
         private void btnResetSim_Click(object sender, EventArgs e)
         {
             sim.steerAngleScrollBar = 0;
-            hsbarSteerAngle.Value = 300;
+            hsbarSteerAngle.Value = 400;
             btnResetSteerAngle.Text = 0.ToString("N1");
             sim.headingTrue = 0;
             sim.stepDistance = 0.2;
@@ -2506,5 +2500,11 @@ namespace AgOpenGPS
             key.Close();
         }
 
+        private Button btnDayNightMode;
+        private Button btnShutdown;
+        private Button btnFullScreen;
+        private ProXoft.WinForms.RepeatButton btnZoomIn;
+        private ProXoft.WinForms.RepeatButton btnZoomOut;
+        private Label lblSpeed;
     }//end class
 }//end namespace
