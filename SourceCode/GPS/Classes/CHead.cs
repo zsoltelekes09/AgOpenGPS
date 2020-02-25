@@ -181,8 +181,13 @@ namespace AgOpenGPS
                 if (!isLookInHealand && isToolUp) isToolUp = false;
                 if (isLookInHealand && isToolInHeadland && !isToolUp) isToolUp = true;
 
-                if (isToolUp) mf.mc.pgn[mf.mc.azRelayData][mf.mc.rdHydLift] = 1;
-                else mf.mc.pgn[mf.mc.azRelayData][mf.mc.rdHydLift] = 0;
+                mf.mc.machineData[mf.mc.mdHydLift] = 0;
+
+                if (mf.vehicle.isHydLiftOn)
+                {
+                    if (isToolUp) mf.mc.machineData[mf.mc.mdHydLift] = 2;
+                    else mf.mc.machineData[mf.mc.mdHydLift] = 1;
+                }
 
                 return isToolUp;
             }
@@ -194,6 +199,13 @@ namespace AgOpenGPS
             }
         }
 
+        public void DrawHeadLinesBack()
+        {
+            {
+                if (headArr[0].hdLine.Count > 0 && isOn) headArr[0].DrawHeadLineBackBuffer();
+            }
+
+        }
         public void DrawHeadLines()
         {
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
@@ -204,29 +216,6 @@ namespace AgOpenGPS
                 }
             }
         }
-
-        //public bool IsPointInsideHeadLine(vec3 pt)
-        //{
-        //    //if inside outer boundary, then potentially add
-        //    if (headArr[0].IsPointInHeadArea(pt))
-        //    {
-        //        for (int b = 1; b < mf.bnd.bndArr.Count; b++)
-        //        {
-        //            {
-        //                if (headArr[b].IsPointInHeadArea(pt))
-        //                {
-        //                    //point is in an inner turn area but inside outer
-        //                    return false;
-        //                }
-        //            }
-        //        }
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //}
 
         public bool IsPointInsideHeadLine(vec2 pt)
         {
@@ -252,68 +241,3 @@ namespace AgOpenGPS
         }
     }
 }
-
-//vec3 toolFix = mf.toolPos;
-//double scanWidthR = (mf.tool.toolWidth * 0.75);
-//double headAB = toolFix.heading;
-
-//boxA.easting = mf.section[0].leftPoint.easting;
-//boxA.northing = mf.section[0].leftPoint.northing;
-
-//boxB.easting = mf.section[mf.tool.numOfSections - 1].rightPoint.easting;
-//boxB.northing = mf.section[mf.tool.numOfSections - 1].rightPoint.northing;
-
-////boxA.easting = fromPt.easting + (Math.Sin(headAB + glm.PIBy2) * -scanWidthR);
-////boxA.northing = fromPt.northing + (Math.Cos(headAB + glm.PIBy2) * -scanWidthR);
-
-////boxB.easting = fromPt.easting + (Math.Sin(headAB + glm.PIBy2) * scanWidthR);
-////boxB.northing = fromPt.northing + (Math.Cos(headAB + glm.PIBy2) * scanWidthR);
-
-//double boxLength = 400;
-
-//boxC.easting = boxB.easting + (Math.Sin(headAB) * boxLength);
-//boxC.northing = boxB.northing + (Math.Cos(headAB) * boxLength);
-
-//boxD.easting = boxA.easting + (Math.Sin(headAB) * boxLength);
-//boxD.northing = boxA.northing + (Math.Cos(headAB) * boxLength);
-
-////determine if point is inside bounding box of the 1 turn chosen above
-//closestList.Clear();
-
-//int ptCount = headArr[0].hdLine.Count;
-//for (int p = 0; p < ptCount; p++)
-//{
-//    if ((((boxB.easting - boxA.easting) * (headArr[0].hdLine[p].northing - boxA.northing))
-//            - ((boxB.northing - boxA.northing) * (headArr[0].hdLine[p].easting - boxA.easting))) < 0) { continue; }
-
-//    if ((((boxD.easting - boxC.easting) * (headArr[0].hdLine[p].northing - boxC.northing))
-//            - ((boxD.northing - boxC.northing) * (headArr[0].hdLine[p].easting - boxC.easting))) < 0) { continue; }
-
-//    if ((((boxC.easting - boxB.easting) * (headArr[0].hdLine[p].northing - boxB.northing))
-//            - ((boxC.northing - boxB.northing) * (headArr[0].hdLine[p].easting - boxB.easting))) < 0) { continue; }
-
-//    if ((((boxA.easting - boxD.easting) * (headArr[0].hdLine[p].northing - boxD.northing))
-//            - ((boxA.northing - boxD.northing) * (headArr[0].hdLine[p].easting - boxD.easting))) < 0) { continue; }
-
-//    //it's in the box, so add to list
-
-//        closestList.Add(p);
-//}
-
-////if (closestList[0] == 0)
-////{
-////    closestList.Insert(0, headArr[0].hdLine.Count - 1);
-////    closestList.Insert(0, headArr[0].hdLine.Count - 2);
-////}
-
-////if (closestList[closestList.Count - 1] == headArr[0].hdLine.Count - 1)
-////{
-////    closestList.Add(0);
-////    closestList.Add(1);
-////}
-
-//if (closestList.Count > 0)
-//{
-//    if (closestList[0] != 0) closestList.Insert(0, closestList[0] - 1);
-//    if (closestList[closestList.Count - 1] != headArr[0].hdLine.Count - 1) closestList.Add(closestList[closestList.Count - 1] + 1);
-//}

@@ -495,7 +495,6 @@ namespace AgOpenGPS
                 }
             }
         }
-
         private void btnSnapRight_Click(object sender, EventArgs e)
         {
             SnapRight();
@@ -504,7 +503,6 @@ namespace AgOpenGPS
         {
             SnapLeft();
         }
-
 
         //Section Manual and Auto
         private void btnManualOffOn_Click(object sender, EventArgs e)
@@ -788,7 +786,6 @@ namespace AgOpenGPS
             ManualBtnUpdate(15, btnSection16Man);
         }
 
-
         //The zoom tilt buttons
         private void btnZoomIn_MouseDown(object sender, MouseEventArgs e)
         {
@@ -815,7 +812,7 @@ namespace AgOpenGPS
         {
             if (camera.camPitch > -59) camera.camPitch = -60;
             camera.camPitch += ((camera.camPitch * 0.012) - 1);
-            if (camera.camPitch < -85) camera.camPitch = -85;
+            if (camera.camPitch < -74) camera.camPitch = -74;
         }
         private void btnMoveDown_MouseDown(object sender, MouseEventArgs e)
         {
@@ -953,10 +950,26 @@ namespace AgOpenGPS
         private void btnFlag_Click(object sender, EventArgs e)
         {
             int nextflag = flagPts.Count + 1;
-            CFlag flagPt = new CFlag(pn.latitude, pn.longitude, pn.fix.easting, pn.fix.northing, fixHeading, flagColor, nextflag, DateTime.Today.ToString());
+            CFlag flagPt = new CFlag(pn.latitude, pn.longitude, pn.fix.easting, pn.fix.northing, fixHeading, flagColor, nextflag, (nextflag).ToString());
             flagPts.Add(flagPt);
             FileSaveFlags();
-            
+
+            Form fc = Application.OpenForms["FormFlags"];
+
+            if (fc != null)
+            {
+                fc.Focus();
+                return;
+            }
+
+            if (flagPts.Count > 0)
+            {
+                flagNumberPicked = nextflag;
+                Form form = new FormFlags(this);
+                form.Show();
+            }
+
+
         }
         private void btnAutoYouTurn_Click(object sender, EventArgs e)
         {
@@ -973,13 +986,18 @@ namespace AgOpenGPS
                 //new direction so reset where to put turn diagnostic
                 yt.ResetCreatedYouTurn();
 
-                if (!isAutoSteerBtnOn) return;
+                if (ABLine.isBtnABLineOn || curve.isBtnCurveOn)
+                {
+                    if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                }
+                else return;
+
                 yt.isYouTurnBtnOn = true;
                 yt.isTurnCreationTooClose = false;
                 yt.isTurnCreationNotCrossingError = false;
                 yt.ResetYouTurn();
                 //mc.autoSteerData[mc.sdX] = 0;
-                mc.machineControlData[mc.cnYouTurn] = 0;
+                mc.machineData[mc.mdUTurn] = 0;
                 btnAutoYouTurn.Image = Properties.Resources.Youturn80;
             }
             else
@@ -993,10 +1011,12 @@ namespace AgOpenGPS
                 yt.ResetCreatedYouTurn();
 
                 //mc.autoSteerData[mc.sdX] = 0;
-                mc.machineControlData[mc.cnYouTurn] = 0;
+                mc.machineData[mc.mdUTurn] = 0;
             }
         }
-        private void btnHeadlandOnOff_Click(object sender, EventArgs e)
+
+        // the context menu from autosteer button
+        private void autoUTurnHeadLiftStrip_Click(object sender, EventArgs e)
         {
             if (hd.headArr.Count > 0)
             {
@@ -1004,8 +1024,102 @@ namespace AgOpenGPS
                 if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
                 else btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
             }
+
+            if (!yt.isYouTurnBtnOn)  btnAutoYouTurn.PerformClick();
+
+            if (!vehicle.isHydLiftOn) btnHydLift.PerformClick();
         }
 
+        private void btnHeadlandOnOff_Click(object sender, EventArgs e)
+        {
+            if (hd.headArr[0].hdLine.Count > 0)
+            {
+                hd.isOn = !hd.isOn;
+                if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
+                else btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
+            }
+
+            if (!hd.isOn)
+            {
+                mc.machineData[mc.mdHydLift] = 0;
+                vehicle.isHydLiftOn = false;
+                btnHydLift.Image = Properties.Resources.HydraulicLiftOff;
+            }
+
+        }
+
+        private void btnHydLift_Click(object sender, EventArgs e)
+        {
+            if (hd.isOn)
+            {
+                vehicle.isHydLiftOn = !vehicle.isHydLiftOn;
+                if (vehicle.isHydLiftOn)
+                {
+                    btnHydLift.Image = Properties.Resources.HydraulicLiftOn;
+                }
+                else
+                {
+                    btnHydLift.Image = Properties.Resources.HydraulicLiftOff;
+                    mc.machineData[mc.mdHydLift] = 0;
+                }
+            }
+            else
+            {
+                mc.machineData[mc.mdHydLift] = 0;
+                vehicle.isHydLiftOn = false;
+                btnHydLift.Image = Properties.Resources.HydraulicLiftOff;
+            }
+        }
+
+        private void gPSInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form f = Application.OpenForms["FormModules"];
+
+            if (f != null)
+            {
+                f.Focus();
+                f.Close();
+                return;
+            }
+
+            Form form = new FormModules(this);
+            form.Show();
+
+        }
+        private void lblSpeed_Click(object sender, EventArgs e)
+        {
+            Form f = Application.OpenForms["FormGPSData"];
+
+            if (f != null)
+            {
+                f.Focus();
+                f.Close();
+                return;
+            }
+
+            Form form = new FormGPSData(this);
+            form.Show();
+
+        }
+        private void showStartScreenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.setDisplay_isTermsOn = true;
+            Properties.Settings.Default.Save();
+
+        }
+        private void startFullScreenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Properties.Settings.Default.setDisplay_isStartFullScreen)
+            {
+                Properties.Settings.Default.setDisplay_isStartFullScreen = false;
+                startFullScreenToolStripMenuItem.Checked = false;
+            }
+            else
+            {
+                Properties.Settings.Default.setDisplay_isStartFullScreen = true;
+                startFullScreenToolStripMenuItem.Checked = true;
+            }
+        }
         private void btnFullScreen_Click(object sender, EventArgs e)
         {
             isFullScreen = !isFullScreen;
@@ -1037,6 +1151,7 @@ namespace AgOpenGPS
             if (result3 == DialogResult.Yes) Close();
 
         }
+
         private void btnReverseDirection_Click(object sender, EventArgs e)
         {
             sim.headingTrue += Math.PI;
@@ -1101,9 +1216,13 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                FileSaveFlagsKML();
+                FileSaveFieldKML();
             }
             Process.Start(fieldsDirectory + currentFieldDirectory);
+        }        
+        private void topMenuFileExplorer_Click(object sender, EventArgs e)
+        {
+            Process.Start(baseDirectory);
         }
         private void toolStripDeleteApplied_Click(object sender, EventArgs e)
         {
@@ -1117,53 +1236,66 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                DialogResult result3 = MessageBox.Show(gStr.gsDeleteAllContoursAndSections,
-                    gStr.gsDeleteForSure,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button2);
-                if (result3 == DialogResult.Yes)
+                if (autoBtnState == btnStates.Off && manualBtnState == btnStates.Off)
                 {
-                    FileCreateContour();
-                    FileCreateSections();
-                    //FileCreateElevation();
 
-                    //turn auto button off
-                    autoBtnState = btnStates.Off;
-                    btnSectionOffAutoOn.Image = Properties.Resources.SectionMasterOff;
-
-                    //turn section buttons all OFF and zero square meters
-                    for (int j = 0; j < MAXSECTIONS; j++)
+                    DialogResult result3 = MessageBox.Show(gStr.gsDeleteAllContoursAndSections,
+                        gStr.gsDeleteForSure,
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button2);
+                    if (result3 == DialogResult.Yes)
                     {
-                        section[j].isAllowedOn = false;
-                        section[j].manBtnState = manBtn.On;
+                        //FileCreateElevation();
+
+                        //turn auto button off
+                        autoBtnState = btnStates.Off;
+                        btnSectionOffAutoOn.Image = Properties.Resources.SectionMasterOff;
+
+                        //turn section buttons all OFF and zero square meters
+                        for (int j = 0; j < MAXSECTIONS; j++)
+                        {
+                            section[j].isAllowedOn = false;
+                            section[j].manBtnState = manBtn.On;
+                        }
+
+                        //turn manual button off
+                        manualBtnState = btnStates.Off;
+                        btnManualOffOn.Image = Properties.Resources.ManualOff;
+
+                        //Update the button colors and text
+                        ManualAllBtnsUpdate();
+
+                        //enable disable manual buttons
+                        LineUpManualBtns();
+
+                        //clear out the contour Lists
+                        ct.StopContourLine(pivotAxlePos);
+                        ct.ResetContour();
+                        fd.workedAreaTotal = 0;
+
+                        //clear the section lists
+                        for (int j = 0; j < MAXSECTIONS; j++)
+                        {
+                            //clean out the lists
+                            section[j].patchList?.Clear();
+                            section[j].triangleList?.Clear();
+                        }
+                        patchSaveList?.Clear();
+
+                        FileCreateContour();
+                        FileCreateSections();
+
                     }
-
-                    //turn manual button off
-                    manualBtnState = btnStates.Off;
-                    btnManualOffOn.Image = Properties.Resources.ManualOff;
-
-                    //Update the button colors and text
-                    ManualAllBtnsUpdate();
-
-                    //enable disable manual buttons
-                    LineUpManualBtns();
-
-                    //clear out the contour Lists
-                    ct.StopContourLine(pivotAxlePos);
-                    ct.ResetContour();
-                    fd.workedAreaTotal = 0;
-
-                    //clear the section lists
-                    for (int j = 0; j < MAXSECTIONS; j++)
+                    else
                     {
-                        //clean out the lists
-                        section[j].patchList?.Clear();
-                        section[j].triangleList?.Clear();
+                        TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
                     }
-                    patchSaveList?.Clear();
                 }
-                else TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
+                else
+                {
+                   TimedMessageBox(1500, "Sections are on", "Turn Auto or Manual Off First");
+                }
             }
         }
         private void toolStripBtnField_Click(object sender, EventArgs e)
@@ -1265,7 +1397,7 @@ namespace AgOpenGPS
         private void threeDToolStripMenuItem_Click(object sender, EventArgs e)
         {
             camera.camFollowing = true;
-            camera.camPitch = -70;
+            camera.camPitch = -75;
         }
         private void northToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1274,7 +1406,7 @@ namespace AgOpenGPS
         }
         private void dNorthToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            camera.camPitch = -70;
+            camera.camPitch = -75;
             camera.camFollowing = false;
         }
         private void toolStripDropDownButtonDistance_Click(object sender, EventArgs e)
@@ -1287,10 +1419,10 @@ namespace AgOpenGPS
             if (isJobStarted)
             {
                 //save new copy of flags
-                FileSaveFlagsKML();
+                FileSaveFieldKML();
 
                 //Process.Start(@"C:\Program Files (x86)\Google\Google Earth\client\googleearth", workingDirectory + currentFieldDirectory + "\\Flags.KML");
-                Process.Start(fieldsDirectory + currentFieldDirectory + "\\Flags.KML");
+                Process.Start(fieldsDirectory + currentFieldDirectory + "\\Field.KML");
             }
             else
             {
@@ -1361,17 +1493,6 @@ namespace AgOpenGPS
         }
         private void toolStripBtnGPSStength_Click(object sender, EventArgs e)
         {
-            Form f = Application.OpenForms["FormGPSData"];
-
-            if (f != null)
-            {
-                f.Focus();
-                f.Close();
-                return;
-            }
-
-            Form form = new FormGPSData(this);
-            form.Show();
         }
         private void toolStripBtnDrag_ButtonClick(object sender, EventArgs e)
         {
@@ -1443,14 +1564,13 @@ namespace AgOpenGPS
         }
         private void arduinoSetupToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var form = new FormArduinoSettings(this, 0))
+            using (var form = new FormArduinoSettings(this))
             {
                 var result = form.ShowDialog();
                 if (result == DialogResult.OK)
                 {
                 }
             }
-
         }                     
         private void batmanToolStrip_Click(object sender, EventArgs e)
         {
@@ -1464,14 +1584,10 @@ namespace AgOpenGPS
         {
             Settings.Default.setDisplay_isSimple = !Settings.Default.setDisplay_isSimple;
             Settings.Default.Save();
+
             SwapBatmanPanels();
             FixPanelsAndMenus();
         }
-        private void topMenuSaveEnvironment_Click(object sender, EventArgs e)
-        {
-            FileSaveEnvironment();
-        }
-        
         //File drop down items
         private void setWorkingDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1598,25 +1714,20 @@ namespace AgOpenGPS
                 TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
-            if (FileOpenVehicle())
-            {
-                using (var form = new FormSettings(this, 0))
-                {
-                    var result = form.ShowDialog();
-                    if (result == DialogResult.OK) { }
-                }
-                using (var form = new FormIMU(this))
-                {
-                    var result = form.ShowDialog();
-                    if (result == DialogResult.OK) { }
-                }
 
-                TimedMessageBox(3000, gStr.gsDidyoumakechangestothevehicle, gStr.gsBesuretosavevehicleifyoudid);
+            using (var form = new FormVehiclePicker(this))
+            {
+                var result = form.ShowDialog();
+                if (result == DialogResult.OK) { }
             }
         }
         private void topMenuSaveVehicle_Click(object sender, EventArgs e)
         {
-            FileSaveVehicle();
+            using (var form = new FormVehicleSaver(this))
+            {
+                var result = form.ShowDialog();
+            }
+
         }
         private void topMenuLoadTool_Click(object sender, EventArgs e)
         {
@@ -1625,20 +1736,31 @@ namespace AgOpenGPS
                 TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
                 return;
             }
-            if (FileOpenTool())
-            {
-                using (var form = new FormToolSettings(this, 0))
-                {
-                    var result = form.ShowDialog();
-                    if (result == DialogResult.OK) { }
-                }
 
-                TimedMessageBox(3000, gStr.gsDidYouMakeChanges, gStr.gsBeSureToSaveIfYouDid);
+            using (var form = new FormToolPicker(this))
+            {
+                var result = form.ShowDialog();
+                if (result == DialogResult.OK) { }
             }
+
+
+            //if (FileOpenTool())
+            //{
+            //    using (var form = new FormToolSettings(this, 0))
+            //    {
+            //        var result = form.ShowDialog();
+            //        if (result == DialogResult.OK) { }
+            //    }
+
+            //    TimedMessageBox(3000, gStr.gsDidYouMakeChanges, gStr.gsBeSureToSaveIfYouDid);
+            //}
         }
         private void topMenuSaveTool_Click(object sender, EventArgs e)
         {
-            FileSaveTool();
+            using (var form = new FormToolSaver(this))
+            {
+                var result = form.ShowDialog();
+            }
         }
         private void topMenuLoadEnvironment_Click(object sender, EventArgs e)
         {
@@ -1648,26 +1770,29 @@ namespace AgOpenGPS
                 return;
             }
 
-            if (FileOpenEnvironment())
+            using (var form = new FormEnvPicker(this))
             {
-                MessageBox.Show(gStr.gsProgramWillExitPleaseRestart, gStr.gsProgramWillExitPleaseRestart);
-                if (isJobStarted) JobClose();
-                Application.Exit();
-            }
-            else
-            {
-                MessageBox.Show(gStr.gsError,
-                    gStr.gsFileError,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button2);
+                var result = form.ShowDialog();
+                if (result == DialogResult.Cancel)
+                {
+                    MessageBox.Show(gStr.gsError,
+                        gStr.gsFileError,
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button2);
+                }
 
                 MessageBox.Show(gStr.gsProgramWillExitPleaseRestart, gStr.gsProgramWillExitPleaseRestart);
-
-                if (isJobStarted) JobClose();
-                Application.Exit();
+                Application.Restart();
+                Environment.Exit(0);
             }
-
+        }
+        private void topMenuSaveEnvironment_Click(object sender, EventArgs e)
+        {
+            using (var form = new FormEnvSaver(this))
+            {
+                var result = form.ShowDialog();
+            }
         }
 
         //Help menu drop down items
@@ -1709,6 +1834,18 @@ namespace AgOpenGPS
 
                     Vehicle.Default.Reset();
                     Vehicle.Default.Save();
+
+                    RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AgOpenGPS");
+
+                    //storing the values
+                    key.SetValue("Language", "en");
+                    key.SetValue("Directory", "Default");
+                    key.Close();
+
+                    Settings.Default.setF_culture = "en";
+                    Settings.Default.setF_workingDirectory = "Default";
+                    Settings.Default.Save();
+
                     MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
                     Application.Exit();
                 }
@@ -1852,9 +1989,36 @@ namespace AgOpenGPS
             Settings.Default.Save();
         }
 
-
-
         //sections Day
+        private void stripSectionColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDlg = new ColorDialog
+            {
+                FullOpen = true,
+                AnyColor = true,
+                SolidColorOnly = false,
+                Color = Settings.Default.setDisplay_colorSectionsDay
+            };
+
+            colorDlg.CustomColors = customColorsList;
+
+            if (colorDlg.ShowDialog() != DialogResult.OK) return;
+
+            sectionColorDay = colorDlg.Color;
+
+            //save the custom colors
+            customColorsList = colorDlg.CustomColors;
+            Properties.Settings.Default.setDisplay_customColors = "";
+            for (int i = 0; i < 15; i++)
+                Properties.Settings.Default.setDisplay_customColors += customColorsList[i].ToString() + ",";
+            Properties.Settings.Default.setDisplay_customColors += customColorsList[15].ToString();
+
+            Settings.Default.setDisplay_colorSectionsDay = sectionColorDay;
+            Settings.Default.Save();
+
+            stripSectionColor.BackColor = sectionColorDay;
+        }
+
         private void nightModeToolSection_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog
@@ -1882,8 +2046,16 @@ namespace AgOpenGPS
                 SolidColorOnly = false,
                 Color = Settings.Default.setDisplay_colorSectionsDay
             };
+            colorDlg.CustomColors = customColorsList;
 
             if (colorDlg.ShowDialog() != DialogResult.OK) return;
+
+            //save the custom colors
+            customColorsList = colorDlg.CustomColors;
+            Properties.Settings.Default.setDisplay_customColors = "";
+            for (int i = 0; i < 15; i++)
+                Properties.Settings.Default.setDisplay_customColors += customColorsList[i].ToString() + ",";
+            Properties.Settings.Default.setDisplay_customColors += customColorsList[15].ToString();
 
             sectionColorDay = colorDlg.Color;
 
@@ -1904,10 +2076,19 @@ namespace AgOpenGPS
                 SolidColorOnly = false,
                 Color = Settings.Default.setDisplay_colorFieldDay
             };
+            colorDlg.CustomColors = customColorsList;
 
             if (colorDlg.ShowDialog() != DialogResult.OK) return;
 
             fieldColorDay = colorDlg.Color;
+
+            //save the custom colors
+            customColorsList = colorDlg.CustomColors;
+            Properties.Settings.Default.setDisplay_customColors = "";
+            for (int i = 0; i < 15; i++)
+                Properties.Settings.Default.setDisplay_customColors += customColorsList[i].ToString() + ",";
+            Properties.Settings.Default.setDisplay_customColors += customColorsList[15].ToString();
+
 
             Settings.Default.setDisplay_colorFieldDay = fieldColorDay;
             Settings.Default.Save();
@@ -1923,12 +2104,20 @@ namespace AgOpenGPS
                     SolidColorOnly = false,
                     Color = Settings.Default.setDisplay_colorFieldNight
                 };
+                colorDlg.CustomColors = customColorsList;
 
-                if (colorDlg.ShowDialog() != DialogResult.OK) return;
+            if (colorDlg.ShowDialog() != DialogResult.OK) return;
 
                 fieldColorNight = colorDlg.Color;
 
-                Settings.Default.setDisplay_colorFieldNight = fieldColorNight;
+            //save the custom colors
+            customColorsList = colorDlg.CustomColors;
+            Properties.Settings.Default.setDisplay_customColors = "";
+            for (int i = 0; i < 15; i++)
+                Properties.Settings.Default.setDisplay_customColors += customColorsList[i].ToString() + ",";
+            Properties.Settings.Default.setDisplay_customColors += customColorsList[15].ToString();
+
+            Settings.Default.setDisplay_colorFieldNight = fieldColorNight;
                 Settings.Default.Save();
         }
         private void dayModeToolStrip_Click(object sender, EventArgs e)
@@ -1940,10 +2129,19 @@ namespace AgOpenGPS
                 SolidColorOnly = true,
                 Color = Properties.Settings.Default.setDisplay_colorDayMode
             };
+            colorDlg.CustomColors = customColorsList;
 
             if (colorDlg.ShowDialog() != DialogResult.OK) return;
 
             dayColor = colorDlg.Color;
+
+            //save the custom colors
+            customColorsList = colorDlg.CustomColors;
+            Properties.Settings.Default.setDisplay_customColors = "";
+            for (int i = 0; i < 15; i++)
+                Properties.Settings.Default.setDisplay_customColors += customColorsList[i].ToString() + ",";
+            Properties.Settings.Default.setDisplay_customColors += customColorsList[15].ToString();
+
 
             Properties.Settings.Default.setDisplay_colorDayMode = dayColor;
                 Settings.Default.Save();
@@ -1960,10 +2158,18 @@ namespace AgOpenGPS
                 SolidColorOnly = true,
                 Color = Properties.Settings.Default.setDisplay_colorNightMode
             };
+            colorDlg.CustomColors = customColorsList;
 
             if (colorDlg.ShowDialog() != DialogResult.OK) return;
 
             nightColor = colorDlg.Color;
+
+            //save the custom colors
+            customColorsList = colorDlg.CustomColors;
+            Properties.Settings.Default.setDisplay_customColors = "";
+            for (int i = 0; i < 15; i++)
+                Properties.Settings.Default.setDisplay_customColors += customColorsList[i].ToString() + ",";
+            Properties.Settings.Default.setDisplay_customColors += customColorsList[15].ToString();
 
             Properties.Settings.Default.setDisplay_colorNightMode = nightColor;
             Settings.Default.Save();
@@ -1990,33 +2196,25 @@ namespace AgOpenGPS
             flagColor = 2;
             btnFlag.Image = Properties.Resources.FlagYel;
         }
-        private void toolStripMenuFlagDelete_Click(object sender, EventArgs e)
+        private void toolStripMenuFlagForm_Click(object sender, EventArgs e)
         {
-            //delete selected flag and set selected to none
-            DeleteSelectedFlag();
-            FileSaveFlags();
-        }
-        private void toolStripMenuFlagDeleteAll_Click(object sender, EventArgs e)
-        {
-            flagNumberPicked = 0;
-            flagPts.Clear();
-            FileSaveFlags();
-        }
-        private void contextMenuStripFlag_Opening(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            toolStripMenuFlagDelete.Enabled = flagNumberPicked != 0;
+            Form fc = Application.OpenForms["FormFlags"];
 
-            toolStripMenuFlagDeleteAll.Enabled = flagPts.Count > 0;
-        }
+            if (fc != null)
+            {
+                fc.Focus();
+                return;
+            }
 
+            if (flagPts.Count > 0)
+            {
+                flagNumberPicked = 1;
+                Form form = new FormFlags(this);
+                form.Show();
+            }            
+        }
 
         //OpenGL Window context Menu and functions
-        private void deleteFlagToolOpenGLContextMenu_Click(object sender, EventArgs e)
-        {
-            //delete selected flag and set selected to none
-            DeleteSelectedFlag();
-            FileSaveFlags();
-        }
         private void contextMenuStripOpenGL_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             //dont bring up menu if no flag selected
@@ -2072,21 +2270,25 @@ namespace AgOpenGPS
                 else sim.DoSimTick(sim.steerAngleScrollBar);
             }
         }
+
         private void hsbarSteerAngle_Scroll(object sender, ScrollEventArgs e)
         {
-            sim.steerAngleScrollBar = (hsbarSteerAngle.Value - 300) * 0.1;
+            sim.steerAngleScrollBar = (hsbarSteerAngle.Value - 400) * 0.1;
             btnResetSteerAngle.Text = sim.steerAngleScrollBar.ToString("N1");
         }
+
         private void hsbarStepDistance_Scroll(object sender, ScrollEventArgs e)
         {
-            sim.stepDistance = ((double)(hsbarStepDistance.Value)) / 10.0 / (double)fixUpdateHz;
+            sim.stepDistance = ((double)(hsbarStepDistance.Value)) / 5.0 / (double)fixUpdateHz;
         }
+
         private void btnResetSteerAngle_Click(object sender, EventArgs e)
         {
             sim.steerAngleScrollBar = 0;
             hsbarSteerAngle.Value = 300;
             btnResetSteerAngle.Text = 0.ToString("N1");
         }
+
         private void btnResetSim_Click(object sender, EventArgs e)
         {
             sim.steerAngleScrollBar = 0;
@@ -2204,6 +2406,29 @@ namespace AgOpenGPS
             Close();
 
         }
+        private void menuLanguagesPolski_Click(object sender, EventArgs e)
+        {
+            if (isJobStarted)
+            {
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
+                return;
+            }
+            SetLanguage("pl");
+            MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
+            Close();
+        }
+        private void menuLanguageTest_Click(object sender, EventArgs e)
+        {
+            if (isJobStarted)
+            {
+                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
+                return;
+            }
+            SetLanguage("af");
+            MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
+            Close();
+        }
+
         private void SetLanguage(string lang)
         {
             //reset them all to false
@@ -2216,6 +2441,9 @@ namespace AgOpenGPS
             menuLanguageItalian.Checked = false;
             menuLanguageUkranian.Checked = false;
             menuLanguageSlovak.Checked = false;
+            menuLanguagePolish.Checked = false;
+
+            menuLanguageTest.Checked = false;
 
             switch (lang)
             {
@@ -2254,6 +2482,20 @@ namespace AgOpenGPS
                 case "sk":
                     menuLanguageSlovak.Checked = true;
                     break;
+
+                case "pl":
+                    menuLanguagePolish.Checked = true;
+                    break;
+
+                case "af":
+                    menuLanguageTest.Checked = true;
+                    break;
+
+                default:
+                    menuLanguageEnglish.Checked = true;
+                    lang = "en";
+                    break;
+
             }
 
             //adding or editing "Language" subkey to the "SOFTWARE" subkey  

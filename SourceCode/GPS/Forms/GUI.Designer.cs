@@ -4,6 +4,9 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using AgOpenGPS.Properties;
+using Microsoft.Win32;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace AgOpenGPS
 {
@@ -39,10 +42,14 @@ namespace AgOpenGPS
         public Color fieldColorDay = Properties.Settings.Default.setDisplay_colorFieldDay;
         public Color fieldColorNight = Properties.Settings.Default.setDisplay_colorFieldNight;
 
+        public int[] customColorsList = new int[16];
+
         //sunrise sunset
         public DateTime dateToday = DateTime.Today;
         public DateTime sunrise = DateTime.Now;
         public DateTime sunset = DateTime.Now;
+
+        public uint sentenceCounter = 0;
 
         //section button states
         public enum manBtn { Off, Auto, On }
@@ -65,6 +72,13 @@ namespace AgOpenGPS
             //isDay = Properties.Settings.Default.setDisplay_isDayMode;
             isDay = !isDay;
             SwapDayNightMode();
+
+            //load the string of custom colors
+            string[] words = Properties.Settings.Default.setDisplay_customColors.Split(',');
+            for (int i = 0; i < 16; i++)
+            {
+                customColorsList[i] = int.Parse(words[i], CultureInfo.InvariantCulture);
+            }
 
             //metric settings
             isMetric = Settings.Default.setMenu_isMetric;
@@ -190,8 +204,41 @@ namespace AgOpenGPS
             if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
             else btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
 
-            isFullScreen = false;
-        }        
+
+            stripSectionColor.BackColor = sectionColorDay;
+
+            if (Properties.Settings.Default.setDisplay_isTermsOn)
+            {
+                using (var form = new Form_First())
+                {
+                    var result = form.ShowDialog();
+                    if (result != DialogResult.OK)
+                    {
+                        Close();
+                    }
+                }
+            }
+
+            if (Properties.Settings.Default.setDisplay_isStartFullScreen)
+            {
+                startFullScreenToolStripMenuItem.Checked = true;
+                this.WindowState = FormWindowState.Normal;
+                this.FormBorderStyle = FormBorderStyle.None;
+                this.WindowState = FormWindowState.Maximized;
+                btnFullScreen.BackgroundImage = Properties.Resources.WindowNormal;
+                isFullScreen = true;
+            }
+            else
+            {
+                startFullScreenToolStripMenuItem.Checked = false;
+                isFullScreen = false;
+            }
+
+            //is rtk on?
+            isRTK = Properties.Settings.Default.setGPS_isRTK;
+
+
+        }
 
         private void SwapDayNightMode()
         {
@@ -274,7 +321,12 @@ namespace AgOpenGPS
                 toolStripMenuRecPath.Visible = true;
                 toolStripDropDownButton3.Visible = true;
                 toolStripStatusLabel2.Visible = true;
-                pbarUDPComm.Visible = true;
+
+                lblDateTime.Visible = false;
+                snapLeftBigStrip.Visible = false;
+                snapRightBigStrip.Visible = false;
+                snapToCurrent.Visible = false;
+
             }
 
             if (Width > 1100)
@@ -359,8 +411,6 @@ namespace AgOpenGPS
                     if (isFullScreen) oglMain.Width += 20;
                 }
 
-                oglMain.Left = statusStripLeft.Width + panelBatman.Width;
-
                 panelBatman.Left = statusStripLeft.Width;
 
                 panelFieldData.Width = oglMain.Width + panelBatman.Width +2;
@@ -368,6 +418,7 @@ namespace AgOpenGPS
                 panelBatman.Visible = true;
 
                 panelSim.Left = 250;
+                panelSim.Width = Width - statusStripLeft.Width - panelBatman.Width - 325;
 
                 if (panelDrag.Visible) panelDrag.Left = statusStripLeft.Width + panelBatman.Width + 5;
 
@@ -388,8 +439,9 @@ namespace AgOpenGPS
                     if (isFullScreen) oglMain.Width += 20;
                 }
                 panelBatman.Visible = false;
-
-                panelSim.Left = 80;
+                
+                panelSim.Left = 100;
+                panelSim.Width = Width - statusStripLeft.Width - 350;
 
                 panelFieldData.Width = oglMain.Width + 2;
                 //if (isFullScreen) panelFieldData.Width += 20;
@@ -458,15 +510,6 @@ namespace AgOpenGPS
             btnSection14Man.Size = new System.Drawing.Size(buttonWidth, buttonHeight);
             btnSection15Man.Size = new System.Drawing.Size(buttonWidth, buttonHeight);
             btnSection16Man.Size = new System.Drawing.Size(buttonWidth, buttonHeight);
-
-
-
-
-
-
-
-
-
 
             switch (tool.numOfSections)
             {
@@ -688,10 +731,10 @@ namespace AgOpenGPS
                          btnSection10Man.Visible = false;
                          btnSection11Man.Visible = false;
                          btnSection12Man.Visible = false;
-                         btnSection12Man.Visible = false;
-                         btnSection12Man.Visible = false;
-                         btnSection12Man.Visible = false;
-                         btnSection12Man.Visible = false;
+                         btnSection13Man.Visible = false;
+                         btnSection14Man.Visible = false;
+                         btnSection15Man.Visible = false;
+                         btnSection16Man.Visible = false;
                         break;
 
                     case 3:
@@ -1116,8 +1159,6 @@ namespace AgOpenGPS
             }
         }               
 
-
-        
         //Function to delete flag
         public void DeleteSelectedFlag()
         {
@@ -1147,6 +1188,14 @@ namespace AgOpenGPS
             yt.isYouTurnBtnOn = false;
             btnAutoYouTurn.Image = Properties.Resources.YouTurnNo;
             yt.ResetYouTurn();
+        }
+
+        private void ShowNoGPSWarning()
+        {
+            //update main window
+            sentenceCounter = 100;
+            oglMain.MakeCurrent();
+            oglMain.Refresh();
         }
 
         private void HalfSecond_Update(object sender, EventArgs e)
@@ -1226,8 +1275,8 @@ namespace AgOpenGPS
                     lblNorthing.Text = "N:" + (pn.actualNorthing).ToString("N2");
                 }
 
-                lblUturnByte.Text = Convert.ToString(mc.autoSteerData[mc.sdYouTurnByte], 2).PadLeft(6, '0');
-            }
+                        lblUturnByte.Text = Convert.ToString(mc.machineData[mc.mdUTurn], 2).PadLeft(6, '0');
+                    }
 
             if (ABLine.isBtnABLineOn && !ct.isContourBtnOn)
             {
@@ -1243,11 +1292,11 @@ namespace AgOpenGPS
 
             if (mc.steerSwitchValue == 0)
             {
-                this.AutoSteerToolBtn.BackColor = System.Drawing.Color.LightBlue;
+                this.btnAutoSteer.BackColor = System.Drawing.Color.LightBlue;
             }
             else
             {
-                this.AutoSteerToolBtn.BackColor = System.Drawing.Color.Transparent;
+                this.btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
             }
 
 
@@ -1320,29 +1369,24 @@ namespace AgOpenGPS
 
             }
 
-            //the main formgps window
-            if (isMetric)  //metric or imperial
-            {
-                //Hectares on the master section soft control and sections
-                btnSectionOffAutoOn.Text = fd.WorkedHectares;
-                lblSpeed.Text = SpeedKPH;
+                    //the main formgps window
+                    if (isMetric)  //metric or imperial
+                    {
+                        //Hectares on the master section soft control and sections
+                        btnSectionOffAutoOn.Text = fd.WorkedHectares;
 
                 //status strip values
                 distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares2;
 
-                btnContour.Text = XTE; //cross track error
+                    }
+                    else  //Imperial Measurements
+                    {
+                        //acres on the master section soft control and sections
+                        btnSectionOffAutoOn.Text = fd.WorkedAcres;
 
-            }
-            else  //Imperial Measurements
-            {
-                //acres on the master section soft control and sections
-                btnSectionOffAutoOn.Text = fd.WorkedAcres;
-                lblSpeed.Text = SpeedMPH;
-
-                //status strip values
-                distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
-                btnContour.Text = InchXTE; //cross track error
-            }
+                        //status strip values
+                        distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
+                    }
 
             //statusbar flash red undefined headland
             if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent)
@@ -1436,6 +1480,7 @@ namespace AgOpenGPS
             testThreeSecond1 = testThreeSecond.ElapsedMilliseconds;
         }
 
+
         #region Properties // ---------------------------------------------------------------------
 
         public string Zone { get { return Convert.ToString(pn.zone); } }
@@ -1498,8 +1543,8 @@ namespace AgOpenGPS
             get
             {
                 double spd = 0;
-                for (int c = 0; c < 10; c++) spd += avgSpeed[c];
-                spd *= 0.0621371;
+                for (int c = 0; c < 5; c++) spd += avgSpeed[c];
+                spd *= 0.124;
                 return Convert.ToString(Math.Round(spd, 1));
             }
         }
@@ -1508,8 +1553,8 @@ namespace AgOpenGPS
             get
             {
                 double spd = 0;
-                for (int c = 0; c < 10; c++) spd += avgSpeed[c];
-                spd *= 0.1;
+                for (int c = 0; c < 5; c++) spd += avgSpeed[c];
+                spd *= 0.2;
                 return Convert.ToString(Math.Round(spd, 1));
             }
         }

@@ -45,7 +45,7 @@ namespace AgOpenGPS
                 catch (Exception e)
                 {
                     WriteErrorLog("Sending UDP Message" + e.ToString());
-                    MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace AgOpenGPS
                 catch (Exception e)
                 {
                     WriteErrorLog("Sending UDP Message" + e.ToString());
-                    MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace AgOpenGPS
             catch (Exception e)
             {
                 WriteErrorLog(" UDP Send Data" + e.ToString());
-                MessageBox.Show("SendData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show("SendData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -148,7 +148,7 @@ namespace AgOpenGPS
             //quick check
             if (data.Length != 10) return;
 
-            if (pbarUDP++ > 99) pbarUDP = 0;
+            if (pbarUDP++ > 98) pbarUDP = 0;
 
             switch (port)
             {
@@ -158,7 +158,13 @@ namespace AgOpenGPS
                         //update progress bar for autosteer
                         if (pbarSteer++ > 99) pbarSteer = 0;
 
-                        if (ahrs.isHeadingFromAutoSteer)
+                        //Steer angle actual
+                        double actualSteerAngle = (Int16)((data[2] << 8) + data[3]);
+
+                        //build string for display
+                        double setSteerAngle = guidanceLineSteerAngle;
+
+                        if (ahrs.isHeadingCorrectionFromAutoSteer)
                         {
                             ahrs.correctionHeadingX16 = (Int16)((data[4] << 8) + data[5]);
                         }
@@ -172,23 +178,14 @@ namespace AgOpenGPS
                         mc.workSwitchValue = mc.steerSwitchValue & 1;
                         mc.steerSwitchValue = mc.steerSwitchValue & 2;
 
-                        //build string for display
-                        double actualSteerAngle = (Int16)((data[2] << 8) + data[3]);
-                        double setSteerAngle = guidanceLineSteerAngle;
                         byte pwm = data[9];
 
                         actualSteerAngleDisp = actualSteerAngle;
-
-
-                        //load the usb recv string with udp recd data for chart and gui info
-                        mc.serialRecvAutoSteerStr = (actualSteerAngle * 0.01).ToString("N2") + "," + (setSteerAngle * 0.01).ToString("N2")
-                               + "," + (ahrs.rollX16 * 0.0625).ToString("N1") + "," + mc.steerSwitchValue.ToString()
-                               + "," + (pwm).ToString();
                         break;
                     }
 
-                //autoDrive
-                case 5566:
+                //From Machine Data
+                case 5555:
                     {
                         //mc.recvUDPSentence = DateTime.Now.ToString() + "," + data[2].ToString();
                         break;
@@ -208,7 +205,7 @@ namespace AgOpenGPS
                         //by Matthias Hammer Jan 2019
                         if ((data[0] == 127) & (data[1] == 238))
                         {
-                            if (ahrs.isHeadingFromExtUDP)
+                            if (ahrs.isHeadingCorrectionFromExtUDP)
                             {
                                 ahrs.correctionHeadingX16 = (Int16)((data[4] << 8) + data[5]);
                             }
@@ -221,6 +218,40 @@ namespace AgOpenGPS
                         break;
                     }
 
+                case 5533://MTZ8302 Feb 2020
+                    {
+                        //check header
+                        if ((data[0] != 0x7F) | (data[1] != 0xF9)) break;
+
+                        /*rate stuff
+                        //left or single actual rate
+                        //int.TryParse(data[0], out mc.incomingInt);
+                        mc.rateActualLeft = (double)data[2] * 0.01;
+
+                        //right actual rate
+                        mc.rateActualRight = (double)data[3] * 0.01;
+
+                        //Volume for dual and single
+                        mc.dualVolumeActual = data[4];
+                       
+                        rate stuff  */
+
+                        //header
+                        mc.ss[mc.swHeaderLo] = 249;
+
+
+                        //read Relay from Arduino = if high then AOG has to switch on = manual
+                        mc.ss[mc.swONHi] = data[5];
+                        mc.ss[mc.swONLo] = data[6];
+
+                        //read SectSWOffToAOG from Arduino = if high then AOG has to switch OFF = manual
+                        mc.ss[mc.swOFFHi] = data[7];
+                        mc.ss[mc.swOFFLo] = data[8];
+
+                        //read MainSW+RateSW
+                        mc.ss[mc.swMain] = data[9];
+                        break;
+                    }
             }
         }
 
@@ -238,10 +269,20 @@ namespace AgOpenGPS
             //speed up
             if (keyData == Keys.Up)
             {
-                sim.stepDistance += 0.05;
-                if (sim.stepDistance > 4.8) sim.stepDistance = 4.8;
+                if (sim.stepDistance < 1) sim.stepDistance += 0.04;
+                else sim.stepDistance += 0.4;
+                if (sim.stepDistance > 4.0) sim.stepDistance = 4.0;
                 hsbarStepDistance.Value = (int)(sim.stepDistance * 5.0 * fixUpdateHz);
+                return true;
+            }
 
+            //slow down
+            if (keyData == Keys.Down)
+            {
+                if (sim.stepDistance < 1) sim.stepDistance -= 0.04;
+                else sim.stepDistance -= 0.4;
+                if (sim.stepDistance < -0.8) sim.stepDistance = -0.8;
+                hsbarStepDistance.Value = (int)(sim.stepDistance * 5 * fixUpdateHz);
                 return true;
             }
 
@@ -253,36 +294,27 @@ namespace AgOpenGPS
                 return true;
             }
 
-            //slow down
-            if (keyData == Keys.Down)
-            {
-                sim.stepDistance -= 0.05;
-                if (sim.stepDistance < 0) sim.stepDistance = 0;
-                hsbarStepDistance.Value = (int)(sim.stepDistance * 10.0 * fixUpdateHz);
-                return true;
-            }
-
             //turn right
             if (keyData == Keys.Right)
             {
-                sim.steerAngle++;
-                if (sim.steerAngle > 30) sim.steerAngle = 30;
-                if (sim.steerAngle < -30) sim.steerAngle = -30;
+                sim.steerAngle+=2;
+                if (sim.steerAngle > 40) sim.steerAngle = 40;
+                if (sim.steerAngle < -40) sim.steerAngle = -40;
                 sim.steerAngleScrollBar = sim.steerAngle;
                 btnResetSteerAngle.Text = sim.steerAngle.ToString();
-                hsbarSteerAngle.Value = (int)(10 * sim.steerAngle) + 300;
+                hsbarSteerAngle.Value = (int)(10 * sim.steerAngle) + 400;
                 return true;
             }
 
             //turn left
             if (keyData == Keys.Left)
             {
-                sim.steerAngle--;
-                if (sim.steerAngle > 30) sim.steerAngle = 30;
-                if (sim.steerAngle < -30) sim.steerAngle = -30;
+                sim.steerAngle-=2;
+                if (sim.steerAngle > 40) sim.steerAngle = 40;
+                if (sim.steerAngle < -40) sim.steerAngle = -40;
                 sim.steerAngleScrollBar = sim.steerAngle;
                 btnResetSteerAngle.Text = sim.steerAngle.ToString();
-                hsbarSteerAngle.Value = (int)(10 * sim.steerAngle) + 300;
+                hsbarSteerAngle.Value = (int)(10 * sim.steerAngle) + 400;
                 return true;
             }
 
@@ -292,7 +324,7 @@ namespace AgOpenGPS
                 sim.steerAngle = 0.0;
                 sim.steerAngleScrollBar = sim.steerAngle;
                 btnResetSteerAngle.Text = sim.steerAngle.ToString();
-                hsbarSteerAngle.Value = (int)(10 * sim.steerAngle) + 300;
+                hsbarSteerAngle.Value = (int)(10 * sim.steerAngle) + 400;
                 return true;
             }
 
@@ -371,6 +403,12 @@ namespace AgOpenGPS
             if (keyData == (Keys.P)) // Snap/Prioritu click
             {
                 btnContourPriority.PerformClick();
+                return true;    // indicate that you handled this keystroke
+            }
+
+            if (keyData == (Keys.F11)) // Full Screen click
+            {
+                btnFullScreen.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 
@@ -709,7 +747,7 @@ namespace AgOpenGPS
                             // to process the rotation gesture.
                             double k = ((int)(gi.ullArguments & ULL_ARGUMENTS_BIT_MASK) - _iArguments) * 0.01;
                             camera.camPitch -= k;
-                            if (camera.camPitch < -80) camera.camPitch = -80;
+                            if (camera.camPitch < -74) camera.camPitch = -74;
                             if (camera.camPitch > 0) camera.camPitch = 0;
                             _iArguments = (int)(gi.ullArguments & ULL_ARGUMENTS_BIT_MASK);
                             break;

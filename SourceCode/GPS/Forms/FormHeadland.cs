@@ -19,7 +19,7 @@ namespace AgOpenGPS
 
         private bool isA, isSet;
         public double headWidth = 0;
-        private int A, B, C, D, E, start = 99999, end = 99999;
+        private int A, B, C, D, E, start = 99999, end = 99999;     
 
         private int Boundary = -1;
         public vec3 pint = new vec3(0.0, 1.0, 0.0);
@@ -28,7 +28,7 @@ namespace AgOpenGPS
         public List<vec3> headLineTemplate = new List<vec3>();
 
         private vec3[] hdx2;
-        private vec3[] hdArr = new vec3[0];
+        private vec3[] hdArr;
 
         public FormHeadland(Form callingForm)
         {
@@ -38,6 +38,7 @@ namespace AgOpenGPS
             InitializeComponent();
             //lblPick.Text = gStr.gsSelectALine;
             this.Text = gStr.gsHeadlandForm;
+            btnReset.Text = gStr.gsResetAll;
 
             nudDistance.Controls[0].Enabled = false;
 
