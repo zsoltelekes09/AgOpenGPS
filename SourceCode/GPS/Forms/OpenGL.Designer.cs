@@ -505,7 +505,7 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             //gls.Perspective(6.0f, 1, 1, 5200);
-            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.104719758f, 1f, 50.0f, 520f);
+            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.1f, 1f, 50.0f, 520f);
             GL.LoadMatrix(ref mat);
             GL.MatrixMode(MatrixMode.Modelview);
         }
@@ -517,11 +517,12 @@ namespace AgOpenGPS
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();					// Reset The View
 
+            double rotation = glm.toDegrees(toolPos.heading);
             //back the camera up
-            GL.Translate(0, 0, -480);
+            GL.Translate(Math.Cos(rotation) * -0.05, Math.Cos(rotation) * -0.05, -500);//5cm both ways
 
             //rotate camera so heading matched fix heading in the world
-            GL.Rotate(glm.toDegrees(toolPos.heading), 0, 0, 1);
+            GL.Rotate(rotation, 0, 0, 1);
 
             //translate to that spot in the world 
             GL.Translate(-toolPos.easting, -toolPos.northing, 0);
@@ -587,7 +588,7 @@ namespace AgOpenGPS
                 {
                     GL.LineWidth(2);
                     GL.Color3((byte)0, (byte)240, (byte)0);
-                    GL.Begin(PrimitiveType.LineStrip);
+                    GL.Begin(PrimitiveType.LineLoop);
                     for (int h = 0; h < ptCount; h++) GL.Vertex3(bnd.bndArr[bnd.LastBoundary].bndLine[h].easting, bnd.bndArr[bnd.LastBoundary].bndLine[h].northing, 0);
                     GL.End();
                 }

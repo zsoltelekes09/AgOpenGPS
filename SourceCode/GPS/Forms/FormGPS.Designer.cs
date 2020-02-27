@@ -1342,7 +1342,7 @@
             this.oglZoom.Location = new System.Drawing.Point(252, 53);
             this.oglZoom.Margin = new System.Windows.Forms.Padding(0);
             this.oglZoom.Name = "oglZoom";
-            this.oglZoom.Size = new System.Drawing.Size(15, 16);
+            this.oglZoom.Size = new System.Drawing.Size(180, 180);
             this.oglZoom.TabIndex = 182;
             this.oglZoom.VSync = false;
             this.oglZoom.Load += new System.EventHandler(this.oglZoom_Load);
@@ -2070,7 +2070,7 @@
             this.oglBack.Location = new System.Drawing.Point(264, 67);
             this.oglBack.Margin = new System.Windows.Forms.Padding(1);
             this.oglBack.Name = "oglBack";
-            this.oglBack.Size = new System.Drawing.Size(2, 2);
+            this.oglBack.Size = new System.Drawing.Size(500, 500);
             this.oglBack.TabIndex = 181;
             this.oglBack.VSync = false;
             this.oglBack.Load += new System.EventHandler(this.oglBack_Load);
