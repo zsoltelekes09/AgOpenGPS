@@ -1687,9 +1687,9 @@ namespace AgOpenGPS
                 hsbarSteerAngle.Value = 400;
                 btnResetSteerAngle.Text = 0.ToString("N1");
                 sim.headingTrue = 0;
-                sim.stepDistance = 0.2;
-                sim.speed = 0.6;
-                hsbarStepDistance.Value = 1;
+                sim.stepDistance = 1.3889;
+                sim.speed = 5.0;
+                hsbarStepDistance.Value = 5;
 
 
 
@@ -2253,7 +2253,7 @@ namespace AgOpenGPS
         }
 
         //Sim controls
-        private void timerSim_Tick(object sender, EventArgs e) 
+        private void timerSim_Tick(object sender, EventArgs e)
         {
             //if a GPS is connected disable sim
             if (!SerialGPS.IsOpen)
@@ -2273,7 +2273,7 @@ namespace AgOpenGPS
 
         private void hsbarStepDistance_Scroll(object sender, ScrollEventArgs e)
         {
-            sim.stepDistance = ((double)(hsbarStepDistance.Value)) / 5.0 / (double)fixUpdateHz;
+            sim.stepDistance = ((double)(hsbarStepDistance.Value / 3.6));
         }
 
         private void btnResetSteerAngle_Click(object sender, EventArgs e)
@@ -2289,9 +2289,9 @@ namespace AgOpenGPS
             hsbarSteerAngle.Value = 400;
             btnResetSteerAngle.Text = 0.ToString("N1");
             sim.headingTrue = 0;
-            sim.stepDistance = 0.2;
-            sim.speed = 0.6;
-            hsbarStepDistance.Value = 1;
+            sim.stepDistance = 1.3889;
+            sim.speed = 5.0;
+            hsbarStepDistance.Value = 5;
 
             sim.latitude = Properties.Settings.Default.setGPS_SimLatitude;
             sim.longitude = Properties.Settings.Default.setGPS_SimLongitude;

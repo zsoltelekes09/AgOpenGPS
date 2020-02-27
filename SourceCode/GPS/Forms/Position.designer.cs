@@ -446,7 +446,7 @@ namespace AgOpenGPS
                     if (yt.isYouTurnBtnOn)
                     {
                         yt.ResetCreatedYouTurn();
-                        sim.stepDistance = 0 / 17.86;
+                        sim.stepDistance = 0;
                     }
                 }
             }
@@ -1194,12 +1194,10 @@ namespace AgOpenGPS
             }//endfor
 
             //set up the super for youturn
-            section[tool.numOfSections].isInsideBoundary = true;
+            section[tool.numOfSections].isInsideSprayArea = true;
 
             //determine if section is in boundary using the section left/right positions
             bool isLeftIn = false, isRightIn = false;
-
-
 
             for (int j = 0; j < tool.numOfSections; j++)
             {
@@ -1213,46 +1211,33 @@ namespace AgOpenGPS
                         {
                             if (j == 0) isLeftIn |= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? hd.headArr[i].IsPointInHeadArea(section[j].leftPoint) : bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
                             isRightIn |= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? hd.headArr[i].IsPointInHeadArea(section[j].rightPoint) : bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
-
-
                         }
                         if (bnd.LastBoundary > -1) break;
-
-
                     }
 
-                    if (isRightIn == false)
-                    {
-
-                        isRightIn = false;
-
-                    }
-                    if (isLeftIn || isRightIn)
+                    if (isLeftIn || isRightIn)//no point in checking inside Boundaries when both outside!
                     {
                         for (int i = 0; i < bnd.bndArr.Count; i++)
                         {
                             if (!bnd.bndArr[i].isOwnField && (bnd.LastBoundary == -1 || bnd.bndArr[i].OuterField == bnd.LastBoundary || bnd.bndArr[i].OuterField == -1))
                             {
-                                //if (j == 0) isLeftIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
-                                //isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
                                 if (j == 0) isLeftIn &= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? !hd.headArr[i].IsPointInHeadArea(section[j].leftPoint) : !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
                                 isRightIn &= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? !hd.headArr[i].IsPointInHeadArea(section[j].rightPoint) : !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
                             }
                         }
                     }
+
                     //merge the two sides into in or out
-                    section[j].isInsideBoundary = (!isLeftIn && !isRightIn) ? false : true;
-                    section[tool.numOfSections].isInsideBoundary &= section[j].isInsideBoundary;
+                    section[j].isInsideSprayArea = (isLeftIn || isRightIn) ? true : false;
+                    section[tool.numOfSections].isInsideSprayArea &= section[j].isInsideSprayArea;
                 }
                 //no boundary created so always inside
                 else
                 {
-                    section[j].isInsideBoundary = true;
-                    section[tool.numOfSections].isInsideBoundary = false;
+                    section[j].isInsideSprayArea = true;
+                    section[tool.numOfSections].isInsideSprayArea = true;
                 }
             }
-
-            section[tool.numOfSections].isInsideHeadland = !section[tool.numOfSections].isInsideHeadland;
 
             //with left and right tool velocity to determine rate of triangle generation, corners are more
             //save far right speed, 0 if going backwards, in meters/sec

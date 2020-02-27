@@ -505,6 +505,8 @@ namespace AgOpenGPS
             fixUpdateHz = Settings.Default.setPort_NMEAHz;
             fixUpdateTime = 1 / (double)fixUpdateHz;
 
+            timerSim.Interval = (int)((1.0 / (double)fixUpdateHz) * 1000.0);
+
             //get the abLines directory, if not exist, create
             ablinesDirectory = baseDirectory + "ABLines\\";
             dir = Path.GetDirectoryName(fieldsDirectory);

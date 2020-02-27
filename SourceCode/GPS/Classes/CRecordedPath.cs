@@ -191,7 +191,7 @@ namespace AgOpenGPS
             }
 
             //if paused, set the sim to 0
-            if (isPausedDrivingRecordedPath) mf.sim.stepDistance = 0 / 17.86;
+            if (isPausedDrivingRecordedPath) mf.sim.stepDistance = 0;
         }
 
         public void StopDrivingRecordedPath()

@@ -204,20 +204,12 @@ namespace AgOpenGPS
                 }
 
                 //min max of the boundary
-                if (mf.bnd.bndArr.Count > 0)
+                if (mf.bnd.bndArr.Count > mf.bnd.LastBoundary && mf.bnd.LastBoundary >= 0)
                 {
-                    int bndCnt = mf.bnd.bndArr[0].bndLine.Count;
-                    for (int i = 0; i < bndCnt; i++)
-                    {
-                        double x = mf.bnd.bndArr[0].bndLine[i].easting;
-                        double y = mf.bnd.bndArr[0].bndLine[i].northing;
-
-                        //also tally the max/min of field x and z
-                        if (minFieldX > x) minFieldX = x;
-                        if (maxFieldX < x) maxFieldX = x;
-                        if (minFieldY > y) minFieldY = y;
-                        if (maxFieldY < y) maxFieldY = y;
-                    }
+                    minFieldY = mf.bnd.bndArr[mf.bnd.LastBoundary].Northingmin;
+                    maxFieldY = mf.bnd.bndArr[mf.bnd.LastBoundary].Northingmax;
+                    minFieldX = mf.bnd.bndArr[mf.bnd.LastBoundary].Eastingmin;
+                    maxFieldX = mf.bnd.bndArr[mf.bnd.LastBoundary].Eastingmax;
                 }
 
                 if (maxFieldX == -9999999 || minFieldX == 9999999 || maxFieldY == -9999999 || minFieldY == 9999999)

@@ -206,9 +206,11 @@ namespace AgOpenGPS
 
         private void cboxNMEAHz_SelectedIndexChanged(object sender, EventArgs e)
         {
-                Properties.Settings.Default.setPort_NMEAHz = Convert.ToInt32(cboxNMEAHz.SelectedItem);
-                Properties.Settings.Default.Save();
-                mf.fixUpdateHz = Properties.Settings.Default.setPort_NMEAHz;
+            Properties.Settings.Default.setPort_NMEAHz = Convert.ToInt32(cboxNMEAHz.SelectedItem);
+            Properties.Settings.Default.Save();
+            mf.fixUpdateHz = Properties.Settings.Default.setPort_NMEAHz;
+
+            mf.timerSim.Interval = (int)((1.0 / (double)mf.fixUpdateHz) * 1000.0);
         }
     }
 }

@@ -201,8 +201,12 @@ namespace AgOpenGPS
 
         public void DrawHeadLinesBack()
         {
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (headArr[0].hdLine.Count > 0 && isOn) headArr[0].DrawHeadLineBackBuffer();
+                if (mf.bnd.LastBoundary >= 0 || (i == mf.bnd.LastBoundary || (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == -1) || mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary))
+                {
+                    if (headArr[i].hdLine.Count > 0) headArr[i].DrawHeadLineBackBuffer();
+                }
             }
 
         }

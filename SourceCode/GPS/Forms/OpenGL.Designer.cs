@@ -515,7 +515,6 @@ namespace AgOpenGPS
             oglBack.MakeCurrent();
 
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-
             GL.LoadIdentity();					// Reset The View
 
             //back the camera up
@@ -568,6 +567,7 @@ namespace AgOpenGPS
 
                         if (isDraw)
                         {
+                            GL.Color3((byte)0, (byte)240, (byte)0);
                             //draw the triangles in each triangle strip
                             GL.Begin(PrimitiveType.TriangleStrip);
                             for (int i = 1; i < count2; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0);
@@ -578,15 +578,16 @@ namespace AgOpenGPS
             }
 
             //draw bright green on back buffer
+            //if (bnd.bndArr.Count > 0)
             if (bnd.bndArr.Count > bnd.LastBoundary && bnd.LastBoundary >= 0)
             {
-                ////draw the perimeter line so far
+                ////draw the bnd line 
                 int ptCount = bnd.bndArr[bnd.LastBoundary].bndLine.Count;
                 if (ptCount > 1)
                 {
                     GL.LineWidth(2);
-                        GL.Color3((byte)0, (byte)240, (byte)0);
-                        GL.Begin(PrimitiveType.LineLoop);
+                    GL.Color3((byte)0, (byte)240, (byte)0);
+                    GL.Begin(PrimitiveType.LineStrip);
                     for (int h = 0; h < ptCount; h++) GL.Vertex3(bnd.bndArr[bnd.LastBoundary].bndLine[h].easting, bnd.bndArr[bnd.LastBoundary].bndLine[h].northing, 0);
                     GL.End();
                 }
@@ -609,14 +610,15 @@ namespace AgOpenGPS
             {
                 if (section[j].sectionLookAhead > rpHeight) rpHeight = section[j].sectionLookAhead;
                 if (section[j].manBtnState == manBtn.Off) tool.isSuperSectionAllowedOn = false;
-                if (!section[j].isInsideBoundary) tool.isSuperSectionAllowedOn = false;
+                if (!section[j].isInsideSprayArea) tool.isSuperSectionAllowedOn = false;
 
                 //check if any sections going backwards
                 if (section[j].sectionLookAhead < 0) tool.isSuperSectionAllowedOn = false;
             }
 
             //if only one section, or going slow no need for super section 
-            if (tool.numOfSections == 1 | pn.speed < vehicle.slowSpeedCutoff) tool.isSuperSectionAllowedOn = false;
+            if (tool.numOfSections == 1 | pn.speed < vehicle.slowSpeedCutoff)
+                tool.isSuperSectionAllowedOn = false;
 
             //clamp the height after looking way ahead, this is for switching off super section only
             rpHeight = Math.Abs(rpHeight) * 2.0;
@@ -660,7 +662,9 @@ namespace AgOpenGPS
                 }
             }
 
-            if (!section[tool.numOfSections].isInsideHeadland & hd.isOn ) 
+            tool.isSuperSectionAllowedOn = false;
+
+            if (!section[tool.numOfSections].isInsideSprayArea & hd.isOn)
                 tool.isSuperSectionAllowedOn = false;
 
 
@@ -705,7 +709,7 @@ namespace AgOpenGPS
                         if (bnd.bndArr.Count > 0)
                         {
                             //if out of boundary, turn it off
-                            if (!section[j].isInsideBoundary)
+                            if (!section[j].isInsideSprayArea)
                             {
                                 section[j].isSectionRequiredOn = false;
                                 section[j].sectionOffRequest = true;
@@ -744,8 +748,8 @@ namespace AgOpenGPS
                                     end += tool.rpWidth;
                                 }
 
-                            //minimum apllied conditions met
-                            GetMeOutaHere:
+                                //minimum apllied conditions met
+                                GetMeOutaHere:
 
                                 if (isBoundaryOrHeadlandClose)
                                 {
@@ -776,7 +780,7 @@ namespace AgOpenGPS
                                         end += tool.rpWidth;
                                     }
 
-                                GetMeOutaHereNow:
+                                    GetMeOutaHereNow:
 
                                     if (hd.isOn && section[j].isSectionRequiredOn)
                                     {
@@ -802,14 +806,14 @@ namespace AgOpenGPS
                                             end += tool.rpWidth;
                                         }
 
-                                    GetMeOut:
-                                    start = 0;
+                                        GetMeOut:
+                                        start = 0;
                                     }
                                 }
 
                                 if (hd.isOn && section[j].isSectionRequiredOn)
                                 {
-                                    if (!section[j].isInsideHeadland)
+                                    if (!section[j].isInsideSprayArea)
                                     {
                                         section[j].isSectionRequiredOn = false;
                                         section[j].sectionOffRequest = true;
@@ -943,17 +947,17 @@ namespace AgOpenGPS
             SendOutUSBMachinePort(mc.machineData, CModuleComm.pgnSentenceLength);
 
             ////send machine data to autosteer if checked
-            if (mc.isMachineDataSentToAutoSteer) 
+            if (mc.isMachineDataSentToAutoSteer)
                 SendOutUSBAutoSteerPort(mc.machineData, CModuleComm.pgnSentenceLength);
 
 
             //if a minute has elapsed save the field in case of crash and to be able to resume            
-            if (minuteCounter > 60 && recvCounter < 134)  
+            if (minuteCounter > 60 && recvCounter < 20)
             {
                 NMEAWatchdog.Enabled = false;
 
                 //don't save if no gps
-                if (isJobStarted )
+                if (isJobStarted)
                 {
                     //auto save the field patches, contours accumulated so far
                     FileSaveSections();

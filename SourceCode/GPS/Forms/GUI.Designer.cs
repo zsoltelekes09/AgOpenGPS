@@ -276,13 +276,8 @@ namespace AgOpenGPS
 
         private void FixPanelsAndMenus()
         {
-
-            //if (panelSim.Left + 443 > Width - 200) panelSim.Left = Width - 200 - 443;
-            //if (panelSim.Top < 80) panelSim.Top = 80;
-            //if (panelSim.Top > Height - 150) panelSim.Top = Height - 150;
-
-
-            //if (panelSim.Left < 75) panelSim.Left = 75;
+            panelSim.Width = Math.Min(panelSim.MaximumSize.Width, oglMain.Width-10);
+            panelSim.Left = (oglMain.Left + oglMain.Width / 2) - panelSim.Width / 2;
 
             if (Settings.Default.setDisplay_isSimple)
             {
@@ -418,8 +413,6 @@ namespace AgOpenGPS
 
                 panelBatman.Visible = true;
 
-                panelSim.Left = 250;
-                panelSim.Width = Width - statusStripLeft.Width - panelBatman.Width - 325;
 
                 if (panelDrag.Visible) panelDrag.Left = statusStripLeft.Width + panelBatman.Width + 5;
 
@@ -440,10 +433,6 @@ namespace AgOpenGPS
                     if (isFullScreen) oglMain.Width += 20;
                 }
                 panelBatman.Visible = false;
-                
-                panelSim.Left = 100;
-                panelSim.Width = Width - statusStripLeft.Width - 350;
-
                 panelFieldData.Width = oglMain.Width + 2;
                 //if (isFullScreen) panelFieldData.Width += 20;
 
@@ -1203,7 +1192,7 @@ namespace AgOpenGPS
             testHalfSecond.Restart();
             testHalfSecond.Start();
 
-            lblSuper.Text = section[tool.numOfSections].isInsideHeadland.ToString();
+            lblSuper.Text = section[tool.numOfSections].isInsideSprayArea.ToString();
 
             HalfSecondUpdate.Enabled = false;
             if (hd.isOn)
@@ -1400,7 +1389,7 @@ namespace AgOpenGPS
             if (isMetric)  //metric or imperial
             {
                 //Hectares on the master section soft control and sections
-                btnSectionOffAutoOn.Text = fd.WorkedHectares;
+                //btnSectionOffAutoOn.Text = fd.WorkedHectares;
 
                 //status strip values
                 distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares2;
@@ -1408,7 +1397,7 @@ namespace AgOpenGPS
             else  //Imperial Measurements
             {
                 //acres on the master section soft control and sections
-                btnSectionOffAutoOn.Text = fd.WorkedAcres;
+                //btnSectionOffAutoOn.Text = fd.WorkedAcres;
 
                 //status strip values
                 distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
@@ -1472,7 +1461,7 @@ namespace AgOpenGPS
                 lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
                 lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ha).ToString("N3"));
 
-                btnManualOffOn.Text = fd.AreaBoundaryLessInnersHectares;
+                //btnManualOffOn.Text = fd.AreaBoundaryLessInnersHectares;
                 lblEqSpec.Text = (Math.Round(tool.toolWidth, 2)).ToString() + " m  " + vehicleFileName + toolFileName;
             }
             else //imperial
@@ -1488,7 +1477,7 @@ namespace AgOpenGPS
                 lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
                 lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ac).ToString("N3"));
 
-                btnManualOffOn.Text = fd.AreaBoundaryLessInnersAcres;
+                //btnManualOffOn.Text = fd.AreaBoundaryLessInnersAcres;
                 lblEqSpec.Text = (Math.Round(tool.toolWidth * glm.m2ft, 2)).ToString() + " ft  " + vehicleFileName + toolFileName;
             }
 
@@ -1572,7 +1561,7 @@ namespace AgOpenGPS
                 double spd = 0;
                 for (int c = 0; c < 5; c++) spd += avgSpeed[c];
                 spd *= 0.124;
-                return Convert.ToString(Math.Round(spd, 1));
+                return String.Format("{0:0.0}", spd);
             }
         }
         public string SpeedKPH
@@ -1582,7 +1571,7 @@ namespace AgOpenGPS
                 double spd = 0;
                 for (int c = 0; c < 5; c++) spd += avgSpeed[c];
                 spd *= 0.2;
-                return Convert.ToString(Math.Round(spd, 1));
+                return String.Format("{0:0.0}", spd);
             }
         }
 
