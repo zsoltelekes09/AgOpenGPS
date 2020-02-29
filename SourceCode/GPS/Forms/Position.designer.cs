@@ -102,10 +102,13 @@ namespace AgOpenGPS
 
                 //Measure the frequency of the GPS updates
                 swHz.Stop();
-                nowHz = ((double)System.Diagnostics.Stopwatch.Frequency) / (double)swHz.ElapsedTicks;
+                nowHz = (((double)System.Diagnostics.Stopwatch.Frequency) / (double)swHz.ElapsedTicks);
 
                 //simple comp filter
-                if (nowHz < 20) HzTime = 0.95 * HzTime + 0.05 * nowHz;
+                if (nowHz < 20)
+                {
+                    HzTime = nowHz*0.03 + HzTime*0.97;
+                }
                 //HzTime = Math.Round(HzTime, 0);
 
                 swHz.Reset();
@@ -818,7 +821,7 @@ namespace AgOpenGPS
                         gpsHeading = glm.toRadians(pn.headingTrue);
                         break;
 
-                    case "HDT":
+                    case "Dual":
                         if (pn.headingHDT != 9999)
                         {
                             //use NMEA headings for camera and tractor graphic
@@ -983,7 +986,7 @@ namespace AgOpenGPS
             //used to increase triangle count when going around corners, less on straight
             //pick the slow moving side edge of tool
             double distance = tool.toolWidth * 0.5;
-            if (distance > 8) distance = 8;
+            if (distance > 3) distance = 3;
 
             
             //whichever is less
@@ -1002,6 +1005,8 @@ namespace AgOpenGPS
 
                 sectionTriggerStepDistance = distance * twist*twist;
             }
+
+
 
             //finally determine distance
             if (!curve.isOkToAddPoints) sectionTriggerStepDistance += 0.2;
@@ -1062,9 +1067,9 @@ namespace AgOpenGPS
             //send the current and previous GPS fore/aft corrected fix to each section
             for (int j = 0; j < tool.numOfSections + 1; j++)
             {
-                if (section[j].isSectionOn)
+                if (section[j].isMappingOn)
                 {
-                    section[j].AddPathPoint(toolPos.northing, toolPos.easting, cosSectionHeading, sinSectionHeading);
+                    section[j].AddMappingPoint(toolPos.northing, toolPos.easting, cosSectionHeading, sinSectionHeading);
                     sectionCounter++;
                 }
             }
@@ -1129,7 +1134,10 @@ namespace AgOpenGPS
             //calculate left side of section 1
             vec2 left = new vec2(0, 0);
             vec2 right = left;
-            double leftSpeed = 0, rightSpeed = 0, leftLook = 0, rightLook = 0;
+            double leftSpeed = 0, rightSpeed = 0;
+
+            //speed max for section kmh*0.277 to m/s * 10 cm per pixel
+            double meterPerSecPerPixel = Math.Abs(pn.speed) * 4.5;
 
             //now loop all the section rights and the one extreme left
             for (int j = 0; j < tool.numOfSections; j++)
@@ -1146,11 +1154,10 @@ namespace AgOpenGPS
                     section[j].lastLeftPoint = section[j].leftPoint;
 
                     //get the speed for left side only once
+                    
                     leftSpeed = left.GetLength() / fixUpdateTime * 10;
-                    leftLook = leftSpeed * tool.toolLookAhead;
+                    if (leftSpeed > meterPerSecPerPixel) leftSpeed = meterPerSecPerPixel;
 
-                    //save the far left speed
-                    tool.toolFarLeftSpeed = leftSpeed;
                 }
                 else
                 {
@@ -1160,7 +1167,10 @@ namespace AgOpenGPS
 
                     //save a copy for next time
                     section[j].lastLeftPoint = section[j].leftPoint;
-                    leftSpeed = rightSpeed;
+                    
+                    //Save the slower of the 2
+                    if (leftSpeed > rightSpeed) leftSpeed = rightSpeed;
+                    
                 }
 
                 section[j].rightPoint = new vec2(cosHeading * (section[j].positionRight) + easting,
@@ -1174,30 +1184,72 @@ namespace AgOpenGPS
 
                 //grab vector length and convert to meters/sec/10 pixels per meter                
                 rightSpeed = right.GetLength() / fixUpdateTime * 10;
-                rightLook = rightSpeed * tool.toolLookAhead;
+                if (rightSpeed > meterPerSecPerPixel) rightSpeed = meterPerSecPerPixel;
 
                 //Is section outer going forward or backward
                 double head = left.HeadingXZ();
-                if (Math.PI - Math.Abs(Math.Abs(head - toolPos.heading) - Math.PI) > glm.PIBy2) leftLook *= -1;
+                if (Math.PI - Math.Abs(Math.Abs(head - toolPos.heading) - Math.PI) > glm.PIBy2)
+                {
+                    if (leftSpeed > 0) leftSpeed *= -1;
+                }
 
                 head = right.HeadingXZ();
-                if (Math.PI - Math.Abs(Math.Abs(head - toolPos.heading) - Math.PI) > glm.PIBy2) rightLook *= -1;
+                if (Math.PI - Math.Abs(Math.Abs(head - toolPos.heading) - Math.PI) > glm.PIBy2)
+                {
+                    if (rightSpeed > 0) rightSpeed *= -1;
+                }
+
+                //save the far left and right speed in m/sec
+                if (j==0)
+                {
+                    tool.toolFarLeftSpeed = (leftSpeed * 0.1);
+                    if (tool.toolFarLeftSpeed < 0.1) tool.toolFarLeftSpeed = 0.1;
+                }
+                if (j == tool.numOfSections - 1)
+                {
+                    tool.toolFarRightSpeed = (rightSpeed * 0.1);
+                    if (tool.toolFarRightSpeed < 0.1) tool.toolFarRightSpeed = 0.1;
+                }
 
                 //choose fastest speed
-                if (leftLook > rightLook) section[j].sectionLookAhead = leftLook;
-                else section[j].sectionLookAhead = rightLook;
+                if (leftSpeed > rightSpeed)
+                {
+                    section[j].speedPixels = leftSpeed;
+                    leftSpeed = rightSpeed;
+                }
+                else section[j].speedPixels = rightSpeed;
+            }
 
-                if (section[j].sectionLookAhead > 190) section[j].sectionLookAhead = 190;
+            //set the look ahead for hyd Lift in pixels per second
+            vehicle.hydLiftLookAheadDistanceLeft = tool.toolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10;
+            vehicle.hydLiftLookAheadDistanceRight = tool.toolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10;
 
-                //Doing the slow mo, exceeding buffer so just set as minimum 0.5 meter
-                if (currentStepFix >= totalFixSteps - 1) section[j].sectionLookAhead = 5;
-            }//endfor
+            if (vehicle.hydLiftLookAheadDistanceLeft < 3) vehicle.hydLiftLookAheadDistanceLeft = 3;
+            if (vehicle.hydLiftLookAheadDistanceRight < 3) vehicle.hydLiftLookAheadDistanceRight = 3;
+
+            if (vehicle.hydLiftLookAheadDistanceLeft > 200) vehicle.hydLiftLookAheadDistanceLeft = 200;
+            if (vehicle.hydLiftLookAheadDistanceRight > 200) vehicle.hydLiftLookAheadDistanceRight = 200;
+
+            tool.lookAheadDistanceOnPixelsLeft = tool.toolFarLeftSpeed * tool.lookAheadOnSetting * 10;
+            tool.lookAheadDistanceOnPixelsRight = tool.toolFarRightSpeed * tool.lookAheadOnSetting * 10;
+
+            if (tool.lookAheadDistanceOnPixelsLeft > 200) tool.lookAheadDistanceOnPixelsLeft = 200;
+            if (tool.lookAheadDistanceOnPixelsRight > 200) tool.lookAheadDistanceOnPixelsRight = 200;
+
+            tool.lookAheadDistanceOffPixelsLeft = tool.toolFarLeftSpeed * tool.lookAheadOffSetting * 10;
+            tool.lookAheadDistanceOffPixelsRight = tool.toolFarRightSpeed * tool.lookAheadOffSetting * 10;
+
+            if (tool.lookAheadDistanceOffPixelsLeft > 160) tool.lookAheadDistanceOffPixelsLeft = 160;
+            if (tool.lookAheadDistanceOffPixelsRight > 160) tool.lookAheadDistanceOffPixelsRight = 160;
+
+            //determine where the tool is wrt to headland
+            if (hd.isOn) hd.WhereAreToolCorners();
 
             //set up the super for youturn
-            section[tool.numOfSections].isInsideSprayArea = true;
+            section[tool.numOfSections].isInBoundary = true;
 
-            //determine if section is in boundary using the section left/right positions
-            bool isLeftIn = false, isRightIn = false;
+            //determine if section is in boundary and headland using the section left/right positions
+            bool isLeftIn = true, isRightIn = true;
 
             for (int j = 0; j < tool.numOfSections; j++)
             {
@@ -1238,16 +1290,6 @@ namespace AgOpenGPS
                     section[tool.numOfSections].isInsideSprayArea = true;
                 }
             }
-
-            //with left and right tool velocity to determine rate of triangle generation, corners are more
-            //save far right speed, 0 if going backwards, in meters/sec
-            if (section[tool.numOfSections - 1].sectionLookAhead > 0) tool.toolFarRightSpeed = rightSpeed*0.1;
-            else tool.toolFarRightSpeed = 0;
-
-            //save left side, 0 if going backwards, in meters/sec convert back from pixels/m
-            if (section[0].sectionLookAhead > 0) tool.toolFarLeftSpeed = tool.toolFarLeftSpeed * 0.1;
-            else tool.toolFarLeftSpeed = 0;
-
         }
 
         //the start of first few frames to initialize entire program
