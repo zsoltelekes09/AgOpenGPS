@@ -509,7 +509,7 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             //gls.Perspective(6.0f, 1, 1, 5200);
-            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.1f, 1f, 50.0f, 520f);
+            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.1f, 1f, 50.0f, 520f);//(0.1f, 1f, 50.0f, 520f);
             GL.LoadMatrix(ref mat);
             GL.MatrixMode(MatrixMode.Modelview);
         }
@@ -574,7 +574,6 @@ namespace AgOpenGPS
 
                         if (isDraw)
                         {
-                            GL.Color3((byte)0, (byte)240, (byte)0);
                             //draw the triangles in each triangle strip
                             GL.Begin(PrimitiveType.TriangleStrip);
                             for (int i = 1; i < count2; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0);
@@ -585,7 +584,6 @@ namespace AgOpenGPS
             }
 
             //draw bright green on back buffer
-            //if (bnd.bndArr.Count > 0)
             if (bnd.bndArr.Count > bnd.LastBoundary && bnd.LastBoundary >= 0)
             {
                 ////draw the bnd line 
@@ -594,7 +592,7 @@ namespace AgOpenGPS
                 {
                     GL.LineWidth(3);
                     GL.Color3((byte)0, (byte)240, (byte)0);
-                    GL.Begin(PrimitiveType.LineLoop);
+                    GL.Begin(PrimitiveType.LineStrip);
                     for (int h = 0; h < ptCount; h++) GL.Vertex3(bnd.bndArr[bnd.LastBoundary].bndLine[h].easting, bnd.bndArr[bnd.LastBoundary].bndLine[h].northing, 0);
                     GL.End();
                 }
@@ -627,7 +625,7 @@ namespace AgOpenGPS
             for (int j = 0; j < tool.numOfSections; j++)
             {
                 if (section[j].manBtnState == manBtn.Off) tool.isSuperSectionAllowedOn = false;
-                if (!section[j].isInsideSprayArea) tool.isSuperSectionAllowedOn = false;
+                if (!section[j].isInBoundary) tool.isSuperSectionAllowedOn = false;
 
                 //check if any sections going backwards, section turned off waaay below
                 if (section[j].speedPixels < 0) tool.isSuperSectionAllowedOn = false;
@@ -667,23 +665,23 @@ namespace AgOpenGPS
             int start = 0, end = 0, tagged = 0;
 
             //slope of the look ahead line
-            double mOn = 0, mOff=0;
+            double mOn = 0, mOff = 0;
+
+            //are there enough pixels in buffer array to warrant turning off supersection
+            for (int a = 0; a < (tool.rpWidth * rpOnHeight); a++)
+            {
+                if (grnPixels[a] != 0)
+                {
+                    if (tool.isSuperSectionAllowedOn & totalPixs++ > pixLimit)
+                    {
+                        tool.isSuperSectionAllowedOn = false;
+                        break;
+                    }
+                }
+            }
 
             if (bnd.bndArr.Count > 0)
             {
-                //are there enough pixels in buffer array to warrant turning off supersection
-                for (int a = 0; a < (tool.rpWidth * rpOnHeight); a++)
-                {
-                    if (grnPixels[a] != 0)
-                    {
-                        if (tool.isSuperSectionAllowedOn & totalPixs++ > pixLimit)
-                        {
-                            tool.isSuperSectionAllowedOn = false;
-                            break;
-                        }
-                    }
-                }
-
                 //5 pixels in is there a boundary line?
                 for (int a = 0; a < (tool.rpWidth * 5); a++)
                 {
@@ -705,7 +703,7 @@ namespace AgOpenGPS
                     for (int pos = 0; pos < tool.rpWidth; pos++)
                     {
                         height = (int)(vehicle.hydLiftLookAheadDistanceLeft + (m * pos)) - 1;
-                        for (int a = pos; a < height*tool.rpWidth; a+=tool.rpWidth)
+                        for (int a = pos; a < height * tool.rpWidth; a += tool.rpWidth)
                         {
                             if (grnPixels[a] == 250)
                             {
@@ -718,7 +716,7 @@ namespace AgOpenGPS
 
                     //is the tool completely in the headland or not
                     hd.isToolInHeadland = hd.isToolOuterPointsInHeadland && !isHeadlandClose;
-                    
+
                     if (isHeadlandClose || hd.isToolInHeadland) tool.isSuperSectionAllowedOn = false;
 
                     //set hydraulics based on tool in headland or not
@@ -729,20 +727,6 @@ namespace AgOpenGPS
                     //else lblInHead.Text = "Work";
                     //if (hd.isToolUp) lblIsHdClose.Text = "Up";
                     //else lblIsHdClose.Text = "Down";
-                }
-            }
-            else  //supersection check by applied only
-            {
-                for (int a = 0; a < (tool.rpWidth * rpOnHeight); a++)
-                {
-                    if (grnPixels[a] != 0)
-                    {
-                        if (tool.isSuperSectionAllowedOn & totalPixs++ > pixLimit)
-                        {
-                            tool.isSuperSectionAllowedOn = false;
-                            break;
-                        }
-                    }
                 }
             }
 
@@ -814,7 +798,7 @@ namespace AgOpenGPS
                 }
 
                 //Mapping   ---------------------------------------------------------------------------------------------------
-                int endHeight = 1, startHeight =1;
+                int endHeight = 1, startHeight = 1;
 
                 for (int j = 0; j < tool.numOfSections; j++)
                 {
@@ -831,7 +815,7 @@ namespace AgOpenGPS
                     for (int pos = start; pos <= end; pos++)
                     {
                         //block 5 pixels high (50 cm look ahead)
-                            endHeight = 5 * tool.rpWidth + pos;
+                        endHeight = 5 * tool.rpWidth + pos;
 
                         for (int a = pos; a <= endHeight; a += tool.rpWidth)
                         {
@@ -846,7 +830,7 @@ namespace AgOpenGPS
                             }
                         }
                     }
-                GetOutMappingOn:
+                    GetOutMappingOn:
                     start = 0;
 
                     if (bnd.bndArr.Count > 0)
@@ -864,11 +848,11 @@ namespace AgOpenGPS
                         else if (section[j].isInHeadlandArea & hd.isOn)
                         {
                             // if headland is on and out, turn off                             
-                                section[j].isMappingRequiredOn = false;
-                                section[j].mappingOffRequest = true;
-                                section[j].mappingOnRequest = false;
-                                section[j].mappingOffTimer = 0;
-                                section[j].mappingOnTimer = 0;                            
+                            section[j].isMappingRequiredOn = false;
+                            section[j].mappingOffRequest = true;
+                            section[j].mappingOnRequest = false;
+                            section[j].mappingOffTimer = 0;
+                            section[j].mappingOnTimer = 0;
                         }
                     }
                 }
@@ -915,10 +899,9 @@ namespace AgOpenGPS
                                         }
                                     }
                                 }
-                            GetOutSectionOn:
-                                tagged = 0;
-
                             }
+                            GetOutSectionOn:
+                            tagged = 0;
 
                             //only turn off if on
                             if (section[j].isSectionRequiredOn == true)
@@ -957,7 +940,7 @@ namespace AgOpenGPS
                                         }
                                     }
                                 }
-                            GetOutSectionOff:
+                                GetOutSectionOff:
                                 start = 0;
                             }
 
@@ -965,7 +948,6 @@ namespace AgOpenGPS
                             if (hd.isOn)
                             {
                                 bool isHeadlandInLookOn = false;
-                                bool isHeadlandInLookOff = false;
 
                                 //is headline in off to on area
                                 mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
@@ -996,33 +978,33 @@ namespace AgOpenGPS
                                         }
                                     }
                                 }
-                            GetOutHdOn:
+                                GetOutHdOn:
 
-                            //    //is headline in base to off area
-                            //    tagged = 0;
-                            //    mOn = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
+                                //    //is headline in base to off area
+                                //    tagged = 0;
+                                //    mOn = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
 
-                            //    start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                            //    end = section[j].rpSectionWidth - 1 + start;
+                                //    start = section[j].rpSectionPosition - section[0].rpSectionPosition;
+                                //    end = section[j].rpSectionWidth - 1 + start;
 
-                            //    for (int pos = start; pos <= end; pos++)
-                            //    {
-                            //        endHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
+                                //    for (int pos = start; pos <= end; pos++)
+                                //    {
+                                //        endHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
 
-                            //        for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                            //        {
-                            //            if (grnPixels[a] == 250)
-                            //            {
-                            //                //tagged++;
-                            //                //if (tagged > tool.toolMinUnappliedPixels)
-                            //                {
-                            //                    isHeadlandInLookOff = true;
-                            //                    goto GetOutHdOff;
-                            //                }
-                            //            }
-                            //        }
-                            //    }
-                            //GetOutHdOff:
+                                //        for (int a = pos; a <= endHeight; a += tool.rpWidth)
+                                //        {
+                                //            if (grnPixels[a] == 250)
+                                //            {
+                                //                //tagged++;
+                                //                //if (tagged > tool.toolMinUnappliedPixels)
+                                //                {
+                                //                    isHeadlandInLookOff = true;
+                                //                    goto GetOutHdOff;
+                                //                }
+                                //            }
+                                //        }
+                                //    }
+                                //GetOutHdOff:
 
                                 //determine if look ahead points are completely in headland
                                 hd.WhereAreToolLookOnPoints();
@@ -1040,13 +1022,9 @@ namespace AgOpenGPS
                                     section[j].sectionOffRequest = false;
                                     section[j].sectionOnRequest = true;
                                 }
-                                
                             }
-                        
                         }
-                    } 
-
-
+                    }
                     else  //Section Control in no boundary field
                     {
                         tagged = 0;
@@ -1072,7 +1050,7 @@ namespace AgOpenGPS
                                 }
                             }
                         }
-                    GetOutSectionOn:
+                        GetOutSectionOn:
 
                         //only turn off if on
                         if (section[j].isSectionRequiredOn == true)
@@ -1107,7 +1085,7 @@ namespace AgOpenGPS
                                     }
                                 }
                             }
-                        GetOutSectionOff:
+                            GetOutSectionOff:
                             start = 0;
                         }
 
@@ -1225,7 +1203,7 @@ namespace AgOpenGPS
 
 
             //if a minute has elapsed save the field in case of crash and to be able to resume            
-            if (minuteCounter > 60 && recvCounter < 20)
+            if (minuteCounter > 60 && recvCounter < 134)
             {
                 NMEAWatchdog.Enabled = false;
 
@@ -2361,7 +2339,7 @@ namespace AgOpenGPS
                         foreach (var triList in section[j].patchList)
                         {
                             int count2 = triList.Count;
-                            for (int i = 0; i < count2; i += 3)
+                            for (int i = 1; i < count2; i += 3)
                             {
                                 double x = triList[i].easting;
                                 double y = triList[i].northing;

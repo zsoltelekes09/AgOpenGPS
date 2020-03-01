@@ -279,49 +279,8 @@ namespace AgOpenGPS
 
         private void FixPanelsAndMenus()
         {
-            panelSim.Width = Math.Min(panelSim.MaximumSize.Width, oglMain.Width-10);
-            panelSim.Left = (oglMain.Left + oglMain.Width / 2) - panelSim.Width / 2;
 
             if (Settings.Default.setDisplay_isSimple)
-            {
-                toolToolbottomStripBtn.Visible = true;
-                vehicleToolStripBtn.Visible = true;
-                AutoSteerToolBtn.Visible = true;
-
-                lblDateTime.Visible = false;
-                snapLeftBigStrip.Visible = false;
-                snapRightBigStrip.Visible = false;
-
-            }
-
-            if (Width > 1100)
-            {
-                snapLeftBigStrip.Visible = true;
-                snapRightBigStrip.Visible = true;
-            }
-            else
-            {
-                snapLeftBigStrip.Visible = false;
-                snapRightBigStrip.Visible = false;
-            }
-
-
-            if (Width > 1300)
-            {
-                lblDateTime.Visible = true;
-            }
-            else
-            {
-                lblDateTime.Visible = false;
-            }
-            if (Width > 1400)
-            {
-            }
-            else
-            {
-            }
-
-            if (isSimple)
             {
                 toolToolbottomStripBtn.Visible = false;
                 vehicleToolStripBtn.Visible = false;
@@ -330,6 +289,31 @@ namespace AgOpenGPS
                 lblDateTime.Visible = true;
                 snapLeftBigStrip.Visible = true;
                 snapRightBigStrip.Visible = true;
+            }
+            else
+            {
+                toolToolbottomStripBtn.Visible = true;
+                vehicleToolStripBtn.Visible = true;
+                AutoSteerToolBtn.Visible = true;
+
+                if (Width > 1100)
+                {
+                    snapLeftBigStrip.Visible = true;
+                    snapRightBigStrip.Visible = true;
+                }
+                else
+                {
+                    snapLeftBigStrip.Visible = false;
+                    snapRightBigStrip.Visible = false;
+                }
+                if (Width > 1300)
+                {
+                    lblDateTime.Visible = true;
+                }
+                else
+                {
+                    lblDateTime.Visible = false;
+                }
             }
         }
 
@@ -380,21 +364,18 @@ namespace AgOpenGPS
             //Properties.Settings.Default.Save();
             if (Properties.Settings.Default.setDisplay_isBatmanOn)
             {
-                //Batman mini-panel shows
-                //if (panelSim.Left < 390) panelSim.Left = 390;
-
                 oglMain.Left = statusStripLeft.Width + panelBatman.Width;
 
                 if (Settings.Default.setDisplay_isSimple)
                 {
-                    oglMain.Width = Width - statusStripLeft.Width - panelBatman.Width - 110;
-                    if (isFullScreen) oglMain.Width += 20;
+                    oglMain.Width = Width - 17 - statusStripLeft.Width - panelBatman.Width - layoutPanelRight.Width / 2;
                 }
                 else
                 {
-                    oglMain.Width = Width - statusStripLeft.Width - panelBatman.Width - 198;
-                    if (isFullScreen) oglMain.Width += 20;
+                    oglMain.Width = Width-16 - statusStripLeft.Width - panelBatman.Width - layoutPanelRight.Width;
                 }
+
+                if (isFullScreen) oglMain.Width += 16;
 
                 panelBatman.Left = statusStripLeft.Width;
                 panelBatman.Visible = true;
@@ -410,20 +391,18 @@ namespace AgOpenGPS
                 oglMain.Left = statusStripLeft.Width;
                 if (Settings.Default.setDisplay_isSimple)
                 {
-                    oglMain.Width = Width - (statusStripLeft.Width) - 110;
-                    if (isFullScreen) oglMain.Width += 20;
+                    oglMain.Width = Width - 17 - statusStripLeft.Width - layoutPanelRight.Width / 2;
                 }
                 else
                 {
-                    oglMain.Width = Width - (statusStripLeft.Width) - 198;
-                    if (isFullScreen) oglMain.Width += 20;
+                    oglMain.Width = Width - 16 - statusStripLeft.Width - layoutPanelRight.Width;
                 }
+
+                if (isFullScreen) oglMain.Width += 16;
+
                 panelBatman.Visible = false;
                 
-                panelSim.Left = 100;
-                panelSim.Width = Width - statusStripLeft.Width - 350;
 
-                //if (isFullScreen) panelFieldData.Width += 20;
 
                 if (panelDrag.Visible) panelDrag.Left = statusStripLeft.Width + 10;
 
@@ -434,20 +413,13 @@ namespace AgOpenGPS
         //line up section On Off Auto buttons based on how many there are
         public void LineUpManualBtns()
         {
-            int oglCenter = 0;
-
-            if (panelBatman.Visible)
-            {
-                oglCenter = panelBatman.Width + statusStripLeft.Width + oglMain.Width/2;
-            }
-
-            else
-            {
-                oglCenter = statusStripLeft.Width + oglMain.Width / 2; 
-            }
+            int oglCenter = (panelBatman.Visible ? panelBatman.Width : 0) + statusStripLeft.Width + oglMain.Width/2;
 
             int top = 180;
             if (panelSim.Visible == true) top = 230;
+
+            panelSim.Width = Math.Min(panelSim.MaximumSize.Width, oglMain.Width - 10);
+            panelSim.Left = oglCenter - panelSim.Width / 2;
 
             btnSection1Man.Top  = Height - top;
             btnSection2Man.Top  = Height - top;
@@ -1178,9 +1150,9 @@ namespace AgOpenGPS
 
         private void HalfSecond_Update(object sender, EventArgs e)
         {
+            HalfSecondUpdate.Enabled = false;
             testHalfSecond.Restart();
             testHalfSecond.Start();
-
 
 
             if (guidanceLineDistanceOff == 32020 | guidanceLineDistanceOff == 32000)
@@ -1191,6 +1163,7 @@ namespace AgOpenGPS
             {
                 AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
             }
+
             //the main formgps window
             if (isMetric)  //metric or imperial
             {
@@ -1207,30 +1180,18 @@ namespace AgOpenGPS
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
 
 
-
-
-
-
-
-
-
-            HalfSecondUpdate.Enabled = false;
-
-
-
-
             testHalfSecond1 = testHalfSecond.ElapsedMilliseconds;
             lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
-            lblHz2.Text = (int)(frameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();//+ testtest.ElapsedTicks.ToString() +;//+ testtest.ElapsedTicks.ToString() + 
+            lblHz2.Text = (int)(frameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();
 
             HalfSecondUpdate.Enabled = true;
         }
 
         private void OneSecond_Update(object sender, EventArgs e)
         {
+            OneSecondUpdate.Enabled = false;
             testOneSecond.Restart();
             testOneSecond.Start();
-
 
             //counter used for saving field in background
             minuteCounter++;
@@ -1238,10 +1199,22 @@ namespace AgOpenGPS
 
             if (isRTK)
             {
-                if (pn.fixQuality == 4 || pn.fixQuality == 5) lblHz.BackColor = Color.Transparent;
-                else lblHz.BackColor = Color.Salmon;
+                if (pn.fixQuality == 4 || pn.fixQuality == 5)
+                {
+                    lblHz.BackColor = Color.Transparent;
+                    lblHz2.BackColor = Color.Transparent;
+                }
+                else
+                {
+                    lblHz.BackColor = Color.Salmon;
+                    lblHz2.BackColor = Color.Salmon;
+                }
             }
-            else lblHz.BackColor = Color.Transparent;
+            else
+            {
+                lblHz.BackColor = Color.Transparent;
+                lblHz2.BackColor = Color.Transparent;
+            }
 
             if (panelBatman.Visible)
             {
@@ -1307,10 +1280,6 @@ namespace AgOpenGPS
 
             //Make sure it is off when it should
             if ((!ABLine.isBtnABLineOn && !ct.isContourBtnOn && !curve.isBtnCurveOn && isAutoSteerBtnOn) || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn)) btnAutoSteer.PerformClick();
-
-
-
-            OneSecondUpdate.Enabled = false;
 
             //do all the NTRIP routines
             if (isNTRIP_TurnedOn)
@@ -1395,20 +1364,16 @@ namespace AgOpenGPS
                 }
             }
 
-            OneSecondUpdate.Enabled = true;
-
-
             testOneSecond1 = testOneSecond.ElapsedMilliseconds;
-    }
+            OneSecondUpdate.Enabled = true;
+        }
 
-
-        public int testint = 0;
         private void ThreeSecond_Update(object sender, EventArgs e)
         {
+            ThreeSecondUpdate.Enabled = false;
             testThreeSecond.Restart();
             testThreeSecond.Start();
 
-            ThreeSecondUpdate.Enabled = false;
             zoomUpdateCounter = true;
             //check to make sure the grid is big enough
             worldGrid.checkZoomWorldGrid(pn.fix.northing, pn.fix.easting);
@@ -1467,14 +1432,11 @@ namespace AgOpenGPS
             if (curve.isBtnCurveOn) btnCurve.Text = "# " + CurveNumber;
             else btnCurve.Text = "";
 
-
             lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
-
-            //toolStripBtnGPSStength.ImageTransparentColor
-            ThreeSecondUpdate.Enabled = true;
 
 
             testThreeSecond1 = testThreeSecond.ElapsedMilliseconds;
+            ThreeSecondUpdate.Enabled = true;
         }
 
 
@@ -1536,8 +1498,8 @@ namespace AgOpenGPS
         public string ActualSteerAngle { get { return ((double)(actualSteerAngleDisp) * 0.01).ToString("N1") + "\u00B0"; } }
 
         public string FixHeading { get { return Math.Round(fixHeading, 4).ToString(); } }
-
-        public string LookAhead { get { return ((int)(section[0].sectionLookAhead)).ToString(); } }
+        
+        //public string LookAhead { get { return ((int)(section[0].lookAheadOn)).ToString(); } }
         public string StepFixNum { get { return (currentStepFix).ToString(); } }
         public string CurrentStepDistance { get { return Math.Round(distanceCurrentStepFix, 3).ToString(); } }
         public string TotalStepDistance { get { return Math.Round(fixStepDist, 3).ToString(); } }

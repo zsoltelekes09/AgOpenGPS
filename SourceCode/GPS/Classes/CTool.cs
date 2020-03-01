@@ -9,9 +9,7 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         public double toolWidth;
-        public double toolFarLeftPosition = 0;
         public double toolFarLeftSpeed = 0;
-        public double toolFarRightPosition = 0;
         public double toolFarRightSpeed = 0;
         //public double toolFarLeftContourSpeed = 0, toolFarRightContourSpeed = 0;
 
@@ -150,14 +148,14 @@ namespace AgOpenGPS
             GL.Begin(PrimitiveType.Lines);
 
             //lookahead section on
-            GL.Color3(0.20f, 0.7f, 0.2f);
-            GL.Vertex3(mf.tool.toolFarLeftPosition, (mf.tool.lookAheadDistanceOnPixelsLeft) * 0.1 + trailingTool, 0);
-            GL.Vertex3(mf.tool.toolFarRightPosition, (mf.tool.lookAheadDistanceOnPixelsRight) * 0.1 + trailingTool, 0);
+            GL.Color3(0.20f, 0.7f, 0.2f);//-5.25  and 5.35
+            GL.Vertex3(mf.section[0].positionLeft, (mf.tool.lookAheadDistanceOnPixelsLeft) * 0.1 + trailingTool, 0);
+            GL.Vertex3(mf.section[mf.tool.numOfSections - 1].positionRight, (mf.tool.lookAheadDistanceOnPixelsRight) * 0.1 + trailingTool, 0);
 
             //lookahead section off
             GL.Color3(0.70f, 0.2f, 0.2f);
-            GL.Vertex3(mf.tool.toolFarLeftPosition, (mf.tool.lookAheadDistanceOffPixelsLeft) * 0.1 + trailingTool, 0);
-            GL.Vertex3(mf.tool.toolFarRightPosition, (mf.tool.lookAheadDistanceOffPixelsRight) * 0.1 + trailingTool, 0);
+            GL.Vertex3(mf.section[0].positionLeft, (mf.tool.lookAheadDistanceOffPixelsLeft) * 0.1 + trailingTool, 0);
+            GL.Vertex3(mf.section[mf.tool.numOfSections - 1].positionRight, (mf.tool.lookAheadDistanceOffPixelsRight) * 0.1 + trailingTool, 0);
 
             if (mf.vehicle.isHydLiftOn)
             {
@@ -227,8 +225,6 @@ namespace AgOpenGPS
             //GL.PointSize(4.0f);
             //GL.Begin(PrimitiveType.Points);
             ////for (int j = 0; j < numOfSections - 1; j++)
-            //GL.Vertex3(mf.section[0].positionLeft, (mf.vehicle.hydLiftLookAheadDistanceLeft * 0.1) + trailingTool, 0);
-            //GL.Vertex3(mf.section[mf.tool.numOfSections - 1].positionRight, (mf.vehicle.hydLiftLookAheadDistanceRight * 0.1) + trailingTool, 0);
             //GL.End();
 
             GL.PopMatrix();

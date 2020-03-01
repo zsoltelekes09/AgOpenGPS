@@ -57,70 +57,67 @@ namespace AgOpenGPS
 
         public void WhereAreToolCorners()
         {
-            if (headArr[0].hdLine.Count == 0)
+            if (mf.bnd.LastBoundary > -1 && headArr.Count > mf.bnd.LastBoundary)
             {
-                return;
-            }
-            else
-            {
-                bool isLeftInWk, isRightInWk = true;
+                bool isLeftInWk, isRightInWk = false;
 
-                if (mf.hd.isOn)
+                for (int j = 0; j < mf.tool.numOfSections; j++)
                 {
-                    for (int j = 0; j < mf.tool.numOfSections; j++)
+                    isLeftInWk = isRightInWk;//grab the right of previous section, its the left of this section
+                    isRightInWk = false;
+                    for (int i = ((mf.bnd.LastBoundary >= mf.bnd.bndArr.Count) || mf.bnd.LastBoundary == -1) ? 0 : mf.bnd.LastBoundary; i < mf.bnd.bndArr.Count; i++)
                     {
-                        if (j == 0)
+                        if (mf.bnd.bndArr[i].isOwnField)
                         {
-                            //only one first left point, the rest are all rights moved over to left
-                            isLeftInWk = mf.hd.headArr[0].IsPointInHeadArea(mf.section[j].leftPoint);
-                            isRightInWk = mf.hd.headArr[0].IsPointInHeadArea(mf.section[j].rightPoint);
-
-                            //save left side
-                            mf.tool.isLeftSideInHeadland = !isLeftInWk;
-
-                            //merge the two sides into in or out
-                            mf.section[j].isInHeadlandArea = !isLeftInWk && !isRightInWk;
-
+                            if (j == 0) isLeftInWk |= mf.hd.headArr[mf.bnd.LastBoundary].IsPointInHeadArea(mf.section[j].leftPoint);
+                            isRightInWk |= mf.hd.headArr[mf.bnd.LastBoundary].IsPointInHeadArea(mf.section[j].rightPoint);
                         }
-                        else
-                        {
-                            //grab the right of previous section, its the left of this section
-                            isLeftInWk = isRightInWk;
-                            isRightInWk = mf.hd.headArr[0].IsPointInHeadArea(mf.section[j].rightPoint);
+                        if (mf.bnd.LastBoundary > -1) break;
+                    }
 
-                            mf.section[j].isInHeadlandArea = !isLeftInWk && !isRightInWk;
+                    if (isLeftInWk || isRightInWk)//no point in checking inside Boundaries when both outside!
+                    {
+                        for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+                        {
+                            if (!mf.bnd.bndArr[i].isOwnField && (mf.bnd.LastBoundary == -1 || mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary || mf.bnd.bndArr[i].OuterField == -1))
+                            {
+                                if (j == 0) isLeftInWk &= !mf.hd.headArr[mf.bnd.LastBoundary].IsPointInHeadArea(mf.section[j].leftPoint);
+                                isRightInWk &= !mf.hd.headArr[mf.bnd.LastBoundary].IsPointInHeadArea(mf.section[j].rightPoint);
+                            }
                         }
                     }
 
-                    //save right side
-                    mf.tool.isRightSideInHeadland = !isRightInWk;
+                    //save left side
+                    if (j == 0) mf.tool.isLeftSideInHeadland = isLeftInWk;
+                    //merge the two sides into in or out
+                    mf.section[j].isInHeadlandArea = !(isLeftInWk || isRightInWk);
 
-                    //is the tool in or out based on endpoints
-                    isToolOuterPointsInHeadland = mf.tool.isLeftSideInHeadland && mf.tool.isRightSideInHeadland;
                 }
-                else
-                {
-                    //set all to true;
-                    isToolOuterPointsInHeadland = true;
-                }
+
+                //save right side
+                mf.tool.isRightSideInHeadland = isRightInWk;
+
+                //is the tool in or out based on endpoints
+                isToolOuterPointsInHeadland = !(mf.tool.isLeftSideInHeadland && mf.tool.isRightSideInHeadland);
+
             }
         }
 
         public void WhereAreToolLookOnPoints()
         {
-            if (headArr[0].hdLine.Count == 0)
-            {
-                return;
-            }
-            else
+            if (mf.bnd.LastBoundary > -1 && headArr.Count > mf.bnd.LastBoundary)
             {
                 vec3 toolFix = mf.toolPos;
                 double sinAB = Math.Sin(toolFix.heading);
                 double cosAB = Math.Cos(toolFix.heading);
 
                 double pos = mf.section[0].rpSectionWidth;
+
+
                 double mOn = (mf.tool.lookAheadDistanceOnPixelsRight - mf.tool.lookAheadDistanceOnPixelsLeft) / mf.tool.rpWidth;
-                double endHeight = (mf.tool.lookAheadDistanceOnPixelsLeft + (mOn * pos))*0.1;
+
+
+                double endHeight = (mf.tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * 0.1;
 
                 for (int j = 0; j < mf.tool.numOfSections; j++)
                 {
@@ -141,7 +138,7 @@ namespace AgOpenGPS
                     else
                     {
                         pos += mf.section[j].rpSectionWidth;
-                        endHeight = (mf.tool.lookAheadDistanceOnPixelsLeft + (mOn * pos))*0.1;
+                        endHeight = (mf.tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * 0.1;
 
                         downR.easting = mf.section[j].rightPoint.easting + (sinAB * endHeight);
                         downR.northing = mf.section[j].rightPoint.northing + (cosAB * endHeight);
@@ -154,56 +151,43 @@ namespace AgOpenGPS
             }
         }
 
-
         public void DrawHeadLinesBack()
         {
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (headArr[0].hdLine.Count > 0 && isOn) headArr[0].DrawHeadLineBackBuffer();
+                if (mf.bnd.LastBoundary == -1 || i == mf.bnd.LastBoundary || (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == -1) || (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary))
+                {
+                    if (headArr[i].hdLine.Count > 0) headArr[i].DrawHeadLineBackBuffer();
+                }
             }
         }
 
         public void DrawHeadLines()
         {
-            //for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (headArr[0].hdLine.Count > 0 && isOn) headArr[0].DrawHeadLine(mf.ABLine.lineWidth);
+                if (mf.bnd.LastBoundary >= 0 || (i == mf.bnd.LastBoundary || (!mf.bnd.bndArr[i].isOwnField && mf.bnd.bndArr[i].OuterField == -1) || mf.bnd.bndArr[i].OuterField == mf.bnd.LastBoundary))
+                {
+                    if (headArr[i].hdLine.Count > 0) headArr[i].DrawHeadLine(mf.ABLine.lineWidth);
+                }
             }
-
-            //GL.LineWidth(4.0f);
-            //GL.Color3(0.9219f, 0.2f, 0.970f);
-            //GL.Begin(PrimitiveType.Lines);
-            //{
-            //    GL.Vertex3(headArr[0].hdLine[A].easting, headArr[0].hdLine[A].northing, 0);
-            //    GL.Vertex3(headArr[0].hdLine[B].easting, headArr[0].hdLine[B].northing, 0);
-            //    GL.Vertex3(headArr[0].hdLine[C].easting, headArr[0].hdLine[C].northing, 0);
-            //    GL.Vertex3(headArr[0].hdLine[D].easting, headArr[0].hdLine[D].northing, 0);
-            //}
-            //GL.End();
-
-            //GL.PointSize(6.0f);
-            //GL.Color3(0.219f, 0.932f, 0.970f);
-            //GL.Begin(PrimitiveType.Points);
-            //GL.Vertex3(downL.easting, downL.northing, 0);
-            //GL.Vertex3(downR.easting, downR.northing, 0);
-            //GL.End();
         }
 
         public bool IsPointInsideHeadLine(vec2 pt)
         {
             //if inside outer boundary, then potentially add
-            if (headArr.Count > 0 && headArr[0].IsPointInHeadArea(pt))
+            if (mf.bnd.LastBoundary > -1 && headArr.Count > mf.bnd.LastBoundary && headArr[mf.bnd.LastBoundary].IsPointInHeadArea(pt))
             {
-                //for (int b = 1; b < mf.bnd.bndArr.Count; b++)
-                //{
-                //    if (mf.bnd.bndArr[b].isSet)
-                //    {
-                //        if (headArr[b].IsPointInHeadArea(pt))
-                //        {
-                //            //point is in an inner turn area but inside outer
-                //            return false;
-                //        }
-                //    }
-                //}
+                for (int b = 0; b < mf.bnd.bndArr.Count; b++)
+                {
+                    if (!mf.bnd.bndArr[b].isOwnField)
+                    {
+                        if (headArr[b].IsPointInHeadArea(pt))
+                        {
+                            return false;
+                        }
+                    }
+                }
                 return true;
             }
             else

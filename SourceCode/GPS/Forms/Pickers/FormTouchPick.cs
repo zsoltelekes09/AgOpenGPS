@@ -189,7 +189,7 @@ namespace AgOpenGPS
                     foreach (var triList in mf.section[j].patchList)
                     {
                         int count2 = triList.Count;
-                        for (int i = 0; i < count2; i += 3)
+                        for (int i = 1; i < count2; i += 3)
                         {
                             double x = triList[i].easting;
                             double y = triList[i].northing;

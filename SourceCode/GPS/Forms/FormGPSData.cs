@@ -16,7 +16,7 @@ namespace AgOpenGPS
             InitializeComponent();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             //all the fixings and position
             lblZone.Text = mf.Zone;
@@ -40,7 +40,7 @@ namespace AgOpenGPS
             lblSatsTracked.Text = mf.SatsTracked;
             lblStatus.Text = mf.Status;
             lblHDOP.Text = mf.HDOP;
-            tboxNMEASerial.lines = mf.recvSentenceSettings;
+            tboxNMEASerial.Lines = mf.recvSentenceSettings;
             lblSpeed.Text = mf.pn.speed.ToString();
 
             lblLookOnLeft.Text = mf.tool.lookAheadDistanceOnPixelsLeft.ToString("N0");

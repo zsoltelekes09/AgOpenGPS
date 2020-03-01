@@ -1221,35 +1221,25 @@ namespace AgOpenGPS
             }
 
             //set the look ahead for hyd Lift in pixels per second
-            vehicle.hydLiftLookAheadDistanceLeft = tool.toolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10;
-            vehicle.hydLiftLookAheadDistanceRight = tool.toolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10;
+            vehicle.hydLiftLookAheadDistanceRight = Math.Min(200, Math.Max(tool.toolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10, 3));
+            vehicle.hydLiftLookAheadDistanceLeft = Math.Min(200, Math.Max(tool.toolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10, 3));
 
-            if (vehicle.hydLiftLookAheadDistanceLeft < 3) vehicle.hydLiftLookAheadDistanceLeft = 3;
-            if (vehicle.hydLiftLookAheadDistanceRight < 3) vehicle.hydLiftLookAheadDistanceRight = 3;
+            tool.lookAheadDistanceOnPixelsLeft = Math.Min(tool.toolFarLeftSpeed * tool.lookAheadOnSetting * 10, 200);
+            tool.lookAheadDistanceOnPixelsRight = Math.Min(tool.toolFarRightSpeed * tool.lookAheadOnSetting * 10, 200);
 
-            if (vehicle.hydLiftLookAheadDistanceLeft > 200) vehicle.hydLiftLookAheadDistanceLeft = 200;
-            if (vehicle.hydLiftLookAheadDistanceRight > 200) vehicle.hydLiftLookAheadDistanceRight = 200;
+            tool.lookAheadDistanceOffPixelsLeft = Math.Min(tool.toolFarLeftSpeed * tool.lookAheadOffSetting * 10, 160);
+            tool.lookAheadDistanceOffPixelsRight = Math.Min(tool.toolFarRightSpeed * tool.lookAheadOffSetting * 10, 160);
 
-            tool.lookAheadDistanceOnPixelsLeft = tool.toolFarLeftSpeed * tool.lookAheadOnSetting * 10;
-            tool.lookAheadDistanceOnPixelsRight = tool.toolFarRightSpeed * tool.lookAheadOnSetting * 10;
 
-            if (tool.lookAheadDistanceOnPixelsLeft > 200) tool.lookAheadDistanceOnPixelsLeft = 200;
-            if (tool.lookAheadDistanceOnPixelsRight > 200) tool.lookAheadDistanceOnPixelsRight = 200;
 
-            tool.lookAheadDistanceOffPixelsLeft = tool.toolFarLeftSpeed * tool.lookAheadOffSetting * 10;
-            tool.lookAheadDistanceOffPixelsRight = tool.toolFarRightSpeed * tool.lookAheadOffSetting * 10;
 
-            if (tool.lookAheadDistanceOffPixelsLeft > 160) tool.lookAheadDistanceOffPixelsLeft = 160;
-            if (tool.lookAheadDistanceOffPixelsRight > 160) tool.lookAheadDistanceOffPixelsRight = 160;
 
-            //determine where the tool is wrt to headland
-            if (hd.isOn) hd.WhereAreToolCorners();
 
             //set up the super for youturn
             section[tool.numOfSections].isInBoundary = true;
 
             //determine if section is in boundary and headland using the section left/right positions
-            bool isLeftIn = true, isRightIn = true;
+            bool isLeftIn = false, isRightIn = false;
 
             for (int j = 0; j < tool.numOfSections; j++)
             {
@@ -1261,8 +1251,8 @@ namespace AgOpenGPS
                     {
                         if (bnd.bndArr[i].isOwnField)
                         {
-                            if (j == 0) isLeftIn |= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? hd.headArr[i].IsPointInHeadArea(section[j].leftPoint) : bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
-                            isRightIn |= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? hd.headArr[i].IsPointInHeadArea(section[j].rightPoint) : bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                            if (j == 0) isLeftIn |= bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
+                            isRightIn |= bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
                         }
                         if (bnd.LastBoundary > -1) break;
                     }
@@ -1273,23 +1263,53 @@ namespace AgOpenGPS
                         {
                             if (!bnd.bndArr[i].isOwnField && (bnd.LastBoundary == -1 || bnd.bndArr[i].OuterField == bnd.LastBoundary || bnd.bndArr[i].OuterField == -1))
                             {
-                                if (j == 0) isLeftIn &= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? !hd.headArr[i].IsPointInHeadArea(section[j].leftPoint) : !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
-                                isRightIn &= (hd.isOn && hd.headArr[i].hdLine.Count > 0) ? !hd.headArr[i].IsPointInHeadArea(section[j].rightPoint) : !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
+                                if (j == 0) isLeftIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
+                                isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
                             }
                         }
                     }
 
                     //merge the two sides into in or out
-                    section[j].isInsideSprayArea = (isLeftIn || isRightIn) ? true : false;
-                    section[tool.numOfSections].isInsideSprayArea &= section[j].isInsideSprayArea;
+                    section[j].isInBoundary = (isLeftIn || isRightIn) ? true : false;
+                    section[tool.numOfSections].isInBoundary &= section[j].isInBoundary;
                 }
                 //no boundary created so always inside
                 else
                 {
-                    section[j].isInsideSprayArea = true;
-                    section[tool.numOfSections].isInsideSprayArea = true;
+                    section[j].isInBoundary = true;
+                    section[tool.numOfSections].isInBoundary = true;
                 }
             }
+
+
+
+            //determine where the tool is wrt to headland
+            if (hd.isOn)
+            {
+                hd.WhereAreToolCorners();
+                //if (section[tool.numOfSections].isInBoundary == true) hd.WhereAreToolCorners();
+                /*else
+                {
+                    for (int j = 0; j < tool.numOfSections; j++)
+                    {
+                        if (j == 0) tool.isLeftSideInHeadland = false;
+                        //merge the two sides into in or out
+                        section[j].isInHeadlandArea = true;
+                    }
+
+                    //save right side
+                    tool.isRightSideInHeadland = false;
+                    //is the tool in or out based on endpoints
+                    hd.isToolOuterPointsInHeadland = true;
+                }
+                */
+            }
+            else hd.isToolOuterPointsInHeadland = true;
+
+
+
+
+
         }
 
         //the start of first few frames to initialize entire program

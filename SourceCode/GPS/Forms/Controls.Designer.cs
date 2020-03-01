@@ -1032,7 +1032,7 @@ namespace AgOpenGPS
 
         private void btnHeadlandOnOff_Click(object sender, EventArgs e)
         {
-            if (hd.headArr[0].hdLine.Count > 0)
+            if (hd.headArr.Count > 0)
             {
                 hd.isOn = !hd.isOn;
                 if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
@@ -1572,6 +1572,7 @@ namespace AgOpenGPS
             Properties.Settings.Default.setDisplay_isBatmanOn = !Properties.Settings.Default.setDisplay_isBatmanOn;
             Properties.Settings.Default.Save();
             SwapBatmanPanels();
+            FixPanelsAndMenus();
 
         }
         private void simplifyToolStrip_Click(object sender, EventArgs e)
@@ -2502,12 +2503,5 @@ namespace AgOpenGPS
             key.SetValue("Language", lang);
             key.Close();
         }
-
-        private Button btnDayNightMode;
-        private Button btnShutdown;
-        private Button btnFullScreen;
-        private ProXoft.WinForms.RepeatButton btnZoomIn;
-        private ProXoft.WinForms.RepeatButton btnZoomOut;
-        private Label lblSpeed;
     }//end class
 }//end namespace
