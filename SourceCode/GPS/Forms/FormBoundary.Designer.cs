@@ -130,7 +130,7 @@
             this.btnLeftRight.Size = new System.Drawing.Size(91, 84);
             this.btnLeftRight.TabIndex = 67;
             this.btnLeftRight.UseVisualStyleBackColor = true;
-            this.btnLeftRight.Click += new System.EventHandler(this.btnLeftRight_Click);
+            this.btnLeftRight.Click += new System.EventHandler(this.BtnLeftRight_Click);
             // 
             // btnGo
             // 
@@ -178,7 +178,7 @@
             this.btnLoadMultiBoundaryFromGE.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnLoadMultiBoundaryFromGE.UseVisualStyleBackColor = true;
             this.btnLoadMultiBoundaryFromGE.Visible = false;
-            this.btnLoadMultiBoundaryFromGE.Click += new System.EventHandler(this.btnLoadBoundaryFromGE_Click);
+            this.btnLoadMultiBoundaryFromGE.Click += new System.EventHandler(this.BtnLoadBoundaryFromGE_Click);
             // 
             // btnLoadBoundaryFromGE
             // 
@@ -193,7 +193,7 @@
             this.btnLoadBoundaryFromGE.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnLoadBoundaryFromGE.UseVisualStyleBackColor = true;
             this.btnLoadBoundaryFromGE.Visible = false;
-            this.btnLoadBoundaryFromGE.Click += new System.EventHandler(this.btnLoadBoundaryFromGE_Click);
+            this.btnLoadBoundaryFromGE.Click += new System.EventHandler(this.BtnLoadBoundaryFromGE_Click);
             // 
             // btnCancel
             // 
@@ -221,7 +221,7 @@
             this.btnDeleteAll.TabIndex = 100;
             this.btnDeleteAll.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDeleteAll.UseVisualStyleBackColor = true;
-            this.btnDeleteAll.Click += new System.EventHandler(this.btnDeleteAll_Click);
+            this.btnDeleteAll.Click += new System.EventHandler(this.BtnDeleteAll_Click);
             // 
             // btnDelete
             // 
@@ -234,7 +234,7 @@
             this.btnDelete.TabIndex = 65;
             this.btnDelete.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDelete.UseVisualStyleBackColor = true;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            this.btnDelete.Click += new System.EventHandler(this.BtnDelete_Click);
             // 
             // btnSerialCancel
             // 
@@ -249,7 +249,7 @@
             this.btnSerialCancel.Size = new System.Drawing.Size(121, 84);
             this.btnSerialCancel.TabIndex = 64;
             this.btnSerialCancel.UseVisualStyleBackColor = true;
-            this.btnSerialCancel.Click += new System.EventHandler(this.btnSerialCancel_Click);
+            this.btnSerialCancel.Click += new System.EventHandler(this.BtnSerialCancel_Click);
             // 
             // btnOpenGoogleEarth
             // 
@@ -264,7 +264,7 @@
             this.btnOpenGoogleEarth.Text = "Google Earth";
             this.btnOpenGoogleEarth.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnOpenGoogleEarth.UseVisualStyleBackColor = true;
-            this.btnOpenGoogleEarth.Click += new System.EventHandler(this.btnOpenGoogleEarth_Click);
+            this.btnOpenGoogleEarth.Click += new System.EventHandler(this.BtnOpenGoogleEarth_Click);
             // 
             // nudBndOffset
             // 

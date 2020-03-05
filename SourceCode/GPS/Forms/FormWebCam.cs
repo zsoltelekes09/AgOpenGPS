@@ -52,12 +52,12 @@ namespace AgOpenGPS
             //imageButton.Enabled = webCameraControl1.IsCapturing;
         }
 
-        private void comboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
+        private void ComboBox1_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             UpdateButtons();
         }
 
-        private void startButton_Click_1(object sender, EventArgs e)
+        private void StartButton_Click_1(object sender, EventArgs e)
         {
             ComboBoxItem i = (ComboBoxItem)comboBox1.SelectedItem;
 
@@ -71,7 +71,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void stopButton_Click_1(object sender, EventArgs e)
+        private void StopButton_Click_1(object sender, EventArgs e)
         {
             webCameraControl1.StopCapture();
 

@@ -62,21 +62,21 @@ namespace AgOpenGPS
             nudCasterPort.Value = Properties.Settings.Default.setNTRIP_casterPort;
             nudSendToUDPPort.Value = Properties.Settings.Default.setNTRIP_sendToUDPPort;
 
-            cboxIsNTRIPOn.CheckedChanged -= cboxIsNTRIPOn_CheckedChanged;
+            cboxIsNTRIPOn.CheckedChanged -= CboxIsNTRIPOn_CheckedChanged;
             cboxIsNTRIPOn.Checked = Properties.Settings.Default.setNTRIP_isOn;
-            cboxIsNTRIPOn.CheckedChanged += cboxIsNTRIPOn_CheckedChanged;
+            cboxIsNTRIPOn.CheckedChanged += CboxIsNTRIPOn_CheckedChanged;
 
             tboxUserName.Text = Properties.Settings.Default.setNTRIP_userName;
             tboxUserPassword.Text = Properties.Settings.Default.setNTRIP_userPassword;
             tboxMount.Text = Properties.Settings.Default.setNTRIP_mount;
 
-            nudGGAInterval.ValueChanged -= nudGGAInterval_ValueChanged;
+            nudGGAInterval.ValueChanged -= NudGGAInterval_ValueChanged;
             nudGGAInterval.Value = Properties.Settings.Default.setNTRIP_sendGGAInterval;
-            nudGGAInterval.ValueChanged += nudGGAInterval_ValueChanged;
+            nudGGAInterval.ValueChanged += NudGGAInterval_ValueChanged;
 
-            nudSendToUDPPort.ValueChanged -= nudSendToUDPPort_ValueChanged;
+            nudSendToUDPPort.ValueChanged -= NudSendToUDPPort_ValueChanged;
             nudSendToUDPPort.Value = Properties.Settings.Default.setNTRIP_sendToUDPPort;
-            nudSendToUDPPort.ValueChanged += nudSendToUDPPort_ValueChanged;
+            nudSendToUDPPort.ValueChanged += NudSendToUDPPort_ValueChanged;
 
             nudLatitude.Value = (decimal)Properties.Settings.Default.setNTRIP_manualLat;
             nudLongitude.Value = (decimal)Properties.Settings.Default.setNTRIP_manualLon;
@@ -106,7 +106,7 @@ namespace AgOpenGPS
             return IP4Address;
         }
 
-        private void btnGetIP_Click(object sender, EventArgs e)
+        private void BtnGetIP_Click(object sender, EventArgs e)
         {
             string actualIP = tboxEnterURL.Text.Trim();
             try
@@ -147,7 +147,7 @@ namespace AgOpenGPS
             return true;
         }
 
-        private void tboxCasterIP_Validating(object sender, CancelEventArgs e)
+        private void TboxCasterIP_Validating(object sender, CancelEventArgs e)
         {
             if (!CheckIPValid(tboxCasterIP.Text))
             {
@@ -157,7 +157,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnSerialOK_Click(object sender, EventArgs e)
+        private void BtnSerialOK_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setNTRIP_casterIP = tboxCasterIP.Text;
             Properties.Settings.Default.setNTRIP_casterPort = (int)nudCasterPort.Value;
@@ -181,33 +181,33 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnSetManualPosition_Click(object sender, EventArgs e)
+        private void BtnSetManualPosition_Click(object sender, EventArgs e)
         {
             nudLatitude.Value = (decimal)mf.pn.latitude;
             nudLongitude.Value = (decimal)mf.pn.longitude;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             tboxCurrentLat.Text = mf.pn.latitude.ToString();
             tboxCurrentLon.Text = mf.pn.longitude.ToString();
         }
 
-        private void btnGetSourceTable_Click(object sender, EventArgs e)
+        private void BtnGetSourceTable_Click(object sender, EventArgs e)
         {
             string syte = "http://monitor.use-snip.com/?hostUrl=" + tboxCasterIP.Text + "&port=" + nudCasterPort.Value.ToString();
             Process.Start(syte);
         }
 
-        private void cboxIsNTRIPOn_CheckedChanged(object sender, EventArgs e)
+        private void CboxIsNTRIPOn_CheckedChanged(object sender, EventArgs e)
         {
         }
 
-        private void nudGGAInterval_ValueChanged(object sender, EventArgs e)
+        private void NudGGAInterval_ValueChanged(object sender, EventArgs e)
         {
         }
 
-        private void nudSendToUDPPort_ValueChanged(object sender, EventArgs e)
+        private void NudSendToUDPPort_ValueChanged(object sender, EventArgs e)
         {
         }
 

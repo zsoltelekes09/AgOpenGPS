@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormToolPicker : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormToolPicker(Form callingForm)
         {

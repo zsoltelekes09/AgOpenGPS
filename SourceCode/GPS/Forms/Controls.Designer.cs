@@ -16,7 +16,7 @@ namespace AgOpenGPS
         private void btnStartStopNtrip_Click(object sender, EventArgs e)
         {
             isNTRIP_TurnedOn = !isNTRIP_TurnedOn;
-            ntripCounter = 15;
+            NtripCounter = 15;
             if (!isNTRIP_TurnedOn)
             {
                 ShutDownNTRIP();
@@ -591,14 +591,11 @@ namespace AgOpenGPS
         //individual buttons for sections
         private void btnSection1Man_Click(object sender, EventArgs e)
         {
+            //if auto is off just have on-off for choices of section buttons
             if (autoBtnState != btnStates.Auto)
             {
-                //if auto is off just have on-off for choices of section buttons
                 if (section[0].manBtnState == manBtn.Off) section[0].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(0, btnSection1Man);
-                return;
             }
-
             ManualBtnUpdate(0, btnSection1Man);
         }
         private void btnSection2Man_Click(object sender, EventArgs e)
@@ -607,10 +604,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[1].manBtnState == manBtn.Off) section[1].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(1, btnSection2Man);
-                return;
             }
-
             ManualBtnUpdate(1, btnSection2Man);
         }
         private void btnSection3Man_Click(object sender, EventArgs e)
@@ -619,10 +613,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[2].manBtnState == manBtn.Off) section[2].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(2, btnSection3Man);
-                return;
             }
-
             ManualBtnUpdate(2, btnSection3Man);
         }
         private void btnSection4Man_Click(object sender, EventArgs e)
@@ -631,8 +622,6 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[3].manBtnState == manBtn.Off) section[3].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(3, btnSection4Man);
-                return;
             }
             ManualBtnUpdate(3, btnSection4Man);
         }
@@ -642,10 +631,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[4].manBtnState == manBtn.Off) section[4].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(4, btnSection5Man);
-                return;
             }
-
             ManualBtnUpdate(4, btnSection5Man);
         }
         private void btnSection6Man_Click(object sender, EventArgs e)
@@ -654,10 +640,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[5].manBtnState == manBtn.Off) section[5].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(5, btnSection6Man);
-                return;
             }
-
             ManualBtnUpdate(5, btnSection6Man);
         }
         private void btnSection7Man_Click(object sender, EventArgs e)
@@ -666,10 +649,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[6].manBtnState == manBtn.Off) section[6].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(6, btnSection7Man);
-                return;
             }
-
             ManualBtnUpdate(6, btnSection7Man);
         }
         private void btnSection8Man_Click(object sender, EventArgs e)
@@ -678,10 +658,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[7].manBtnState == manBtn.Off) section[7].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(7, btnSection8Man);
-                return;
             }
-
             ManualBtnUpdate(7, btnSection8Man);
         }
         private void btnSection9Man_Click(object sender, EventArgs e)
@@ -690,12 +667,8 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[8].manBtnState == manBtn.Off) section[8].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(8, btnSection9Man);
-                return;
             }
-
             ManualBtnUpdate(8, btnSection9Man);
-
         }
         private void btnSection10Man_Click(object sender, EventArgs e)
         {
@@ -703,12 +676,8 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[9].manBtnState == manBtn.Off) section[9].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(9, btnSection10Man);
-                return;
             }
-
             ManualBtnUpdate(9, btnSection10Man);
-
         }
         private void btnSection11Man_Click(object sender, EventArgs e)
         {
@@ -716,12 +685,8 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[10].manBtnState == manBtn.Off) section[10].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(10, btnSection11Man);
-                return;
             }
-
             ManualBtnUpdate(10, btnSection11Man);
-
         }
         private void btnSection12Man_Click(object sender, EventArgs e)
         {
@@ -729,10 +694,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[11].manBtnState == manBtn.Off) section[11].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(11, btnSection12Man);
-                return;
             }
-
             ManualBtnUpdate(11, btnSection12Man);
         }
         private void btnSection13Man_Click(object sender, EventArgs e)
@@ -741,12 +703,8 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[12].manBtnState == manBtn.Off) section[12].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(12, btnSection13Man);
-                return;
             }
-
             ManualBtnUpdate(12, btnSection13Man);
-
         }
         private void btnSection14Man_Click(object sender, EventArgs e)
         {
@@ -754,12 +712,8 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[13].manBtnState == manBtn.Off) section[13].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(13, btnSection14Man);
-                return;
             }
-
             ManualBtnUpdate(13, btnSection14Man);
-
         }
         private void btnSection15Man_Click(object sender, EventArgs e)
         {
@@ -767,10 +721,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[14].manBtnState == manBtn.Off) section[14].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(14, btnSection15Man);
-                return;
             }
-
             ManualBtnUpdate(14, btnSection15Man);
         }
         private void btnSection16Man_Click(object sender, EventArgs e)
@@ -779,10 +730,7 @@ namespace AgOpenGPS
             if (autoBtnState != btnStates.Auto)
             {
                 if (section[15].manBtnState == manBtn.Off) section[15].manBtnState = manBtn.Auto;
-                ManualBtnUpdate(15, btnSection16Man);
-                return;
             }
-
             ManualBtnUpdate(15, btnSection16Man);
         }
 
@@ -1232,7 +1180,6 @@ namespace AgOpenGPS
             {
                 if (autoBtnState == btnStates.Off && manualBtnState == btnStates.Off)
                 {
-
                     DialogResult result3 = MessageBox.Show(gStr.gsDeleteAllContoursAndSections,
                         gStr.gsDeleteForSure,
                         MessageBoxButtons.YesNo,

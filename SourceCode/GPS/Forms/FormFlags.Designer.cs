@@ -63,7 +63,7 @@
             this.btnSouth.Size = new System.Drawing.Size(94, 52);
             this.btnSouth.TabIndex = 195;
             this.btnSouth.UseVisualStyleBackColor = true;
-            this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnSouth_MouseDown);
+            this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSouth_MouseDown);
             // 
             // btnNorth
             // 
@@ -77,7 +77,7 @@
             this.btnNorth.Size = new System.Drawing.Size(94, 52);
             this.btnNorth.TabIndex = 196;
             this.btnNorth.UseVisualStyleBackColor = true;
-            this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnNorth_MouseDown);
+            this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnNorth_MouseDown);
             // 
             // lblFlagSelected
             // 
@@ -204,9 +204,9 @@
             this.tboxFlagNotes.Size = new System.Drawing.Size(281, 69);
             this.tboxFlagNotes.TabIndex = 209;
             this.tboxFlagNotes.Text = "Default";
-            this.tboxFlagNotes.TextChanged += new System.EventHandler(this.tboxFlagNotes_TextChanged);
-            this.tboxFlagNotes.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tboxFlagNotes_KeyPress);
-            this.tboxFlagNotes.Leave += new System.EventHandler(this.tboxFlagNotes_Leave);
+            this.tboxFlagNotes.TextChanged += new System.EventHandler(this.TboxFlagNotes_TextChanged);
+            this.tboxFlagNotes.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TboxFlagNotes_KeyPress);
+            this.tboxFlagNotes.Leave += new System.EventHandler(this.TboxFlagNotes_Leave);
             // 
             // btnExit
             // 
@@ -224,7 +224,7 @@
             this.btnExit.TabIndex = 210;
             this.btnExit.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
             // 
             // btnDeleteFlag
             // 
@@ -240,7 +240,7 @@
             this.btnDeleteFlag.TabIndex = 211;
             this.btnDeleteFlag.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDeleteFlag.UseVisualStyleBackColor = true;
-            this.btnDeleteFlag.Click += new System.EventHandler(this.btnDeleteFlag_Click);
+            this.btnDeleteFlag.Click += new System.EventHandler(this.BtnDeleteFlag_Click);
             // 
             // btnDriveToFlag
             // 
@@ -257,7 +257,7 @@
             this.btnDriveToFlag.TabIndex = 212;
             this.btnDriveToFlag.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDriveToFlag.UseVisualStyleBackColor = true;
-            this.btnDriveToFlag.Click += new System.EventHandler(this.btnDriveToFlag_Click);
+            this.btnDriveToFlag.Click += new System.EventHandler(this.BtnDriveToFlag_Click);
             // 
             // lblHeading
             // 
@@ -289,7 +289,7 @@
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 500;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // label2
             // 

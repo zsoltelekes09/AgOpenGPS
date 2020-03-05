@@ -63,7 +63,7 @@
             this.tboxFieldName.Name = "tboxFieldName";
             this.tboxFieldName.Size = new System.Drawing.Size(606, 36);
             this.tboxFieldName.TabIndex = 0;
-            this.tboxFieldName.TextChanged += new System.EventHandler(this.tboxFieldName_TextChanged);
+            this.tboxFieldName.TextChanged += new System.EventHandler(this.TboxFieldName_TextChanged);
             // 
             // label2
             // 
@@ -89,7 +89,7 @@
             this.btnSerialCancel.TabIndex = 4;
             this.btnSerialCancel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnSerialCancel.UseVisualStyleBackColor = true;
-            this.btnSerialCancel.Click += new System.EventHandler(this.btnSerialCancel_Click);
+            this.btnSerialCancel.Click += new System.EventHandler(this.BtnSerialCancel_Click);
             // 
             // btnTemplate
             // 
@@ -106,7 +106,7 @@
             this.btnTemplate.Text = "Clone From";
             this.btnTemplate.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnTemplate.UseVisualStyleBackColor = false;
-            this.btnTemplate.Click += new System.EventHandler(this.btnTemplate_Click);
+            this.btnTemplate.Click += new System.EventHandler(this.BtnTemplate_Click);
             // 
             // lblTemplateChosen
             // 
@@ -144,7 +144,7 @@
             this.btnSave.TabIndex = 3;
             this.btnSave.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
             // tboxTask
             // 
@@ -155,7 +155,7 @@
             this.tboxTask.Name = "tboxTask";
             this.tboxTask.Size = new System.Drawing.Size(470, 36);
             this.tboxTask.TabIndex = 1;
-            this.tboxTask.TextChanged += new System.EventHandler(this.tboxTask_TextChanged);
+            this.tboxTask.TextChanged += new System.EventHandler(this.TboxTask_TextChanged);
             // 
             // label4
             // 
@@ -191,7 +191,7 @@
             this.tboxVehicle.Name = "tboxVehicle";
             this.tboxVehicle.Size = new System.Drawing.Size(470, 36);
             this.tboxVehicle.TabIndex = 2;
-            this.tboxVehicle.TextChanged += new System.EventHandler(this.tboxVehicle_TextChanged);
+            this.tboxVehicle.TextChanged += new System.EventHandler(this.TboxVehicle_TextChanged);
             // 
             // lblFilename
             // 

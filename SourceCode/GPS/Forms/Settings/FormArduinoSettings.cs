@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormArduinoSettings : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
 
         //constructor
@@ -129,7 +129,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOK_Click(object sender, EventArgs e)
         {
             SaveSettings();
             //mf.SendArduinoSettingsOutToAutoSteerPort();
@@ -137,7 +137,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
 
         }
@@ -266,7 +266,7 @@ namespace AgOpenGPS
             mf.mc.ardMachineConfig[mf.mc.amEnableHyd] = Properties.Vehicle.Default.setArdMac_isHydEnabled;
         }
 
-        private void btnSendToMachineArduino_Click(object sender, EventArgs e)
+        private void BtnSendToMachineArduino_Click(object sender, EventArgs e)
         {
             SaveSettings();
             
@@ -274,7 +274,7 @@ namespace AgOpenGPS
             mf.SendArduinoSettingsOutMachinePort();
         }
 
-        private void btnSendToSteerArduino_Click(object sender, EventArgs e)
+        private void BtnSendToSteerArduino_Click(object sender, EventArgs e)
         {
             SaveSettings();
 
@@ -290,25 +290,25 @@ namespace AgOpenGPS
             }
         }
 
-        private void nudMaxSpeed_Enter(object sender, EventArgs e)
+        private void NudMaxSpeed_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudMinSpeed_Enter(object sender, EventArgs e)
+        private void NudMinSpeed_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudMaxCounts_Enter(object sender, EventArgs e)
+        private void NudMaxCounts_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             tboxSerialFromAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;
             tboxSerialFromMachine.Text = mf.mc.serialRecvMachineStr;
@@ -319,19 +319,19 @@ namespace AgOpenGPS
             }
         }
 
-        private void nudRaiseTime_Enter(object sender, EventArgs e)
+        private void NudRaiseTime_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudLowerTime_Enter(object sender, EventArgs e)
+        private void NudLowerTime_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudAckerman_Enter(object sender, EventArgs e)
+        private void NudAckerman_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();

@@ -47,7 +47,7 @@
             this.cboxEnv.Name = "cboxEnv";
             this.cboxEnv.Size = new System.Drawing.Size(548, 43);
             this.cboxEnv.TabIndex = 212;
-            this.cboxEnv.SelectedIndexChanged += new System.EventHandler(this.cboxVeh_SelectedIndexChanged);
+            this.cboxEnv.SelectedIndexChanged += new System.EventHandler(this.CboxVeh_SelectedIndexChanged);
             // 
             // lblLast
             // 
@@ -70,7 +70,7 @@
             this.tboxName.Name = "tboxName";
             this.tboxName.Size = new System.Drawing.Size(373, 36);
             this.tboxName.TabIndex = 214;
-            this.tboxName.TextChanged += new System.EventHandler(this.tboxName_TextChanged);
+            this.tboxName.TextChanged += new System.EventHandler(this.TboxName_TextChanged);
             // 
             // btnSave
             // 
@@ -82,7 +82,7 @@
             this.btnSave.Size = new System.Drawing.Size(127, 71);
             this.btnSave.TabIndex = 215;
             this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
             // label1
             // 

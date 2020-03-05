@@ -6,7 +6,7 @@ namespace AgOpenGPS
     public partial class FormBoundaryPlayer : Form
     {
         //properties
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         //constructor
         public FormBoundaryPlayer(Form callingForm)
@@ -21,7 +21,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsStopRecordPauseBoundary;
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
+        private void BtnStop_Click(object sender, EventArgs e)
         {
             if (mf.bnd.bndBeingMadePts.Count > 2)
             {
@@ -63,7 +63,7 @@ namespace AgOpenGPS
         }
 
         //actually the record button
-        private void btnPausePlay_Click(object sender, EventArgs e)
+        private void BtnPausePlay_Click(object sender, EventArgs e)
         {
             if (mf.bnd.isOkToAddPoints)
             {
@@ -91,7 +91,7 @@ namespace AgOpenGPS
             mf.Focus();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             int ptCount = mf.bnd.bndBeingMadePts.Count;
             double area = 0;
@@ -118,7 +118,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnAddPoint_Click(object sender, EventArgs e)
+        private void BtnAddPoint_Click(object sender, EventArgs e)
         {
         
             mf.bnd.isOkToAddPoints = true;
@@ -129,7 +129,7 @@ namespace AgOpenGPS
             mf.Focus();
         }
 
-        private void btnDeleteLast_Click(object sender, EventArgs e)
+        private void BtnDeleteLast_Click(object sender, EventArgs e)
         {
             int ptCount = mf.bnd.bndBeingMadePts.Count;
             if (ptCount > 0)
@@ -138,7 +138,7 @@ namespace AgOpenGPS
             mf.Focus();
         }
 
-        private void btnRestart_Click(object sender, EventArgs e)
+        private void BtnRestart_Click(object sender, EventArgs e)
         {
             DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
                                     gStr.gsDeleteForSure,

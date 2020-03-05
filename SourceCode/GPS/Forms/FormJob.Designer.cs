@@ -49,7 +49,7 @@
             this.btnJobOpen.Text = "Open";
             this.btnJobOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnJobOpen.UseVisualStyleBackColor = true;
-            this.btnJobOpen.Click += new System.EventHandler(this.btnJobOpen_Click);
+            this.btnJobOpen.Click += new System.EventHandler(this.BtnJobOpen_Click);
             // 
             // btnJobNew
             // 
@@ -64,7 +64,7 @@
             this.btnJobNew.Text = "New";
             this.btnJobNew.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnJobNew.UseVisualStyleBackColor = true;
-            this.btnJobNew.Click += new System.EventHandler(this.btnJobNew_Click);
+            this.btnJobNew.Click += new System.EventHandler(this.BtnJobNew_Click);
             // 
             // btnDeleteAB
             // 
@@ -91,7 +91,7 @@
             this.btnJobResume.Text = "Resume";
             this.btnJobResume.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnJobResume.UseVisualStyleBackColor = true;
-            this.btnJobResume.Click += new System.EventHandler(this.btnJobResume_Click);
+            this.btnJobResume.Click += new System.EventHandler(this.BtnJobResume_Click);
             // 
             // label1
             // 

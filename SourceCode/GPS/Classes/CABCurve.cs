@@ -421,7 +421,9 @@ namespace AgOpenGPS
                     double s = widthMinusOverlap / 2;
 
                     curList?.Clear();
-                    double circumference = (glm.twoPI * s) / (boundaryTriggerDistance * 0.1);
+                    //double circumference = (glm.twoPI * s) / (boundaryTriggerDistance * 0.1);
+                    double circumference;
+
                     for (double round = glm.twoPI * (howManyPathsAway - 2); round <= (glm.twoPI * (howManyPathsAway + 2) + 0.00001); round += (glm.twoPI / circumference))
                     {
                         double x = s * (Math.Cos(round) + (round / Math.PI) * Math.Sin(round));

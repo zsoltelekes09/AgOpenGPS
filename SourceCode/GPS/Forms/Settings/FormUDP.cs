@@ -9,7 +9,7 @@ namespace AgOpenGPS
     public partial class FormUDP : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormUDP(Form callingForm)
         {
@@ -33,7 +33,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsEthernetConfiguration;
         }
 
-        private void btnSerialOK_Click(object sender, EventArgs e)
+        private void BtnSerialOK_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setIP_thisPort = (int)nudThisPort.Value;
 
@@ -66,9 +66,9 @@ namespace AgOpenGPS
             //tboxRateMachineIP.Text = Properties.Settings.Default.setIP_rateMachineIP;
             //nudRateMachinePort.Value = Properties.Settings.Default.setIP_rateMachinePort;
 
-            cboxIsUDPOn.CheckedChanged -= cboxIsUDPOn_CheckedChanged;
+            cboxIsUDPOn.CheckedChanged -= CboxIsUDPOn_CheckedChanged;
             cboxIsUDPOn.Checked = Properties.Settings.Default.setUDP_isOn;
-            cboxIsUDPOn.CheckedChanged += cboxIsUDPOn_CheckedChanged;
+            cboxIsUDPOn.CheckedChanged += CboxIsUDPOn_CheckedChanged;
         }
 
         //get the ipv4 address only
@@ -114,7 +114,7 @@ namespace AgOpenGPS
             return true;
         }
 
-        private void tboxAutoSteerIP_Validating(object sender, CancelEventArgs e)
+        private void TboxAutoSteerIP_Validating(object sender, CancelEventArgs e)
         {
             if (!CheckIPValid(tboxAutoSteerIP.Text))
             {
@@ -134,7 +134,7 @@ namespace AgOpenGPS
         //    }
         //}
 
-        private void cboxIsUDPOn_CheckedChanged(object sender, EventArgs e)
+        private void CboxIsUDPOn_CheckedChanged(object sender, EventArgs e)
         {
         }
     }

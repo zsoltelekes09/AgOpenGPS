@@ -148,7 +148,7 @@
             this.rbtnHeadingHDT.Text = "Dual";
             this.rbtnHeadingHDT.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rbtnHeadingHDT.UseVisualStyleBackColor = true;
-            this.rbtnHeadingHDT.CheckedChanged += new System.EventHandler(this.rbtnHeadingFix_CheckedChanged);
+            this.rbtnHeadingHDT.CheckedChanged += new System.EventHandler(this.RbtnHeadingFix_CheckedChanged);
             // 
             // rbtnHeadingGPS
             // 
@@ -163,7 +163,7 @@
             this.rbtnHeadingGPS.Text = "GPS";
             this.rbtnHeadingGPS.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rbtnHeadingGPS.UseVisualStyleBackColor = true;
-            this.rbtnHeadingGPS.CheckedChanged += new System.EventHandler(this.rbtnHeadingFix_CheckedChanged);
+            this.rbtnHeadingGPS.CheckedChanged += new System.EventHandler(this.RbtnHeadingFix_CheckedChanged);
             // 
             // rbtnHeadingFix
             // 
@@ -178,7 +178,7 @@
             this.rbtnHeadingFix.Text = "Fix";
             this.rbtnHeadingFix.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rbtnHeadingFix.UseVisualStyleBackColor = true;
-            this.rbtnHeadingFix.CheckedChanged += new System.EventHandler(this.rbtnHeadingFix_CheckedChanged);
+            this.rbtnHeadingFix.CheckedChanged += new System.EventHandler(this.RbtnHeadingFix_CheckedChanged);
             // 
             // btnRollZero
             // 
@@ -219,7 +219,7 @@
             this.btnRemoveZeroOffsetPitch.TabIndex = 79;
             this.btnRemoveZeroOffsetPitch.Text = "Remove Offset";
             this.btnRemoveZeroOffsetPitch.UseVisualStyleBackColor = true;
-            this.btnRemoveZeroOffsetPitch.Click += new System.EventHandler(this.btnRemoveZeroOffsetPitch_Click);
+            this.btnRemoveZeroOffsetPitch.Click += new System.EventHandler(this.BtnRemoveZeroOffsetPitch_Click);
             // 
             // label1
             // 
@@ -243,7 +243,7 @@
             this.btnZeroPitch.TabIndex = 77;
             this.btnZeroPitch.Text = "> 0 <";
             this.btnZeroPitch.UseVisualStyleBackColor = true;
-            this.btnZeroPitch.Click += new System.EventHandler(this.btnZeroPitch_Click);
+            this.btnZeroPitch.Click += new System.EventHandler(this.BtnZeroPitch_Click);
             // 
             // btnRemoveZeroOffset
             // 
@@ -255,7 +255,7 @@
             this.btnRemoveZeroOffset.TabIndex = 76;
             this.btnRemoveZeroOffset.Text = "Remove Offset";
             this.btnRemoveZeroOffset.UseVisualStyleBackColor = true;
-            this.btnRemoveZeroOffset.Click += new System.EventHandler(this.btnRemoveZeroOffset_Click);
+            this.btnRemoveZeroOffset.Click += new System.EventHandler(this.BtnRemoveZeroOffset_Click);
             // 
             // lblRollZeroOffset
             // 
@@ -278,7 +278,7 @@
             this.btnZeroRoll.TabIndex = 73;
             this.btnZeroRoll.Text = "> 0 <";
             this.btnZeroRoll.UseVisualStyleBackColor = true;
-            this.btnZeroRoll.Click += new System.EventHandler(this.btnZeroRoll_Click);
+            this.btnZeroRoll.Click += new System.EventHandler(this.BtnZeroRoll_Click);
             // 
             // label10
             // 
@@ -527,7 +527,7 @@
             this.btnCancel.Size = new System.Drawing.Size(88, 72);
             this.btnCancel.TabIndex = 5;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -541,7 +541,7 @@
             this.bntOK.TabIndex = 4;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = true;
-            this.bntOK.Click += new System.EventHandler(this.bntOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BntOK_Click);
             // 
             // tabControl1
             // 
@@ -611,7 +611,7 @@
             this.cboxNMEAHz.Name = "cboxNMEAHz";
             this.cboxNMEAHz.Size = new System.Drawing.Size(96, 37);
             this.cboxNMEAHz.TabIndex = 88;
-            this.cboxNMEAHz.SelectedIndexChanged += new System.EventHandler(this.cboxNMEAHz_SelectedIndexChanged);
+            this.cboxNMEAHz.SelectedIndexChanged += new System.EventHandler(this.CboxNMEAHz_SelectedIndexChanged);
             // 
             // lblSimGGA
             // 
@@ -653,7 +653,7 @@
             this.rbtnOGI.Text = "OGI";
             this.rbtnOGI.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rbtnOGI.UseVisualStyleBackColor = true;
-            this.rbtnOGI.CheckedChanged += new System.EventHandler(this.rbtnGGA_CheckedChanged);
+            this.rbtnOGI.CheckedChanged += new System.EventHandler(this.RbtnGGA_CheckedChanged);
             // 
             // rbtnRMC
             // 
@@ -670,7 +670,7 @@
             this.rbtnRMC.Text = "RMC";
             this.rbtnRMC.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rbtnRMC.UseVisualStyleBackColor = true;
-            this.rbtnRMC.CheckedChanged += new System.EventHandler(this.rbtnGGA_CheckedChanged);
+            this.rbtnRMC.CheckedChanged += new System.EventHandler(this.RbtnGGA_CheckedChanged);
             // 
             // rbtnGGA
             // 
@@ -686,7 +686,7 @@
             this.rbtnGGA.Text = "GGA";
             this.rbtnGGA.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rbtnGGA.UseVisualStyleBackColor = true;
-            this.rbtnGGA.CheckedChanged += new System.EventHandler(this.rbtnGGA_CheckedChanged);
+            this.rbtnGGA.CheckedChanged += new System.EventHandler(this.RbtnGGA_CheckedChanged);
             // 
             // tabHeading
             // 

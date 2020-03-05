@@ -44,7 +44,7 @@ namespace AgOpenGPS
         private void ReconnectRequest()
         {
             //TimedMessageBox(2000, "NTRIP Not Connected", " Reconnect Request");
-            ntripCounter = 16;
+            NtripCounter = 16;
             isNTRIP_Connected = false;
             isNTRIP_Connecting = false;
 

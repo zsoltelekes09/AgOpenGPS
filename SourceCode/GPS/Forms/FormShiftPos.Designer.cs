@@ -64,7 +64,7 @@
             this.nudNorth.TabIndex = 154;
             this.nudNorth.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.nudNorth.UpDownAlign = System.Windows.Forms.LeftRightAlignment.Left;
-            this.nudNorth.ValueChanged += new System.EventHandler(this.nudNorth_ValueChanged);
+            this.nudNorth.ValueChanged += new System.EventHandler(this.NudNorth_ValueChanged);
             // 
             // nudEast
             // 
@@ -90,7 +90,7 @@
             0,
             0,
             0});
-            this.nudEast.ValueChanged += new System.EventHandler(this.nudEast_ValueChanged);
+            this.nudEast.ValueChanged += new System.EventHandler(this.NudEast_ValueChanged);
             // 
             // label27
             // 
@@ -147,7 +147,7 @@
             this.btnSouth.Size = new System.Drawing.Size(72, 72);
             this.btnSouth.TabIndex = 192;
             this.btnSouth.UseVisualStyleBackColor = true;
-            this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnSouth_MouseDown);
+            this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSouth_MouseDown);
             // 
             // btnNorth
             // 
@@ -160,7 +160,7 @@
             this.btnNorth.Size = new System.Drawing.Size(72, 72);
             this.btnNorth.TabIndex = 193;
             this.btnNorth.UseVisualStyleBackColor = true;
-            this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnNorth_MouseDown);
+            this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnNorth_MouseDown);
             // 
             // btnEast
             // 
@@ -173,7 +173,7 @@
             this.btnEast.Size = new System.Drawing.Size(72, 72);
             this.btnEast.TabIndex = 194;
             this.btnEast.UseVisualStyleBackColor = true;
-            this.btnEast.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnEast_MouseDown);
+            this.btnEast.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnEast_MouseDown);
             // 
             // btnWest
             // 
@@ -186,7 +186,7 @@
             this.btnWest.Size = new System.Drawing.Size(72, 72);
             this.btnWest.TabIndex = 195;
             this.btnWest.UseVisualStyleBackColor = true;
-            this.btnWest.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnWest_MouseDown);
+            this.btnWest.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnWest_MouseDown);
             // 
             // bntOK
             // 
@@ -201,7 +201,7 @@
             this.bntOK.TabIndex = 196;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = true;
-            this.bntOK.Click += new System.EventHandler(this.bntOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BntOK_Click);
             // 
             // btnZero
             // 
@@ -213,7 +213,7 @@
             this.btnZero.TabIndex = 227;
             this.btnZero.Text = "> 0 <";
             this.btnZero.UseVisualStyleBackColor = true;
-            this.btnZero.Click += new System.EventHandler(this.btnZero_Click);
+            this.btnZero.Click += new System.EventHandler(this.BtnZero_Click);
             // 
             // FormShiftPos
             // 

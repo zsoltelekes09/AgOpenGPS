@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using System.Text;
 
 namespace AgOpenGPS
@@ -476,7 +474,7 @@ namespace AgOpenGPS
                     GL.Flush();
                     oglMain.SwapBuffers();
 
-                    if (leftMouseDownOnOpenGL) MakeFlagMark();
+                    if (LeftMouseDownOnOpenGL) MakeFlagMark();
 
                     //draw the section control window off screen buffer
                     oglBack.Refresh();
@@ -509,7 +507,14 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             //gls.Perspective(6.0f, 1, 1, 5200);
-            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.1f, 1f, 50.0f, 520f);//(0.1f, 1f, 50.0f, 520f);
+
+
+
+            GL.Viewport(0, 0, 500, 500);
+            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.1f, 1.0f, 50.0f, 520f);
+
+
+            //Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.1f, 1f, 50.0f, 520f);//(0.1f, 1f, 50.0f, 520f);
             GL.LoadMatrix(ref mat);
             GL.MatrixMode(MatrixMode.Modelview);
         }
@@ -521,14 +526,13 @@ namespace AgOpenGPS
             oglBack.MakeCurrent();
 
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-            GL.LoadIdentity();					// Reset The View
+            GL.LoadIdentity();// Reset The View
 
-            double rotation = glm.toDegrees(toolPos.heading);
             //back the camera up
-            GL.Translate(Math.Cos(rotation) * -0.05, Math.Cos(rotation) * -0.05, -500);//5cm both ways
+            GL.Translate(0.05, -0.05, -500);
 
             //rotate camera so heading matched fix heading in the world
-            GL.Rotate(rotation, 0, 0, 1);
+            GL.Rotate(glm.toDegrees(toolPos.heading), 0, 0, 1);
 
             //translate to that spot in the world 
             GL.Translate(-toolPos.easting, -toolPos.northing, 0);
@@ -610,33 +614,30 @@ namespace AgOpenGPS
             double rpToolHeight = 0;
 
             //pick the larger side
-            if (vehicle.hydLiftLookAheadDistanceLeft > vehicle.hydLiftLookAheadDistanceRight) rpToolHeight = vehicle.hydLiftLookAheadDistanceLeft;
-            else rpToolHeight = vehicle.hydLiftLookAheadDistanceRight;
-
-            if (tool.lookAheadDistanceOnPixelsLeft > tool.lookAheadDistanceOnPixelsRight) rpOnHeight = tool.lookAheadDistanceOnPixelsLeft;
-            else rpOnHeight = tool.lookAheadDistanceOnPixelsRight;
+            rpToolHeight = Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft);
+            rpOnHeight = Math.Max(tool.lookAheadDistanceOnPixelsRight, tool.lookAheadDistanceOnPixelsLeft);
 
             //assume all sections are on and super can be on, if not set false to turn off.
-            tool.isSuperSectionAllowedOn = true;
+            bool isSuperSectionAllowedOn = true;
             isHeadlandClose = false;
             isBoundaryClose = false;
 
             //find any off buttons, any outside of boundary, going backwards, and the farthest lookahead
             for (int j = 0; j < tool.numOfSections; j++)
             {
-                if (section[j].manBtnState == manBtn.Off) tool.isSuperSectionAllowedOn = false;
-                if (!section[j].isInBoundary) tool.isSuperSectionAllowedOn = false;
+                if (section[j].manBtnState == manBtn.Off) isSuperSectionAllowedOn = false;
+                if (!section[j].isInBoundary) isSuperSectionAllowedOn = false;
 
                 //check if any sections going backwards, section turned off waaay below
-                if (section[j].speedPixels < 0) tool.isSuperSectionAllowedOn = false;
+                if (section[j].speedPixels < 0) isSuperSectionAllowedOn = false;
             }
 
             //if only one section, or going slow no need for super section 
             if (tool.numOfSections == 1 | pn.speed < vehicle.slowSpeedCutoff)
-                tool.isSuperSectionAllowedOn = false;
+                isSuperSectionAllowedOn = false;
 
             if ((!tool.isRightSideInHeadland || !tool.isLeftSideInHeadland) && hd.isOn)
-                tool.isSuperSectionAllowedOn = false;
+                isSuperSectionAllowedOn = false;
 
             //clamp the height after looking way ahead, this is for switching off super section only
             rpOnHeight = Math.Abs(rpOnHeight);
@@ -655,7 +656,7 @@ namespace AgOpenGPS
             GL.ReadPixels(tool.rpXPosition, 250, tool.rpWidth, (int)rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, grnPixels);
 
             //Paint to context for troubleshooting
-            //oglBack.MakeCurrent();
+            //oglBack.BringToFront();
             //oglBack.SwapBuffers();
 
             //is applied area coming up?
@@ -672,9 +673,9 @@ namespace AgOpenGPS
             {
                 if (grnPixels[a] != 0)
                 {
-                    if (tool.isSuperSectionAllowedOn & totalPixs++ > pixLimit)
+                    if (isSuperSectionAllowedOn & totalPixs++ > pixLimit)
                     {
-                        tool.isSuperSectionAllowedOn = false;
+                        isSuperSectionAllowedOn = false;
                         break;
                     }
                 }
@@ -687,7 +688,7 @@ namespace AgOpenGPS
                 {
                     if (grnPixels[a] == 240)
                     {
-                        tool.isSuperSectionAllowedOn = false;
+                        isSuperSectionAllowedOn = false;
                         isBoundaryClose = true;
                         break;
                     }
@@ -717,7 +718,7 @@ namespace AgOpenGPS
                     //is the tool completely in the headland or not
                     hd.isToolInHeadland = hd.isToolOuterPointsInHeadland && !isHeadlandClose;
 
-                    if (isHeadlandClose || hd.isToolInHeadland) tool.isSuperSectionAllowedOn = false;
+                    if (isHeadlandClose || hd.isToolInHeadland) isSuperSectionAllowedOn = false;
 
                     //set hydraulics based on tool in headland or not
                     hd.SetHydPosition();
@@ -733,16 +734,15 @@ namespace AgOpenGPS
             //if all manual and all on go supersection
             if (manualBtnState == btnStates.On)
             {
-                tool.isSuperSectionAllowedOn = true;
+                isSuperSectionAllowedOn = true;
                 for (int j = 0; j < tool.numOfSections; j++)
                 {
-                    if (section[j].manBtnState == manBtn.Off) tool.isSuperSectionAllowedOn = false;
+                    if (section[j].manBtnState == manBtn.Off) isSuperSectionAllowedOn = false;
                 }
             }
 
-
             // If ALL sections are required on, No buttons are off, within boundary, turn super section on, normal sections off
-            if (tool.isSuperSectionAllowedOn)
+            if (isSuperSectionAllowedOn)
             {
                 for (int j = 0; j < tool.numOfSections; j++)
                 {
@@ -864,6 +864,74 @@ namespace AgOpenGPS
                     //ensure it starts off
                     section[j].isSectionRequiredOn = false;
 
+                    mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
+                    start = section[j].rpSectionPosition - section[0].rpSectionPosition;
+                    end = section[j].rpSectionWidth - 1 + start;
+                    tagged = 0;
+
+                    for (int pos = start; pos <= end; pos++)
+                    {
+                        if (isBoundaryClose) endHeight = tool.rpWidth + pos;
+                        else endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
+
+                        for (int a = pos; a <= endHeight; a += tool.rpWidth)
+                        {
+                            if (grnPixels[a] == 0)
+                            {
+                                tagged++;
+                                if (tagged > tool.toolMinUnappliedPixels)
+                                {
+                                    section[j].isSectionRequiredOn = true;
+                                    goto GetOutSectionOn;
+                                }
+                            }
+                        }
+                    }
+                    GetOutSectionOn:
+
+                    //only turn off if on
+                    if (section[j].isSectionRequiredOn == true)
+                    {
+                        section[j].isSectionRequiredOn = false;
+                        //calculate the slopes of the lines
+                        mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
+                        mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
+                        start = section[j].rpSectionPosition - section[0].rpSectionPosition;
+                        end = section[j].rpSectionWidth - 1 + start;
+                        tagged = 0;
+
+                        for (int pos = start; pos <= end; pos++)
+                        {
+                            if (isBoundaryClose)
+                            {
+                                endHeight = tool.rpWidth + pos;
+                                startHeight = pos;
+                            }
+                            else
+                            {
+                                startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
+                                endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
+                            }
+
+                            for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
+                            {
+                                if (a < 0) mOn = 0;
+                                if (grnPixels[a] == 0)
+                                {
+                                    tagged++;
+                                    if (tagged > tool.toolMinUnappliedPixels)
+                                    {
+                                        section[j].isSectionRequiredOn = true;
+                                        goto GetOutSectionOff;
+                                    }
+                                }
+                            }
+                        }
+                        GetOutSectionOff:
+                        start = 0;
+                    }
+
+
                     if (bnd.bndArr.Count > 0)
                     {
                         //if out of boundary, turn it off
@@ -877,73 +945,6 @@ namespace AgOpenGPS
                         }
                         else
                         {
-                            mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                            start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                            end = section[j].rpSectionWidth - 1 + start;
-                            tagged = 0;
-
-                            for (int pos = start; pos <= end; pos++)
-                            {
-                                if (isBoundaryClose) endHeight = tool.rpWidth + pos;
-                                else endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                                for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                                {
-                                    if (grnPixels[a] == 0)
-                                    {
-                                        tagged++;
-                                        if (tagged > tool.toolMinUnappliedPixels)
-                                        {
-                                            section[j].isSectionRequiredOn = true;
-                                            goto GetOutSectionOn;
-                                        }
-                                    }
-                                }
-                            }
-                            GetOutSectionOn:
-                            tagged = 0;
-
-                            //only turn off if on
-                            if (section[j].isSectionRequiredOn == true)
-                            {
-                                section[j].isSectionRequiredOn = false;
-                                //calculate the slopes of the lines
-                                mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                                mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-                                start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                                end = section[j].rpSectionWidth - 1 + start;
-                                tagged = 0;
-
-                                for (int pos = start; pos <= end; pos++)
-                                {
-                                    if (isBoundaryClose)
-                                    {
-                                        endHeight = tool.rpWidth + pos;
-                                        startHeight = pos;
-                                    }
-                                    else
-                                    {
-                                        startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
-                                        endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-                                    }
-
-                                    for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
-                                    {
-                                        if (grnPixels[a] == 0)
-                                        {
-                                            tagged++;
-                                            if (tagged > tool.toolMinUnappliedPixels)
-                                            {
-                                                section[j].isSectionRequiredOn = true;
-                                                goto GetOutSectionOff;
-                                            }
-                                        }
-                                    }
-                                }
-                                GetOutSectionOff:
-                                start = 0;
-                            }
-
                             //is headland coming up
                             if (hd.isOn)
                             {
@@ -980,32 +981,6 @@ namespace AgOpenGPS
                                 }
                                 GetOutHdOn:
 
-                                //    //is headline in base to off area
-                                //    tagged = 0;
-                                //    mOn = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-
-                                //    start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                                //    end = section[j].rpSectionWidth - 1 + start;
-
-                                //    for (int pos = start; pos <= end; pos++)
-                                //    {
-                                //        endHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                                //        for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                                //        {
-                                //            if (grnPixels[a] == 250)
-                                //            {
-                                //                //tagged++;
-                                //                //if (tagged > tool.toolMinUnappliedPixels)
-                                //                {
-                                //                    isHeadlandInLookOff = true;
-                                //                    goto GetOutHdOff;
-                                //                }
-                                //            }
-                                //        }
-                                //    }
-                                //GetOutHdOff:
-
                                 //determine if look ahead points are completely in headland
                                 hd.WhereAreToolLookOnPoints();
 
@@ -1025,82 +1000,24 @@ namespace AgOpenGPS
                             }
                         }
                     }
-                    else  //Section Control in no boundary field
-                    {
-                        tagged = 0;
-                        mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-
-                        start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                        end = section[j].rpSectionWidth - 1 + start;
-
-                        for (int pos = start; pos <= end; pos++)
-                        {
-                            endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                            for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                            {
-                                if (grnPixels[a] == 0)
-                                {
-                                    tagged++;
-                                    if (tagged > tool.toolMinUnappliedPixels)
-                                    {
-                                        section[j].isSectionRequiredOn = true;
-                                        goto GetOutSectionOn;
-                                    }
-                                }
-                            }
-                        }
-                        GetOutSectionOn:
-
-                        //only turn off if on
-                        if (section[j].isSectionRequiredOn == true)
-                        {
-                            section[j].isSectionRequiredOn = false;
-                            //calculate the slopes of the lines
-                            mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                            mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-
-                            start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-
-                            end = section[j].rpSectionWidth - 1 + start;
-                            tagged = 0;
-
-                            for (int pos = start; pos <= end; pos++)
-                            {
-                                startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
-                                endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                                for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
-                                {
-                                    if (a < 0)
-                                        mOn = 0;
-                                    if (grnPixels[a] == 0)
-                                    {
-                                        tagged++;
-                                        if (tagged > tool.toolMinUnappliedPixels)
-                                        {
-                                            section[j].isSectionRequiredOn = true;
-                                            goto GetOutSectionOff;
-                                        }
-                                    }
-                                }
-                            }
-                            GetOutSectionOff:
-                            start = 0;
-                        }
-
-                        start = 0; end = 0;
-                    }
 
                     if (section[j].speedPixels < 0)
                     {
                         section[j].isSectionRequiredOn = false;
-
                         section[j].isMappingRequiredOn = false;
                         section[j].mappingOffRequest = true;
                         section[j].mappingOnRequest = false;
                     }
                 }  // end of go thru all sections "for"
+
+
+
+
+
+
+
+
+
 
                 //if Master Auto is on
                 for (int j = 0; j < tool.numOfSections; j++)
@@ -1203,9 +1120,9 @@ namespace AgOpenGPS
 
 
             //if a minute has elapsed save the field in case of crash and to be able to resume            
-            if (minuteCounter > 60 && recvCounter < 134)
+            if (MinuteCounter > 60 && recvCounter < 134)
             {
-                NMEAWatchdog.Enabled = false;
+                 NMEAWatchdog.Enabled = false;
 
                 //don't save if no gps
                 if (isJobStarted)
@@ -1220,9 +1137,9 @@ namespace AgOpenGPS
                     //FileSaveFieldKML();
                 }
 
-                if (isAutoDayNight && tenMinuteCounter > 600)
+                if (isAutoDayNight && TenMinuteCounter > 600)
                 {
-                    tenMinuteCounter = 0;
+                    TenMinuteCounter = 0;
                     isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
 
                     if (isDayTime != isDay)
@@ -1245,7 +1162,7 @@ namespace AgOpenGPS
                 }
 
                 //if its the next day, calc sunrise sunset for next day
-                minuteCounter = 0;
+                MinuteCounter = 0;
 
                 //set saving flag off
                 isSavingFile = false;
@@ -1588,7 +1505,7 @@ namespace AgOpenGPS
 
         private void MakeFlagMark()
         {
-            leftMouseDownOnOpenGL = false;
+            LeftMouseDownOnOpenGL = false;
             byte[] data1 = new byte[768];
 
             //scan the center of click and a set of square points around

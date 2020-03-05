@@ -55,7 +55,7 @@
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // lblArea
             // 
@@ -101,7 +101,7 @@
             this.btnRestart.TabIndex = 147;
             this.btnRestart.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnRestart.UseVisualStyleBackColor = false;
-            this.btnRestart.Click += new System.EventHandler(this.btnRestart_Click);
+            this.btnRestart.Click += new System.EventHandler(this.BtnRestart_Click);
             // 
             // btnDeleteLast
             // 
@@ -116,7 +116,7 @@
             this.btnDeleteLast.TabIndex = 144;
             this.btnDeleteLast.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDeleteLast.UseVisualStyleBackColor = false;
-            this.btnDeleteLast.Click += new System.EventHandler(this.btnDeleteLast_Click);
+            this.btnDeleteLast.Click += new System.EventHandler(this.BtnDeleteLast_Click);
             // 
             // btnAddPoint
             // 
@@ -131,7 +131,7 @@
             this.btnAddPoint.TabIndex = 143;
             this.btnAddPoint.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnAddPoint.UseVisualStyleBackColor = false;
-            this.btnAddPoint.Click += new System.EventHandler(this.btnAddPoint_Click);
+            this.btnAddPoint.Click += new System.EventHandler(this.BtnAddPoint_Click);
             // 
             // btnStop
             // 
@@ -145,7 +145,7 @@
             this.btnStop.TabIndex = 140;
             this.btnStop.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            this.btnStop.Click += new System.EventHandler(this.BtnStop_Click);
             // 
             // btnPausePlay
             // 
@@ -161,7 +161,7 @@
             this.btnPausePlay.Text = "Record";
             this.btnPausePlay.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnPausePlay.UseVisualStyleBackColor = false;
-            this.btnPausePlay.Click += new System.EventHandler(this.btnPausePlay_Click);
+            this.btnPausePlay.Click += new System.EventHandler(this.BtnPausePlay_Click);
             // 
             // FormBoundaryPlayer
             // 

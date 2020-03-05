@@ -8,7 +8,7 @@ namespace AgOpenGPS
 {
     public partial class FormGPSData : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormGPSData(Form callingForm)
         {

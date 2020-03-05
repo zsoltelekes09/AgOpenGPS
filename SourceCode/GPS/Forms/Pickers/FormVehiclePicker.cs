@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormVehiclePicker : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormVehiclePicker(Form callingForm)
         {

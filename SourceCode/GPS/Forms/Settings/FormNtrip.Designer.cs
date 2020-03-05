@@ -105,7 +105,7 @@
             this.cboxIsNTRIPOn.TabIndex = 92;
             this.cboxIsNTRIPOn.Text = "NTRIP On";
             this.cboxIsNTRIPOn.UseVisualStyleBackColor = false;
-            this.cboxIsNTRIPOn.CheckedChanged += new System.EventHandler(this.cboxIsNTRIPOn_CheckedChanged);
+            this.cboxIsNTRIPOn.CheckedChanged += new System.EventHandler(this.CboxIsNTRIPOn_CheckedChanged);
             // 
             // tboxCasterIP
             // 
@@ -116,7 +116,7 @@
             this.tboxCasterIP.Size = new System.Drawing.Size(157, 33);
             this.tboxCasterIP.TabIndex = 79;
             this.tboxCasterIP.Text = "192.168.188.255";
-            this.tboxCasterIP.Validating += new System.ComponentModel.CancelEventHandler(this.tboxCasterIP_Validating);
+            this.tboxCasterIP.Validating += new System.ComponentModel.CancelEventHandler(this.TboxCasterIP_Validating);
             // 
             // nudCasterPort
             // 
@@ -221,7 +221,7 @@
             0,
             0,
             0});
-            this.nudSendToUDPPort.ValueChanged += new System.EventHandler(this.nudSendToUDPPort_ValueChanged);
+            this.nudSendToUDPPort.ValueChanged += new System.EventHandler(this.NudSendToUDPPort_ValueChanged);
             this.nudSendToUDPPort.Enter += new System.EventHandler(this.NudSendToUDPPort_Enter);
             // 
             // label10
@@ -261,7 +261,7 @@
             this.btnSerialOK.TabIndex = 94;
             this.btnSerialOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnSerialOK.UseVisualStyleBackColor = true;
-            this.btnSerialOK.Click += new System.EventHandler(this.btnSerialOK_Click);
+            this.btnSerialOK.Click += new System.EventHandler(this.BtnSerialOK_Click);
             // 
             // label7
             // 
@@ -350,7 +350,7 @@
             0,
             0,
             0});
-            this.nudGGAInterval.ValueChanged += new System.EventHandler(this.nudGGAInterval_ValueChanged);
+            this.nudGGAInterval.ValueChanged += new System.EventHandler(this.NudGGAInterval_ValueChanged);
             this.nudGGAInterval.Enter += new System.EventHandler(this.NudGGAInterval_Enter);
             // 
             // label15
@@ -382,7 +382,7 @@
             this.btnGetIP.TabIndex = 109;
             this.btnGetIP.Text = "Confirm IP";
             this.btnGetIP.UseVisualStyleBackColor = true;
-            this.btnGetIP.Click += new System.EventHandler(this.btnGetIP_Click);
+            this.btnGetIP.Click += new System.EventHandler(this.BtnGetIP_Click);
             // 
             // label2
             // 
@@ -490,7 +490,7 @@
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 500;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // label9
             // 
@@ -551,7 +551,7 @@
             this.btnGetSourceTable.TabIndex = 127;
             this.btnGetSourceTable.Text = "Get Source Table";
             this.btnGetSourceTable.UseVisualStyleBackColor = true;
-            this.btnGetSourceTable.Click += new System.EventHandler(this.btnGetSourceTable_Click);
+            this.btnGetSourceTable.Click += new System.EventHandler(this.BtnGetSourceTable_Click);
             // 
             // btnSetManualPosition
             // 
@@ -562,7 +562,7 @@
             this.btnSetManualPosition.TabIndex = 121;
             this.btnSetManualPosition.Text = "Send To Manual Fix";
             this.btnSetManualPosition.UseVisualStyleBackColor = true;
-            this.btnSetManualPosition.Click += new System.EventHandler(this.btnSetManualPosition_Click);
+            this.btnSetManualPosition.Click += new System.EventHandler(this.BtnSetManualPosition_Click);
             // 
             // cboxGGAManual
             // 

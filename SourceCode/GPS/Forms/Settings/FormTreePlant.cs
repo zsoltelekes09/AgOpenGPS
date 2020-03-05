@@ -6,7 +6,7 @@ namespace AgOpenGPS
 {
     public partial class FormTreePlant : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
         private double lastDist;
         private bool wasRed, isRunning;
         private int trees;
@@ -32,7 +32,7 @@ namespace AgOpenGPS
             nudTreeSpacing.Controls[0].Enabled = false;
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
+        private void BtnStop_Click(object sender, EventArgs e)
         {
             if (mf.manualBtnState != AgOpenGPS.FormGPS.btnStates.Off)
             {
@@ -44,7 +44,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             if (isRunning)
             {
@@ -70,7 +70,7 @@ namespace AgOpenGPS
             lastDist = mf.treeSpacingCounter;
         }
 
-        private void btnZeroDistance_Click(object sender, EventArgs e)
+        private void BtnZeroDistance_Click(object sender, EventArgs e)
         {
             if (isRunning)
             {

@@ -5,7 +5,7 @@ namespace AgOpenGPS
     public class CModuleComm
     {
         //copy of the mainform address
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         //Critical Safety Properties
         public bool isOutOfBounds = true;

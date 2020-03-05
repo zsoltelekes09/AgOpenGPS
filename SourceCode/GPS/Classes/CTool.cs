@@ -38,9 +38,6 @@ namespace AgOpenGPS
         //used for super section off on
         public int toolMinUnappliedPixels;
 
-        public bool isSuperSectionAllowedOn;
-        public bool areAllSectionBtnsOn = true;
-
         public bool isLeftSideInHeadland = true, isRightSideInHeadland = true;
 
         //read pixel values
@@ -80,7 +77,6 @@ namespace AgOpenGPS
         public void DrawTool()
         {
 
-#pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
             //translate and rotate at pivot axle
             GL.Translate(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0);
             GL.PushMatrix();
@@ -130,7 +126,6 @@ namespace AgOpenGPS
             {
                 GL.Rotate(glm.toDegrees(-mf.toolPos.heading), 0.0, 0.0, 1.0);
             }
-#pragma warning restore CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
 
             //draw the hitch if trailing
             if (isToolTrailing)

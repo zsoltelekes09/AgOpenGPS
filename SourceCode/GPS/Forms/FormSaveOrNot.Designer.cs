@@ -56,7 +56,7 @@
             this.btnReturn.Size = new System.Drawing.Size(127, 85);
             this.btnReturn.TabIndex = 5;
             this.btnReturn.UseVisualStyleBackColor = true;
-            this.btnReturn.Click += new System.EventHandler(this.btnReturn_Click);
+            this.btnReturn.Click += new System.EventHandler(this.BtnReturn_Click);
             // 
             // btnOk
             // 
@@ -68,7 +68,7 @@
             this.btnOk.Size = new System.Drawing.Size(127, 85);
             this.btnOk.TabIndex = 0;
             this.btnOk.UseVisualStyleBackColor = true;
-            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+            this.btnOk.Click += new System.EventHandler(this.BtnOk_Click);
             // 
             // label2
             // 

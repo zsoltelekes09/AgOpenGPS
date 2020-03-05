@@ -59,7 +59,7 @@
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // label12
             // 
@@ -108,7 +108,7 @@
             this.btnZeroDistance.Text = "Begin";
             this.btnZeroDistance.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnZeroDistance.UseVisualStyleBackColor = false;
-            this.btnZeroDistance.Click += new System.EventHandler(this.btnZeroDistance_Click);
+            this.btnZeroDistance.Click += new System.EventHandler(this.BtnZeroDistance_Click);
             // 
             // btnStop
             // 
@@ -123,7 +123,7 @@
             this.btnStop.TabIndex = 141;
             this.btnStop.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            this.btnStop.Click += new System.EventHandler(this.BtnStop_Click);
             // 
             // lblSpeed
             // 

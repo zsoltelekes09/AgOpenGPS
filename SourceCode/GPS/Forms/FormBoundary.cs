@@ -9,7 +9,7 @@ namespace AgOpenGPS
 {
     public partial class FormBoundary : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private bool Selectedreset = true;
         private int position = 0;
@@ -249,19 +249,19 @@ namespace AgOpenGPS
             UpdateChart();
         }
 
-        private void btnSerialCancel_Click(object sender, EventArgs e)
+        private void BtnSerialCancel_Click(object sender, EventArgs e)
         {
             mf.bnd.boundarySelected = -1;
             mf.bnd.isOkToAddPoints = false;
         }
 
-        private void btnLeftRight_Click(object sender, EventArgs e)
+        private void BtnLeftRight_Click(object sender, EventArgs e)
         {
             mf.bnd.isDrawRightSide = !mf.bnd.isDrawRightSide;
             btnLeftRight.Image = mf.bnd.isDrawRightSide ? Properties.Resources.BoundaryRight : Properties.Resources.BoundaryLeft;
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
+        private void BtnDelete_Click(object sender, EventArgs e)
         {
             btnDelete.Enabled = false;
 
@@ -304,7 +304,7 @@ namespace AgOpenGPS
             btnDelete.Enabled = false;
         }
 
-        private void btnOpenGoogleEarth_Click(object sender, EventArgs e)
+        private void BtnOpenGoogleEarth_Click(object sender, EventArgs e)
         {
             //save new copy of kml with selected flag and view in GoogleEarth
             mf.FileMakeKMLFromCurrentPosition(mf.pn.latitude, mf.pn.longitude);
@@ -325,7 +325,7 @@ namespace AgOpenGPS
             this.DialogResult = DialogResult.OK;
         }
 
-        private void btnDeleteAll_Click(object sender, EventArgs e)
+        private void BtnDeleteAll_Click(object sender, EventArgs e)
         {
             ResetAllBoundary();
 
@@ -342,7 +342,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnLoadBoundaryFromGE_Click(object sender, EventArgs e)
+        private void BtnLoadBoundaryFromGE_Click(object sender, EventArgs e)
         {
             if (sender is Button button)
             {

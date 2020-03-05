@@ -68,10 +68,10 @@
             this.oglSelf.Size = new System.Drawing.Size(700, 700);
             this.oglSelf.TabIndex = 183;
             this.oglSelf.VSync = false;
-            this.oglSelf.Load += new System.EventHandler(this.oglSelf_Load);
-            this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.oglSelf_Paint);
-            this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.oglSelf_MouseDown);
-            this.oglSelf.Resize += new System.EventHandler(this.oglSelf_Resize);
+            this.oglSelf.Load += new System.EventHandler(this.OglSelf_Load);
+            this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.OglSelf_Paint);
+            this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OglSelf_MouseDown);
+            this.oglSelf.Resize += new System.EventHandler(this.OglSelf_Resize);
             // 
             // btnExit
             // 
@@ -85,7 +85,7 @@
             this.btnExit.Size = new System.Drawing.Size(123, 70);
             this.btnExit.TabIndex = 234;
             this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
             // 
             // btnMakeABLine
             // 
@@ -358,7 +358,7 @@
             this.nudDistance.Size = new System.Drawing.Size(132, 52);
             this.nudDistance.TabIndex = 338;
             this.nudDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudDistance.Enter += new System.EventHandler(this.nudDistance_Enter);
+            this.nudDistance.Enter += new System.EventHandler(this.NudDistance_Enter);
             // 
             // label5
             // 
@@ -387,7 +387,7 @@
             this.btnDrawSections.TabIndex = 340;
             this.btnDrawSections.Text = "Off";
             this.btnDrawSections.UseVisualStyleBackColor = false;
-            this.btnDrawSections.Click += new System.EventHandler(this.btnDrawSections_Click);
+            this.btnDrawSections.Click += new System.EventHandler(this.BtnDrawSections_Click);
             // 
             // label6
             // 
@@ -409,7 +409,7 @@
             this.button1.TabIndex = 342;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // button2
             // 
@@ -419,7 +419,7 @@
             this.button2.TabIndex = 343;
             this.button2.Text = "button2";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // FormABDraw
             // 

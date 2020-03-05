@@ -7,7 +7,7 @@ namespace AgOpenGPS
 {
     public partial class FormSteerGraph : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         //chart data
         private string dataSteerAngle = "0";
@@ -25,7 +25,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsSteerChart;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             DrawChart();
         }
@@ -34,10 +34,8 @@ namespace AgOpenGPS
         {
             {
                 //word 0 - steerangle, 1 - pwmDisplay
-#pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
                 dataSteerAngle = mf.actualSteerAngleDisp.ToString();
                 dataPWM = mf.guidanceLineSteerAngle.ToString();
-#pragma warning restore CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
 
                 lblSteerAng.Text = mf.ActualSteerAngle;
                 lblPWM.Text = mf.SetSteerAngle;
@@ -74,7 +72,7 @@ namespace AgOpenGPS
             timer1.Interval = (int)((1 / (double)mf.fixUpdateHz) * 1000);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             Close();
         }

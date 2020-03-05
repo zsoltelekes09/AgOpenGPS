@@ -15,14 +15,14 @@ namespace AgOpenGPS
             this.label1.Text = gStr.gsSaveAndExit;
         }
 
-        private void btnOk_Click(object sender, EventArgs e)
+        private void BtnOk_Click(object sender, EventArgs e)
         {
             //back to FormGPS
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private void btnReturn_Click(object sender, EventArgs e)
+        private void BtnReturn_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Ignore;
             Close();

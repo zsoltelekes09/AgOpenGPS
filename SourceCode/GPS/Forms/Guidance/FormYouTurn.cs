@@ -764,7 +764,7 @@ namespace AgOpenGPS
 
         // YouTurn Tab
 
-        private void btnYouTurnKeyHole_Click(object sender, EventArgs e)
+        private void BtnYouTurnKeyHole_Click(object sender, EventArgs e)
         {
             mf.yt.LoadYouTurnShapeFromFile(@".\Dependencies/YouTurnShapes\KeyHole.txt");
             Properties.Settings.Default.setAS_youTurnShape = "KeyHole.txt";
@@ -775,7 +775,7 @@ namespace AgOpenGPS
             btnYouTurnWideReturn.BackColor = Color.Silver;
         }
 
-        private void btnYouTurnSemiCircle_Click(object sender, EventArgs e)
+        private void BtnYouTurnSemiCircle_Click(object sender, EventArgs e)
         {
             mf.yt.LoadYouTurnShapeFromFile(@".\Dependencies\YouTurnShapes\SemiCircle.txt");
             Properties.Settings.Default.setAS_youTurnShape = "SemiCircle.txt";
@@ -786,7 +786,7 @@ namespace AgOpenGPS
             btnYouTurnWideReturn.BackColor = Color.Silver;
         }
 
-        private void btnYouTurnWideReturn_Click(object sender, EventArgs e)
+        private void BtnYouTurnWideReturn_Click(object sender, EventArgs e)
         {
             mf.yt.LoadYouTurnShapeFromFile(@".\Dependencies\YouTurnShapes\WideReturn.txt");
             Properties.Settings.Default.setAS_youTurnShape = "WideReturn.txt";
@@ -797,7 +797,7 @@ namespace AgOpenGPS
             btnYouTurnWideReturn.BackColor = Color.LimeGreen;
         }
 
-        private void btnYouTurnCustom_Click(object sender, EventArgs e)
+        private void BtnYouTurnCustom_Click(object sender, EventArgs e)
         {
             mf.yt.LoadYouTurnShapeFromFile(@".\Dependencies\YouTurnShapes\Custom.txt");
             Properties.Settings.Default.setAS_youTurnShape = "Custom.txt";
@@ -808,7 +808,7 @@ namespace AgOpenGPS
             btnYouTurnWideReturn.BackColor = Color.Silver;
         }
 
-        private void btnYouTurnRecord_Click(object sender, EventArgs e)
+        private void BtnYouTurnRecord_Click(object sender, EventArgs e)
         {
             if (mf.ABLine.isABLineSet)
             {
@@ -821,7 +821,7 @@ namespace AgOpenGPS
             else { mf.TimedMessageBox(3000, "No AB Lines", "Start AB Line Guidance"); }
         }
 
-        private void btnIsUsingDubins_Click(object sender, EventArgs e)
+        private void BtnIsUsingDubins_Click(object sender, EventArgs e)
         {
             if (mf.yt.isUsingDubinsTurn)
             {
@@ -847,7 +847,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxRowWidth_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxRowWidth_SelectedIndexChanged(object sender, EventArgs e)
         {
             mf.yt.rowSkipsWidth = cboxRowWidth.SelectedIndex + 1;
         }
@@ -856,7 +856,7 @@ namespace AgOpenGPS
 
         #region distance
 
-        private void btnDistanceDn_Click(object sender, EventArgs e)
+        private void BtnDistanceDn_Click(object sender, EventArgs e)
         {
             if (mf.yt.youTurnStartOffset-- < 4) mf.yt.youTurnStartOffset = 3;
             lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
@@ -864,7 +864,7 @@ namespace AgOpenGPS
             else lblWhenTrig.Text = gStr.gsAfter;
         }
 
-        private void btnDistanceUp_Click(object sender, EventArgs e)
+        private void BtnDistanceUp_Click(object sender, EventArgs e)
         {
             if (mf.yt.youTurnStartOffset++ > 49) mf.yt.youTurnStartOffset = 50;
             lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
@@ -872,26 +872,26 @@ namespace AgOpenGPS
             else lblWhenTrig.Text = gStr.gsAfter;
         }
 
-        private void btnTriggerDistanceUp_MouseDown(object sender, MouseEventArgs e)
+        private void BtnTriggerDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
             if (mf.yt.triggerDistanceOffset++ > 50) mf.yt.triggerDistanceOffset = 50;
             lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
         }
 
-        private void btnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
+        private void BtnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
             mf.yt.triggerDistanceOffset--;
             if (mf.yt.triggerDistanceOffset < 0) mf.yt.triggerDistanceOffset = 0;
             lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
         }
 
-        private void btnGeoFenceDistanceUp_MouseDown(object sender, MouseEventArgs e)
+        private void BtnGeoFenceDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
             if (mf.yt.geoFenceDistance++ > 50) mf.yt.geoFenceDistance = 50;
             lblGeoFenceDistance.Text = mf.yt.geoFenceDistance.ToString() + "m";
         }
 
-        private void btnGeoFenceDistanceDn_MouseDown(object sender, MouseEventArgs e)
+        private void BtnGeoFenceDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
             mf.yt.geoFenceDistance--;
             if (mf.yt.geoFenceDistance < 0) mf.yt.geoFenceDistance = 0;
@@ -902,7 +902,7 @@ namespace AgOpenGPS
 
         #region Sequence select
 
-        private void cboxEnterFunc0_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc0_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc0.SelectedIndex == 0)
             {
@@ -911,7 +911,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxEnterFunc1_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc1.SelectedIndex == 0)
             {
@@ -920,7 +920,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxEnterFunc2_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc2_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc2.SelectedIndex == 0)
             {
@@ -929,7 +929,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxEnterFunc3_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc3_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc3.SelectedIndex == 0)
             {
@@ -938,7 +938,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxEnterFunc4_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc4_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc4.SelectedIndex == 0)
             {
@@ -947,7 +947,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxEnterFunc5_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc5_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc5.SelectedIndex == 0)
             {
@@ -956,7 +956,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxEnterFunc6_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc6_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc6.SelectedIndex == 0)
             {
@@ -965,7 +965,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxEnterFunc7_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxEnterFunc7_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxEnterFunc7.SelectedIndex == 0)
             {
@@ -974,7 +974,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc0_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc0_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc0.SelectedIndex == 0)
             {
@@ -983,7 +983,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc1_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc1.SelectedIndex == 0)
             {
@@ -992,7 +992,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc2_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc2_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc2.SelectedIndex == 0)
             {
@@ -1001,7 +1001,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc3_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc3_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc3.SelectedIndex == 0)
             {
@@ -1010,7 +1010,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc4_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc4_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc4.SelectedIndex == 0)
             {
@@ -1019,7 +1019,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc5_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc5_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc5.SelectedIndex == 0)
             {
@@ -1028,7 +1028,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc6_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc6_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc6.SelectedIndex == 0)
             {
@@ -1037,7 +1037,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxExitFunc7_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxExitFunc7_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cboxExitFunc7.SelectedIndex == 0)
             {
@@ -1050,7 +1050,7 @@ namespace AgOpenGPS
 
         #region Edit names
 
-        private void btnSaveNames_Click(object sender, EventArgs e)
+        private void BtnSaveNames_Click(object sender, EventArgs e)
         {
             //pos1 = tboxPos1.Text; pos2 = tboxPos2.Text; auto manual buttons are read only
             mf.seq.pos3 = tboxPos3.Text;
@@ -1122,13 +1122,13 @@ namespace AgOpenGPS
             mf.TimedMessageBox(1500, "Function Names", "Saved to Settings.....");
         }
 
-        private void btnEditCancel_Click(object sender, EventArgs e)
+        private void BtnEditCancel_Click(object sender, EventArgs e)
         {
             //select entry tab page 1
             tabControl1.SelectTab(1);
         }
 
-        private void tabEdit_Enter(object sender, EventArgs e)
+        private void TabEdit_Enter(object sender, EventArgs e)
         {
             btnOK.Enabled = false;
             btnCancel.Enabled = false;
@@ -1148,7 +1148,7 @@ namespace AgOpenGPS
             LoadEditFunctionNames();
         }
 
-        private void tabEdit_Leave(object sender, EventArgs e)
+        private void TabEdit_Leave(object sender, EventArgs e)
         {
             btnOK.Enabled = true;
             btnCancel.Enabled = true;
@@ -1163,7 +1163,7 @@ namespace AgOpenGPS
         //    mf.mc.machineControlData[mf.mc.cnYouTurnByte] = 0;
         //}
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOK_Click(object sender, EventArgs e)
         {
             //save all the sequences and events
             SaveSequences();
@@ -1247,7 +1247,7 @@ namespace AgOpenGPS
             mf.yt.ResetCreatedYouTurn();
         }
 
-        private void btnTurnAllOff_Click(object sender, EventArgs e)
+        private void BtnTurnAllOff_Click(object sender, EventArgs e)
         {
             mf.mc.machineData[mf.mc.mdUTurn] = 0;
             FunctionButtonsOnOff();
@@ -1258,7 +1258,7 @@ namespace AgOpenGPS
             return (b & (1 << pos)) != 0;
         }
 
-        private void btnToggle3_Click(object sender, EventArgs e)
+        private void BtnToggle3_Click(object sender, EventArgs e)
         {
             if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 0))
                 mf.mc.machineData[mf.mc.mdUTurn] &= 0b11111110;
@@ -1266,7 +1266,7 @@ namespace AgOpenGPS
             FunctionButtonsOnOff();
         }
 
-        private void btnToggle4_Click(object sender, EventArgs e)
+        private void BtnToggle4_Click(object sender, EventArgs e)
         {
             if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 1))
                 mf.mc.machineData[mf.mc.mdUTurn] &= 0b11111101;
@@ -1274,7 +1274,7 @@ namespace AgOpenGPS
             FunctionButtonsOnOff();
         }
 
-        private void btnToggle5_Click(object sender, EventArgs e)
+        private void BtnToggle5_Click(object sender, EventArgs e)
         {
             if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 2))
                 mf.mc.machineData[mf.mc.mdUTurn] &= 0b11111011;
@@ -1282,7 +1282,7 @@ namespace AgOpenGPS
             FunctionButtonsOnOff();
         }
 
-        private void btnToggle6_Click(object sender, EventArgs e)
+        private void BtnToggle6_Click(object sender, EventArgs e)
         {
             if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 3))
                 mf.mc.machineData[mf.mc.mdUTurn] &= 0b11110111;
@@ -1290,7 +1290,7 @@ namespace AgOpenGPS
             FunctionButtonsOnOff();
         }
 
-        private void btnToggle7_Click(object sender, EventArgs e)
+        private void BtnToggle7_Click(object sender, EventArgs e)
         {
             if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 4))
                 mf.mc.machineData[mf.mc.mdUTurn] &= 0b11101111;
@@ -1298,7 +1298,7 @@ namespace AgOpenGPS
             FunctionButtonsOnOff();
         }
 
-        private void btnToggle8_Click(object sender, EventArgs e)
+        private void BtnToggle8_Click(object sender, EventArgs e)
         {
             if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 5))
                 mf.mc.machineData[mf.mc.mdUTurn] &= 0b11011111;

@@ -1,15 +1,8 @@
-﻿//Please, if you use this, share the improvements
-
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 using AgOpenGPS.Properties;
-using Microsoft.Win32;
-using System.Collections.Generic;
 using System.Globalization;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-
 
 namespace AgOpenGPS
 {
@@ -1090,7 +1083,7 @@ namespace AgOpenGPS
 
                 mouseX = point.X;
                 mouseY = oglMain.Height - point.Y;
-                leftMouseDownOnOpenGL = true;
+                LeftMouseDownOnOpenGL = true;
             }
         }
         private void oglZoom_MouseClick(object sender, MouseEventArgs e)
@@ -1182,7 +1175,7 @@ namespace AgOpenGPS
 
             testHalfSecond1 = testHalfSecond.ElapsedMilliseconds;
             lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
-            lblHz2.Text = (int)(frameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();
+            lblHz2.Text = (int)(FrameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();
 
             HalfSecondUpdate.Enabled = true;
         }
@@ -1194,8 +1187,8 @@ namespace AgOpenGPS
             testOneSecond.Start();
 
             //counter used for saving field in background
-            minuteCounter++;
-            tenMinuteCounter++;
+            MinuteCounter++;
+            TenMinuteCounter++;
 
             if (isRTK)
             {
@@ -1242,27 +1235,15 @@ namespace AgOpenGPS
                 lblUturnByte.Text = Convert.ToString(mc.machineData[mc.mdUTurn], 2).PadLeft(6, '0');
             }
 
-            if (ABLine.isBtnABLineOn && !ct.isContourBtnOn)
-            {
-                btnEditHeadingB.Text = ((int)(ABLine.moveDistance * 100)).ToString();
-            }
-            if (curve.isBtnCurveOn && !ct.isContourBtnOn)
-            {
-                btnEditHeadingB.Text = ((int)(curve.moveDistance * 100)).ToString();
-            }
+            if (ABLine.isBtnABLineOn && !ct.isContourBtnOn) btnEditHeadingB.Text = ((int)(ABLine.moveDistance * 100)).ToString();
+            if (curve.isBtnCurveOn && !ct.isContourBtnOn) btnEditHeadingB.Text = ((int)(curve.moveDistance * 100)).ToString();
 
             pbarAutoSteerComm.Value = pbarSteer;
             pbarUDPComm.Value = pbarUDP;
             pbarMachineComm.Value = pbarMachine;
 
-            if (mc.steerSwitchValue == 0)
-            {
-                this.btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
-            }
-            else
-            {
-                this.btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
-            }
+            if (mc.steerSwitchValue == 0) btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
+            else btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
 
             //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
             if (isJobStarted && ahrs.isAutoSteerAuto && !recPath.isDrivingRecordedPath &&
@@ -1285,7 +1266,7 @@ namespace AgOpenGPS
             if (isNTRIP_TurnedOn)
             {
                 //increment once every second
-                ntripCounter++;
+                NtripCounter++;
 
                 //Thinks is connected but not receiving anything // 30sec maybe a bit much?
                 if (NTRIP_Watchdog++ > 10 && isNTRIP_Connected) ReconnectRequest();
@@ -1293,12 +1274,12 @@ namespace AgOpenGPS
                 //Have we connection
                 if (!isNTRIP_Connected && !isNTRIP_Connecting)
                 {
-                    if (ntripCounter > 20) StartNTRIP();
+                    if (NtripCounter > 20) StartNTRIP();
                 }
 
                 if (isNTRIP_Connecting)
                 {
-                    if (ntripCounter > 25)//give it 5 seconds
+                    if (NtripCounter > 25)//give it 5 seconds
                     {
                         TimedMessageBox(2000, gStr.gsSocketConnectionProblem, gStr.gsNotConnectingToCaster);
                         ReconnectRequest();
@@ -1310,8 +1291,8 @@ namespace AgOpenGPS
                 }
 
                 //update byte counter and up counter
-                if (ntripCounter > 20) lblNTRIPSeconds.Text = string.Format("{0:00}:{1:00}", ((ntripCounter-21) / 60), (Math.Abs(ntripCounter-21)) % 60);
-                else lblNTRIPSeconds.Text = gStr.gsConnectingIn + " " + (Math.Abs(ntripCounter - 21));
+                if (NtripCounter > 20) lblNTRIPSeconds.Text = string.Format("{0:00}:{1:00}", ((NtripCounter-21) / 60), (Math.Abs(NtripCounter-21)) % 60);
+                else lblNTRIPSeconds.Text = gStr.gsConnectingIn + " " + (Math.Abs(NtripCounter - 21));
 
                 pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
                 NTRIPBytesMenu.Text = ((tripBytes) * 0.001).ToString("###,###,###") + " kb";
@@ -1332,37 +1313,13 @@ namespace AgOpenGPS
             }
 
             //the main formgps window
-            if (isMetric)  //metric or imperial
-            {
-                //Hectares on the master section soft control and sections
-                btnSectionOffAutoOn.Text = fd.WorkedHectares;
-
-                //status strip values
-                distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares2;
-
-            }
-            else  //Imperial Measurements
-            {
-                //acres on the master section soft control and sections
-                btnSectionOffAutoOn.Text = fd.WorkedAcres;
-
-                //status strip values
-                distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
-            }
+            //status strip values
+            if (isMetric) distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares2;
+            else distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres2;
 
             //statusbar flash red undefined headland
-            if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent
-                || !mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato)
-            {
-                if (!mc.isOutOfBounds)
-                {
-                    statusStripBottom.BackColor = Color.Transparent;
-                }
-                else
-                {
-                    statusStripBottom.BackColor = Color.Tomato;
-                }
-            }
+            if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent) statusStripBottom.BackColor = Color.Tomato;
+            else if (!mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato) statusStripBottom.BackColor = Color.Transparent;
 
             testOneSecond1 = testOneSecond.ElapsedMilliseconds;
             OneSecondUpdate.Enabled = true;
@@ -1380,14 +1337,8 @@ namespace AgOpenGPS
 
             if (panelBatman.Visible)
             {
-                if (isMetric)
-                {
-                    lblAltitude.Text = Altitude;
-                }
-                else //imperial
-                {
-                    lblAltitude.Text = AltitudeFeet;
-                }
+                if (isMetric) lblAltitude.Text = Altitude;
+                else lblAltitude.Text = AltitudeFeet;
 
                 lblZone.Text = pn.zone.ToString();
             }
@@ -1405,7 +1356,6 @@ namespace AgOpenGPS
                 lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
                 lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ha).ToString("N3"));
 
-                btnManualOffOn.Text = fd.AreaBoundaryLessInnersHectares;
                 lblEqSpec.Text = (Math.Round(tool.toolWidth, 2)).ToString() + " m  " + vehicleFileName + toolFileName;
             }
             else //imperial
@@ -1421,7 +1371,6 @@ namespace AgOpenGPS
                 lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
                 lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ac).ToString("N3"));
 
-                btnManualOffOn.Text = fd.AreaBoundaryLessInnersAcres;
                 lblEqSpec.Text = (Math.Round(tool.toolWidth * glm.m2ft, 2)).ToString() + " ft  " + vehicleFileName + toolFileName;
             }
 

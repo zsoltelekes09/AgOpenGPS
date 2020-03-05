@@ -6,7 +6,7 @@ namespace AgOpenGPS
 {
     public partial class FormIMU : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private decimal minFixStepDistance;
 
@@ -53,7 +53,7 @@ namespace AgOpenGPS
 
         #region EntryExit
 
-        private void bntOK_Click(object sender, EventArgs e)
+        private void BntOK_Click(object sender, EventArgs e)
         {
             ////Display ---load the delay slides --------------------------------------------------------------------
             Properties.Settings.Default.setIMU_UID = tboxTinkerUID.Text.Trim();
@@ -94,7 +94,7 @@ namespace AgOpenGPS
             this.Dispose();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             { DialogResult = DialogResult.Cancel; Close(); }
         }
@@ -145,7 +145,7 @@ namespace AgOpenGPS
 
         #endregion EntryExit
 
-        private void btnRemoveZeroOffset_Click(object sender, EventArgs e)
+        private void BtnRemoveZeroOffset_Click(object sender, EventArgs e)
         {
             mf.ahrs.rollZeroX16 = 0;
             lblRollZeroOffset.Text = "0.00";
@@ -153,15 +153,15 @@ namespace AgOpenGPS
             Properties.Settings.Default.Save();
         }
 
-        private void btnRemoveZeroOffsetPitch_Click(object sender, EventArgs e)
+        private void BtnRemoveZeroOffsetPitch_Click(object sender, EventArgs e)
         {
         }
 
-        private void btnZeroPitch_Click(object sender, EventArgs e)
+        private void BtnZeroPitch_Click(object sender, EventArgs e)
         {
         }
 
-        private void btnZeroRoll_Click(object sender, EventArgs e)
+        private void BtnZeroRoll_Click(object sender, EventArgs e)
         {
             if (mf.ahrs.rollX16 == 9999)
             {
@@ -187,7 +187,7 @@ namespace AgOpenGPS
             btnCancel.Focus();
         }
 
-        private void rbtnGGA_CheckedChanged(object sender, EventArgs e)
+        private void RbtnGGA_CheckedChanged(object sender, EventArgs e)
         {
             var checkedButton = groupBox4.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked);
             Properties.Settings.Default.setGPS_fixFromWhichSentence = checkedButton.Text;
@@ -195,7 +195,7 @@ namespace AgOpenGPS
             mf.pn.fixFrom = checkedButton.Text;
         }
 
-        private void rbtnHeadingFix_CheckedChanged(object sender, EventArgs e)
+        private void RbtnHeadingFix_CheckedChanged(object sender, EventArgs e)
         {
             var checkedButton = headingGroupBox.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked);
             Properties.Settings.Default.setGPS_headingFromWhichSource = checkedButton.Text;
@@ -203,7 +203,7 @@ namespace AgOpenGPS
             mf.headingFromSource = checkedButton.Text;
         }
 
-        private void cboxNMEAHz_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxNMEAHz_SelectedIndexChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.setPort_NMEAHz = Convert.ToInt32(cboxNMEAHz.SelectedItem);
             Properties.Settings.Default.Save();

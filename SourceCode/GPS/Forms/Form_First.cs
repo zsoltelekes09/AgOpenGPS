@@ -11,12 +11,12 @@ namespace AgOpenGPS
             InitializeComponent();
         }
 
-        private void linkLabelGit_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LinkLabelGit_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.Link.LinkData.ToString());
         }
 
-        private void linkLabelCombineForum_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LinkLabelCombineForum_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.Link.LinkData.ToString());
         }
@@ -39,14 +39,14 @@ namespace AgOpenGPS
             cboxStart.Checked = Properties.Settings.Default.setDisplay_isTermsOn;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setDisplay_isTermsOn = cboxStart.Checked;
             Properties.Settings.Default.Save();
             Close();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setDisplay_isTermsOn = true;
             Properties.Settings.Default.Save();

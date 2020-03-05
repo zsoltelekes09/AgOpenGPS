@@ -5,7 +5,7 @@ namespace AgOpenGPS
 {
     public partial class FormEditAB : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private double snapAdj = 0;
 

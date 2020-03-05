@@ -129,7 +129,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnAddToFile_Click(object sender, EventArgs e)
+        private void BtnAddToFile_Click(object sender, EventArgs e)
         {
             if (mf.curve.refList.Count > 0)
             {
@@ -231,7 +231,7 @@ namespace AgOpenGPS
             btnAPoint.Enabled = true;
         }
 
-        private void btnAPoint_Click(object sender, System.EventArgs e)
+        private void BtnAPoint_Click(object sender, System.EventArgs e)
         {
             mf.curve.moveDistance = 0;
             //clear out the reference list
@@ -245,7 +245,7 @@ namespace AgOpenGPS
             btnBPoint.Enabled = true;
         }
 
-        private void btnBPoint_Click(object sender, System.EventArgs e)
+        private void BtnBPoint_Click(object sender, System.EventArgs e)
         {
             mf.curve.aveLineHeading = 0;
             mf.curve.isOkToAddPoints = false;
@@ -383,7 +383,7 @@ namespace AgOpenGPS
             textBox1.Text = "";
         }
 
-        private void btnCancel_Click(object sender, System.EventArgs e)
+        private void BtnCancel_Click(object sender, System.EventArgs e)
         {
             mf.curve.oldhowManyPathsAway = -99999;
             mf.curve.moveDistance = 0;
@@ -403,7 +403,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnListDelete_Click(object sender, EventArgs e)
+        private void BtnListDelete_Click(object sender, EventArgs e)
         {
             mf.curve.moveDistance = 0;
 
@@ -429,7 +429,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnListUse_Click(object sender, EventArgs e)
+        private void BtnListUse_Click(object sender, EventArgs e)
         {
             mf.curve.oldhowManyPathsAway = -99999;
             mf.curve.moveDistance = 0;
@@ -506,7 +506,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnPausePlay_Click(object sender, EventArgs e)
+        private void BtnPausePlay_Click(object sender, EventArgs e)
         {
             if (mf.curve.isOkToAddPoints)
             {

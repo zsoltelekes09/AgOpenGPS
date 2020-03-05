@@ -200,7 +200,6 @@ namespace AgOpenGPS
 
         //    //if (!isToolHeadingSameAsABHeading) headAB += Math.PI;
 
-        //    //#pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
 
         //    //            mf.hl.FindClosestHeadlandPoint(mf.toolPos, mf.toolPos.heading);
         //    //            if ((int)mf.hl.closestHeadlandPt.easting != -20000)
@@ -215,7 +214,6 @@ namespace AgOpenGPS
         //    //                mf.distTool = -3333;
         //    //                return;
         //    //            }
-        //    //#pragma warning restore CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
 
         //    //            //make distance sign correct
         //    //            if (isInHeadland) mf.distTool *= -1;
@@ -293,7 +291,6 @@ namespace AgOpenGPS
                 //determine if Section is entry or exit based on trigger point direction
                 //bool isToolHeadingSameAsABHeading;
 
-#pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
 
                 if (mf.yt.onA <= 0)
                 {

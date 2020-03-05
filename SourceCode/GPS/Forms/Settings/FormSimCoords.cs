@@ -6,7 +6,7 @@ namespace AgOpenGPS
     public partial class FormSimCoords : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormSimCoords(Form callingForm)
         {
@@ -44,7 +44,7 @@ namespace AgOpenGPS
             lblGPSLon.Text = mf.pn.longitude.ToString("N6");
         }
 
-        private void bntOK_Click(object sender, EventArgs e)
+        private void BntOK_Click(object sender, EventArgs e)
         {
             mf.sim.latitude = (double)nudLatitude.Value;
             mf.sim.longitude = (double)nudLongitude.Value;
@@ -55,24 +55,24 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void btnGetFieldFix_Click(object sender, EventArgs e)
+        private void BtnGetFieldFix_Click(object sender, EventArgs e)
         {
             nudLatitude.Value = (decimal)mf.pn.latStart;
             nudLongitude.Value = (decimal)mf.pn.lonStart;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             nudLatitude.Value = (decimal)mf.pn.latitude;
             nudLongitude.Value = (decimal)mf.pn.longitude;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             lblGPSLat.Text = mf.pn.latitude.ToString("N6");
             lblGPSLon.Text = mf.pn.longitude.ToString("N6");

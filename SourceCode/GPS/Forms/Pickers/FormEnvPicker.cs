@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormEnvPicker : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormEnvPicker(Form callingForm)
         {
@@ -40,7 +40,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxVeh_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxVeh_SelectedIndexChanged(object sender, EventArgs e)
         {
             DialogResult resul = mf.FileOpenEnvironment(mf.envDirectory + cboxEnv.SelectedItem.ToString() + ".txt");
 

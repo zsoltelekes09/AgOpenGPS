@@ -202,7 +202,7 @@
             this.btnChangeAttachment.Size = new System.Drawing.Size(133, 67);
             this.btnChangeAttachment.TabIndex = 251;
             this.btnChangeAttachment.UseVisualStyleBackColor = false;
-            this.btnChangeAttachment.Click += new System.EventHandler(this.btnChangeAttachment_Click);
+            this.btnChangeAttachment.Click += new System.EventHandler(this.BtnChangeAttachment_Click);
             // 
             // rbtnTBT
             // 
@@ -219,7 +219,7 @@
             this.rbtnTBT.TabIndex = 112;
             this.rbtnTBT.TabStop = true;
             this.rbtnTBT.UseVisualStyleBackColor = false;
-            this.rbtnTBT.CheckedChanged += new System.EventHandler(this.rbtnFront_CheckedChanged);
+            this.rbtnTBT.CheckedChanged += new System.EventHandler(this.RbtnFront_CheckedChanged);
             // 
             // rbtnFixedRear
             // 
@@ -236,7 +236,7 @@
             this.rbtnFixedRear.TabIndex = 111;
             this.rbtnFixedRear.TabStop = true;
             this.rbtnFixedRear.UseVisualStyleBackColor = false;
-            this.rbtnFixedRear.CheckedChanged += new System.EventHandler(this.rbtnFront_CheckedChanged);
+            this.rbtnFixedRear.CheckedChanged += new System.EventHandler(this.RbtnFront_CheckedChanged);
             // 
             // rbtnFront
             // 
@@ -253,7 +253,7 @@
             this.rbtnFront.TabIndex = 110;
             this.rbtnFront.TabStop = true;
             this.rbtnFront.UseVisualStyleBackColor = false;
-            this.rbtnFront.CheckedChanged += new System.EventHandler(this.rbtnFront_CheckedChanged);
+            this.rbtnFront.CheckedChanged += new System.EventHandler(this.RbtnFront_CheckedChanged);
             // 
             // rbtnTrailing
             // 
@@ -270,7 +270,7 @@
             this.rbtnTrailing.TabIndex = 109;
             this.rbtnTrailing.TabStop = true;
             this.rbtnTrailing.UseVisualStyleBackColor = false;
-            this.rbtnTrailing.CheckedChanged += new System.EventHandler(this.rbtnFront_CheckedChanged);
+            this.rbtnTrailing.CheckedChanged += new System.EventHandler(this.RbtnFront_CheckedChanged);
             // 
             // tabHitch
             // 
@@ -322,7 +322,7 @@
             0,
             0,
             0});
-            this.nudForeAft.ValueChanged += new System.EventHandler(this.nudForeAft_ValueChanged);
+            this.nudForeAft.ValueChanged += new System.EventHandler(this.NudForeAft_ValueChanged);
             this.nudForeAft.Enter += new System.EventHandler(this.NudForeAft_Enter);
             // 
             // nudHitchLength
@@ -346,7 +346,7 @@
             0,
             0,
             0});
-            this.nudHitchLength.ValueChanged += new System.EventHandler(this.nudHitchLength_ValueChanged);
+            this.nudHitchLength.ValueChanged += new System.EventHandler(this.NudHitchLength_ValueChanged);
             this.nudHitchLength.Enter += new System.EventHandler(this.NudHitchLength_Enter);
             // 
             // nudTankHitch
@@ -369,7 +369,7 @@
             0,
             0,
             0});
-            this.nudTankHitch.ValueChanged += new System.EventHandler(this.nudTankHitch_ValueChanged);
+            this.nudTankHitch.ValueChanged += new System.EventHandler(this.NudTankHitch_ValueChanged);
             this.nudTankHitch.Enter += new System.EventHandler(this.NudTankHitch_Enter);
             // 
             // tabSettings
@@ -431,8 +431,8 @@
             0,
             0,
             65536});
-            this.nudLookAheadOff.ValueChanged += new System.EventHandler(this.nudLookAheadOff_ValueChanged);
-            this.nudLookAheadOff.Enter += new System.EventHandler(this.nudLookAheadOff_Enter);
+            this.nudLookAheadOff.ValueChanged += new System.EventHandler(this.NudLookAheadOff_ValueChanged);
+            this.nudLookAheadOff.Enter += new System.EventHandler(this.NudLookAheadOff_Enter);
             // 
             // nudCutoffSpeed
             // 
@@ -460,7 +460,7 @@
             0,
             0,
             65536});
-            this.nudCutoffSpeed.ValueChanged += new System.EventHandler(this.nudCutoffSpeed_ValueChanged);
+            this.nudCutoffSpeed.ValueChanged += new System.EventHandler(this.NudCutoffSpeed_ValueChanged);
             this.nudCutoffSpeed.Enter += new System.EventHandler(this.NudCutoffSpeed_Enter);
             // 
             // label30
@@ -512,7 +512,7 @@
             0,
             0,
             -2147483648});
-            this.nudOffset.ValueChanged += new System.EventHandler(this.nudOffset_ValueChanged);
+            this.nudOffset.ValueChanged += new System.EventHandler(this.NudOffset_ValueChanged);
             this.nudOffset.Enter += new System.EventHandler(this.NudOffset_Enter);
             // 
             // label23
@@ -547,7 +547,7 @@
             this.nudTurnOffDelay.Size = new System.Drawing.Size(150, 65);
             this.nudTurnOffDelay.TabIndex = 108;
             this.nudTurnOffDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudTurnOffDelay.ValueChanged += new System.EventHandler(this.nudTurnOffDelay_ValueChanged);
+            this.nudTurnOffDelay.ValueChanged += new System.EventHandler(this.NudTurnOffDelay_ValueChanged);
             this.nudTurnOffDelay.Enter += new System.EventHandler(this.NudTurnOffDelay_Enter);
             // 
             // label3
@@ -592,7 +592,7 @@
             0,
             0,
             65536});
-            this.nudLookAhead.ValueChanged += new System.EventHandler(this.nudLookAhead_ValueChanged);
+            this.nudLookAhead.ValueChanged += new System.EventHandler(this.NudLookAhead_ValueChanged);
             this.nudLookAhead.Enter += new System.EventHandler(this.NudLookAhead_Enter);
             // 
             // nudOverlap
@@ -620,7 +620,7 @@
             0,
             0,
             0});
-            this.nudOverlap.ValueChanged += new System.EventHandler(this.nudOverlap_ValueChanged);
+            this.nudOverlap.ValueChanged += new System.EventHandler(this.NudOverlap_ValueChanged);
             this.nudOverlap.Enter += new System.EventHandler(this.NudOverlap_Enter);
             // 
             // tabSections
@@ -704,8 +704,8 @@
             0,
             0,
             0});
-            this.nudSection16.ValueChanged += new System.EventHandler(this.nudSection16_ValueChanged);
-            this.nudSection16.Enter += new System.EventHandler(this.nudSection16_Enter);
+            this.nudSection16.ValueChanged += new System.EventHandler(this.NudSection16_ValueChanged);
+            this.nudSection16.Enter += new System.EventHandler(this.NudSection16_Enter);
             // 
             // label1
             // 
@@ -760,8 +760,8 @@
             0,
             0,
             0});
-            this.nudSection15.ValueChanged += new System.EventHandler(this.nudSection15_ValueChanged);
-            this.nudSection15.Enter += new System.EventHandler(this.nudSection15_Enter);
+            this.nudSection15.ValueChanged += new System.EventHandler(this.NudSection15_ValueChanged);
+            this.nudSection15.Enter += new System.EventHandler(this.NudSection15_Enter);
             // 
             // nudSection14
             // 
@@ -783,8 +783,8 @@
             0,
             0,
             0});
-            this.nudSection14.ValueChanged += new System.EventHandler(this.nudSection14_ValueChanged);
-            this.nudSection14.Enter += new System.EventHandler(this.nudSection14_Enter);
+            this.nudSection14.ValueChanged += new System.EventHandler(this.NudSection14_ValueChanged);
+            this.nudSection14.Enter += new System.EventHandler(this.NudSection14_Enter);
             // 
             // nudSection13
             // 
@@ -806,8 +806,8 @@
             0,
             0,
             0});
-            this.nudSection13.ValueChanged += new System.EventHandler(this.nudSection13_ValueChanged);
-            this.nudSection13.Enter += new System.EventHandler(this.nudSection13_Enter);
+            this.nudSection13.ValueChanged += new System.EventHandler(this.NudSection13_ValueChanged);
+            this.nudSection13.Enter += new System.EventHandler(this.NudSection13_Enter);
             // 
             // label4
             // 
@@ -846,7 +846,7 @@
             0,
             0,
             0});
-            this.nudDefaultSectionWidth.Enter += new System.EventHandler(this.nudDefaultSectionWidth_Enter);
+            this.nudDefaultSectionWidth.Enter += new System.EventHandler(this.NudDefaultSectionWidth_Enter);
             // 
             // cboxNumSections
             // 
@@ -917,7 +917,7 @@
             0,
             0,
             0});
-            this.nudMinApplied.ValueChanged += new System.EventHandler(this.nudMinApplied_ValueChanged);
+            this.nudMinApplied.ValueChanged += new System.EventHandler(this.NudMinApplied_ValueChanged);
             this.nudMinApplied.Enter += new System.EventHandler(this.NudMinApplied_Enter);
             // 
             // label31
@@ -1072,7 +1072,7 @@
             0,
             0,
             0});
-            this.nudSection12.ValueChanged += new System.EventHandler(this.nudSection12_ValueChanged);
+            this.nudSection12.ValueChanged += new System.EventHandler(this.NudSection12_ValueChanged);
             this.nudSection12.Enter += new System.EventHandler(this.NudSection12_Enter);
             // 
             // nudSection11
@@ -1095,7 +1095,7 @@
             0,
             0,
             0});
-            this.nudSection11.ValueChanged += new System.EventHandler(this.nudSection11_ValueChanged);
+            this.nudSection11.ValueChanged += new System.EventHandler(this.NudSection11_ValueChanged);
             this.nudSection11.Enter += new System.EventHandler(this.NudSection11_Enter);
             // 
             // nudSection10
@@ -1118,7 +1118,7 @@
             0,
             0,
             0});
-            this.nudSection10.ValueChanged += new System.EventHandler(this.nudSection10_ValueChanged);
+            this.nudSection10.ValueChanged += new System.EventHandler(this.NudSection10_ValueChanged);
             this.nudSection10.Enter += new System.EventHandler(this.NudSection10_Enter);
             // 
             // nudSection9
@@ -1141,7 +1141,7 @@
             0,
             0,
             0});
-            this.nudSection9.ValueChanged += new System.EventHandler(this.nudSection9_ValueChanged);
+            this.nudSection9.ValueChanged += new System.EventHandler(this.NudSection9_ValueChanged);
             this.nudSection9.Enter += new System.EventHandler(this.NudSection9_Enter);
             // 
             // nudSection8
@@ -1164,7 +1164,7 @@
             0,
             0,
             0});
-            this.nudSection8.ValueChanged += new System.EventHandler(this.nudSection8_ValueChanged);
+            this.nudSection8.ValueChanged += new System.EventHandler(this.NudSection8_ValueChanged);
             this.nudSection8.Enter += new System.EventHandler(this.NudSection8_Enter);
             // 
             // nudSection7
@@ -1187,7 +1187,7 @@
             0,
             0,
             0});
-            this.nudSection7.ValueChanged += new System.EventHandler(this.nudSection7_ValueChanged);
+            this.nudSection7.ValueChanged += new System.EventHandler(this.NudSection7_ValueChanged);
             this.nudSection7.Enter += new System.EventHandler(this.NudSection7_Enter);
             // 
             // nudSection6
@@ -1210,7 +1210,7 @@
             0,
             0,
             0});
-            this.nudSection6.ValueChanged += new System.EventHandler(this.nudSection6_ValueChanged);
+            this.nudSection6.ValueChanged += new System.EventHandler(this.NudSection6_ValueChanged);
             this.nudSection6.Enter += new System.EventHandler(this.NudSection6_Enter);
             // 
             // nudSection5
@@ -1233,7 +1233,7 @@
             0,
             0,
             0});
-            this.nudSection5.ValueChanged += new System.EventHandler(this.nudSection5_ValueChanged);
+            this.nudSection5.ValueChanged += new System.EventHandler(this.NudSection5_ValueChanged);
             this.nudSection5.Enter += new System.EventHandler(this.NudSection5_Enter);
             // 
             // nudSection4
@@ -1256,7 +1256,7 @@
             0,
             0,
             0});
-            this.nudSection4.ValueChanged += new System.EventHandler(this.nudSection4_ValueChanged);
+            this.nudSection4.ValueChanged += new System.EventHandler(this.NudSection4_ValueChanged);
             this.nudSection4.Enter += new System.EventHandler(this.NudSection4_Enter);
             // 
             // nudSection3
@@ -1279,7 +1279,7 @@
             0,
             0,
             0});
-            this.nudSection3.ValueChanged += new System.EventHandler(this.nudSection3_ValueChanged);
+            this.nudSection3.ValueChanged += new System.EventHandler(this.NudSection3_ValueChanged);
             this.nudSection3.Enter += new System.EventHandler(this.NudSection3_Enter);
             // 
             // nudSection2
@@ -1302,7 +1302,7 @@
             0,
             0,
             0});
-            this.nudSection2.ValueChanged += new System.EventHandler(this.nudSection2_ValueChanged);
+            this.nudSection2.ValueChanged += new System.EventHandler(this.NudSection2_ValueChanged);
             this.nudSection2.Enter += new System.EventHandler(this.NudSection2_Enter);
             // 
             // nudSection1
@@ -1325,7 +1325,7 @@
             0,
             0,
             0});
-            this.nudSection1.ValueChanged += new System.EventHandler(this.nudSection1_ValueChanged);
+            this.nudSection1.ValueChanged += new System.EventHandler(this.NudSection1_ValueChanged);
             this.nudSection1.Enter += new System.EventHandler(this.NudSection1_Enter);
             // 
             // label2
@@ -1376,7 +1376,7 @@
             this.checkWorkSwitchManual.TabIndex = 0;
             this.checkWorkSwitchManual.Text = "Work Switch Controls Manual";
             this.checkWorkSwitchManual.UseVisualStyleBackColor = true;
-            this.checkWorkSwitchManual.CheckedChanged += new System.EventHandler(this.checkWorkSwitchManual_CheckedChanged);
+            this.checkWorkSwitchManual.CheckedChanged += new System.EventHandler(this.CheckWorkSwitchManual_CheckedChanged);
             // 
             // chkWorkSwActiveLow
             // 
@@ -1389,7 +1389,7 @@
             this.chkWorkSwActiveLow.TabIndex = 0;
             this.chkWorkSwActiveLow.Text = "Active Low";
             this.chkWorkSwActiveLow.UseVisualStyleBackColor = true;
-            this.chkWorkSwActiveLow.CheckedChanged += new System.EventHandler(this.chkWorkSwActiveLow_CheckedChanged);
+            this.chkWorkSwActiveLow.CheckedChanged += new System.EventHandler(this.ChkWorkSwActiveLow_CheckedChanged);
             // 
             // chkEnableWorkSwitch
             // 
@@ -1402,7 +1402,7 @@
             this.chkEnableWorkSwitch.TabIndex = 1;
             this.chkEnableWorkSwitch.Text = "Enable Work Switch";
             this.chkEnableWorkSwitch.UseVisualStyleBackColor = true;
-            this.chkEnableWorkSwitch.CheckedChanged += new System.EventHandler(this.chkEnableWorkSwitch_CheckedChanged);
+            this.chkEnableWorkSwitch.CheckedChanged += new System.EventHandler(this.ChkEnableWorkSwitch_CheckedChanged);
             // 
             // lblDoNotExceed
             // 
@@ -1494,7 +1494,7 @@
             this.btnCancel.Size = new System.Drawing.Size(88, 68);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -1508,7 +1508,7 @@
             this.bntOK.TabIndex = 0;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = true;
-            this.bntOK.Click += new System.EventHandler(this.btnOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
             // FormToolSettings
             // 

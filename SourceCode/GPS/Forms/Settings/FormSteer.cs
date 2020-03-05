@@ -6,7 +6,7 @@ namespace AgOpenGPS
 {
     public partial class FormSteer : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         //Form stuff
         public FormSteer(Form callingForm)
@@ -117,7 +117,7 @@ namespace AgOpenGPS
         }
 
         //Stanley Page tab
-        private void hsbarStanleyGain_ValueChanged(object sender, EventArgs e)
+        private void HsbarStanleyGain_ValueChanged(object sender, EventArgs e)
         {
             mf.vehicle.stanleyGain = hsbarStanleyGain.Value * 0.1;
             lblStanleyGain.Text = mf.vehicle.stanleyGain.ToString();
@@ -125,7 +125,7 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.Save();
         }
 
-        private void hsbarHeadingErrorGain_ValueChanged(object sender, EventArgs e)
+        private void HsbarHeadingErrorGain_ValueChanged(object sender, EventArgs e)
         {
             mf.vehicle.stanleyHeadingErrorGain = hsbarHeadingErrorGain.Value * 0.1;
             lblHeadingErrorGain.Text = mf.vehicle.stanleyHeadingErrorGain.ToString();
@@ -134,7 +134,7 @@ namespace AgOpenGPS
         }
 
         //Scrollbars
-        private void hsbarLookAhead_ValueChanged(object sender, EventArgs e)
+        private void HsbarLookAhead_ValueChanged(object sender, EventArgs e)
         {
             mf.vehicle.goalPointLookAheadSeconds = hsbarLookAhead.Value * 0.1;
             lblLookAhead.Text = mf.vehicle.goalPointLookAheadSeconds.ToString();
@@ -143,7 +143,7 @@ namespace AgOpenGPS
             //mf.AutoSteerSettingsOutToPort();
         }
 
-        private void hsbarLookAheadUturnMult_ValueChanged(object sender, EventArgs e)
+        private void HsbarLookAheadUturnMult_ValueChanged(object sender, EventArgs e)
         {
             mf.vehicle.goalPointLookAheadUturnMult = hsbarLookAheadUturnMult.Value * 0.1;
             lblLookAheadUturnMult.Text = mf.vehicle.goalPointLookAheadUturnMult.ToString();
@@ -151,7 +151,7 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.Save();
         }
 
-        private void hsbarDistanceFromLine_ValueChanged(object sender, EventArgs e)
+        private void HsbarDistanceFromLine_ValueChanged(object sender, EventArgs e)
         {
             mf.vehicle.goalPointDistanceMultiplier = hsbarDistanceFromLine.Value * 0.1;
             lblDistanceFromLine.Text = (mf.vehicle.goalPointDistanceMultiplier + 1).ToString();
@@ -159,7 +159,7 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.Save();
         }
 
-        private void hsbarLookAheadMin_ValueChanged(object sender, EventArgs e)
+        private void HsbarLookAheadMin_ValueChanged(object sender, EventArgs e)
         {
             mf.vehicle.goalPointLookAheadMinimumDistance = hsbarLookAheadMin.Value * 0.1;
             lblLookAheadMinimum.Text = mf.vehicle.goalPointLookAheadMinimumDistance.ToString();
@@ -167,7 +167,7 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.Save();
         }
 
-        private void hsbarCountsPerDegree_ValueChanged(object sender, EventArgs e)
+        private void HsbarCountsPerDegree_ValueChanged(object sender, EventArgs e)
         {
             mf.mc.autoSteerSettings[mf.mc.ssCountsPerDegree] = unchecked((byte)hsbarCountsPerDegree.Value);
             lblCountsPerDegree.Text = (mf.mc.autoSteerSettings[mf.mc.ssCountsPerDegree]).ToString();
@@ -176,7 +176,7 @@ namespace AgOpenGPS
             mf.SendSteerSettingsOutAutoSteerPort();
         }
 
-        private void hsbarMaxSteerAngle_ValueChanged(object sender, EventArgs e)
+        private void HsbarMaxSteerAngle_ValueChanged(object sender, EventArgs e)
         {
             mf.vehicle.maxSteerAngle = hsbarMaxSteerAngle.Value;
             lblMaxSteerAngle.Text = hsbarMaxSteerAngle.Value.ToString();
@@ -184,7 +184,7 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.Save();
         }
 
-        private void hsbarSteerAngleSensorZero_ValueChanged(object sender, EventArgs e)
+        private void HsbarSteerAngleSensorZero_ValueChanged(object sender, EventArgs e)
         {
             lblSteerAngleSensorZero.Text = hsbarSteerAngleSensorZero.Value.ToString();
             mf.mc.autoSteerSettings[mf.mc.ssSteerOffset] = unchecked((byte)(127 + hsbarSteerAngleSensorZero.Value));
@@ -195,7 +195,7 @@ namespace AgOpenGPS
 
         //Stanley Parameters
 
-        private void hsbarMinPWM_ValueChanged(object sender, EventArgs e)
+        private void HsbarMinPWM_ValueChanged(object sender, EventArgs e)
         {
             mf.mc.autoSteerSettings[mf.mc.ssMinPWM] = unchecked((byte)hsbarMinPWM.Value);
             lblMinPWM.Text = (mf.mc.autoSteerSettings[mf.mc.ssMinPWM]).ToString();
@@ -204,7 +204,7 @@ namespace AgOpenGPS
             mf.SendSteerSettingsOutAutoSteerPort();
         }
 
-        private void hsbarProportionalGain_ValueChanged(object sender, EventArgs e)
+        private void HsbarProportionalGain_ValueChanged(object sender, EventArgs e)
         {
             mf.mc.autoSteerSettings[mf.mc.ssKp] = unchecked((byte)hsbarProportionalGain.Value);
             lblProportionalGain.Text = (mf.mc.autoSteerSettings[mf.mc.ssKp]).ToString();
@@ -213,7 +213,7 @@ namespace AgOpenGPS
             mf.SendSteerSettingsOutAutoSteerPort();
         }
 
-        private void hsbarOutputGain_ValueChanged(object sender, EventArgs e)
+        private void HsbarOutputGain_ValueChanged(object sender, EventArgs e)
         {
             mf.mc.autoSteerSettings[mf.mc.ssKo] = unchecked((byte)hsbarOutputGain.Value);
             lblOutputGain.Text = (mf.mc.autoSteerSettings[mf.mc.ssKo]).ToString();
@@ -222,7 +222,7 @@ namespace AgOpenGPS
             mf.SendSteerSettingsOutAutoSteerPort();
         }
 
-        private void hsbarSidehillDraftGain_ValueChanged(object sender, EventArgs e)
+        private void HsbarSidehillDraftGain_ValueChanged(object sender, EventArgs e)
         {
             mf.mc.autoSteerSettings[mf.mc.ssKd] = unchecked((byte)hsbarSidehillDraftGain.Value);
             lblSidehillDraftGain.Text = (mf.mc.autoSteerSettings[mf.mc.ssKd]).ToString();
@@ -231,7 +231,7 @@ namespace AgOpenGPS
             mf.SendSteerSettingsOutAutoSteerPort();
         }
 
-        private void hsbarIntegralGain_ValueChanged(object sender, EventArgs e)
+        private void HsbarIntegralGain_ValueChanged(object sender, EventArgs e)
         {
             mf.mc.autoSteerSettings[mf.mc.ssKi] = unchecked((byte)hsbarIntegralGain.Value);
             lblIntegralGain.Text = (mf.mc.autoSteerSettings[mf.mc.ssKi]).ToString();
@@ -240,7 +240,7 @@ namespace AgOpenGPS
             mf.SendSteerSettingsOutAutoSteerPort();
         }
 
-        private void hsbarIntegralMax_ValueChanged(object sender, EventArgs e)
+        private void HsbarIntegralMax_ValueChanged(object sender, EventArgs e)
         {
             mf.mc.autoSteerSettings[mf.mc.ssMaxIntegral] = unchecked((byte)hsbarIntegralMax.Value);
             lblIntegralMax.Text = (mf.mc.autoSteerSettings[mf.mc.ssMaxIntegral]).ToString();
@@ -251,13 +251,13 @@ namespace AgOpenGPS
 
         //FREE DRIVE SECTION
 
-        private void hSBarFreeDrive_ValueChanged(object sender, EventArgs e)
+        private void HSBarFreeDrive_ValueChanged(object sender, EventArgs e)
         {
             mf.ast.driveFreeSteerAngle = (Int16)hSBarFreeDrive.Value;
             lblFreeDriveAngle.Text = Convert.ToString(mf.ast.driveFreeSteerAngle);
         }
 
-        private void btnFreeDrive_Click(object sender, EventArgs e)
+        private void BtnFreeDrive_Click(object sender, EventArgs e)
         {
             if (mf.ast.isInFreeDriveMode)
             {
@@ -283,25 +283,25 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnFreeDriveZero_Click(object sender, EventArgs e)
+        private void BtnFreeDriveZero_Click(object sender, EventArgs e)
         {
             mf.ast.driveFreeSteerAngle = 0;
             hSBarFreeDrive.Value = mf.ast.driveFreeSteerAngle;
             lblFreeDriveAngle.Text = Convert.ToString(mf.ast.driveFreeSteerAngle);
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void BtnExit_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void btnMax_Click(object sender, EventArgs e)
+        private void BtnMax_Click(object sender, EventArgs e)
         {
             if (Height < 600) Height = 650;
             else Height = 400;
         }
 
-        private void btnChart_Click(object sender, EventArgs e)
+        private void BtnChart_Click(object sender, EventArgs e)
         {
             mf.toolStripAutoSteerChart.PerformClick();
         }

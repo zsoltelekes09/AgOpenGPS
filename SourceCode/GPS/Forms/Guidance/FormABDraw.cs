@@ -11,7 +11,7 @@ namespace AgOpenGPS
     public partial class FormABDraw : Form
     {
         //access to the main GPS form and all its variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private double maxFieldX, maxFieldY, minFieldX, minFieldY, fieldCenterX, fieldCenterY, maxFieldDistance;
         private Point fixPt;
@@ -92,7 +92,7 @@ namespace AgOpenGPS
             oglSelf.Refresh();
         }
 
-        private void nudDistance_Enter(object sender, EventArgs e)
+        private void NudDistance_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnSelectABLine.Focus();
@@ -130,7 +130,7 @@ namespace AgOpenGPS
             oglSelf.Refresh();
         }
 
-        private void btnDrawSections_Click(object sender, EventArgs e)
+        private void BtnDrawSections_Click(object sender, EventArgs e)
         {
             isDrawSections = !isDrawSections;
             if (isDrawSections) btnDrawSections.Text = "On";
@@ -138,7 +138,7 @@ namespace AgOpenGPS
             oglSelf.Refresh();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             Boundary++;
             btnMakeABLine.Enabled = btnMakeCurve.Enabled = btnCancelTouch.Enabled = false;
@@ -151,7 +151,7 @@ namespace AgOpenGPS
             UpdateBoundary();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
             Boundary--;
             btnMakeABLine.Enabled = btnMakeCurve.Enabled = btnCancelTouch.Enabled = false;
@@ -217,7 +217,7 @@ namespace AgOpenGPS
 
         }
 
-        private void oglSelf_MouseDown(object sender, MouseEventArgs e)
+        private void OglSelf_MouseDown(object sender, MouseEventArgs e)
         {
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
@@ -515,7 +515,7 @@ namespace AgOpenGPS
             FixLabelsABLine();
         }
 
-        private void oglSelf_Paint(object sender, PaintEventArgs e)
+        private void OglSelf_Paint(object sender, PaintEventArgs e)
         {
             oglSelf.MakeCurrent();
 
@@ -672,7 +672,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void BtnExit_Click(object sender, EventArgs e)
         {
             if (mf.ABLine.numABLineSelected > 0)
             {
@@ -754,7 +754,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void oglSelf_Resize(object sender, EventArgs e)
+        private void OglSelf_Resize(object sender, EventArgs e)
         {
             oglSelf.MakeCurrent();
             GL.MatrixMode(MatrixMode.Projection);
@@ -767,7 +767,7 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Modelview);
         }
 
-        private void oglSelf_Load(object sender, EventArgs e)
+        private void OglSelf_Load(object sender, EventArgs e)
         {
             oglSelf.MakeCurrent();
             GL.Enable(EnableCap.CullFace);

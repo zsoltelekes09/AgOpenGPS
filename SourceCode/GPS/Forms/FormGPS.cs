@@ -23,7 +23,6 @@ namespace AgOpenGPS
     {
         #region // Class Props and instances
 
-        FormTimedMessage form = new FormTimedMessage();
 
         //list of vec3 points of Dubins shortest path between 2 points - To be converted to RecPt
         public List<vec3> flagDubinsList = new List<vec3>();
@@ -54,8 +53,6 @@ namespace AgOpenGPS
 
         //current fields and field directory
         public string fieldsDirectory, currentFieldDirectory;
-
-        private bool leftMouseDownOnOpenGL; //mousedown event in opengl window
         public int flagNumberPicked = 0;
 
         //bool for whether or not a job is active
@@ -75,21 +72,8 @@ namespace AgOpenGPS
         public readonly Stopwatch testNMEA = new Stopwatch();
         public long testHalfSecond1 = 0, testOneSecond1 = 0, testThreeSecond1 = 0, testNMEA1 = 0;
 
-        //Time to do fix position update and draw routine
-        private double frameTime = 0;
-
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         private readonly Stopwatch swHz = new Stopwatch();
-
-        //Time to do fix position update and draw routine
-        private double HzTime = 5;
-
-        //For field saving in background
-        private int minuteCounter = 1;
-        private int tenMinuteCounter = 1;
-
-        //for the NTRIP CLient counting
-        private int ntripCounter = 0;
 
         //whether or not to use Stanley control
         public bool isStanleyUsed = true;
@@ -230,14 +214,22 @@ namespace AgOpenGPS
         public CWorkSwitch workSwitch;
 
         /// <summary>
-        /// Sound for approaching boundary
-        /// </summary>
-        public SoundPlayer sndBoundaryAlarm;
-
-        /// <summary>
         /// The font class
         /// </summary>
         public CFont font;
+
+        private static readonly FormTimedMessage formTimedMessage = new FormTimedMessage();
+
+        public bool LeftMouseDownOnOpenGL { get; set; }
+        public double FrameTime { get; set; } = 0;
+        public double HzTime { get; set; } = 5;
+        public SoundPlayer SndBoundaryAlarm { get; set; }
+        public int MinuteCounter { get; set; } = 1;
+        public int TenMinuteCounter { get; set; } = 1;
+        public int NtripCounter { get; set; } = 0;
+        public FormTimedMessage Form { get; set; } = formTimedMessage;
+
+        //public FormTimedMessage Form { get; } = new FormTimedMessage();
 
         #endregion // Class Props and instances
 
@@ -490,11 +482,11 @@ namespace AgOpenGPS
             string wave = Path.Combine(directoryName, "Dependencies\\Audio", "Boundary.Wav");
             if (File.Exists(wave))
             {
-                sndBoundaryAlarm = new SoundPlayer(wave);
+                SndBoundaryAlarm = new SoundPlayer(wave);
             }
             else
             {
-                sndBoundaryAlarm = new SoundPlayer(Properties.Resources.Alarm10);
+                SndBoundaryAlarm = new SoundPlayer(Properties.Resources.Alarm10);
             }
 
             //grab the current vehicle filename - make sure it exists
@@ -1061,7 +1053,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnTestIsMapping_Click(object sender, EventArgs e)
+        private void BtnTestIsMapping_Click(object sender, EventArgs e)
         {
             isMapping = !isMapping;
             if (isMapping) btnTestIsMapping.Text = "Mapping";
@@ -1598,12 +1590,18 @@ namespace AgOpenGPS
                     if (section[j].isSectionOn) section[j].isSectionOn = false;
                 }
 
+
+
+
+
+
+
                 //MAPPING - 
 
                 //easy just turn it on
                 if (section[j].mappingOnRequest)
                 {
-                    if (!section[j].isMappingOn && isMapping) section[j].TurnMappingOn(); //**************************************** un comment to enable mappping again
+                    if (!section[j].isMappingOn && isMapping) section[j].TurnMappingOn();
                 }
 
                 //turn off
@@ -1622,6 +1620,13 @@ namespace AgOpenGPS
                     if (section[j].isMappingOn) section[j].TurnMappingOff();
                     section[j].mappingOffRequest = false;
                 }
+
+
+
+
+
+
+
 
                 #region notes
                 //Turn ON
@@ -1873,13 +1878,14 @@ namespace AgOpenGPS
         //message box pops up with info then goes away
         public void TimedMessageBox(int timeout, string s1, string s2)
         {
-            form.SetTimedMessage(timeout, s1, s2, this);
+            Form.SetTimedMessage(timeout, s1, s2, this);
 
-            form.TopLevel = false;
-            this.Controls.Add(form);
+            Form.TopLevel = false;
+            Form.BringToFront();
+            Controls.Add(Form);
             //form.Show();
 
-            this.Controls.GetChildIndex(form);
+            //this.Controls.GetChildIndex(Form);
 
 
             //Form2.SetTimedMessage();

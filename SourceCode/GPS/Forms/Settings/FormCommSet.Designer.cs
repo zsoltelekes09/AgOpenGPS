@@ -88,7 +88,7 @@
             this.btnRescan.TabIndex = 58;
             this.btnRescan.Text = "Rescan Ports";
             this.btnRescan.UseVisualStyleBackColor = false;
-            this.btnRescan.Click += new System.EventHandler(this.btnRescan_Click);
+            this.btnRescan.Click += new System.EventHandler(this.BtnRescan_Click);
             // 
             // btnSerialOK
             // 
@@ -103,7 +103,7 @@
             this.btnSerialOK.TabIndex = 59;
             this.btnSerialOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnSerialOK.UseVisualStyleBackColor = true;
-            this.btnSerialOK.Click += new System.EventHandler(this.btnSerialOK_Click);
+            this.btnSerialOK.Click += new System.EventHandler(this.BtnSerialOK_Click);
             // 
             // groupBox1
             // 
@@ -236,7 +236,7 @@
             this.cboxPort.Size = new System.Drawing.Size(169, 37);
             this.cboxPort.TabIndex = 50;
             this.cboxPort.UseWaitCursor = true;
-            this.cboxPort.SelectedIndexChanged += new System.EventHandler(this.cboxPort_SelectedIndexChanged_1);
+            this.cboxPort.SelectedIndexChanged += new System.EventHandler(this.CboxPort_SelectedIndexChanged_1);
             // 
             // label1
             // 
@@ -266,7 +266,7 @@
             this.cboxBaud.Name = "cboxBaud";
             this.cboxBaud.Size = new System.Drawing.Size(127, 37);
             this.cboxBaud.TabIndex = 49;
-            this.cboxBaud.SelectedIndexChanged += new System.EventHandler(this.cboxBaud_SelectedIndexChanged_1);
+            this.cboxBaud.SelectedIndexChanged += new System.EventHandler(this.CboxBaud_SelectedIndexChanged_1);
             // 
             // lblCurrentPort
             // 
@@ -299,7 +299,7 @@
             this.btnCloseSerial.TabIndex = 44;
             this.btnCloseSerial.Text = "Disconnect";
             this.btnCloseSerial.UseVisualStyleBackColor = false;
-            this.btnCloseSerial.Click += new System.EventHandler(this.btnCloseSerial_Click);
+            this.btnCloseSerial.Click += new System.EventHandler(this.BtnCloseSerial_Click);
             // 
             // textBoxRcv
             // 
@@ -335,7 +335,7 @@
             this.btnOpenSerial.TabIndex = 45;
             this.btnOpenSerial.Text = "Connect";
             this.btnOpenSerial.UseVisualStyleBackColor = false;
-            this.btnOpenSerial.Click += new System.EventHandler(this.btnOpenSerial_Click);
+            this.btnOpenSerial.Click += new System.EventHandler(this.BtnOpenSerial_Click);
             // 
             // btnCloseSerialArduino
             // 
@@ -348,7 +348,7 @@
             this.btnCloseSerialArduino.TabIndex = 52;
             this.btnCloseSerialArduino.Text = "Disconnect";
             this.btnCloseSerialArduino.UseVisualStyleBackColor = false;
-            this.btnCloseSerialArduino.Click += new System.EventHandler(this.btnCloseSerialArduino_Click);
+            this.btnCloseSerialArduino.Click += new System.EventHandler(this.BtnCloseSerialArduino_Click);
             // 
             // btnOpenSerialArduino
             // 
@@ -361,7 +361,7 @@
             this.btnOpenSerialArduino.TabIndex = 53;
             this.btnOpenSerialArduino.Text = "Connect";
             this.btnOpenSerialArduino.UseVisualStyleBackColor = false;
-            this.btnOpenSerialArduino.Click += new System.EventHandler(this.btnOpenSerialArduino_Click);
+            this.btnOpenSerialArduino.Click += new System.EventHandler(this.BtnOpenSerialArduino_Click);
             // 
             // label15
             // 
@@ -403,7 +403,7 @@
             this.cboxArdPort.Name = "cboxArdPort";
             this.cboxArdPort.Size = new System.Drawing.Size(121, 37);
             this.cboxArdPort.TabIndex = 64;
-            this.cboxArdPort.SelectedIndexChanged += new System.EventHandler(this.cboxArdPort_SelectedIndexChanged);
+            this.cboxArdPort.SelectedIndexChanged += new System.EventHandler(this.CboxArdPort_SelectedIndexChanged);
             // 
             // groupBox2
             // 
@@ -475,7 +475,7 @@
             this.usejrk.TabIndex = 67;
             this.usejrk.Text = "JRK";
             this.usejrk.UseVisualStyleBackColor = true;
-            this.usejrk.CheckedChanged += new System.EventHandler(this.usejrk_CheckedChanged);
+            this.usejrk.CheckedChanged += new System.EventHandler(this.Usejrk_CheckedChanged);
             // 
             // label3
             // 
@@ -508,7 +508,7 @@
             this.cboxASPort.Name = "cboxASPort";
             this.cboxASPort.Size = new System.Drawing.Size(121, 37);
             this.cboxASPort.TabIndex = 64;
-            this.cboxASPort.SelectedIndexChanged += new System.EventHandler(this.cboxASPort_SelectedIndexChanged);
+            this.cboxASPort.SelectedIndexChanged += new System.EventHandler(this.CboxASPort_SelectedIndexChanged);
             // 
             // txtBoxRecvAutoSteer
             // 
@@ -552,7 +552,7 @@
             this.btnOpenSerialAutoSteer.TabIndex = 53;
             this.btnOpenSerialAutoSteer.Text = "Connect";
             this.btnOpenSerialAutoSteer.UseVisualStyleBackColor = false;
-            this.btnOpenSerialAutoSteer.Click += new System.EventHandler(this.btnOpenSerialAutoSteer_Click);
+            this.btnOpenSerialAutoSteer.Click += new System.EventHandler(this.BtnOpenSerialAutoSteer_Click);
             // 
             // btnCloseSerialAutoSteer
             // 
@@ -565,7 +565,7 @@
             this.btnCloseSerialAutoSteer.TabIndex = 52;
             this.btnCloseSerialAutoSteer.Text = "Disconnect";
             this.btnCloseSerialAutoSteer.UseVisualStyleBackColor = false;
-            this.btnCloseSerialAutoSteer.Click += new System.EventHandler(this.btnCloseSerialAutoSteer_Click);
+            this.btnCloseSerialAutoSteer.Click += new System.EventHandler(this.BtnCloseSerialAutoSteer_Click);
             // 
             // FormCommSet
             // 

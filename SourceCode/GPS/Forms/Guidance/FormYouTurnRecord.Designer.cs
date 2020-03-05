@@ -47,7 +47,7 @@
             this.btnStop.Text = "Done";
             this.btnStop.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            this.btnStop.Click += new System.EventHandler(this.BtnStop_Click);
             // 
             // btnRecord
             // 
@@ -63,7 +63,7 @@
             this.btnRecord.Text = "Record";
             this.btnRecord.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnRecord.UseVisualStyleBackColor = false;
-            this.btnRecord.Click += new System.EventHandler(this.btnRecord_Click);
+            this.btnRecord.Click += new System.EventHandler(this.BtnRecord_Click);
             // 
             // label1
             // 

@@ -7,7 +7,7 @@ namespace AgOpenGPS
     public partial class FormCommSet : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         //constructor
         public FormCommSet(Form callingForm)
@@ -130,14 +130,14 @@ namespace AgOpenGPS
         #region PortSettings //----------------------------------------------------------------
 
         //AutoSteer
-        private void cboxASPort_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxASPort_SelectedIndexChanged(object sender, EventArgs e)
         {
             mf.spAutoSteer.PortName = cboxASPort.Text;
             FormGPS.portNameAutoSteer = cboxASPort.Text;
             lblCurrentAutoSteerPort.Text = cboxASPort.Text;
         }
 
-        private void btnOpenSerialAutoSteer_Click(object sender, EventArgs e)
+        private void BtnOpenSerialAutoSteer_Click(object sender, EventArgs e)
         {
             mf.SerialPortAutoSteerOpen();
             if (mf.spAutoSteer.IsOpen)
@@ -155,7 +155,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnCloseSerialAutoSteer_Click(object sender, EventArgs e)
+        private void BtnCloseSerialAutoSteer_Click(object sender, EventArgs e)
         {
             mf.SerialPortAutoSteerClose();
             if (mf.spAutoSteer.IsOpen)
@@ -173,7 +173,7 @@ namespace AgOpenGPS
         }
 
         // Arduino
-        private void btnOpenSerialArduino_Click(object sender, EventArgs e)
+        private void BtnOpenSerialArduino_Click(object sender, EventArgs e)
         {
             mf.SerialPortMachineOpen();
             if (mf.spMachine.IsOpen)
@@ -191,7 +191,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnCloseSerialArduino_Click(object sender, EventArgs e)
+        private void BtnCloseSerialArduino_Click(object sender, EventArgs e)
         {
             mf.SerialPortMachineClose();
             if (mf.spMachine.IsOpen)
@@ -208,7 +208,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxArdPort_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxArdPort_SelectedIndexChanged(object sender, EventArgs e)
         {
             mf.spMachine.PortName = cboxArdPort.Text;
             FormGPS.portNameMachine = cboxArdPort.Text;
@@ -216,20 +216,20 @@ namespace AgOpenGPS
         }
 
         // GPS Serial Port
-        private void cboxBaud_SelectedIndexChanged_1(object sender, EventArgs e)
+        private void CboxBaud_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             mf.SerialGPS.BaudRate = Convert.ToInt32(cboxBaud.Text);
             FormGPS.baudRateGPS = Convert.ToInt32(cboxBaud.Text);
         }
 
-        private void cboxPort_SelectedIndexChanged_1(object sender, EventArgs e)
+        private void CboxPort_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             mf.SerialGPS.PortName = cboxPort.Text;
             FormGPS.portNameGPS = cboxPort.Text;
         }
 
 
-        private void btnOpenSerial_Click(object sender, EventArgs e)
+        private void BtnOpenSerial_Click(object sender, EventArgs e)
         {
             //else
             {
@@ -253,7 +253,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnCloseSerial_Click(object sender, EventArgs e)
+        private void BtnCloseSerial_Click(object sender, EventArgs e)
         {
             mf.SerialPortCloseGPS();
             if (mf.SerialGPS.IsOpen)
@@ -272,7 +272,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnRescan_Click(object sender, EventArgs e)
+        private void BtnRescan_Click(object sender, EventArgs e)
         {
             cboxASPort.Items.Clear();
             foreach (String s in System.IO.Ports.SerialPort.GetPortNames())
@@ -302,14 +302,14 @@ namespace AgOpenGPS
                                     + ", " + mf.guidanceLineDistanceOff + ", " + mf.guidanceLineSteerAngle + ", " + mf.mc.machineData[mf.mc.mdUTurn];
         }
 
-        private void btnSerialOK_Click(object sender, EventArgs e)
+        private void BtnSerialOK_Click(object sender, EventArgs e)
         {
             //save
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private void usejrk_CheckedChanged(object sender, EventArgs e)
+        private void Usejrk_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.setAS_isJRK = usejrk.Checked;
             Properties.Settings.Default.Save();

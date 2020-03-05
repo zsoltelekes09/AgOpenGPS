@@ -7,7 +7,7 @@ namespace AgOpenGPS
     public partial class FormFlags : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormFlags(Form callingForm)
         {
@@ -35,21 +35,21 @@ namespace AgOpenGPS
         {
             UpdateLabels(); }
 
-        private void btnNorth_MouseDown(object sender, MouseEventArgs e)
+        private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
         {
             mf.flagNumberPicked++;
             if (mf.flagNumberPicked > mf.flagPts.Count) mf.flagNumberPicked = 1;
             UpdateLabels();
         }
 
-        private void btnSouth_MouseDown(object sender, MouseEventArgs e)
+        private void BtnSouth_MouseDown(object sender, MouseEventArgs e)
         {
             mf.flagNumberPicked--;
             if (mf.flagNumberPicked < 1) mf.flagNumberPicked = mf.flagPts.Count;
             UpdateLabels();
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void BtnExit_Click(object sender, EventArgs e)
         {
             timer1.Enabled = false;
             mf.flagNumberPicked = 0;
@@ -60,7 +60,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnDeleteFlag_Click(object sender, EventArgs e)
+        private void BtnDeleteFlag_Click(object sender, EventArgs e)
         {
             int flag = mf.flagNumberPicked;
             if (mf.flagPts.Count > 0) mf.DeleteSelectedFlag();
@@ -75,27 +75,27 @@ namespace AgOpenGPS
             UpdateLabels();
         }
 
-        private void tboxFlagNotes_Leave(object sender, EventArgs e)
+        private void TboxFlagNotes_Leave(object sender, EventArgs e)
         {
             mf.flagPts[mf.flagNumberPicked - 1].notes = tboxFlagNotes.Text;
         }
 
-        private void tboxFlagNotes_TextChanged(object sender, EventArgs e)
+        private void TboxFlagNotes_TextChanged(object sender, EventArgs e)
         {
 
             //mf.flagPts[mf.flagNumberPicked - 1].notes = tboxFlagNotes.Text;
         }
 
-        private void tboxFlagNotes_KeyPress(object sender, KeyPressEventArgs e)
+        private void TboxFlagNotes_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r') e.Handled = true;
         }
 
-        private void btnDriveToFlag_Click(object sender, EventArgs e)
+        private void BtnDriveToFlag_Click(object sender, EventArgs e)
         {
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             //MakeDubinsLineFromPivotToFlag();
             vec3 steerAxlePosRP = mf.pivotAxlePos;
@@ -106,7 +106,7 @@ namespace AgOpenGPS
                 mf.flagPts[mf.flagNumberPicked - 1].easting, mf.flagPts[mf.flagNumberPicked - 1].northing) * glm.m2ft).ToString("N2") + " m";
         
         }
-
+        /*
         private void MakeDubinsLineFromPivotToFlag()
         {
             //if (mf.ABLine.isBtnABLineOn)
@@ -143,5 +143,6 @@ namespace AgOpenGPS
             mf.flagDubinsList = dubPath.GenerateDubins(pt2, goal, mf.gf);
 
         }
+        */
     }
 }

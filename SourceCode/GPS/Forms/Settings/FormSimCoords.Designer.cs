@@ -68,7 +68,7 @@
             this.btnCancel.TabIndex = 5;
             this.btnCancel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -84,7 +84,7 @@
             this.bntOK.TabIndex = 4;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.bntOK.UseVisualStyleBackColor = true;
-            this.bntOK.Click += new System.EventHandler(this.bntOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BntOK_Click);
             // 
             // nudLongitude
             // 
@@ -173,7 +173,7 @@
             this.btnGetFieldFix.Text = "Use Field";
             this.btnGetFieldFix.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnGetFieldFix.UseVisualStyleBackColor = false;
-            this.btnGetFieldFix.Click += new System.EventHandler(this.btnGetFieldFix_Click);
+            this.btnGetFieldFix.Click += new System.EventHandler(this.BtnGetFieldFix_Click);
             // 
             // label3
             // 
@@ -277,13 +277,13 @@
             this.btnLoadGPSFix.Text = "Use GPS";
             this.btnLoadGPSFix.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnLoadGPSFix.UseVisualStyleBackColor = false;
-            this.btnLoadGPSFix.Click += new System.EventHandler(this.button1_Click);
+            this.btnLoadGPSFix.Click += new System.EventHandler(this.Button1_Click);
             // 
             // timer1
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // label2
             // 

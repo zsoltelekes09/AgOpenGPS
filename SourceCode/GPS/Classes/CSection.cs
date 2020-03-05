@@ -1,5 +1,4 @@
 ﻿//Please, if you use this, share the improvements
-
 using System;
 using System.Collections.Generic;
 
@@ -95,7 +94,6 @@ namespace AgOpenGPS
             //do not tally square meters on inital point, that would be silly
             if (!isMappingOn)
             {
- #pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
                //set the section bool to on
                 isMappingOn = true;
 
@@ -104,6 +102,7 @@ namespace AgOpenGPS
                 triangleList = new List<vec3>();
                 patchList.Add(triangleList);
                 vec3 colur;
+
                 //if (mf.autoBtnState == FormGPS.btnStates.Auto)
                     colur = new vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
                 //else colur = new vec3(mf.sectionColorDay.B, mf.sectionColorDay.G, mf.sectionColorDay.R);
@@ -119,16 +118,13 @@ namespace AgOpenGPS
                 //Right side of triangle
                 point = new vec3((mf.cosSectionHeading * positionRight) + mf.toolPos.easting,
                     (mf.sinSectionHeading * positionRight) + mf.toolPos.northing, 0);
-#pragma warning restore CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
                 triangleList.Add(point);
             }
         }
 
         public void TurnMappingOff()
         {
-#pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
             AddMappingPoint(mf.toolPos.northing, mf.toolPos.easting, mf.cosSectionHeading, mf.sinSectionHeading);
-#pragma warning restore CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
             isMappingOn = false;
             numTriangles = 0;
 
@@ -197,11 +193,9 @@ namespace AgOpenGPS
                 triangleList = new List<vec3>();
                 patchList.Add(triangleList);
 
-#pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
                 //Add Patch colour
                 vec3 colur = new vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
                 triangleList.Add(colur);
-#pragma warning restore CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
 
                 //add the points to List, yes its more points, but breaks up patches for culling
                 triangleList.Add(point);

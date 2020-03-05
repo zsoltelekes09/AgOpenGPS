@@ -171,7 +171,7 @@
             this.nudMinSpeed.Size = new System.Drawing.Size(165, 52);
             this.nudMinSpeed.TabIndex = 267;
             this.nudMinSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudMinSpeed.Enter += new System.EventHandler(this.nudMinSpeed_Enter);
+            this.nudMinSpeed.Enter += new System.EventHandler(this.NudMinSpeed_Enter);
             // 
             // label4
             // 
@@ -210,7 +210,7 @@
             0,
             0,
             0});
-            this.nudMaxSpeed.Enter += new System.EventHandler(this.nudMaxSpeed_Enter);
+            this.nudMaxSpeed.Enter += new System.EventHandler(this.NudMaxSpeed_Enter);
             // 
             // chkInvertRoll
             // 
@@ -380,7 +380,7 @@
             this.btnChangeAttachment.Size = new System.Drawing.Size(133, 62);
             this.btnChangeAttachment.TabIndex = 251;
             this.btnChangeAttachment.UseVisualStyleBackColor = false;
-            this.btnChangeAttachment.Click += new System.EventHandler(this.btnSendToSteerArduino_Click);
+            this.btnChangeAttachment.Click += new System.EventHandler(this.BtnSendToSteerArduino_Click);
             // 
             // label7
             // 
@@ -419,7 +419,7 @@
             0,
             0,
             0});
-            this.nudMaxCounts.Enter += new System.EventHandler(this.nudMaxCounts_Enter);
+            this.nudMaxCounts.Enter += new System.EventHandler(this.NudMaxCounts_Enter);
             // 
             // label9
             // 
@@ -449,7 +449,7 @@
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 300;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // tabcArduino
             // 
@@ -536,7 +536,7 @@
             0,
             0,
             0});
-            this.nudAckerman.Enter += new System.EventHandler(this.nudAckerman_Enter);
+            this.nudAckerman.Enter += new System.EventHandler(this.NudAckerman_Enter);
             // 
             // tabMachine
             // 
@@ -630,7 +630,7 @@
             0,
             0,
             0});
-            this.nudLowerTime.Enter += new System.EventHandler(this.nudLowerTime_Enter);
+            this.nudLowerTime.Enter += new System.EventHandler(this.NudLowerTime_Enter);
             // 
             // nudRaiseTime
             // 
@@ -657,7 +657,7 @@
             0,
             0,
             0});
-            this.nudRaiseTime.Enter += new System.EventHandler(this.nudRaiseTime_Enter);
+            this.nudRaiseTime.Enter += new System.EventHandler(this.NudRaiseTime_Enter);
             // 
             // label10
             // 
@@ -712,7 +712,7 @@
             this.btnCancel.Size = new System.Drawing.Size(90, 67);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -727,7 +727,7 @@
             this.bntOK.TabIndex = 0;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = true;
-            this.bntOK.Click += new System.EventHandler(this.btnOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
             // FormArduinoSettings
             // 

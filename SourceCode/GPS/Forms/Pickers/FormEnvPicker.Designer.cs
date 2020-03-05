@@ -43,7 +43,7 @@
             this.cboxEnv.Name = "cboxEnv";
             this.cboxEnv.Size = new System.Drawing.Size(548, 43);
             this.cboxEnv.TabIndex = 212;
-            this.cboxEnv.SelectedIndexChanged += new System.EventHandler(this.cboxVeh_SelectedIndexChanged);
+            this.cboxEnv.SelectedIndexChanged += new System.EventHandler(this.CboxVeh_SelectedIndexChanged);
             // 
             // lblLast
             // 

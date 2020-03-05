@@ -1,6 +1,4 @@
 ﻿//Please, if you use this, share the improvements
-
-using AgOpenGPS.Properties;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -235,6 +233,8 @@ namespace AgOpenGPS
             if (isJobStarted && glm.Distance(pn.fix, prevSectionPos) > sectionTriggerStepDistance)
             {
                 AddSectionContourPathPoints();
+
+
                 //grab fix and elevation
                 if (isLogElevation) sbFix.Append(pn.fix.easting.ToString("N2") + "," + pn.fix.northing.ToString("N2") + ","
                                                     + pn.altitude.ToString("N2") + ","
@@ -428,7 +428,7 @@ namespace AgOpenGPS
 
                                     if (!isBoundAlarming)
                                     {
-                                        sndBoundaryAlarm.Play();
+                                        SndBoundaryAlarm.Play();
                                         isBoundAlarming = true;
                                     }
 
@@ -778,7 +778,7 @@ namespace AgOpenGPS
             swFrame.Stop();
 
             //stop the timer and calc how long it took to do calcs and draw
-            frameTime = (double)swFrame.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency * 1000;
+            FrameTime = (double)swFrame.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency * 1000;
         }
 
         public bool isBoundAlarming;
@@ -1073,6 +1073,20 @@ namespace AgOpenGPS
                     sectionCounter++;
                 }
             }
+
+
+            for (int j = 0; j < tool.numOfSections + 1; j++)
+            {
+
+                if (section[j].isMappingOn)
+                {
+                    section[j].AddMappingPoint(toolPos.northing, toolPos.easting, cosSectionHeading, sinSectionHeading);
+                    sectionCounter++;
+                }
+            }
+
+
+
             if ((ABLine.isBtnABLineOn && !ct.isContourBtnOn && ABLine.isABLineSet && isAutoSteerBtnOn) ||
                         (!ct.isContourBtnOn && curve.isBtnCurveOn && curve.isCurveSet && isAutoSteerBtnOn))
             {

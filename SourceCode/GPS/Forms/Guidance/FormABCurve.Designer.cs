@@ -132,7 +132,7 @@
             this.btnPausePlay.Text = "Pause";
             this.btnPausePlay.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnPausePlay.UseVisualStyleBackColor = false;
-            this.btnPausePlay.Click += new System.EventHandler(this.btnPausePlay_Click);
+            this.btnPausePlay.Click += new System.EventHandler(this.BtnPausePlay_Click);
             // 
             // btnCancel
             // 
@@ -148,7 +148,7 @@
             this.btnCancel.TabIndex = 86;
             this.btnCancel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // btnBPoint
             // 
@@ -164,7 +164,7 @@
             this.btnBPoint.Size = new System.Drawing.Size(87, 98);
             this.btnBPoint.TabIndex = 64;
             this.btnBPoint.UseVisualStyleBackColor = false;
-            this.btnBPoint.Click += new System.EventHandler(this.btnBPoint_Click);
+            this.btnBPoint.Click += new System.EventHandler(this.BtnBPoint_Click);
             // 
             // btnAPoint
             // 
@@ -179,7 +179,7 @@
             this.btnAPoint.Size = new System.Drawing.Size(87, 98);
             this.btnAPoint.TabIndex = 63;
             this.btnAPoint.UseVisualStyleBackColor = false;
-            this.btnAPoint.Click += new System.EventHandler(this.btnAPoint_Click);
+            this.btnAPoint.Click += new System.EventHandler(this.BtnAPoint_Click);
             // 
             // btnListUse
             // 
@@ -197,7 +197,7 @@
             this.btnListUse.TabIndex = 144;
             this.btnListUse.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnListUse.UseVisualStyleBackColor = false;
-            this.btnListUse.Click += new System.EventHandler(this.btnListUse_Click);
+            this.btnListUse.Click += new System.EventHandler(this.BtnListUse_Click);
             // 
             // btnAddToFile
             // 
@@ -215,7 +215,7 @@
             this.btnAddToFile.TabIndex = 143;
             this.btnAddToFile.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnAddToFile.UseVisualStyleBackColor = false;
-            this.btnAddToFile.Click += new System.EventHandler(this.btnAddToFile_Click);
+            this.btnAddToFile.Click += new System.EventHandler(this.BtnAddToFile_Click);
             // 
             // btnListDelete
             // 
@@ -232,7 +232,7 @@
             this.btnListDelete.TabIndex = 142;
             this.btnListDelete.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnListDelete.UseVisualStyleBackColor = false;
-            this.btnListDelete.Click += new System.EventHandler(this.btnListDelete_Click);
+            this.btnListDelete.Click += new System.EventHandler(this.BtnListDelete_Click);
             // 
             // timer1
             // 
