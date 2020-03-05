@@ -50,7 +50,6 @@ namespace AgOpenGPS
 
         public void DoSimTick(double _st)
         {
-
             steerAngle = _st;
             double temp = (stepDistance / mf.fixUpdateHz * Math.Tan(steerAngle * 0.0165329252) / 3.3);
             headingTrue += temp;

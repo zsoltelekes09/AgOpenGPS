@@ -1674,7 +1674,7 @@
             // timerSim
             // 
             this.timerSim.Enabled = true;
-            this.timerSim.Interval = 94;
+            this.timerSim.Interval = 100;
             this.timerSim.Tick += new System.EventHandler(this.timerSim_Tick);
             // 
             // toolStripMenuItem2

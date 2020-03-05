@@ -8,11 +8,9 @@ namespace AgOpenGPS
 {
     public partial class FormDrivePicker : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
-        private int order;
-
-        ListViewItem itm;
+        public ListViewItem Itm { get; set; }
 
         public FormDrivePicker(Form callingForm, string _fileList)
         {
@@ -21,11 +19,11 @@ namespace AgOpenGPS
 
             InitializeComponent();
 
-            string [] fileList = _fileList.Split(',');
+            string[] fileList = _fileList.Split(',');
             for (int i = 0; i < fileList.Length; i++)
             {
-                itm = new ListViewItem(fileList[i]);
-                lvLines.Items.Add(itm);
+                Itm = new ListViewItem(fileList[i]);
+                lvLines.Items.Add(Itm);
             }
         }
         private void FormFilePicker_Load(object sender, EventArgs e)
@@ -33,7 +31,7 @@ namespace AgOpenGPS
         }
 
 
-        private void btnOpenExistingLv_Click(object sender, EventArgs e)
+        private void BtnOpenExistingLv_Click(object sender, EventArgs e)
         {
             int count = lvLines.SelectedItems.Count;
             if (count > 0)
@@ -43,7 +41,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnDeleteAB_Click(object sender, EventArgs e)
+        private void BtnDeleteAB_Click(object sender, EventArgs e)
         {
             mf.filePickerFileAndDirectory = "";
         }

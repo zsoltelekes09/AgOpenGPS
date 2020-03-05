@@ -125,7 +125,7 @@
             this.btnInField.Text = "Drive In";
             this.btnInField.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnInField.UseVisualStyleBackColor = true;
-            this.btnInField.Click += new System.EventHandler(this.btnInField_Click);
+            this.btnInField.Click += new System.EventHandler(this.BtnInField_Click);
             // 
             // FormJob
             // 

@@ -75,8 +75,8 @@ namespace AgOpenGPS
                     distance = Math.Sqrt(distance);
                     distance *= 100;
 
-                    fileList.Add(fieldDirectory);
-                    fileList.Add(distance.ToString("0.##"));
+                    FileList.Add(fieldDirectory);
+                    FileList.Add(distance.ToString("0.##"));
                 }
 
                 //grab the boundary area
@@ -159,15 +159,15 @@ namespace AgOpenGPS
                         }
                     }
 
-                    fileList.Add(area.ToString("0.#"));
+                    FileList.Add(area.ToString("0.#"));
                 }
                     
                 filename = dir + "\\Field.txt";
             }
 
-            for (int i = 0; i < fileList.Count; i += 3)
+            for (int i = 0; i < FileList.Count-2; i += 3)
             {
-                string[] fieldNames = { fileList[i], fileList[i + 1], fileList[i+2] };
+                string[] fieldNames = { FileList[i], FileList[i + 1], FileList[i+2] };
                 itm = new ListViewItem(fieldNames);
                 lvLines.Items.Add(itm);
             }
@@ -196,21 +196,21 @@ namespace AgOpenGPS
             if (order == 3) order = 0;
 
 
-            for (int i = 0; i < fileList.Count; i += 3)
+            for (int i = 0; i < FileList.Count-2; i += 3)
             {
                 if (order == 0)
                 {
-                    string[] fieldNames = { fileList[i], fileList[i + 1], fileList[i + 2] };
+                    string[] fieldNames = { FileList[i], FileList[i + 1], FileList[i + 2] };
                     itm = new ListViewItem(fieldNames);
                 }
                 else if (order == 1)
                 {
-                    string[] fieldNames = { fileList[i + 1], fileList[i], fileList[i + 2] };
+                    string[] fieldNames = { FileList[i + 1], FileList[i], FileList[i + 2] };
                     itm = new ListViewItem(fieldNames);
                 }
                 else
                 {
-                    string[] fieldNames = { fileList[i + 2], fileList[i], fileList[i + 1] };
+                    string[] fieldNames = { FileList[i + 2], FileList[i], FileList[i + 1] };
                     itm = new ListViewItem(fieldNames);
                 }
 

@@ -142,14 +142,12 @@ namespace AgOpenGPS
 
             #region Step Fix
 
-
-
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = glm.Distance(pn.fix, stepFixPts[0]);
 
-            CalculatePositionHeading();
 
-            if (distanceCurrentStepFix > 0.1)//minFixStepDist / totalFixSteps)
+
+            if (distanceCurrentStepFix > minFixStepDist/totalFixSteps)//minFixStepDist / totalFixSteps)
             {
                 for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
 
@@ -160,22 +158,13 @@ namespace AgOpenGPS
 
                 if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser -= 3000; ;//userDistance can be reset
 
-                double test = Math.Atan2(stepFixPts[0].easting - stepFixPts[1].easting, stepFixPts[0].northing - stepFixPts[1].northing);
+                CalculatePositionHeading();
 
-                double angle = test - lasttest;
-                while (angle > Math.PI) angle -= glm.twoPI;
-                while (angle < -Math.PI) angle += glm.twoPI;
-                //if (angle < -glm.PIBy2 || angle > glm.PIBy2)
-                if (angle < -1 || angle > 1)
-                {
-                    //System.Windows.Forms.MessageBox.Show("change".ToString());
-                }
-                lasttest = test;
-
+                CalculateSectionLookAhead(toolPos.northing, toolPos.easting, cosSectionHeading, sinSectionHeading);
             }
 
             //test if travelled far enough for new boundary point
-            if (glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryAndPerimiterPoint();
+            if (glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryPoint();
 
             //tree spacing
             if (vehicle.treeSpacing != 0 && section[0].isSectionOn && (treeSpacingCounter += (distanceCurrentStepFix * 100)) > vehicle.treeSpacing)
@@ -187,7 +176,7 @@ namespace AgOpenGPS
             //test if travelled far enough for new Section point, To prevent drawing high numbers of triangles
             if (isJobStarted && glm.Distance(pn.fix, prevSectionPos) > sectionTriggerStepDistance)
             {
-                AddSectionContourPathPoints();
+                AddSectionOrContourPathPoints();
 
 
                 //grab fix and elevation
@@ -1003,7 +992,7 @@ namespace AgOpenGPS
             {
                 if (section[j].isMappingOn)
                 {
-                    section[j].AddMappingPoint(toolPos.northing, toolPos.easting, cosSectionHeading, sinSectionHeading);
+                    section[j].AddMappingPoint();
                     sectionCounter++;
                 }
             }

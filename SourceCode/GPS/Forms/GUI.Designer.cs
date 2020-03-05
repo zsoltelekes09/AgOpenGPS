@@ -1172,7 +1172,6 @@ namespace AgOpenGPS
 
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
 
-
             testHalfSecond1 = testHalfSecond.ElapsedMilliseconds;
             lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
             lblHz2.Text = (int)(FrameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();
@@ -1383,8 +1382,6 @@ namespace AgOpenGPS
 
             if (curve.isBtnCurveOn) btnCurve.Text = "# " + CurveNumber;
             else btnCurve.Text = "";
-                    lblHz.Text = NMEAHz + "Hz " + (int)(frameTime) + "\r\n" + FixQuality + Math.Round(HzTime, MidpointRounding.AwayFromZero) + " Hz";
-                }
 
             lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
 

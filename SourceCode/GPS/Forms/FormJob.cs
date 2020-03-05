@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 
@@ -25,7 +27,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsStartNewField;
         }
 
-        private void btnJobNew_Click(object sender, EventArgs e)
+        private void BtnJobNew_Click(object sender, EventArgs e)
         {
             //back to FormGPS
             DialogResult = DialogResult.Yes;
@@ -106,7 +108,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnInField_Click(object sender, EventArgs e)
+        private void BtnInField_Click(object sender, EventArgs e)
         {
             string infieldList = "";
             int numFields = 0;
@@ -147,7 +149,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                            mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
                         }
                     }
 
@@ -268,8 +270,7 @@ namespace AgOpenGPS
             }
             else //no fields found
             {
-                var form2 = new FormTimedMessage(2000, gStr.gsNoFieldsFound, gStr.gsFieldNotOpen);
-                form2.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoFieldsFound, gStr.gsFieldNotOpen);
             }
 
         }

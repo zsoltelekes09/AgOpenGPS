@@ -340,9 +340,8 @@ Field	Meaning
 
                                 speed = (rawBuffer[66] | (rawBuffer[67] << 8) | (rawBuffer[68] << 16) | (rawBuffer[69] << 24)) * 0.0036;//to km/h
 
-                                //average the speeds for display, not calcs
-                                mf.avgSpeed[mf.ringCounter] = speed;
-                                if (mf.ringCounter++ > 8) mf.ringCounter = 0;
+                                //average the speed
+                                AverageTheSpeed();
 
                                 mf.recvSentenceSettings[2] = mf.recvSentenceSettings[0];
                                 mf.recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
@@ -724,8 +723,7 @@ Field	Meaning
 
                 //is imu valid fusion
                 // isValidIMU = words[18] == "T";
-                int tempInt = 0;
-                int.TryParse(words[18], NumberStyles.Float, CultureInfo.InvariantCulture, out tempInt);
+                int.TryParse(words[18], NumberStyles.Float, CultureInfo.InvariantCulture, out int tempInt);
                 if (tempInt == 0)//0: no heading, no roll 1: heading ok, no roll 2: roll+heading ok
                 {
                     if (mf.headingFromSource != "Fix") { mf.headingFromSourceBak = mf.headingFromSource; }

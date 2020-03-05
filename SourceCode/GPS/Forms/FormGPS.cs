@@ -227,9 +227,7 @@ namespace AgOpenGPS
         public int MinuteCounter { get; set; } = 1;
         public int TenMinuteCounter { get; set; } = 1;
         public int NtripCounter { get; set; } = 0;
-        public FormTimedMessage Form { get; set; } = formTimedMessage;
-
-        //public FormTimedMessage Form { get; } = new FormTimedMessage();
+        public FormTimedMessage Form { get; set; } = new FormTimedMessage();
 
         #endregion // Class Props and instances
 

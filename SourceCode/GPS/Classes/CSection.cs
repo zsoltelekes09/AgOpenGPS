@@ -102,12 +102,10 @@ namespace AgOpenGPS
                 //starting a new patch chunk so create a new triangle list
                 triangleList = new List<vec3>();
                 patchList.Add(triangleList);
-                vec3 colur;
                 //if (mf.autoBtnState == FormGPS.btnStates.Auto)
-                    colur = new vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
-                //else colur = new vec3(mf.sectionColorDay.B, mf.sectionColorDay.G, mf.sectionColorDay.R);
 
                 vec3 colur = new vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
+
                 triangleList.Add(colur);
 
                 //left side of triangle
