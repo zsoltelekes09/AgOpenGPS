@@ -371,8 +371,13 @@
             this.nudAntennaOffset.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.nudAntennaOffset.InterceptArrowKeys = false;
             this.nudAntennaOffset.Location = new System.Drawing.Point(710, 319);
+            this.nudAntennaOffset.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
             this.nudAntennaOffset.Minimum = new decimal(new int[] {
-            100,
+            500,
             0,
             0,
             -2147483648});

@@ -1321,6 +1321,9 @@ namespace AgOpenGPS
             if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent) statusStripBottom.BackColor = Color.Tomato;
             else if (!mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato) statusStripBottom.BackColor = Color.Transparent;
 
+                    lblEast.Text = ((int)(pn.actualEasting)).ToString();
+                    lblNorth.Text = ((int)(pn.actualNorthing)).ToString();
+
             testOneSecond1 = testOneSecond.ElapsedMilliseconds;
             OneSecondUpdate.Enabled = true;
         }
@@ -1380,6 +1383,8 @@ namespace AgOpenGPS
 
             if (curve.isBtnCurveOn) btnCurve.Text = "# " + CurveNumber;
             else btnCurve.Text = "";
+                    lblHz.Text = NMEAHz + "Hz " + (int)(frameTime) + "\r\n" + FixQuality + Math.Round(HzTime, MidpointRounding.AwayFromZero) + " Hz";
+                }
 
             lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
 
@@ -1461,20 +1466,14 @@ namespace AgOpenGPS
         {
             get
             {
-                double spd = 0;
-                for (int c = 0; c < 5; c++) spd += avgSpeed[c];
-                spd *= 0.124;
-                return String.Format("{0:0.0}", spd);
+                return Convert.ToString(Math.Round(avgSpeed*0.62137, 1));
             }
         }
         public string SpeedKPH
         {
             get
             {
-                double spd = 0;
-                for (int c = 0; c < 5; c++) spd += avgSpeed[c];
-                spd *= 0.2;
-                return String.Format("{0:0.0}", spd);
+                return Convert.ToString(Math.Round(avgSpeed, 1));
             }
         }
 

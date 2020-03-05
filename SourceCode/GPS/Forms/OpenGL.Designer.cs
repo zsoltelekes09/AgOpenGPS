@@ -874,31 +874,33 @@ namespace AgOpenGPS
                         if (isBoundaryClose) endHeight = tool.rpWidth + pos;
                         else endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
 
-                        for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                        {
-                            if (grnPixels[a] == 0)
-                            {
-                                tagged++;
-                                if (tagged > tool.toolMinUnappliedPixels)
+                                for (int a = pos; a <= endHeight; a += tool.rpWidth)
                                 {
-                                    section[j].isSectionRequiredOn = true;
-                                    goto GetOutSectionOn;
+                                    if (grnPixels[a] == 0)
+                                    {
+                                        tagged++;
+                                        if (tagged > tool.toolMinUnappliedPixels)
+                                        {
+                                            section[j].isSectionRequiredOn = true;
+                                            goto GetOutSectionOn;
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    }
-                    GetOutSectionOn:
 
-                    //only turn off if on
-                    if (section[j].isSectionRequiredOn == true)
-                    {
-                        section[j].isSectionRequiredOn = false;
-                        //calculate the slopes of the lines
-                        mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                        mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-                        start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                        end = section[j].rpSectionWidth - 1 + start;
-                        tagged = 0;
+                            }
+                            GetOutSectionOn:
+                                tagged = 0;
+
+                            //only turn off if on
+                            if (section[j].isSectionRequiredOn == true)
+                            {
+                                section[j].isSectionRequiredOn = false;
+                                //calculate the slopes of the lines
+                                mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
+                                mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
+                                start = section[j].rpSectionPosition - section[0].rpSectionPosition;
+                                end = section[j].rpSectionWidth - 1 + start;
+                                tagged = 0;
 
                         for (int pos = start; pos <= end; pos++)
                         {
@@ -996,8 +998,8 @@ namespace AgOpenGPS
                                     section[j].isSectionRequiredOn = true;
                                     section[j].sectionOffRequest = false;
                                     section[j].sectionOnRequest = true;
-                                }
-                            }
+                                }                                
+                            }                        
                         }
                     }
 
@@ -1587,7 +1589,7 @@ namespace AgOpenGPS
             double down = 20;
             GL.LineWidth(1);
             //GL.Translate(0, 0, 0.01);
-            
+            offlineDistance *= -1;
             //  Dot distance is representation of how far from AB Line
             int dotDistance = (int)(offlineDistance);
             int limit = (int)lightbarCmPerPixel * 8;
@@ -1709,24 +1711,20 @@ namespace AgOpenGPS
                 double size = 1.5;
                 string hede;
 
-                if (dist == 3200 || dist == 3202 )
+                if (dist != 3200 && dist != 3202)
                 {
-                    //lblDistanceOffLine.Text = "Lost";
-                }
-                else 
-                {
-                    if (dist < 0.0)
+                    if (dist > 0.0)
                     {
                         GL.Color3(0.50f, 0.952f, 0.3f);
-                         hede = "< " + (Math.Abs(dist)).ToString("N0");
+                        hede = "< " + (Math.Abs(dist)).ToString("N0");
                     }
                     else
                     {
                         GL.Color3(0.9752f, 0.50f, 0.3f);
-                         hede = (dist).ToString("N0") + " >" ;
+                        hede = (Math.Abs(dist)).ToString("N0") + " >";
                     }
-                        int center = -(int)(((double)(hede.Length) * 0.5) * 16 * size);
-                        font.DrawText(center, 38, hede, size);
+                    int center = -(int)(((double)(hede.Length) * 0.5) * 16 * size);
+                    font.DrawText(center, 38, hede, size);
                 }
             }
             //if (ct.isContourBtnOn)
@@ -2042,21 +2040,15 @@ namespace AgOpenGPS
             double angle = 0;
             if (isMetric)
             {
-                double aveSpd = 0;
-                for (int c = 0; c < 5; c++) aveSpd += avgSpeed[c];
-                aveSpd *= 0.2;
-                aveSpd = Math.Abs(aveSpd);
+                double aveSpd = Math.Abs(avgSpeed);
                 if (aveSpd > 20) aveSpd = 20;
                 angle = (aveSpd - 10) * 15;
             }
             else
             {
-                double aveSpd = 0;
-                for (int c = 0; c < 5; c++) aveSpd += avgSpeed[c];
-                aveSpd *= 0.124;
-                aveSpd = Math.Abs(aveSpd);
-                angle = (aveSpd - 10) * 15;
+                double aveSpd = Math.Abs(avgSpeed*0.62137);
                 if (aveSpd > 20) aveSpd = 20;
+                angle = (aveSpd - 10) * 15;
             }
 
             if (pn.speed > -0.1) GL.Color3(0.0f, 0.950f, 0.0f);
