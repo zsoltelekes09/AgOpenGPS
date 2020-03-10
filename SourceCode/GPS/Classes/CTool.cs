@@ -17,8 +17,8 @@ namespace AgOpenGPS
         public double toolTrailingHitchLength, toolTankTrailingHitchLength;
         public double toolOffset;
 
-        public double lookAheadOffSetting, lookAheadOnSetting;
-        public double turnOffDelay;
+        public double LookAheadOffSetting, LookAheadOnSetting;
+        public double TurnOffDelay;
 
         public double lookAheadDistanceOnPixelsLeft, lookAheadDistanceOnPixelsRight;
         public double lookAheadDistanceOffPixelsLeft, lookAheadDistanceOffPixelsRight;
@@ -37,8 +37,6 @@ namespace AgOpenGPS
 
         //used for super section off on
         public int toolMinUnappliedPixels;
-
-        public bool isLeftSideInHeadland = true, isRightSideInHeadland = true;
 
         //read pixel values
         public int rpXPosition;
@@ -63,9 +61,9 @@ namespace AgOpenGPS
             isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
             isToolTBT = Properties.Vehicle.Default.setTool_isToolTBT;
 
-            lookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
-            lookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
-            turnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
+            LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
+            LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
+            TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
 
             numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
             numSuperSection = numOfSections + 1;
@@ -166,10 +164,9 @@ namespace AgOpenGPS
             GL.Begin(PrimitiveType.Lines);
 
             //draw super section line
-            if (mf.section[numOfSections].isSectionOn)
+            if (mf.section[numOfSections].IsSectionOn)
             {
-                if (mf.section[0].manBtnState == FormGPS.manBtn.Auto) GL.Color3(0.50f, 0.97f, 0.950f);
-                else GL.Color3(0.99, 0.99, 0);
+                GL.Color3(0.50f, 0.97f, 0.950f);
                 GL.Vertex3(mf.section[numOfSections].positionLeft, trailingTool, 0);
                 GL.Vertex3(mf.section[numOfSections].positionRight, trailingTool, 0);
             }
@@ -178,9 +175,9 @@ namespace AgOpenGPS
                 for (int j = 0; j < numOfSections; j++)
                 {
                     //if section is on, green, if off, red color
-                    if (mf.section[j].isSectionOn)
+                    if (mf.section[j].IsSectionOn)
                     {
-                        if (mf.section[j].manBtnState == FormGPS.manBtn.Auto)
+                        if (mf.section[j].BtnSectionState == FormGPS.btnStates.Auto)
                         {
                             GL.Color3(0.0f, 0.9f, 0.0f);
                             //if (mf.section[j].isMappingOn) GL.Color3(0.0f, 0.7f, 0.0f);

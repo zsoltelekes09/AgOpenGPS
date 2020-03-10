@@ -51,8 +51,8 @@ namespace AgOpenGPS
             lblLeftToolSpd.Text = (mf.tool.toolFarLeftSpeed*3.6).ToString("N1");
             lblRightToolSpd.Text = (mf.tool.toolFarRightSpeed*3.6).ToString("N1");
 
-            lblSectSpdLeft.Text = (mf.section[0].speedPixels*0.36).ToString("N1");
-            lblSectSpdRight.Text = (mf.section[mf.tool.numOfSections-1].speedPixels*0.36).ToString("N1");
+            lblSectSpdLeft.Text = (mf.section[0].speedPixels).ToString("N1");
+            lblSectSpdRight.Text = (mf.section[mf.tool.numOfSections-1].speedPixels).ToString("N1");
         }
     }
 }

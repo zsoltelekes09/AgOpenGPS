@@ -235,24 +235,42 @@ namespace AgOpenGPS
         {
             ////draw the perimeter line so far
             if (bndLine.Count < 1) return;
-            //GL.PointSize(2);
             GL.LineWidth(2);
             int ptCount = bndLine.Count;
             //if (isDriveThru) GL.Color3(0.25f, 0.752f, 0.860f);
             //else
-            GL.Begin(PrimitiveType.Lines);
-            for (int h = 0; h < ptCount; h++) GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
+            //GL.Begin(PrimitiveType.Lines);
+            GL.Begin(PrimitiveType.Triangles);
+
+            //for (int h = 0; h < ptCount; h++) GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
+            for (int h = 0; h < ptCount - 2; h += 3)
+            {
+                GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
+                GL.Vertex3(bndLine[h+1].easting, bndLine[h+1].northing, 0);
+                GL.Vertex3(bndLine[h+2].easting, bndLine[h+2].northing, 0);
+            }
             //GL.Color3(0.95f, 0.972f, 0.90f);
             //GL.Vertex3(bndLine[0].easting, bndLine[0].northing, 0);
             GL.End();
+        }
 
-            //ptCount = bdList.Count;
-            //if (ptCount < 1) return;
-            //gl.PointSize(4);
-            //gl.Color(0.19f, 0.932f, 0.70f);
-            //gl.Begin(OpenGL.GL_POINTS);
-            ////gl.Vertex(closestBoundaryPt.easting, closestBoundaryPt.northing, 0);
-            //gl.End();
+        public void DrawBoundaryLineBackBuffer()
+        {
+            GL.LineWidth(3);
+            GL.Color3((byte)0, (byte)50, (byte)0);
+
+            int ptCount = bndLine.Count;
+            if (ptCount < 3) return;
+
+            GL.Begin(PrimitiveType.Triangles);
+
+            for (int h = 0; h < ptCount - 2; h += 3)
+            {
+                GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
+                GL.Vertex3(bndLine[h + 1].easting, bndLine[h + 1].northing, 0);
+                GL.Vertex3(bndLine[h + 2].easting, bndLine[h + 2].northing, 0);
+            }
+            GL.End();
         }
 
         //obvious

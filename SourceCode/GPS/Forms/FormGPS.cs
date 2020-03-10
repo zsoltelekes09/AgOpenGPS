@@ -70,6 +70,7 @@ namespace AgOpenGPS
         private readonly Stopwatch testOneSecond = new Stopwatch();
         private readonly Stopwatch testThreeSecond = new Stopwatch();
         public readonly Stopwatch testNMEA = new Stopwatch();
+
         public long testHalfSecond1 = 0, testOneSecond1 = 0, testThreeSecond1 = 0, testNMEA1 = 0;
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
@@ -209,16 +210,9 @@ namespace AgOpenGPS
         public CGeoFence gf;
 
         /// <summary>
-        /// Class containing workswitch functionality
-        /// </summary>
-        public CWorkSwitch workSwitch;
-
-        /// <summary>
         /// The font class
         /// </summary>
         public CFont font;
-
-        private static readonly FormTimedMessage formTimedMessage = new FormTimedMessage();
 
         public bool LeftMouseDownOnOpenGL { get; set; }
         public double FrameTime { get; set; } = 0;
@@ -400,9 +394,6 @@ namespace AgOpenGPS
 
             // Add Message Event handler for Form decoupling from client socket thread
             updateRTCM_DataEvent = new UpdateRTCM_Data(OnAddMessage);
-
-            // Access to workswitch functionality
-            workSwitch = new CWorkSwitch(this);
 
             //access to font class
             font = new CFont(this);
@@ -1253,21 +1244,15 @@ namespace AgOpenGPS
                 oglZoom.Width = 300;
                 oglZoom.Height = 300;
             }
-                //isGPSPositionInitialized = false;
-                //offset = 0;
-                //pn.latStart = pn.latitude;
-                //pn.lonStart = pn.longitude;
 
-                SendSteerSettingsOutAutoSteerPort();
+            SendSteerSettingsOutAutoSteerPort();
             isJobStarted = true;
 
-            btnManualOffOn.Enabled = true;
-            manualBtnState = btnStates.Off;
-            btnManualOffOn.Image = Properties.Resources.ManualOff;
+            btnManualSection.Enabled = true;
+            btnAutoSection.Enabled = true;
 
-            btnSectionOffAutoOn.Enabled = true;
             autoBtnState = btnStates.Off;
-            btnSectionOffAutoOn.Image = Properties.Resources.SectionMasterOff;
+            btnSection_Update();
 
             btnSection1Man.BackColor = Color.Red;
             btnSection2Man.BackColor = Color.Red;
@@ -1370,22 +1355,21 @@ namespace AgOpenGPS
             //turn section buttons all OFF
             for (int j = 0; j < MAXSECTIONS; j++)
             {
-                section[j].isAllowedOn = false;
-                section[j].manBtnState = manBtn.On;
+                section[j].IsAllowedOn = false;
+                section[j].BtnSectionState = btnStates.Off;
+                //Update the button colors and text
+                if (j < MAXSECTIONS - 1)
+                ManualBtnUpdate(j, Controls[string.Format("btnSection{0}Man", j+1)] as Button);
             }
 
-            //fix ManualOffOnAuto buttons
-            btnManualOffOn.Enabled = false;
-            manualBtnState = btnStates.Off;
-            btnManualOffOn.Image = Properties.Resources.ManualOff;
 
             //fix auto button
-            btnSectionOffAutoOn.Enabled = false;
-            autoBtnState = btnStates.Off;
-            btnSectionOffAutoOn.Image = Properties.Resources.SectionMasterOff;
+            btnManualSection.Enabled = false;
+            btnAutoSection.Enabled = false;
 
-            //Update the button colors and text
-            ManualAllBtnsUpdate();
+            autoBtnState = btnStates.Off;
+            btnSection_Update();
+
 
             //enable disable manual buttons
             LineUpManualBtns();
@@ -1597,64 +1581,58 @@ namespace AgOpenGPS
             for (int j = 0; j < tool.numOfSections + 1; j++)
             {
                 //SECTIONS - 
-
-                if (section[j].sectionOnRequest) section[j].isSectionOn = true;
-
-                if (!section[j].sectionOffRequest) section[j].sectionOffTimer = (int)((double)fixUpdateHz * tool.turnOffDelay);
-
-                if (section[j].sectionOffTimer > 0) section[j].sectionOffTimer--;
-
-                if (section[j].sectionOffRequest && section[j].sectionOffTimer == 0)
+                if (section[j].SectionOnRequest)
                 {
-                    if (section[j].isSectionOn) section[j].isSectionOn = false;
+                    section[j].IsSectionOn = true;
+                    section[j].SectionOverlapTimer = (int)((double)fixUpdateHz * tool.TurnOffDelay + 1);
+
+                    if (section[j].MappingOnTimer == 0) section[j].MappingOnTimer = fixUpdateHz * 1;
+                }
+                else
+                {
+                    if (section[j].SectionOverlapTimer > 0) section[j].SectionOverlapTimer--;
+                    if (section[j].IsSectionOn && section[j].SectionOverlapTimer == 0)
+                    {
+                        section[j].IsSectionOn = false;
+                    }
                 }
 
-
-
-
-
-
-
-                //MAPPING - 
-
-                //easy just turn it on
-                if (section[j].mappingOnRequest)
+                //MAPPING -
+                if (!section[j].IsMappingOn && isMapping && section[j].MappingOnTimer > 0)
                 {
-                    if (!section[j].isMappingOn && isMapping) section[j].TurnMappingOn();
+                    if (section[j].MappingOnTimer > 0) section[j].MappingOnTimer--;
+                    if (section[j].MappingOnTimer == 0)
+                    {
+                        section[j].TurnMappingOn();
+                    }
                 }
 
-                //turn off
-                double sped = 1 / ((pn.speed + 5) * 0.2);
-                if (sped < 0.2) sped = 0.2;
-
-                //keep setting the timer so full when ready to turn off
-                if (!section[j].mappingOffRequest) section[j].mappingOffTimer = (int)(fixUpdateHz * 1 * sped + ((double)fixUpdateHz * tool.turnOffDelay));
-
-                //decrement the off timer
-                if (section[j].mappingOffTimer > 0) section[j].mappingOffTimer--;
-
-                //if Off mapping timer is zero, turn off the section, reset everything
-                if (section[j].mappingOffTimer == 0 && section[j].mappingOffRequest)
+                if (section[j].IsSectionOn)
                 {
-                    if (section[j].isMappingOn) section[j].TurnMappingOff();
-                    section[j].mappingOffRequest = false;
+                    section[j].MappingOffTimer = (int)(0.8 * fixUpdateHz+1);
                 }
-
-
-
-
-
+                else
+                {
+                    if (section[j].MappingOffTimer > 0) section[j].MappingOffTimer--;
+                    if (section[j].MappingOffTimer == 0)
+                    {
+                        if (section[j].IsMappingOn)
+                        {
+                            section[j].TurnMappingOff();
+                            section[j].MappingOnTimer = 0;
+                        }
+                    }
+                }
 
 
 
                 #region notes
                 //Turn ON
                 //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
-                //if (section[j].sectionOnRequest && !section[j].sectionOnOffCycle)
+                //if (section[j].sectionOnRequest)
                 //{
                 //    section[j].sectionOnTimer = (int)(pn.speed * section[j].lookAheadOn) + 1;
                 //    if (section[j].sectionOnTimer > fixUpdateHz + 3) section[j].sectionOnTimer = fixUpdateHz + 3;
-                //    section[j].sectionOnOffCycle = true;
                 //}
 
                 ////reset the ON request
@@ -1665,7 +1643,7 @@ namespace AgOpenGPS
                 //{
                 //    //turn the section ON if not and decrement timer
                 //    section[j].sectionOnTimer--;
-                //    if (!section[j].isSectionOn) section[j].isSectionOn = true;
+                //    if (!section[j].IsSectionOn) section[j].IsSectionOn = true;
 
                 //    //keep resetting the section OFF timer while the ON is active
                 //    //section[j].sectionOffTimer = (int)(fixUpdateHz * tool.toolTurnOffDelay);
@@ -1680,18 +1658,13 @@ namespace AgOpenGPS
                 ////if Off section timer is zero, turn off the section
                 //if (section[j].sectionOffTimer == 0 && section[j].sectionOnTimer == 0 && section[j].sectionOffRequest)
                 //{
-                //    if (section[j].isSectionOn) section[j].isSectionOn = false;
+                //    if (section[j].IsSectionOn) section[j].IsSectionOn = false;
                 //    //section[j].sectionOnOffCycle = false;
                 //    section[j].sectionOffRequest = false;
                 //    //}
                 //}
                 //Turn ON
                 //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
-                //if (section[j].mappingOnRequest && !section[j].mappingOnOffCycle)
-                //{
-                //    section[j].mappingOnTimer = (int)(fixUpdateHz * 1) + 1;
-                //    section[j].mappingOnOffCycle = true;
-                //}
 
                 ////reset the ON request
                 //section[j].mappingOnRequest = false;
@@ -1714,34 +1687,26 @@ namespace AgOpenGPS
                 case 1: //Manual button
                     if (action == 0) //turn auto off
                     {
-                        if (manualBtnState != btnStates.Off)
-                        {
-                            btnManualOffOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.Off;
+                        btnSection_Update();
                     }
                     else
                     {
-                        if (manualBtnState != btnStates.On)
-                        {
-                            btnManualOffOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.On;
+                        btnSection_Update();
                     }
                     break;
 
                 case 2: //Auto Button
                     if (action == 0) //turn auto off
                     {
-                        if (autoBtnState != btnStates.Off)
-                        {
-                            btnSectionOffAutoOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.Off;
+                        btnSection_Update();
                     }
                     else
                     {
-                        if (autoBtnState != btnStates.Auto)
-                        {
-                            btnSectionOffAutoOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.Auto;
+                        btnSection_Update();
                     }
                     break;
 
@@ -1861,9 +1826,8 @@ namespace AgOpenGPS
             //turn off all the sections
             for (int j = 0; j < tool.numOfSections + 1; j++)
             {
-                if (section[j].isMappingOn) section[j].TurnMappingOff();
-                section[j].sectionOnOffCycle = false;
-                section[j].sectionOffRequest = false;
+                if (section[j].IsMappingOn) section[j].TurnMappingOff();
+                section[j].SectionOnRequest = false;
             }
 
             //FileSaveHeadland();

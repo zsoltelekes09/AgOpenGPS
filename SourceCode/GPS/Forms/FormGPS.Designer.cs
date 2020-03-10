@@ -195,8 +195,8 @@
             this.btnContourPriority = new System.Windows.Forms.Button();
             this.btnFlag = new System.Windows.Forms.Button();
             this.btnMakeLinesFromBoundary = new System.Windows.Forms.Button();
-            this.btnSectionOffAutoOn = new System.Windows.Forms.Button();
-            this.btnManualOffOn = new System.Windows.Forms.Button();
+            this.btnAutoSection = new System.Windows.Forms.Button();
+            this.btnManualSection = new System.Windows.Forms.Button();
             this.btnCycleLines = new System.Windows.Forms.Button();
             this.btnHeadlandOnOff = new System.Windows.Forms.Button();
             this.btnEditHeadingB = new System.Windows.Forms.Button();
@@ -1725,7 +1725,7 @@
             this.btnSection8Man.Text = "8";
             this.btnSection8Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection8Man.UseVisualStyleBackColor = false;
-            this.btnSection8Man.Click += new System.EventHandler(this.btnSection8Man_Click);
+            this.btnSection8Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection7Man
             // 
@@ -1744,7 +1744,7 @@
             this.btnSection7Man.Text = "7";
             this.btnSection7Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection7Man.UseVisualStyleBackColor = false;
-            this.btnSection7Man.Click += new System.EventHandler(this.btnSection7Man_Click);
+            this.btnSection7Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection6Man
             // 
@@ -1763,7 +1763,7 @@
             this.btnSection6Man.Text = "6";
             this.btnSection6Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection6Man.UseVisualStyleBackColor = false;
-            this.btnSection6Man.Click += new System.EventHandler(this.btnSection6Man_Click);
+            this.btnSection6Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection5Man
             // 
@@ -1782,7 +1782,7 @@
             this.btnSection5Man.Text = "5";
             this.btnSection5Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection5Man.UseVisualStyleBackColor = false;
-            this.btnSection5Man.Click += new System.EventHandler(this.btnSection5Man_Click);
+            this.btnSection5Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection4Man
             // 
@@ -1801,7 +1801,7 @@
             this.btnSection4Man.Text = "4";
             this.btnSection4Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection4Man.UseVisualStyleBackColor = false;
-            this.btnSection4Man.Click += new System.EventHandler(this.btnSection4Man_Click);
+            this.btnSection4Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection3Man
             // 
@@ -1820,7 +1820,7 @@
             this.btnSection3Man.Text = "3";
             this.btnSection3Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection3Man.UseVisualStyleBackColor = false;
-            this.btnSection3Man.Click += new System.EventHandler(this.btnSection3Man_Click);
+            this.btnSection3Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection2Man
             // 
@@ -1839,7 +1839,7 @@
             this.btnSection2Man.Text = "2";
             this.btnSection2Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection2Man.UseVisualStyleBackColor = false;
-            this.btnSection2Man.Click += new System.EventHandler(this.btnSection2Man_Click);
+            this.btnSection2Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection1Man
             // 
@@ -1877,7 +1877,7 @@
             this.btnSection9Man.Text = "9";
             this.btnSection9Man.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnSection9Man.UseVisualStyleBackColor = false;
-            this.btnSection9Man.Click += new System.EventHandler(this.btnSection9Man_Click);
+            this.btnSection9Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection10Man
             // 
@@ -1895,7 +1895,7 @@
             this.btnSection10Man.TabIndex = 175;
             this.btnSection10Man.Text = "10";
             this.btnSection10Man.UseVisualStyleBackColor = false;
-            this.btnSection10Man.Click += new System.EventHandler(this.btnSection10Man_Click);
+            this.btnSection10Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection11Man
             // 
@@ -1913,7 +1913,7 @@
             this.btnSection11Man.TabIndex = 176;
             this.btnSection11Man.Text = "11";
             this.btnSection11Man.UseVisualStyleBackColor = false;
-            this.btnSection11Man.Click += new System.EventHandler(this.btnSection11Man_Click);
+            this.btnSection11Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection12Man
             // 
@@ -1931,7 +1931,7 @@
             this.btnSection12Man.TabIndex = 177;
             this.btnSection12Man.Text = "12";
             this.btnSection12Man.UseVisualStyleBackColor = false;
-            this.btnSection12Man.Click += new System.EventHandler(this.btnSection12Man_Click);
+            this.btnSection12Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // oglMain
             // 
@@ -1999,8 +1999,8 @@
             this.layoutPanelRight.Controls.Add(this.cboxpRowWidth, 0, 4);
             this.layoutPanelRight.Controls.Add(this.btnFlag, 0, 5);
             this.layoutPanelRight.Controls.Add(this.btnMakeLinesFromBoundary, 0, 3);
-            this.layoutPanelRight.Controls.Add(this.btnSectionOffAutoOn, 1, 5);
-            this.layoutPanelRight.Controls.Add(this.btnManualOffOn, 1, 4);
+            this.layoutPanelRight.Controls.Add(this.btnAutoSection, 1, 5);
+            this.layoutPanelRight.Controls.Add(this.btnManualSection, 1, 4);
             this.layoutPanelRight.Controls.Add(this.btnCycleLines, 1, 3);
             this.layoutPanelRight.Controls.Add(this.btnHeadlandOnOff, 0, 6);
             this.layoutPanelRight.Controls.Add(this.btnEditHeadingB, 0, 2);
@@ -2239,46 +2239,46 @@
             this.btnMakeLinesFromBoundary.UseVisualStyleBackColor = false;
             this.btnMakeLinesFromBoundary.Click += new System.EventHandler(this.BtnMakeLinesFromBoundary_Click);
             // 
-            // btnSectionOffAutoOn
+            // btnAutoSection
             // 
-            this.btnSectionOffAutoOn.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnSectionOffAutoOn.BackColor = System.Drawing.Color.Transparent;
-            this.btnSectionOffAutoOn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnSectionOffAutoOn.Enabled = false;
-            this.btnSectionOffAutoOn.FlatAppearance.BorderColor = System.Drawing.SystemColors.HotTrack;
-            this.btnSectionOffAutoOn.FlatAppearance.BorderSize = 0;
-            this.btnSectionOffAutoOn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSectionOffAutoOn.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSectionOffAutoOn.Image = global::AgOpenGPS.Properties.Resources.SectionMasterOff;
-            this.btnSectionOffAutoOn.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnSectionOffAutoOn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnSectionOffAutoOn.Location = new System.Drawing.Point(93, 331);
-            this.btnSectionOffAutoOn.Margin = new System.Windows.Forms.Padding(0);
-            this.btnSectionOffAutoOn.Name = "btnSectionOffAutoOn";
-            this.btnSectionOffAutoOn.Size = new System.Drawing.Size(83, 65);
-            this.btnSectionOffAutoOn.TabIndex = 152;
-            this.btnSectionOffAutoOn.UseVisualStyleBackColor = false;
-            this.btnSectionOffAutoOn.Click += new System.EventHandler(this.btnSectionOffAutoOn_Click);
+            this.btnAutoSection.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnAutoSection.BackColor = System.Drawing.Color.Transparent;
+            this.btnAutoSection.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnAutoSection.Enabled = false;
+            this.btnAutoSection.FlatAppearance.BorderColor = System.Drawing.SystemColors.HotTrack;
+            this.btnAutoSection.FlatAppearance.BorderSize = 0;
+            this.btnAutoSection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAutoSection.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAutoSection.Image = global::AgOpenGPS.Properties.Resources.SectionMasterOff;
+            this.btnAutoSection.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnAutoSection.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.btnAutoSection.Location = new System.Drawing.Point(93, 331);
+            this.btnAutoSection.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAutoSection.Name = "btnAutoSection";
+            this.btnAutoSection.Size = new System.Drawing.Size(83, 65);
+            this.btnAutoSection.TabIndex = 152;
+            this.btnAutoSection.UseVisualStyleBackColor = false;
+            this.btnAutoSection.Click += new System.EventHandler(this.btnSection_Click);
             // 
-            // btnManualOffOn
+            // btnManualSection
             // 
-            this.btnManualOffOn.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnManualOffOn.BackColor = System.Drawing.Color.Transparent;
-            this.btnManualOffOn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnManualOffOn.Enabled = false;
-            this.btnManualOffOn.FlatAppearance.BorderColor = System.Drawing.SystemColors.HotTrack;
-            this.btnManualOffOn.FlatAppearance.BorderSize = 0;
-            this.btnManualOffOn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnManualOffOn.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnManualOffOn.Image = global::AgOpenGPS.Properties.Resources.ManualOff;
-            this.btnManualOffOn.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnManualOffOn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnManualOffOn.Location = new System.Drawing.Point(93, 268);
-            this.btnManualOffOn.Name = "btnManualOffOn";
-            this.btnManualOffOn.Size = new System.Drawing.Size(83, 59);
-            this.btnManualOffOn.TabIndex = 98;
-            this.btnManualOffOn.UseVisualStyleBackColor = false;
-            this.btnManualOffOn.Click += new System.EventHandler(this.btnManualOffOn_Click);
+            this.btnManualSection.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnManualSection.BackColor = System.Drawing.Color.Transparent;
+            this.btnManualSection.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnManualSection.Enabled = false;
+            this.btnManualSection.FlatAppearance.BorderColor = System.Drawing.SystemColors.HotTrack;
+            this.btnManualSection.FlatAppearance.BorderSize = 0;
+            this.btnManualSection.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnManualSection.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnManualSection.Image = global::AgOpenGPS.Properties.Resources.ManualOff;
+            this.btnManualSection.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnManualSection.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.btnManualSection.Location = new System.Drawing.Point(93, 268);
+            this.btnManualSection.Name = "btnManualSection";
+            this.btnManualSection.Size = new System.Drawing.Size(83, 59);
+            this.btnManualSection.TabIndex = 98;
+            this.btnManualSection.UseVisualStyleBackColor = false;
+            this.btnManualSection.Click += new System.EventHandler(this.btnSection_Click);
             // 
             // btnCycleLines
             // 
@@ -3281,7 +3281,7 @@
             this.btnSection16Man.TabIndex = 448;
             this.btnSection16Man.Text = "16";
             this.btnSection16Man.UseVisualStyleBackColor = false;
-            this.btnSection16Man.Click += new System.EventHandler(this.btnSection16Man_Click);
+            this.btnSection16Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection15Man
             // 
@@ -3299,7 +3299,7 @@
             this.btnSection15Man.TabIndex = 449;
             this.btnSection15Man.Text = "15";
             this.btnSection15Man.UseVisualStyleBackColor = false;
-            this.btnSection15Man.Click += new System.EventHandler(this.btnSection15Man_Click);
+            this.btnSection15Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection14Man
             // 
@@ -3317,7 +3317,7 @@
             this.btnSection14Man.TabIndex = 450;
             this.btnSection14Man.Text = "14";
             this.btnSection14Man.UseVisualStyleBackColor = false;
-            this.btnSection14Man.Click += new System.EventHandler(this.btnSection14Man_Click);
+            this.btnSection14Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // btnSection13Man
             // 
@@ -3335,7 +3335,7 @@
             this.btnSection13Man.TabIndex = 451;
             this.btnSection13Man.Text = "13";
             this.btnSection13Man.UseVisualStyleBackColor = false;
-            this.btnSection13Man.Click += new System.EventHandler(this.btnSection13Man_Click);
+            this.btnSection13Man.Click += new System.EventHandler(this.btnSection1Man_Click);
             // 
             // contextManualColor
             // 
@@ -3491,10 +3491,6 @@
             this.ClientSize = new System.Drawing.Size(1432, 695);
             this.Controls.Add(this.lblHz2);
             this.Controls.Add(this.btnDayNightMode);
-            this.Controls.Add(this.btnSection13Man);
-            this.Controls.Add(this.btnSection14Man);
-            this.Controls.Add(this.btnSection15Man);
-            this.Controls.Add(this.btnSection16Man);
             this.Controls.Add(this.btnShutdown);
             this.Controls.Add(this.btnFullScreen);
             this.Controls.Add(this.panelDrag);
@@ -3508,19 +3504,23 @@
             this.Controls.Add(this.btnZoomIn);
             this.Controls.Add(this.btnZoomOut);
             this.Controls.Add(this.lblSpeed);
-            this.Controls.Add(this.btnSection8Man);
-            this.Controls.Add(this.btnSection7Man);
-            this.Controls.Add(this.btnSection6Man);
-            this.Controls.Add(this.btnSection5Man);
-            this.Controls.Add(this.btnSection4Man);
-            this.Controls.Add(this.btnSection3Man);
-            this.Controls.Add(this.btnSection2Man);
             this.Controls.Add(this.btnSection1Man);
-            this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.btnSection12Man);
-            this.Controls.Add(this.btnSection11Man);
-            this.Controls.Add(this.btnSection10Man);
+            this.Controls.Add(this.btnSection2Man);
+            this.Controls.Add(this.btnSection3Man);
+            this.Controls.Add(this.btnSection4Man);
+            this.Controls.Add(this.btnSection5Man);
+            this.Controls.Add(this.btnSection6Man);
+            this.Controls.Add(this.btnSection7Man);
+            this.Controls.Add(this.btnSection8Man);
             this.Controls.Add(this.btnSection9Man);
+            this.Controls.Add(this.btnSection10Man);
+            this.Controls.Add(this.btnSection11Man);
+            this.Controls.Add(this.btnSection12Man);
+            this.Controls.Add(this.btnSection13Man);
+            this.Controls.Add(this.btnSection14Man);
+            this.Controls.Add(this.btnSection15Man);
+            this.Controls.Add(this.btnSection16Man);
+            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.oglMain);
             this.Controls.Add(this.layoutPanelRight);
             this.Controls.Add(this.oglBack);
@@ -3561,11 +3561,23 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.MenuStrip menuStrip1;
+        public System.Windows.Forms.Button btnAutoSection;
         private System.Windows.Forms.Button btnSection1Man;
         private System.Windows.Forms.Button btnSection2Man;
         private System.Windows.Forms.Button btnSection3Man;
         private System.Windows.Forms.Button btnSection4Man;
         private System.Windows.Forms.Button btnSection5Man;
+        private System.Windows.Forms.Button btnSection6Man;
+        private System.Windows.Forms.Button btnSection7Man;
+        private System.Windows.Forms.Button btnSection8Man;
+        private System.Windows.Forms.Button btnSection9Man;
+        private System.Windows.Forms.Button btnSection10Man;
+        private System.Windows.Forms.Button btnSection11Man;
+        private System.Windows.Forms.Button btnSection12Man;
+        private System.Windows.Forms.Button btnSection13Man;
+        private System.Windows.Forms.Button btnSection14Man;
+        private System.Windows.Forms.Button btnSection15Man;
+        private System.Windows.Forms.Button btnSection16Man;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem lightbarToolStripMenuItem;
@@ -3586,9 +3598,6 @@
         private System.Windows.Forms.ToolStripMenuItem colorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sectionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fieldToolStripMenuItem1;
-        private System.Windows.Forms.Button btnSection8Man;
-        private System.Windows.Forms.Button btnSection7Man;
-        private System.Windows.Forms.Button btnSection6Man;
         private System.Windows.Forms.ToolStripMenuItem toolStripUnitsMenu;
         private System.Windows.Forms.ToolStripMenuItem metricToolStrip;
         private System.Windows.Forms.ToolStripMenuItem imperialToolStrip;
@@ -3610,7 +3619,6 @@
         private System.Windows.Forms.Label lblLatitude;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label lblAltitude;
-        public System.Windows.Forms.Button btnSectionOffAutoOn;
         private System.Windows.Forms.ToolStripMenuItem menuLanguageEnglish;
         private System.Windows.Forms.ToolStripMenuItem menuLanguageDeutsch;
         private System.Windows.Forms.ToolStripMenuItem setWorkingDirectoryToolStripMenuItem;
@@ -3624,10 +3632,6 @@
         private System.Windows.Forms.ToolStripMenuItem menuLanguageItalian;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         public System.Windows.Forms.Button btnCurve;
-        private System.Windows.Forms.Button btnSection9Man;
-        private System.Windows.Forms.Button btnSection10Man;
-        private System.Windows.Forms.Button btnSection11Man;
-        private System.Windows.Forms.Button btnSection12Man;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.ToolStripMenuItem enterSimCoordsToolStripMenuItem;
         public System.Windows.Forms.Button btnABLine;
@@ -3651,7 +3655,7 @@
         private System.Windows.Forms.Label lblWatch;
         public System.Windows.Forms.Button btnContour;
         public System.Windows.Forms.Timer timerSim;
-        public System.Windows.Forms.Button btnManualOffOn;
+        public System.Windows.Forms.Button btnManualSection;
         public System.Windows.Forms.Button btnMakeLinesFromBoundary;
         public System.Windows.Forms.ToolStripMenuItem menustripLanguage;
         public System.Windows.Forms.Button btnCycleLines;
@@ -3751,10 +3755,6 @@
         private System.Windows.Forms.ToolStripMenuItem resetEverythingToolStripMenuItem;
         private System.Windows.Forms.Button btnFullScreen;
         private System.Windows.Forms.Button btnShutdown;
-        private System.Windows.Forms.Button btnSection16Man;
-        private System.Windows.Forms.Button btnSection15Man;
-        private System.Windows.Forms.Button btnSection14Man;
-        private System.Windows.Forms.Button btnSection13Man;
         private System.Windows.Forms.Button btnReverseDirection;
         private System.Windows.Forms.Button btnSimSetSpeedToZero;
         private System.Windows.Forms.Button btnDayNightMode;

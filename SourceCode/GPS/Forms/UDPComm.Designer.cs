@@ -143,8 +143,6 @@ namespace AgOpenGPS
             if (data[0] == 36)
             {
                 pn.rawBuffer.AddRange(data);
-
-                //pn.rawBuffer += Encoding.ASCII.GetString(data);
                 return;
             }
 
@@ -174,10 +172,59 @@ namespace AgOpenGPS
                                 ahrs.rollX16 = (Int16)((data[6] << 8) + data[7]);
                             }
 
-                            mc.steerSwitchValue = data[8];
-                            mc.workSwitchValue = mc.steerSwitchValue & 1;
-                            mc.steerSwitchValue = mc.steerSwitchValue & 2;
+                            if (isJobStarted && mc.isWorkSwitchEnabled)
+                            {
+                                if ((!mc.isWorkSwitchActiveLow && (data[8] & 1) == 1) || (mc.isWorkSwitchActiveLow && (data[8] & 1) == 0))
+                                {
+                                    if (mc.isWorkSwitchManual)
+                                    {
+                                        if (autoBtnState != FormGPS.btnStates.On)
+                                        {
+                                            autoBtnState = FormGPS.btnStates.On;
+                                            btnSection_Update();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (autoBtnState != FormGPS.btnStates.Auto)
+                                        {
+                                            autoBtnState = FormGPS.btnStates.Auto;
+                                            btnSection_Update();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (autoBtnState != FormGPS.btnStates.Off)
+                                    {
+                                        autoBtnState = FormGPS.btnStates.Off;
+                                        btnSection_Update();
+                                    }
+                                }
+                            }
 
+                            //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
+                            if (ahrs.isAutoSteerAuto)
+                            {
+                                if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLine.isBtnABLineOn || ct.isContourBtnOn || curve.isBtnCurveOn))
+                                {
+                                    if ((data[8] & 2) == 0)
+                                    {
+                                        if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                        btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
+                                    }
+                                    else
+                                    {
+                                        if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                        btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
+                                    }
+                                }
+                                else
+                                {
+                                    if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                    btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
+                                }
+                            }
                             byte pwm = data[9];
 
                             actualSteerAngleDisp = actualSteerAngle;
@@ -203,8 +250,6 @@ namespace AgOpenGPS
                     case 238:
                         {
                             //by Matthias Hammer Jan 2019
-                            //if ((data[0] == 127) & (data[1] == 238))
-
                             if (ahrs.isHeadingCorrectionFromExtUDP)
                             {
                                 ahrs.correctionHeadingX16 = (Int16)((data[4] << 8) + data[5]);
@@ -220,8 +265,6 @@ namespace AgOpenGPS
 
                     case 249://MTZ8302 Feb 2020
                         {
-                            //check header
-                            //if ((data[0] != 0x7F) | (data[1] != 0xF9)) break;
 
                             /*rate stuff
                             //left or single actual rate
@@ -237,19 +280,12 @@ namespace AgOpenGPS
                             rate stuff  */
 
                             //header
-                            mc.ss[mc.swHeaderLo] = 249;
-
-
-                            //read Relay from Arduino = if high then AOG has to switch on = manual
-                            mc.ss[mc.swONHi] = data[5];
-                            mc.ss[mc.swONLo] = data[6];
-
-                            //read SectSWOffToAOG from Arduino = if high then AOG has to switch OFF = manual
-                            mc.ss[mc.swOFFHi] = data[7];
-                            mc.ss[mc.swOFFLo] = data[8];
-
-                            //read MainSW+RateSW
-                            mc.ss[mc.swMain] = data[9];
+                            mc.ss[mc.swHeaderLo] = 0xF9;
+                            mc.ss[mc.swONHi] = data[5];  //Section On status
+                            mc.ss[mc.swONLo] = data[6];  //Section On status
+                            mc.ss[mc.swAutoHi] = data[7];//Section Auto status(only when Section On)
+                            mc.ss[mc.swAutoLo] = data[8];//Section Auto status(only when Section On)
+                            mc.ss[mc.swMain] = data[9];  //read MainSW+RateSW
                             break;
                         }
                 }
@@ -270,20 +306,70 @@ namespace AgOpenGPS
             //speed up
             if (keyData == Keys.Up)
             {
-                if (sim.stepDistance < 1) sim.stepDistance += 0.04;
-                else sim.stepDistance += 0.055;
-                if (sim.stepDistance > 27.77) sim.stepDistance = 27.77;
-                hsbarStepDistance.Value = (int)(sim.stepDistance * 3.6);
+                //if (sim.stepDistance < 1) sim.stepDistance += 0.04;
+                //else sim.stepDistance += 0.055;
+                //if (sim.stepDistance > 27.77) sim.stepDistance = 27.77;
+                //hsbarStepDistance.Value = (int)(sim.stepDistance * 3.6);
+
+                mc.ss[mc.swHeaderLo] = 0xF9;
+
+                if (mc.ss[mc.swONLo] == 0x00 && mc.ss[mc.swAutoLo] == 0x00)
+                {
+                    mc.ss[mc.swONLo] = 0xAA;
+                    mc.ss[mc.swAutoLo] = 0x55;
+                    mc.ss[mc.swONHi] = 0xAA;
+                    mc.ss[mc.swAutoHi] = 0x55;
+                }
+                else if (mc.ss[mc.swAutoLo] == 0x55)
+                {
+                    mc.ss[mc.swONLo] = 0xff;
+                    mc.ss[mc.swAutoLo] = 0xff;
+
+                    mc.ss[mc.swONHi] = 0xAA;
+                    mc.ss[mc.swAutoHi] = 0x55;
+                }
+                else if (mc.ss[mc.swONLo] == 0xff)
+                {
+                    mc.ss[mc.swONLo] = 0x00;
+                    mc.ss[mc.swAutoLo] = 0xff;
+
+                    mc.ss[mc.swONHi] = 0x00;
+                    mc.ss[mc.swAutoHi] = 0xff;
+                }
+                else
+                {
+                    mc.ss[mc.swONLo] = 0x00;
+                    mc.ss[mc.swAutoLo] = 0x00;
+                }
+
+
                 return true;
             }
 
             //slow down
             if (keyData == Keys.Down)
             {
-                if (sim.stepDistance < 1) sim.stepDistance -= 0.04;
-                else sim.stepDistance -= 0.055;
-                if (sim.stepDistance < -6.94) sim.stepDistance = -6.94;
-                hsbarStepDistance.Value = (int)(sim.stepDistance * 3.6);
+                //if (sim.stepDistance < 1) sim.stepDistance -= 0.04;
+                //else sim.stepDistance -= 0.055;
+                //if (sim.stepDistance < -6.94) sim.stepDistance = -6.94;
+                //hsbarStepDistance.Value = (int)(sim.stepDistance * 3.6);
+
+                mc.ss[mc.swHeaderLo] = 0xF9;
+
+                if (mc.ss[mc.swMain] == 0x00)
+                {
+                    mc.ss[mc.swMain] = 0x01;
+                }
+                else if (mc.ss[mc.swMain] == 0x01)
+                {
+                    mc.ss[mc.swMain] = 0x02;
+                }
+                else
+                {
+                    mc.ss[mc.swMain] = 0x00;
+                }
+
+
                 return true;
             }
 
@@ -373,25 +459,25 @@ namespace AgOpenGPS
 
             if (keyData == (Keys.NumPad1)) //auto section on off
             {
-                btnSectionOffAutoOn.PerformClick();
+                btnAutoSection.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 
             if (keyData == (Keys.N)) //auto section on off
             {
-                btnSectionOffAutoOn.PerformClick();
+                btnAutoSection.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 
             if (keyData == (Keys.NumPad0)) //auto section on off
             {
-                btnManualOffOn.PerformClick();
+                btnManualSection.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 
             if (keyData == (Keys.M)) //auto section on off
             {
-                btnManualOffOn.PerformClick();
+                btnManualSection.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 

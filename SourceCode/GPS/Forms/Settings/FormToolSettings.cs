@@ -388,14 +388,14 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.setVehicle_toolOverlap = mf.tool.toolOverlap;
 
             
-            mf.tool.lookAheadOnSetting = toolLookAheadOn;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOn = mf.tool.lookAheadOnSetting;
+            mf.tool.LookAheadOnSetting = toolLookAheadOn;
+            Properties.Vehicle.Default.setVehicle_toolLookAheadOn = mf.tool.LookAheadOnSetting;
            
-            mf.tool.lookAheadOffSetting = toolLookAheadOff;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOff = mf.tool.lookAheadOffSetting;
+            mf.tool.LookAheadOffSetting = toolLookAheadOff;
+            Properties.Vehicle.Default.setVehicle_toolLookAheadOff = mf.tool.LookAheadOffSetting;
 
-            mf.tool.turnOffDelay = toolTurnOffDelay;
-            Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.tool.turnOffDelay;
+            mf.tool.TurnOffDelay = toolTurnOffDelay;
+            Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.tool.TurnOffDelay;
 
 
             mf.tool.toolOffset = toolOffset;

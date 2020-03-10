@@ -127,7 +127,6 @@
     <Compile Include="Classes\CRecordedPath.cs" />
     <Compile Include="Classes\CSim.cs" />
     <Compile Include="Classes\CTram.cs" />
-    <Compile Include="Classes\CWorkSwitch.cs" />
     <Compile Include="Classes\CYouTurn.cs" />
     <Compile Include="Classes\CBoundary.cs" />
     <Compile Include="Classes\CFlag.cs" />
@@ -423,7 +422,6 @@
     <Compile Include="Forms\Guidance\FormTram.Designer.cs">
       <DependentUpon>FormTram.cs</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="gStr.af.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

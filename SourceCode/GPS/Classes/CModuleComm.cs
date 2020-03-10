@@ -54,7 +54,7 @@ namespace AgOpenGPS
         public byte[] ss = new byte[pgnSentenceLength];
         public byte[] ssP = new byte[pgnSentenceLength];
         public int swHeaderHi, swHeaderLo = 1, sw2 = 2, sw3 = 3, sw4 = 4,
-             swONHi = 5, swONLo = 6, swOFFHi = 7, swOFFLo = 8, swMain = 9;
+             swONHi = 5, swONLo = 6, swAutoHi = 7, swAutoLo = 8, swMain = 9;
 
         //LIDAR
         //UDP sentence just rec'd
@@ -64,8 +64,6 @@ namespace AgOpenGPS
 
         //for the workswitch
         public bool isWorkSwitchActiveLow, isWorkSwitchEnabled, isWorkSwitchManual;
-
-        public int workSwitchValue, steerSwitchValue = 1;
 
         //constructor
         public CModuleComm(FormGPS _f)
@@ -151,8 +149,8 @@ namespace AgOpenGPS
             ss[sw4] = 0;
             ss[swONHi] = 0;
             ss[swONLo] = 0;
-            ss[swOFFHi] = 0;
-            ss[swOFFLo] = 0;
+            ss[swAutoHi] = 0;
+            ss[swAutoLo] = 0;
             ss[swMain] = 0;
 
             ssP[swHeaderHi] = 0;  //PGN - 32609
@@ -162,8 +160,8 @@ namespace AgOpenGPS
             ssP[sw4] = 0;
             ssP[swONHi] = 0;
             ssP[swONLo] = 0;
-            ssP[swOFFHi] = 0;
-            ssP[swOFFLo] = 0;
+            ssP[swAutoHi] = 0;
+            ssP[swAutoLo] = 0;
             ssP[swMain] = 0;
         }
 

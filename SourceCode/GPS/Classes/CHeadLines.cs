@@ -115,13 +115,13 @@ namespace AgOpenGPS
             if (ptCount > 1)
             {
                 GL.LineWidth(3);
-                GL.Color3((byte)0,(byte)250,(byte)0);
+                GL.Color3((byte)0,(byte)50,(byte)0);
 
                 while (cntr < ptCount)
                 {
                     if (isDrawList[cntr])
                     {
-                        GL.Begin(PrimitiveType.LineStrip);
+                        GL.Begin(PrimitiveType.Polygon);
 
                         if (cntr > 0) GL.Vertex3(hdLine[cntr - 1].easting, hdLine[cntr - 1].northing, 0);
                         else GL.Vertex3(hdLine[hdLine.Count - 1].easting, hdLine[hdLine.Count - 1].northing, 0);

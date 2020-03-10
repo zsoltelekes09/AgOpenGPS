@@ -460,10 +460,10 @@ namespace AgOpenGPS
                                         if (i == 0) mf.bnd.bndArr[i].isOwnField = true;
                                         else mf.bnd.bndArr[i].isOwnField = true;
 
-                                        coordinates = "";
-                                        i++;
                                         mf.turn.BuildTurnLines(i);
                                         mf.gf.BuildGeoFenceLines(i);
+                                        coordinates = "";
+                                        i++;
                                     }
                                     else
                                     {

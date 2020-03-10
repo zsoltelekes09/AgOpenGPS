@@ -285,7 +285,7 @@ Field	Meaning
                                 if (words[0] == "$PAOGI") ParseOGI();
                                 if (words[0] == "$PTNL") ParseAVR();
                                 if (words[0] == "$GNTRA") ParseTRA();
-                                mf.testNMEA1 = mf.testNMEA.ElapsedMilliseconds;
+                                //mf.testNMEA1 = mf.testNMEA.ElapsedMilliseconds;
                             }
                             rawBuffer.RemoveRange(0, j + 2);
                         }
@@ -353,7 +353,7 @@ Field	Meaning
                                 mf.recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
                             }
                         }
-                        mf.testNMEA1 = mf.testNMEA.ElapsedMilliseconds;
+                        //mf.testNMEA1 = mf.testNMEA.ElapsedMilliseconds;
                         rawBuffer.RemoveRange(0, 100);
                     }
                 }

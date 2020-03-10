@@ -162,6 +162,7 @@ namespace AgOpenGPS
                 bndArr[i].DrawBoundaryLine();
             }
 
+
             if (bndBeingMadePts.Count > 0)
             {
                 //the boundary so far

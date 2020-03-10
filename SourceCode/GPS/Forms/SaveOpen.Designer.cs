@@ -1074,9 +1074,9 @@ namespace AgOpenGPS
                         tool.toolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
                         tool.toolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
 
-                        tool.lookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
-                        tool.lookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
-                        tool.turnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
+                        tool.LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
+                        tool.LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
+                        tool.TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
 
                         tool.toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
 
@@ -1767,18 +1767,19 @@ namespace AgOpenGPS
                 {
                     try
                     {
-
                         //read header
                         line = reader.ReadLine();//Boundary
+
+                        bnd.bndArr.Add(new CBoundaryLines());
+                        turn.turnArr.Add(new CTurnLines());
+                        gf.geoFenceArr.Add(new CGeoFenceLines());
+                        hd.headArr.Add(new CHeadLines());
+
 
                         for (int k = 0; true; k++)
                         {
                             if (reader.EndOfStream) break;
-
-                            bnd.bndArr.Add(new CBoundaryLines());
-                            turn.turnArr.Add(new CTurnLines());
-                            gf.geoFenceArr.Add(new CGeoFenceLines());
-                            hd.headArr.Add(new CHeadLines());
+                            k = 0;
 
                             //True or False OR points from older boundary files
                             line = reader.ReadLine();
@@ -1831,34 +1832,34 @@ namespace AgOpenGPS
                                 }
 
 
-                                bnd.bndArr[k].FixBoundaryLine(k, tool.toolWidth);
-                                bnd.bndArr[k].CalculateBoundaryArea();
-                                bnd.bndArr[k].PreCalcBoundaryLines();
-                                if (bnd.bndArr[k].area == 0)
-                                {
-                                    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
-                                    k = k - 1;
-                                }
+                                //bnd.bndArr[k].FixBoundaryLine(k, tool.toolWidth);
+                                //bnd.bndArr[k].CalculateBoundaryArea();
+                                //bnd.bndArr[k].PreCalcBoundaryLines();
+                                //if (bnd.bndArr[k].area == 0)
+                                //{
+                                //    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
+                                //    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
+                                //   gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
+                                //    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
+                                //    k = k - 1;
+                                //}
                             }
                             else
                             {
-                                bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
-                                turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
-                                gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
-                                hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
-                                k = k - 1;
+                                //bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
+                                //turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
+                               //gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
+                                //hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
+                                //k = k - 1;
                             }
                             if (reader.EndOfStream) break;
                         }
 
-                        CalculateMinMax();
-                        turn.BuildTurnLines(-1);
-                        gf.BuildGeoFenceLines(-1);
-                        fd.UpdateFieldBoundaryGUIAreas();
-                        mazeGrid.BuildMazeGridArray();
+                        //CalculateMinMax();
+                        //turn.BuildTurnLines(-1);
+                        //gf.BuildGeoFenceLines(-1);
+                        //fd.UpdateFieldBoundaryGUIAreas();
+                        //mazeGrid.BuildMazeGridArray();
                     }
 
                     catch (Exception e)
@@ -2197,9 +2198,9 @@ namespace AgOpenGPS
                     if (bnd.bndArr[i].bndLine.Count > 0)
                     {
                         for (int j = 0; j < bnd.bndArr[i].bndLine.Count; j++)
-                            writer.WriteLine(Math.Round(bnd.bndArr[i].bndLine[j].easting,3).ToString(CultureInfo.InvariantCulture) + "," +
+                            writer.WriteLine(Math.Round(bnd.bndArr[i].bndLine[j].easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
                                                 Math.Round(bnd.bndArr[i].bndLine[j].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                                    Math.Round(bnd.bndArr[i].bndLine[j].heading,5).ToString(CultureInfo.InvariantCulture));
+                                                    Math.Round(bnd.bndArr[i].bndLine[j].heading, 5).ToString(CultureInfo.InvariantCulture));
                     }
                 }
             }

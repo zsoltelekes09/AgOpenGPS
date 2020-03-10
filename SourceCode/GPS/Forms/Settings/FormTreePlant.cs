@@ -34,9 +34,10 @@ namespace AgOpenGPS
 
         private void BtnStop_Click(object sender, EventArgs e)
         {
-            if (mf.manualBtnState != AgOpenGPS.FormGPS.btnStates.Off)
+            if (mf.autoBtnState != FormGPS.btnStates.Off)
             {
-                mf.btnManualOffOn.PerformClick();
+                mf.autoBtnState = FormGPS.btnStates.Off;
+                mf.btnSection_Update();
             }
             Properties.Settings.Default.setDistance_TreeSpacing = mf.vehicle.treeSpacing;
             Properties.Settings.Default.Save();
@@ -76,9 +77,10 @@ namespace AgOpenGPS
             {
                 lastDist = 0;
                 mf.treeSpacingCounter = 0;
-                if (mf.manualBtnState != AgOpenGPS.FormGPS.btnStates.Off)
+                if (mf.autoBtnState != FormGPS.btnStates.Off)
                 {
-                    mf.btnManualOffOn.PerformClick();
+                    mf.autoBtnState = FormGPS.btnStates.Off;
+                    mf.btnSection_Update();
                 }
 
                 mf.distanceCurrentStepFix = 0;
@@ -92,9 +94,10 @@ namespace AgOpenGPS
                 lastDist = 0;
                 trees = 0;
                 mf.treeSpacingCounter = 0;
-                if (mf.manualBtnState == AgOpenGPS.FormGPS.btnStates.Off)
+                if (mf.autoBtnState != FormGPS.btnStates.On)
                 {
-                    mf.btnManualOffOn.PerformClick();
+                    mf.autoBtnState = FormGPS.btnStates.On;
+                    mf.btnSection_Update();
                 }
 
                 mf.distanceCurrentStepFix = 0;
@@ -120,9 +123,10 @@ namespace AgOpenGPS
 
         private void FormTreePlant_Load(object sender, EventArgs e)
         {
-            if (mf.manualBtnState != AgOpenGPS.FormGPS.btnStates.Off)
+            if (mf.autoBtnState != FormGPS.btnStates.Off)
             {
-                mf.btnManualOffOn.PerformClick();
+                mf.autoBtnState = FormGPS.btnStates.Off;
+                mf.btnSection_Update();
             }
 
             //mf.vehicle.treeSpacing = Properties.Settings.Default.setDistance_TreeSpacing;
