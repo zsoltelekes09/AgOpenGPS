@@ -113,41 +113,44 @@ namespace AgOpenGPS
 
         public void PreCalcTurnLines()
         {
-            int j = turnLine.Count - 1;
-            //clear the list, constant is easting, multiple is northing
-            calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
-
-            Northingmin = Northingmax = turnLine[0].northing;
-            Eastingmin = Eastingmax = turnLine[0].easting;
-
-            for (int i = 0; i < turnLine.Count; j = i++)
+            if (turnLine.Count > 3)
             {
+                int j = turnLine.Count - 1;
+                //clear the list, constant is easting, multiple is northing
+                calcList.Clear();
+                vec2 constantMultiple = new vec2(0, 0);
 
-                if (Northingmin > turnLine[i].northing) Northingmin = turnLine[i].northing;
+                Northingmin = Northingmax = turnLine[0].northing;
+                Eastingmin = Eastingmax = turnLine[0].easting;
 
-                if (Northingmax < turnLine[i].northing) Northingmax = turnLine[i].northing;
-
-                if (Eastingmin > turnLine[i].easting) Eastingmin = turnLine[i].easting;
-
-                if (Eastingmax < turnLine[i].easting) Eastingmax = turnLine[i].easting;
-
-
-                //check for divide by zero
-                if (Math.Abs(turnLine[i].northing - turnLine[j].northing) < 0.00000000001)
+                for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    constantMultiple.easting = turnLine[i].easting;
-                    constantMultiple.northing = 0;
-                    calcList.Add(constantMultiple);
-                }
-                else
-                {
-                    //determine constant and multiple and add to list
-                    constantMultiple.easting = turnLine[i].easting - ((turnLine[i].northing * turnLine[j].easting)
-                                    / (turnLine[j].northing - turnLine[i].northing)) + ((turnLine[i].northing * turnLine[i].easting)
-                                        / (turnLine[j].northing - turnLine[i].northing));
-                    constantMultiple.northing = (turnLine[j].easting - turnLine[i].easting) / (turnLine[j].northing - turnLine[i].northing);
-                    calcList.Add(constantMultiple);
+
+                    if (Northingmin > turnLine[i].northing) Northingmin = turnLine[i].northing;
+
+                    if (Northingmax < turnLine[i].northing) Northingmax = turnLine[i].northing;
+
+                    if (Eastingmin > turnLine[i].easting) Eastingmin = turnLine[i].easting;
+
+                    if (Eastingmax < turnLine[i].easting) Eastingmax = turnLine[i].easting;
+
+
+                    //check for divide by zero
+                    if (Math.Abs(turnLine[i].northing - turnLine[j].northing) < 0.00000000001)
+                    {
+                        constantMultiple.easting = turnLine[i].easting;
+                        constantMultiple.northing = 0;
+                        calcList.Add(constantMultiple);
+                    }
+                    else
+                    {
+                        //determine constant and multiple and add to list
+                        constantMultiple.easting = turnLine[i].easting - ((turnLine[i].northing * turnLine[j].easting)
+                                        / (turnLine[j].northing - turnLine[i].northing)) + ((turnLine[i].northing * turnLine[i].easting)
+                                            / (turnLine[j].northing - turnLine[i].northing));
+                        constantMultiple.northing = (turnLine[j].easting - turnLine[i].easting) / (turnLine[j].northing - turnLine[i].northing);
+                        calcList.Add(constantMultiple);
+                    }
                 }
             }
         }

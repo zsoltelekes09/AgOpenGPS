@@ -73,10 +73,10 @@ namespace AgOpenGPS
             nudSetDistance.Value = 20;
             if (mf.hd.headArr.Count > Boundary && Boundary >= 0)
             {
-                if (mf.hd.headArr[Boundary].hdLine.Count > 0)
+                if (mf.hd.headArr[Boundary].HeadLine.Count > 0)
                 {
-                    hdArr = new vec3[mf.hd.headArr[Boundary].hdLine.Count];
-                    mf.hd.headArr[Boundary].hdLine.CopyTo(hdArr);
+                    hdArr = new vec3[mf.hd.headArr[Boundary].HeadLine.Count];
+                    mf.hd.headArr[Boundary].HeadLine.CopyTo(hdArr);
                     RebuildHeadLineTemplate();
                 }
                 else
@@ -579,20 +579,20 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
-                mf.hd.headArr[Boundary].hdLine?.Clear();
+                mf.hd.headArr[Boundary].HeadLine?.Clear();
                 mf.hd.headArr[Boundary].isDrawList?.Clear();
 
                 for (int i = 0; i < hdArr.Length; i++)
                 {
                     vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
-                    mf.hd.headArr[Boundary].hdLine.Add(pt);
+                    mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
                     if (mf.bnd.bndArr[Boundary].isOwnField && mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else if (!mf.bnd.bndArr[Boundary].isOwnField && !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
 
-                mf.hd.headArr[Boundary].PreCalcHeadLines();
+                mf.hd.headArr[Boundary].PreCalcHeadArea();
             }
 
             Boundary++;
@@ -603,10 +603,10 @@ namespace AgOpenGPS
             isA = true;
             isSet = false;
 
-            if (mf.hd.headArr[Boundary].hdLine.Count > 0)
+            if (mf.hd.headArr[Boundary].HeadLine.Count > 0)
             {
-                hdArr = new vec3[mf.hd.headArr[Boundary].hdLine.Count];
-                mf.hd.headArr[Boundary].hdLine.CopyTo(hdArr);
+                hdArr = new vec3[mf.hd.headArr[Boundary].HeadLine.Count];
+                mf.hd.headArr[Boundary].HeadLine.CopyTo(hdArr);
                 RebuildHeadLineTemplate();
             }
             else
@@ -622,20 +622,20 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
-                mf.hd.headArr[Boundary].hdLine?.Clear();
+                mf.hd.headArr[Boundary].HeadLine?.Clear();
                 mf.hd.headArr[Boundary].isDrawList?.Clear();
 
                 for (int i = 0; i < hdArr.Length; i++)
                 {
                     vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
-                    mf.hd.headArr[Boundary].hdLine.Add(pt);
+                    mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
                     if (mf.bnd.bndArr[Boundary].isOwnField && mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else if (!mf.bnd.bndArr[Boundary].isOwnField && !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
 
-                mf.hd.headArr[Boundary].PreCalcHeadLines();
+                mf.hd.headArr[Boundary].PreCalcHeadArea();
             }
 
             Boundary--;
@@ -645,10 +645,10 @@ namespace AgOpenGPS
             isA = true;
             isSet = false;
 
-            if (mf.hd.headArr[Boundary].hdLine.Count > 0)
+            if (mf.hd.headArr[Boundary].HeadLine.Count > 0)
             {
-                hdArr = new vec3[mf.hd.headArr[Boundary].hdLine.Count];
-                mf.hd.headArr[Boundary].hdLine.CopyTo(hdArr);
+                hdArr = new vec3[mf.hd.headArr[Boundary].HeadLine.Count];
+                mf.hd.headArr[Boundary].HeadLine.CopyTo(hdArr);
                 RebuildHeadLineTemplate();
             }
             else
@@ -721,13 +721,13 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
-                mf.hd.headArr[Boundary].hdLine?.Clear();
+                mf.hd.headArr[Boundary].HeadLine?.Clear();
                 mf.hd.headArr[Boundary].isDrawList?.Clear();
 
                 for (int i = 0; i < hdArr.Length; i++)
                 {
                     vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
-                    mf.hd.headArr[Boundary].hdLine.Add(pt);
+                    mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
                     if (mf.bnd.bndArr[Boundary].isOwnField && mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else if (!mf.bnd.bndArr[Boundary].isOwnField && !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
@@ -735,7 +735,7 @@ namespace AgOpenGPS
 
                 }
 
-                mf.hd.headArr[Boundary].PreCalcHeadLines();
+                mf.hd.headArr[Boundary].PreCalcHeadArea();
             }
             mf.FileSaveHeadland();
             Close();

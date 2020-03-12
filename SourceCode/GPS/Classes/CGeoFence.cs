@@ -209,9 +209,6 @@ namespace AgOpenGPS
             //to fill the list of line points
             vec3 point = new vec3();
 
-            //determine how wide a headland space
-            double totalHeadWidth = mf.yt.geoFenceDistance;
-
             //inside boundaries
             for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
             {
@@ -225,18 +222,18 @@ namespace AgOpenGPS
                 for (int i = ptCount - 1; i >= 0; i--)
                 {
                     //calculate the point outside the boundary
-                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
-                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
+                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
+                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
 
                     //only add if outside actual field boundary
-                    if ((mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (!mf.bnd.bndArr[j].isOwnField && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
+                    //if ((mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (!mf.bnd.bndArr[j].isOwnField && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
                     {
                         vec2 tPnt = new vec2(point.easting, point.northing);
                         geoFenceArr[j].geoFenceLine.Add(tPnt);
                     }
                 }
-                geoFenceArr[j].FixGeoFenceLine(totalHeadWidth, mf.bnd.bndArr[j].bndLine, mf.tool.toolWidth * 0.5);
+                geoFenceArr[j].FixGeoFenceLine(mf.yt.geoFenceDistance, mf.bnd.bndArr[j].bndLine, mf.tool.toolWidth * 0.5);
                 geoFenceArr[j].PreCalcTurnLines();
 
                 if (Num > -1) break;

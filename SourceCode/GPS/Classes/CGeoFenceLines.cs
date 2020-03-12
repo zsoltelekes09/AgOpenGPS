@@ -136,37 +136,40 @@ namespace AgOpenGPS
 
         public void PreCalcTurnLines()
         {
-            int j = geoFenceLine.Count - 1;
-            //clear the list, constant is easting, multiple is northing
-            calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
-
-            Northingmin = Northingmax = geoFenceLine[0].northing;
-            Eastingmin = Eastingmax = geoFenceLine[0].easting;
-
-
-            for (int i = 0; i < geoFenceLine.Count; j = i++)
+            if (geoFenceLine.Count > 3)
             {
-                if (Northingmin > geoFenceLine[i].northing) Northingmin = geoFenceLine[i].northing;
-                if (Northingmax < geoFenceLine[i].northing) Northingmax = geoFenceLine[i].northing;
-                if (Eastingmin > geoFenceLine[i].easting) Eastingmin = geoFenceLine[i].easting;
-                if (Eastingmax < geoFenceLine[i].easting) Eastingmax = geoFenceLine[i].easting;
+                int j = geoFenceLine.Count - 1;
+                //clear the list, constant is easting, multiple is northing
+                calcList.Clear();
+                vec2 constantMultiple = new vec2(0, 0);
 
-                //check for divide by zero
-                if (Math.Abs(geoFenceLine[i].northing - geoFenceLine[j].northing) < double.Epsilon)
+                Northingmin = Northingmax = geoFenceLine[0].northing;
+                Eastingmin = Eastingmax = geoFenceLine[0].easting;
+
+
+                for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    constantMultiple.easting = geoFenceLine[i].easting;
-                    constantMultiple.northing = 0;
-                    calcList.Add(constantMultiple);
-                }
-                else
-                {
-                    //determine constant and multiple and add to list
-                    constantMultiple.easting = geoFenceLine[i].easting - ((geoFenceLine[i].northing * geoFenceLine[j].easting)
-                                    / (geoFenceLine[j].northing - geoFenceLine[i].northing)) + ((geoFenceLine[i].northing * geoFenceLine[i].easting)
-                                        / (geoFenceLine[j].northing - geoFenceLine[i].northing));
-                    constantMultiple.northing = (geoFenceLine[j].easting - geoFenceLine[i].easting) / (geoFenceLine[j].northing - geoFenceLine[i].northing);
-                    calcList.Add(constantMultiple);
+                    if (Northingmin > geoFenceLine[i].northing) Northingmin = geoFenceLine[i].northing;
+                    if (Northingmax < geoFenceLine[i].northing) Northingmax = geoFenceLine[i].northing;
+                    if (Eastingmin > geoFenceLine[i].easting) Eastingmin = geoFenceLine[i].easting;
+                    if (Eastingmax < geoFenceLine[i].easting) Eastingmax = geoFenceLine[i].easting;
+
+                    //check for divide by zero
+                    if (Math.Abs(geoFenceLine[i].northing - geoFenceLine[j].northing) < double.Epsilon)
+                    {
+                        constantMultiple.easting = geoFenceLine[i].easting;
+                        constantMultiple.northing = 0;
+                        calcList.Add(constantMultiple);
+                    }
+                    else
+                    {
+                        //determine constant and multiple and add to list
+                        constantMultiple.easting = geoFenceLine[i].easting - ((geoFenceLine[i].northing * geoFenceLine[j].easting)
+                                        / (geoFenceLine[j].northing - geoFenceLine[i].northing)) + ((geoFenceLine[i].northing * geoFenceLine[i].easting)
+                                            / (geoFenceLine[j].northing - geoFenceLine[i].northing));
+                        constantMultiple.northing = (geoFenceLine[j].easting - geoFenceLine[i].easting) / (geoFenceLine[j].northing - geoFenceLine[i].northing);
+                        calcList.Add(constantMultiple);
+                    }
                 }
             }
         }

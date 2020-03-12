@@ -92,6 +92,15 @@ namespace AgOpenGPS
                         };
                         d.Click += DriveThru_Click;
 
+                        var f = new Button
+                        {
+                            Margin = new Padding(0),
+                            Size = new System.Drawing.Size(80, 40),
+                            Name = string.Format("{0}", i - position),
+                            TextAlign = ContentAlignment.MiddleCenter
+                        };
+                        f.Click += ChangeWinding_Click;
+
                         var e = new Button
                         {
                             Margin = new Padding(0),
@@ -101,8 +110,9 @@ namespace AgOpenGPS
                         };
                         e.Click += DriveAround_Click;
                         tableLayoutPanel1.Controls.Add(a, 0, i - position);
-                        tableLayoutPanel1.Controls.Add(d, 3-1, i - position);
-                        tableLayoutPanel1.Controls.Add(e, 4-1, i - position);
+                        tableLayoutPanel1.Controls.Add(d, 2, i - position);
+                        tableLayoutPanel1.Controls.Add(e, 3, i - position);
+                        tableLayoutPanel1.Controls.Add(f, 4, i - position);
                     }
 
                     if (i < mf.bnd.bndArr.Count)
@@ -234,6 +244,20 @@ namespace AgOpenGPS
             }
         }
 
+        void ChangeWinding_Click(object sender, EventArgs e)
+        {
+            if (sender is Button b)
+            {
+                int pos = Convert.ToInt32(b.Name) + position;
+
+                mf.bnd.bndArr[pos].ReverseWinding();
+
+                mf.gf.BuildGeoFenceLines(pos);
+                UpdateChart();
+                mf.FileSaveBoundary();
+            }
+        }
+
         void B_Click(object sender, EventArgs e)
         {
             if (sender is Button b)
@@ -324,6 +348,7 @@ namespace AgOpenGPS
 
             this.DialogResult = DialogResult.OK;
         }
+
 
         private void BtnDeleteAll_Click(object sender, EventArgs e)
         {

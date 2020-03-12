@@ -1770,16 +1770,14 @@ namespace AgOpenGPS
                         //read header
                         line = reader.ReadLine();//Boundary
 
-                        bnd.bndArr.Add(new CBoundaryLines());
-                        turn.turnArr.Add(new CTurnLines());
-                        gf.geoFenceArr.Add(new CGeoFenceLines());
-                        hd.headArr.Add(new CHeadLines());
-
-
                         for (int k = 0; true; k++)
                         {
                             if (reader.EndOfStream) break;
-                            k = 0;
+
+                            bnd.bndArr.Add(new CBoundaryLines());
+                            turn.turnArr.Add(new CTurnLines());
+                            gf.geoFenceArr.Add(new CGeoFenceLines());
+                            hd.headArr.Add(new CHeadLines());
 
                             //True or False OR points from older boundary files
                             line = reader.ReadLine();
@@ -1806,7 +1804,7 @@ namespace AgOpenGPS
                             }
                             else if (k == 0)
                             {
-                                //turnheading = true;
+                                turnheading = true;
                                 bnd.bndArr[0].isOwnField = true;
                             }
 
@@ -1832,34 +1830,29 @@ namespace AgOpenGPS
                                 }
 
 
-                                //bnd.bndArr[k].FixBoundaryLine(k, tool.toolWidth);
-                                //bnd.bndArr[k].CalculateBoundaryArea();
-                                //bnd.bndArr[k].PreCalcBoundaryLines();
-                                //if (bnd.bndArr[k].area == 0)
-                                //{
-                                //    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
-                                //    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
-                                //   gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
-                                //    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
-                                //    k = k - 1;
-                                //}
+                                bnd.bndArr[k].FixBoundaryLine(k, tool.toolWidth);
+                                bnd.bndArr[k].CalculateBoundaryArea();
+                                bnd.bndArr[k].PreCalcBoundaryLines();
+                                if (bnd.bndArr[k].area == 0)
+                                {
+                                    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
+                                    k = k - 1;
+                                }
                             }
                             else
                             {
-                                //bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
-                                //turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
-                               //gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
-                                //hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
-                                //k = k - 1;
+                                bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
+                                turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
+                                gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
+                                hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
+                                k = k - 1;
                             }
                             if (reader.EndOfStream) break;
                         }
 
-                        //CalculateMinMax();
-                        //turn.BuildTurnLines(-1);
-                        //gf.BuildGeoFenceLines(-1);
-                        //fd.UpdateFieldBoundaryGUIAreas();
-                        //mazeGrid.BuildMazeGridArray();
                     }
 
                     catch (Exception e)
@@ -1867,6 +1860,12 @@ namespace AgOpenGPS
                         TimedMessageBox(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
+
+                    CalculateMinMax();
+                    gf.BuildGeoFenceLines(-1);
+                    fd.UpdateFieldBoundaryGUIAreas();
+                    mazeGrid.BuildMazeGridArray();
+                    turn.BuildTurnLines(-1);
 
 
                 }
@@ -1903,13 +1902,13 @@ namespace AgOpenGPS
                                         double.Parse(words[0], CultureInfo.InvariantCulture),
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
-                                    hd.headArr[k].hdLine.Add(vecPt);
+                                    hd.headArr[k].HeadLine.Add(vecPt);
 
                                     if (bnd.bndArr[k].isOwnField && gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt)) hd.headArr[k].isDrawList.Add(true);
                                     else if (!bnd.bndArr[k].isOwnField && !gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt)) hd.headArr[k].isDrawList.Add(true);
                                     else hd.headArr[k].isDrawList.Add(false);
                                 }
-                                hd.headArr[k].PreCalcHeadLines();
+                                hd.headArr[k].PreCalcHeadArea();
                             }
                         }
                     }
@@ -2221,13 +2220,13 @@ namespace AgOpenGPS
                 writer.WriteLine("$Headland");
                 for (int i = 0; i < hd.headArr.Count; i++)
                 {
-                    writer.WriteLine(hd.headArr[i].hdLine.Count.ToString(CultureInfo.InvariantCulture));
-                    if (hd.headArr[i].hdLine.Count > 0)
+                    writer.WriteLine(hd.headArr[i].HeadLine.Count.ToString(CultureInfo.InvariantCulture));
+                    if (hd.headArr[i].HeadLine.Count > 0)
                     {
-                        for (int j = 0; j < hd.headArr[i].hdLine.Count; j++)
-                            writer.WriteLine(Math.Round(hd.headArr[i].hdLine[j].easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                             Math.Round(hd.headArr[i].hdLine[j].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                             Math.Round(hd.headArr[i].hdLine[j].heading, 3).ToString(CultureInfo.InvariantCulture));
+                        for (int j = 0; j < hd.headArr[i].HeadLine.Count; j++)
+                            writer.WriteLine(Math.Round(hd.headArr[i].HeadLine[j].easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                                             Math.Round(hd.headArr[i].HeadLine[j].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                                             Math.Round(hd.headArr[i].HeadLine[j].heading, 3).ToString(CultureInfo.InvariantCulture));
                     }
                 }
             }

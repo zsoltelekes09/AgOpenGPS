@@ -1,5 +1,4 @@
 ﻿using OpenTK.Graphics.OpenGL;
-using System;
 using System.Collections.Generic;
 
 namespace AgOpenGPS
@@ -7,59 +6,20 @@ namespace AgOpenGPS
     public class CHeadLines
     {
         //list of coordinates of boundary line
-        public List<vec3> hdLine = new List<vec3>();
+        public List<vec3> HeadLine = new List<vec3>();
+        public List<vec3> HeadArea = new List<vec3>();
 
         //the list of constants and multiples of the boundary
         public List<vec2> calcList = new List<vec2>();
 
+
         public List<bool> isDrawList = new List<bool>();
 
-        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
-
-        public bool IsPointInHeadArea(vec3 testPointv2)
-        {
-            if (calcList.Count < 3) return false;
-            int j = hdLine.Count - 1;
-            bool oddNodes = false;
-
-            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
-            {
-                //test against the constant and multiples list the test point
-                for (int i = 0; i < hdLine.Count; j = i++)
-                {
-                    if ((hdLine[i].northing < testPointv2.northing && hdLine[j].northing >= testPointv2.northing)
-                    || (hdLine[j].northing < testPointv2.northing && hdLine[i].northing >= testPointv2.northing))
-                    {
-                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
-                    }
-                }
-            }
-            return oddNodes; //true means inside.
-        }
-
-        public bool IsPointInHeadArea(vec2 testPointv2)
-        {
-            if (calcList.Count < 3) return false;
-            int j = hdLine.Count - 1;
-            bool oddNodes = false;
-
-            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
-            {
-                //test against the constant and multiples list the test point
-                for (int i = 0; i < hdLine.Count; j = i++)
-                {
-                    if ((hdLine[i].northing < testPointv2.northing && hdLine[j].northing >= testPointv2.northing)
-                    || (hdLine[j].northing < testPointv2.northing && hdLine[i].northing >= testPointv2.northing))
-                    {
-                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
-                    }
-                }
-            }
-            return oddNodes; //true means inside.
-        }
 
         public void DrawHeadLine(int linewidth)
         {
+        
+
             ////draw the turn line oject
             //if (hdLine.Count < 1) return;
             //int ptCount = hdLine.Count;
@@ -69,9 +29,9 @@ namespace AgOpenGPS
             //for (int h = 0; h < ptCount; h++) GL.Vertex3(hdLine[h].easting, hdLine[h].northing, 0);
             //GL.Vertex3(hdLine[0].easting, hdLine[0].northing, 0);
             //GL.End();
-
-            if (hdLine.Count < 2) return;
-            int ptCount = hdLine.Count;
+            
+            if (HeadLine.Count < 2) return;
+            int ptCount = HeadLine.Count;
             int cntr = 0;
             if (ptCount > 1)
             {
@@ -85,56 +45,18 @@ namespace AgOpenGPS
                     {
                         GL.Begin(PrimitiveType.LineStrip);
 
-                        if (cntr > 0) GL.Vertex3(hdLine[cntr - 1].easting, hdLine[cntr - 1].northing, 0);
-                        else GL.Vertex3(hdLine[hdLine.Count - 1].easting, hdLine[hdLine.Count - 1].northing, 0);
+                        if (cntr > 0) GL.Vertex3(HeadLine[cntr - 1].easting, HeadLine[cntr - 1].northing, 0);
+                        else GL.Vertex3(HeadLine[HeadLine.Count - 1].easting, HeadLine[HeadLine.Count - 1].northing, 0);
 
 
                         for (int i = cntr; i < ptCount; i++)
                         {
                             cntr++;
                             if (!isDrawList[i]) break;
-                            GL.Vertex3(hdLine[i].easting, hdLine[i].northing, 0);
+                            GL.Vertex3(HeadLine[i].easting, HeadLine[i].northing, 0);
                         }
                         if (cntr < ptCount - 1)
-                            GL.Vertex3(hdLine[cntr + 1].easting, hdLine[cntr + 1].northing, 0);
-
-                        GL.End();
-                    }
-                    else
-                    {
-                        cntr++;
-                    }
-                }
-            }
-        }
-        public void DrawHeadLineBackBuffer()
-        {
-            if (hdLine.Count < 2) return;
-            int ptCount = hdLine.Count;
-            int cntr = 0;
-            if (ptCount > 1)
-            {
-                GL.LineWidth(3);
-                GL.Color3((byte)0,(byte)50,(byte)0);
-
-                while (cntr < ptCount)
-                {
-                    if (isDrawList[cntr])
-                    {
-                        GL.Begin(PrimitiveType.Polygon);
-
-                        if (cntr > 0) GL.Vertex3(hdLine[cntr - 1].easting, hdLine[cntr - 1].northing, 0);
-                        else GL.Vertex3(hdLine[hdLine.Count - 1].easting, hdLine[hdLine.Count - 1].northing, 0);
-
-
-                        for (int i = cntr; i < ptCount; i++)
-                        {
-                            cntr++;
-                            if (!isDrawList[i]) break;
-                            GL.Vertex3(hdLine[i].easting, hdLine[i].northing, 0);
-                        }
-                        if (cntr < ptCount - 1)
-                            GL.Vertex3(hdLine[cntr + 1].easting, hdLine[cntr + 1].northing, 0);
+                            GL.Vertex3(HeadLine[cntr + 1].easting, HeadLine[cntr + 1].northing, 0);
 
                         GL.End();
                     }
@@ -146,38 +68,70 @@ namespace AgOpenGPS
             }
         }
 
-        public void PreCalcHeadLines()
+        public void DrawHeadBackBuffer()
         {
-            int j = hdLine.Count - 1;
-            //clear the list, constant is easting, multiple is northing
-            calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
-
-            Northingmin = Northingmax = hdLine[0].northing;
-            Eastingmin = Eastingmax = hdLine[0].easting;
-
-            for (int i = 0; i < hdLine.Count; j = i++)
+            int ptCount = HeadArea.Count;
+            if (ptCount < 3) return;
+            GL.Begin(PrimitiveType.Triangles);
+            for (int h = 0; h < ptCount - 2; h += 3)
             {
-                if (Northingmin > hdLine[i].northing) Northingmin = hdLine[i].northing;
-                if (Northingmax < hdLine[i].northing) Northingmax = hdLine[i].northing;
-                if (Eastingmin > hdLine[i].easting) Eastingmin = hdLine[i].easting;
-                if (Eastingmax < hdLine[i].easting) Eastingmax = hdLine[i].easting;
+                GL.Vertex3(HeadArea[h].easting, HeadArea[h].northing, 0);
+                GL.Vertex3(HeadArea[h + 1].easting, HeadArea[h + 1].northing, 0);
+                GL.Vertex3(HeadArea[h + 2].easting, HeadArea[h + 2].northing, 0);
+            }
+            GL.End();
+        }
 
-                //check for divide by zero
-                if (Math.Abs(hdLine[i].northing - hdLine[j].northing) < double.Epsilon)
+        private Vec3 Project(Vec3 v, Tess _tess)
+        {
+
+            Vec3 norm = _tess.Normal;
+            int i = Vec3.LongAxis(ref norm);
+
+            Vec3 sUnit = Vec3.Zero;
+            sUnit[i] = 0.0f;
+            sUnit[(i + 1) % 3] = _tess.SUnitX;
+            sUnit[(i + 2) % 3] = _tess.SUnitY;
+
+            Vec3 tUnit = Vec3.Zero;
+            tUnit[i] = 0.0f;
+            tUnit[(i + 1) % 3] = norm[i] > 0.0f ? -_tess.SUnitY : _tess.SUnitY;
+            tUnit[(i + 2) % 3] = norm[i] > 0.0f ? _tess.SUnitX : -_tess.SUnitX;
+
+            Vec3 result = Vec3.Zero;
+            // Project the vertices onto the sweep plane
+            Vec3.Dot(ref v, ref sUnit, out result.X);
+            Vec3.Dot(ref v, ref tUnit, out result.Y);
+            return result;
+        }
+
+        public void PreCalcHeadArea()
+        {
+
+            var v = new ContourVertex[HeadLine.Count];
+            for (int i = 0; i < HeadLine.Count; i++)
+            {
+                v[i].Position = new Vec3(HeadLine[i].easting, HeadLine[i].northing, 0);
+            }
+
+            Tess _tess = new Tess();
+            _tess.AddContour(v, ContourOrientation.Original);
+
+            _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3, null);
+
+
+            HeadArea.Clear();
+
+            //var output = new List<Polygon>();
+            for (int i = 0; i < _tess.ElementCount; i++)
+            {
+                for (int k = 0; k < 3; k++)
                 {
-                    constantMultiple.easting = hdLine[i].easting;
-                    constantMultiple.northing = 0;
-                    calcList.Add(constantMultiple);
-                }
-                else
-                {
-                    //determine constant and multiple and add to list
-                    constantMultiple.easting = hdLine[i].easting - ((hdLine[i].northing * hdLine[j].easting)
-                                    / (hdLine[j].northing - hdLine[i].northing)) + ((hdLine[i].northing * hdLine[i].easting)
-                                        / (hdLine[j].northing - hdLine[i].northing));
-                    constantMultiple.northing = (hdLine[j].easting - hdLine[i].easting) / (hdLine[j].northing - hdLine[i].northing);
-                    calcList.Add(constantMultiple);
+                    int index = _tess.Elements[i * 3 + k];
+                    if (index == -1) continue;
+                    var proj = Project(_tess.Vertices[index].Position, _tess);
+                    HeadArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
+                    //HeadArea.Add(new vec3(proj.X, proj.Y, 0));
                 }
             }
         }

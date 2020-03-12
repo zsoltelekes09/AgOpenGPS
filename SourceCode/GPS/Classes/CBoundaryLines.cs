@@ -18,6 +18,7 @@ namespace AgOpenGPS
 
         //list of coordinates of boundary line
         public List<vec3> bndLine = new List<vec3>();
+        public List<vec3> bndArea = new List<vec3>();
 
         //the list of constants and multiples of the boundary
         public List<vec2> calcList = new List<vec2>();
@@ -71,8 +72,8 @@ namespace AgOpenGPS
             if (spacing > 3) spacing = 3;
 
             //first find out which side is inside the boundary
-            vec3 point = new vec3(bndLine[2].easting - (Math.Sin(glm.PIBy2 + bndLine[2].heading) * 2.0),
-            bndLine[2].northing - (Math.Cos(glm.PIBy2 + bndLine[2].heading) * 2.0), 0.0);
+            vec3 point = new vec3(bndLine[0].easting - (Math.Sin(glm.PIBy2 + bndLine[0].heading) * 2.0),
+            bndLine[0].northing - (Math.Cos(glm.PIBy2 + bndLine[0].heading) * 2.0), 0.0);
 
             //make sure boundaries are wound correctly
             if (IsPointInsideBoundary(point)) ReverseWinding();
@@ -137,7 +138,7 @@ namespace AgOpenGPS
             CalculateBoundaryHeadings();
         }
 
-        private void ReverseWinding()
+        public void ReverseWinding()
         {
             //reverse the boundary
             int cnt = bndLine.Count;
@@ -152,6 +153,7 @@ namespace AgOpenGPS
                 bndLine.Add(arr[i]);
             }
         }
+
 
         public void PreCalcBoundaryLines()
         {
@@ -237,45 +239,89 @@ namespace AgOpenGPS
             if (bndLine.Count < 1) return;
             GL.LineWidth(2);
             int ptCount = bndLine.Count;
-            //if (isDriveThru) GL.Color3(0.25f, 0.752f, 0.860f);
-            //else
-            //GL.Begin(PrimitiveType.Lines);
-            GL.Begin(PrimitiveType.Triangles);
 
-            //for (int h = 0; h < ptCount; h++) GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
-            for (int h = 0; h < ptCount - 2; h += 3)
-            {
-                GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
-                GL.Vertex3(bndLine[h+1].easting, bndLine[h+1].northing, 0);
-                GL.Vertex3(bndLine[h+2].easting, bndLine[h+2].northing, 0);
-            }
-            //GL.Color3(0.95f, 0.972f, 0.90f);
-            //GL.Vertex3(bndLine[0].easting, bndLine[0].northing, 0);
+            GL.Begin(PrimitiveType.LineLoop);
+            for (int h = 0; h < ptCount; h++) GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
             GL.End();
         }
 
-        public void DrawBoundaryLineBackBuffer()
+        public void DrawBoundaryBackBuffer()
         {
-            GL.LineWidth(3);
-            GL.Color3((byte)0, (byte)50, (byte)0);
-
             int ptCount = bndLine.Count;
             if (ptCount < 3) return;
 
-            GL.Begin(PrimitiveType.Triangles);
+            GL.Begin(PrimitiveType.LineLoop);
+            for (int h = 0; h < ptCount; h++) GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
+            GL.End();
 
+            ptCount = bndArea.Count;
+
+            GL.Begin(PrimitiveType.Triangles);
             for (int h = 0; h < ptCount - 2; h += 3)
             {
-                GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
-                GL.Vertex3(bndLine[h + 1].easting, bndLine[h + 1].northing, 0);
-                GL.Vertex3(bndLine[h + 2].easting, bndLine[h + 2].northing, 0);
+                GL.Vertex3(bndArea[h].easting, bndArea[h].northing, 0);
+                GL.Vertex3(bndArea[h + 1].easting, bndArea[h + 1].northing, 0);
+                GL.Vertex3(bndArea[h + 2].easting, bndArea[h + 2].northing, 0);
             }
             GL.End();
+        }
+
+        private Vec3 Project(Vec3 v, Tess _tess)
+        {
+
+            Vec3 norm = _tess.Normal;
+            int i = Vec3.LongAxis(ref norm);
+
+            Vec3 sUnit = Vec3.Zero;
+            sUnit[i] = 0.0f;
+            sUnit[(i + 1) % 3] = _tess.SUnitX;
+            sUnit[(i + 2) % 3] = _tess.SUnitY;
+
+            Vec3 tUnit = Vec3.Zero;
+            tUnit[i] = 0.0f;
+            tUnit[(i + 1) % 3] = norm[i] > 0.0f ? -_tess.SUnitY : _tess.SUnitY;
+            tUnit[(i + 2) % 3] = norm[i] > 0.0f ? _tess.SUnitX : -_tess.SUnitX;
+
+            Vec3 result = Vec3.Zero;
+            // Project the vertices onto the sweep plane
+            Vec3.Dot(ref v, ref sUnit, out result.X);
+            Vec3.Dot(ref v, ref tUnit, out result.Y);
+            return result;
         }
 
         //obvious
         public void CalculateBoundaryArea()
         {
+
+            var v = new ContourVertex[bndLine.Count];
+            for (int i = 0; i < bndLine.Count; i++)
+            {
+                v[i].Position = new Vec3(bndLine[i].easting, bndLine[i].northing, 0);
+            }
+
+            Tess _tess = new Tess();
+            _tess.AddContour(v, ContourOrientation.CounterClockwise);
+
+            _tess.Tessellate(WindingRule.EvenOdd, ElementType.Polygons, 3, null);
+
+
+
+            bndArea.Clear();
+
+            for (int i = 0; i < _tess.ElementCount; i++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    int index = _tess.Elements[i * 3 + k];
+                    if (index == -1) continue;
+                    var proj = Project(_tess.Vertices[index].Position, _tess);
+                    //bndArea.Add(new vec3(proj.X, proj.Y, 0));
+                    bndArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
+                }
+            }
+
+
+
             int ptCount = bndLine.Count;
             if (ptCount < 1) return;
 

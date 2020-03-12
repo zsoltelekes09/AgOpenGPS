@@ -21,8 +21,6 @@ namespace AgOpenGPS
         public double lookaheadActual, test2;
         private bool zoomUpdateCounter = false;
 
-        //data buffer for pixels read from off screen buffer
-        byte[] grnPixels = new byte[125001];
 
         // When oglMain is created
         private void oglMain_Load(object sender, EventArgs e)
@@ -381,7 +379,17 @@ namespace AgOpenGPS
 
                     if (mc.isOutOfBounds) gf.DrawGeoFenceLines();
 
-                    if (hd.isOn) hd.DrawHeadLines();
+                    if (hd.isOn)
+                    {
+                        for (int i = 0; i < bnd.bndArr.Count; i++)
+                        {
+                            if (bnd.LastBoundary >= 0 || (i == bnd.LastBoundary || (!bnd.bndArr[i].isOwnField && bnd.bndArr[i].OuterField == -1) || bnd.bndArr[i].OuterField == bnd.LastBoundary))
+                            {
+                                if (hd.headArr[i].HeadLine.Count > 0) hd.headArr[i].DrawHeadLine(ABLine.lineWidth);
+                            }
+                        }
+
+                    }
 
                     if (flagPts.Count > 0) DrawFlags();
 
@@ -533,19 +541,31 @@ namespace AgOpenGPS
             //calculate the frustum for the section control window
             CalcFrustum();
 
+
             for (int i = 0; i < bnd.bndArr.Count; i++)
             {
-                if (bnd.LastBoundary == -1 || i == bnd.LastBoundary || (!bnd.bndArr[i].isOwnField && bnd.bndArr[i].OuterField == -1) || (!bnd.bndArr[i].isOwnField && bnd.bndArr[i].OuterField == bnd.LastBoundary))
+                if (bnd.bndArr[i].isOwnField)
                 {
-                    if (hd.isOn && hd.headArr[i].hdLine.Count > 0) hd.headArr[i].DrawHeadLineBackBuffer();
-                    else bnd.bndArr[i].DrawBoundaryLineBackBuffer();
+                    GL.Color3((byte)0, (byte)255, (byte)0);
+
+                    if (hd.isOn && hd.headArr[i].HeadLine.Count > 0) hd.headArr[i].DrawHeadBackBuffer();
+                    else bnd.bndArr[i].DrawBoundaryBackBuffer();
                 }
             }
 
-            testNMEA1 = testNMEA.ElapsedTicks;
+            for (int i = 0; i < bnd.bndArr.Count; i++)
+            {
+                if ((!bnd.bndArr[i].isOwnField && bnd.bndArr[i].OuterField == -1) || (!bnd.bndArr[i].isOwnField && bnd.bndArr[i].OuterField == bnd.LastBoundary))
+                {
+                    GL.Color3((byte)0, (byte)0, (byte)0);
+
+                    if (hd.isOn && hd.headArr[i].HeadLine.Count > 0) hd.headArr[i].DrawHeadBackBuffer();
+                    else bnd.bndArr[i].DrawBoundaryBackBuffer();
+                }
+            }
 
             //patch color
-            GL.Color3(0.0f, 0.5f, 0.0f);
+            GL.Color3((byte)255, (byte)0, (byte)0);
 
             //to draw or not the triangle patch
             bool isDraw;
@@ -594,12 +614,13 @@ namespace AgOpenGPS
             //finish it up - we need to read the ram of video card
             GL.Flush();
 
-
-
             int rpHeight = (int)Math.Min(Math.Max(Math.Max(Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft), Math.Max(tool.lookAheadDistanceOnPixelsRight, tool.lookAheadDistanceOnPixelsLeft)) + 2, 8), 240);
 
-            //read the whole block of pixels up to max lookahead, one read only
-            GL.ReadPixels(tool.rpXPosition, 250, tool.rpWidth, rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, grnPixels);
+            //data buffer for pixels read from off screen buffer
+            //byte[] GreenPixels = new byte[125001];
+
+            byte[] GreenPixels = new byte[(tool.rpWidth * rpHeight)];
+            GL.ReadPixels(tool.rpXPosition, 250, tool.rpWidth, rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
 
             //Paint to context for troubleshooting
             oglBack.BringToFront();
@@ -625,7 +646,7 @@ namespace AgOpenGPS
                     {
                         if (a >= 0)
                         {
-                            if (grnPixels[a] > 9)
+                            if (GreenPixels[a] == 255)
                             {
                                 totalPixs++;
                                 mc.machineData[mc.mdHydLift] = 2;
@@ -689,21 +710,15 @@ namespace AgOpenGPS
                                 if (a >= 0)
                                 {
                                     totalPixs++;
-                                    if (grnPixels[a] == 50)
+                                    if (GreenPixels[a] == 255)
                                     {
                                         tagged++;
-                                        //if (++tagged > tool.toolMinUnappliedPixels)
-                                        //{
-                                        //    goto GetOutTool;
-                                        //}
                                     }
                                 }
                             }
                         }
-                        //GetOutTool:
 
                         if (tagged != 0 && (tagged * 100) / totalPixs > tool.toolMinUnappliedPixels)
-                        //if (tagged > tool.toolMinUnappliedPixels)
                         {
                             section[j].IsSectionRequiredOn = true;
                         }
@@ -749,20 +764,11 @@ namespace AgOpenGPS
                 }
             }
 
-
-
-
-
-
-
+            testNMEA1 = testNMEA.ElapsedTicks;
 
 
             //Determine if sections want to be on or off
             ProcessSectionOnOffRequests();
-
-
-
-
 
             //send the byte out to section machines
             BuildMachineByte();
@@ -773,19 +779,6 @@ namespace AgOpenGPS
             ////send machine data to autosteer if checked
             if (mc.isMachineDataSentToAutoSteer)
                 SendOutUSBAutoSteerPort(mc.machineData, CModuleComm.pgnSentenceLength);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             //if a minute has elapsed save the field in case of crash and to be able to resume            
             if (MinuteCounter > 60 && recvCounter < 134)
