@@ -63,20 +63,13 @@ namespace AgOpenGPS
             bndLine.Add(pt3);
         }
 
-        public void FixBoundaryLine(int bndNum, double spacing)
+        public void FixBoundaryLine(double spacing)
         {
             //boundary point spacing based on eq width
             spacing *= 0.25;
 
             if (spacing < 1) spacing = 1;
             if (spacing > 3) spacing = 3;
-
-            //first find out which side is inside the boundary
-            vec3 point = new vec3(bndLine[0].easting - (Math.Sin(glm.PIBy2 + bndLine[0].heading) * 2.0),
-            bndLine[0].northing - (Math.Cos(glm.PIBy2 + bndLine[0].heading) * 2.0), 0.0);
-
-            //make sure boundaries are wound correctly
-            if (IsPointInsideBoundary(point)) ReverseWinding();
 
             //make sure distance isn't too small between points on headland
             int bndCount = bndLine.Count;
@@ -247,14 +240,8 @@ namespace AgOpenGPS
 
         public void DrawBoundaryBackBuffer()
         {
-            int ptCount = bndLine.Count;
+            int ptCount = bndArea.Count;
             if (ptCount < 3) return;
-
-            GL.Begin(PrimitiveType.LineLoop);
-            for (int h = 0; h < ptCount; h++) GL.Vertex3(bndLine[h].easting, bndLine[h].northing, 0);
-            GL.End();
-
-            ptCount = bndArea.Count;
 
             GL.Begin(PrimitiveType.Triangles);
             for (int h = 0; h < ptCount - 2; h += 3)
@@ -266,33 +253,29 @@ namespace AgOpenGPS
             GL.End();
         }
 
-        private Vec3 Project(Vec3 v, Tess _tess)
+        public void CalculateBoundaryWinding()
         {
+            int ptCount = bndLine.Count;
+            if (ptCount < 3) return;
 
-            Vec3 norm = _tess.Normal;
-            int i = Vec3.LongAxis(ref norm);
+            double area2 = 0;         // Accumulates area in the loop
+            vec3 lastpoint = new vec3(bndLine[ptCount - 1].easting + (-Math.Sin(glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), bndLine[ptCount - 1].northing + (-Math.Cos(glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), 0);
 
-            Vec3 sUnit = Vec3.Zero;
-            sUnit[i] = 0.0f;
-            sUnit[(i + 1) % 3] = _tess.SUnitX;
-            sUnit[(i + 2) % 3] = _tess.SUnitY;
-
-            Vec3 tUnit = Vec3.Zero;
-            tUnit[i] = 0.0f;
-            tUnit[(i + 1) % 3] = norm[i] > 0.0f ? -_tess.SUnitY : _tess.SUnitY;
-            tUnit[(i + 2) % 3] = norm[i] > 0.0f ? _tess.SUnitX : -_tess.SUnitX;
-
-            Vec3 result = Vec3.Zero;
-            // Project the vertices onto the sweep plane
-            Vec3.Dot(ref v, ref sUnit, out result.X);
-            Vec3.Dot(ref v, ref tUnit, out result.Y);
-            return result;
+            for (int i = 0; i < ptCount; i++)
+            {
+                vec3 point = new vec3(bndLine[i].easting + (-Math.Sin(glm.PIBy2 + bndLine[i].heading) * 5f), bndLine[i].northing + (-Math.Cos(glm.PIBy2 + bndLine[i].heading) * 5f), 0);
+                area2 += (lastpoint.easting + point.easting) * (lastpoint.northing - point.northing);
+                lastpoint = point;
+            }
+            area2 = Math.Abs(area2 / 2);
+            if (area2 > area)
+            {
+                ReverseWinding();
+            }
         }
 
-        //obvious
         public void CalculateBoundaryArea()
         {
-
             var v = new ContourVertex[bndLine.Count];
             for (int i = 0; i < bndLine.Count; i++)
             {
@@ -300,11 +283,9 @@ namespace AgOpenGPS
             }
 
             Tess _tess = new Tess();
-            _tess.AddContour(v, ContourOrientation.CounterClockwise);
+            _tess.AddContour(v, ContourOrientation.Clockwise);
 
-            _tess.Tessellate(WindingRule.EvenOdd, ElementType.Polygons, 3, null);
-
-
+            _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3, null);
 
             bndArea.Clear();
 
@@ -314,13 +295,9 @@ namespace AgOpenGPS
                 {
                     int index = _tess.Elements[i * 3 + k];
                     if (index == -1) continue;
-                    var proj = Project(_tess.Vertices[index].Position, _tess);
-                    //bndArea.Add(new vec3(proj.X, proj.Y, 0));
                     bndArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
                 }
             }
-
-
 
             int ptCount = bndLine.Count;
             if (ptCount < 1) return;

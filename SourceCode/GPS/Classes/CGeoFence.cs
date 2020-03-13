@@ -215,7 +215,7 @@ namespace AgOpenGPS
                 geoFenceArr[j].geoFenceLine.Clear();
                 //if (!mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].isDriveThru) continue;
 
-                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? -1 : 1;
+                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? 1 : -1;
 
                 int ptCount = mf.bnd.bndArr[j].bndLine.Count;
 

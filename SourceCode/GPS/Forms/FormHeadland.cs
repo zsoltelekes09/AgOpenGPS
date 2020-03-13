@@ -94,6 +94,7 @@ namespace AgOpenGPS
             //outside boundary - count the points from the boundary
             headLineTemplate.Clear();
 
+
             int ptCount = mf.bnd.bndArr[Boundary].bndLine.Count;
             for (int i = ptCount - 1; i >= 0; i--)
             {
@@ -233,7 +234,7 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
-                int ChangeDirection = mf.bnd.bndArr[Boundary].isOwnField ? -1 : 1;
+                int ChangeDirection = mf.bnd.bndArr[Boundary].isOwnField ? 1 : -1;
                 if (end > headLineTemplate.Count)
                 {
                     for (int i = start; i < hdArr.Length; i++)
@@ -279,7 +280,7 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
-                int ChangeDirection = mf.bnd.bndArr[Boundary].isOwnField ? -1 : 1;
+                int ChangeDirection = mf.bnd.bndArr[Boundary].isOwnField ? 1 : -1;
                 for (int i = 0; i < headLineTemplate.Count; i++)
                 {
                     //calculate the point inside the boundary

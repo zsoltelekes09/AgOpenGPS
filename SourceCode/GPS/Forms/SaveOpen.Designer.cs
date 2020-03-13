@@ -1792,7 +1792,6 @@ namespace AgOpenGPS
                                 line = reader.ReadLine(); //number of points
                             }
                             //Check for latest boundary files, then above line string is num of points
-                            bool turnheading = false;
 
                             if (line == "True" || line == "False")
                             {
@@ -1804,7 +1803,6 @@ namespace AgOpenGPS
                             }
                             else if (k == 0)
                             {
-                                turnheading = true;
                                 bnd.bndArr[0].isOwnField = true;
                             }
 
@@ -1821,18 +1819,14 @@ namespace AgOpenGPS
                                     double.Parse(words[0], CultureInfo.InvariantCulture),
                                     double.Parse(words[1], CultureInfo.InvariantCulture),
                                     double.Parse(words[2], CultureInfo.InvariantCulture));
-
-                                    if (turnheading)
-                                    {
-                                        vecPt.heading = vecPt.heading + Math.PI;
-                                    }
                                     bnd.bndArr[k].bndLine.Add(vecPt);
                                 }
 
-
-                                bnd.bndArr[k].FixBoundaryLine(k, tool.toolWidth);
-                                bnd.bndArr[k].CalculateBoundaryArea();
+                                bnd.bndArr[k].FixBoundaryLine(tool.toolWidth);
                                 bnd.bndArr[k].PreCalcBoundaryLines();
+                                bnd.bndArr[k].CalculateBoundaryArea();
+                                bnd.bndArr[k].CalculateBoundaryWinding();
+
                                 if (bnd.bndArr[k].area == 0)
                                 {
                                     bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
@@ -1861,13 +1855,11 @@ namespace AgOpenGPS
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
 
-                    CalculateMinMax();
+                    turn.BuildTurnLines(-1);
                     gf.BuildGeoFenceLines(-1);
                     fd.UpdateFieldBoundaryGUIAreas();
                     mazeGrid.BuildMazeGridArray();
-                    turn.BuildTurnLines(-1);
-
-
+                    CalculateMinMax();
                 }
             }
 

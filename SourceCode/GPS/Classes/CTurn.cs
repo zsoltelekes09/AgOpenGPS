@@ -244,7 +244,7 @@ namespace AgOpenGPS
                 turnArr[j].turnLine.Clear();
                 //if (!mf.bnd.bndArr[j].isOwnField && (mf.bnd.bndArr[j].isDriveThru || mf.bnd.bndArr[j].isDriveAround)) continue;
 
-                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? -1 : 1;
+                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? 1 : -1;
 
                 int ptCount = mf.bnd.bndArr[j].bndLine.Count;
 
@@ -256,7 +256,7 @@ namespace AgOpenGPS
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
 
                     //only add if outside actual field boundary
-                    if ((mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (!mf.bnd.bndArr[j].isOwnField && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
+                    //if ((mf.bnd.bndArr[j].isOwnField && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (!mf.bnd.bndArr[j].isOwnField && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
                     {
                         vec3 tPnt = new vec3(point.easting, point.northing, point.heading);
                         turnArr[j].turnLine.Add(tPnt);

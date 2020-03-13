@@ -162,7 +162,7 @@ namespace AgOpenGPS
 
             for (int j = 0; j < mf.bnd.bndArr.Count; j++)
             {
-                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? -1 : 1;
+                int ChangeDirection = mf.bnd.bndArr[j].isOwnField ? 1 : -1;
 
             //totalHeadWidth = (mf.vehicle.toolWidth - mf.vehicle.toolOverlap) * 0.5 + 0.2 + (mf.vehicle.toolWidth - mf.vehicle.toolOverlap);
 

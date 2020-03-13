@@ -82,32 +82,8 @@ namespace AgOpenGPS
             GL.End();
         }
 
-        private Vec3 Project(Vec3 v, Tess _tess)
-        {
-
-            Vec3 norm = _tess.Normal;
-            int i = Vec3.LongAxis(ref norm);
-
-            Vec3 sUnit = Vec3.Zero;
-            sUnit[i] = 0.0f;
-            sUnit[(i + 1) % 3] = _tess.SUnitX;
-            sUnit[(i + 2) % 3] = _tess.SUnitY;
-
-            Vec3 tUnit = Vec3.Zero;
-            tUnit[i] = 0.0f;
-            tUnit[(i + 1) % 3] = norm[i] > 0.0f ? -_tess.SUnitY : _tess.SUnitY;
-            tUnit[(i + 2) % 3] = norm[i] > 0.0f ? _tess.SUnitX : -_tess.SUnitX;
-
-            Vec3 result = Vec3.Zero;
-            // Project the vertices onto the sweep plane
-            Vec3.Dot(ref v, ref sUnit, out result.X);
-            Vec3.Dot(ref v, ref tUnit, out result.Y);
-            return result;
-        }
-
         public void PreCalcHeadArea()
         {
-
             var v = new ContourVertex[HeadLine.Count];
             for (int i = 0; i < HeadLine.Count; i++)
             {
@@ -115,10 +91,8 @@ namespace AgOpenGPS
             }
 
             Tess _tess = new Tess();
-            _tess.AddContour(v, ContourOrientation.Original);
-
+            _tess.AddContour(v, ContourOrientation.Clockwise);
             _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3, null);
-
 
             HeadArea.Clear();
 
@@ -129,9 +103,7 @@ namespace AgOpenGPS
                 {
                     int index = _tess.Elements[i * 3 + k];
                     if (index == -1) continue;
-                    var proj = Project(_tess.Vertices[index].Position, _tess);
                     HeadArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
-                    //HeadArea.Add(new vec3(proj.X, proj.Y, 0));
                 }
             }
         }

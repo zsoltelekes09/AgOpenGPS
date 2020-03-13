@@ -83,6 +83,14 @@ namespace AgOpenGPS
 
                         aa = a;
 
+                        var c = new Button
+                        {
+                            Margin = new Padding(0),
+                            Size = new System.Drawing.Size(80, 40),
+                            Name = string.Format("{0}", i - position),
+                            TextAlign = ContentAlignment.MiddleCenter
+                        };
+                        c.Click += DriveThru_Click;
                         var d = new Button
                         {
                             Margin = new Padding(0),
@@ -90,16 +98,7 @@ namespace AgOpenGPS
                             Name = string.Format("{0}", i - position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
-                        d.Click += DriveThru_Click;
-
-                        var f = new Button
-                        {
-                            Margin = new Padding(0),
-                            Size = new System.Drawing.Size(80, 40),
-                            Name = string.Format("{0}", i - position),
-                            TextAlign = ContentAlignment.MiddleCenter
-                        };
-                        f.Click += ChangeWinding_Click;
+                        d.Click += DriveAround_Click;
 
                         var e = new Button
                         {
@@ -108,11 +107,13 @@ namespace AgOpenGPS
                             Name = string.Format("{0}", i - position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
-                        e.Click += DriveAround_Click;
+                        e.Click += OwnField_Click;
+
+
                         tableLayoutPanel1.Controls.Add(a, 0, i - position);
-                        tableLayoutPanel1.Controls.Add(d, 2, i - position);
-                        tableLayoutPanel1.Controls.Add(e, 3, i - position);
-                        tableLayoutPanel1.Controls.Add(f, 4, i - position);
+                        tableLayoutPanel1.Controls.Add(c, 2, i - position);
+                        tableLayoutPanel1.Controls.Add(d, 3, i - position);
+                        tableLayoutPanel1.Controls.Add(e, 4, i - position);
                     }
 
                     if (i < mf.bnd.bndArr.Count)
@@ -137,9 +138,11 @@ namespace AgOpenGPS
                             tableLayoutPanel1.Controls.Add(b, 1, i - position);
                             bb = b;
                         }
-                        Control dd = tableLayoutPanel1.GetControlFromPosition(3-1, i - position);
+                        Control cc = tableLayoutPanel1.GetControlFromPosition(2, i - position);
+                        cc.Visible = true;
+                        Control dd = tableLayoutPanel1.GetControlFromPosition(3, i - position);
                         dd.Visible = true;
-                        Control ee = tableLayoutPanel1.GetControlFromPosition(4-1, i - position);
+                        Control ee = tableLayoutPanel1.GetControlFromPosition(4, i - position);
                         ee.Visible = true;
 
                         Font backupfont = new Font(aa.Font.FontFamily, 18F, FontStyle.Bold);
@@ -149,13 +152,14 @@ namespace AgOpenGPS
                             //cc.Text = "Field";
                             aa.Text = string.Format(gStr.gsOuter + " {0}", field);
                             field += 1;
+                            cc.Enabled = false;
                             dd.Enabled = false;
-                            ee.Enabled = false;
 
                             mf.bnd.bndArr[i].isDriveThru = false;
                             mf.bnd.bndArr[i].isDriveAround = false;
+                            cc.Text = gStr.gsNo;
                             dd.Text = gStr.gsNo;
-                            ee.Text = gStr.gsNo;
+                            ee.Text = gStr.gsYes;
 
                         }
                         else
@@ -163,15 +167,18 @@ namespace AgOpenGPS
                             //cc.Text = "Inner";
                             aa.Text = string.Format(gStr.gsInner + " {0}", inner);
                             inner += 1;
+                            cc.Enabled = true;
                             dd.Enabled = true;
-                            ee.Enabled = true;
-                            dd.Text = mf.bnd.bndArr[i].isDriveThru ? gStr.gsYes : gStr.gsNo;
-                            ee.Text = mf.bnd.bndArr[i].isDriveAround ? gStr.gsYes : gStr.gsNo;
+                            cc.Text = mf.bnd.bndArr[i].isDriveThru ? gStr.gsYes : gStr.gsNo;
+                            dd.Text = mf.bnd.bndArr[i].isDriveAround ? gStr.gsYes : gStr.gsNo;
+                            ee.Text = gStr.gsNo;
                         }
 
                         aa.Font = backupfont;
+                        cc.BackColor = Color.WhiteSmoke;
                         dd.BackColor = Color.WhiteSmoke;
                         ee.BackColor = Color.WhiteSmoke;
+                        cc.Anchor = AnchorStyles.None;
                         dd.Anchor = AnchorStyles.None;
                         ee.Anchor = AnchorStyles.None;
 
@@ -244,15 +251,18 @@ namespace AgOpenGPS
             }
         }
 
-        void ChangeWinding_Click(object sender, EventArgs e)
+        void OwnField_Click(object sender, EventArgs e)
         {
             if (sender is Button b)
             {
                 int pos = Convert.ToInt32(b.Name) + position;
 
-                mf.bnd.bndArr[pos].ReverseWinding();
+                mf.bnd.bndArr[pos].isOwnField = !mf.bnd.bndArr[pos].isOwnField;
 
-                mf.gf.BuildGeoFenceLines(pos);
+                //mf.bnd.bndArr[pos].CalculateBoundaryArea();
+                //mf.gf.BuildGeoFenceLines(pos);
+                //mf.turn.BuildTurnLines(pos);
+
                 UpdateChart();
                 mf.FileSaveBoundary();
             }
@@ -472,18 +482,14 @@ namespace AgOpenGPS
 
                                     if (mf.bnd.bndArr[i].bndLine.Count > 0)
                                     {
+                                        mf.bnd.bndArr[i].isOwnField = (i == 0) ? true : false;
+
                                         //fix the points if there are gaps bigger then
-
-                                        mf.bnd.bndArr[i].CalculateBoundaryHeadings();
+                                        mf.bnd.bndArr[i].FixBoundaryLine(mf.tool.toolWidth);
                                         mf.bnd.bndArr[i].PreCalcBoundaryLines();
-                                        mf.bnd.bndArr[i].FixBoundaryLine(i, mf.tool.toolWidth);
-
-                                        //boundary area, pre calcs etc
                                         mf.bnd.bndArr[i].CalculateBoundaryArea();
-                                        mf.bnd.bndArr[i].PreCalcBoundaryLines();
+                                        mf.bnd.bndArr[i].CalculateBoundaryWinding();
 
-                                        if (i == 0) mf.bnd.bndArr[i].isOwnField = true;
-                                        else mf.bnd.bndArr[i].isOwnField = true;
 
                                         mf.turn.BuildTurnLines(i);
                                         mf.gf.BuildGeoFenceLines(i);

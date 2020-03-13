@@ -83,7 +83,7 @@ namespace AgOpenGPS
             double distSq = ((tramWidth * 0.5) - halfWheelTrack) * ((tramWidth * 0.5) - halfWheelTrack) * 0.97;
             bool fail = false;
             
-            int ChangeDirection = mf.bnd.bndArr[mf.bnd.LastBoundary].isOwnField ? -1 : 1;
+            int ChangeDirection = mf.bnd.bndArr[mf.bnd.LastBoundary].isOwnField ? 1 : -1;
             //make the boundary tram outer array
             for (int i = 0; i < ptCount; i++)
             {
@@ -137,7 +137,7 @@ namespace AgOpenGPS
 
             int cnt = mf.tram.outArr.Count;
 
-            int ChangeDirection = mf.bnd.bndArr[mf.bnd.LastBoundary].isOwnField ? -1 : 1;
+            int ChangeDirection = mf.bnd.bndArr[mf.bnd.LastBoundary].isOwnField ? 1 : -1;
             if (cnt > 0)
             {
                 vec2 pt = new vec2();

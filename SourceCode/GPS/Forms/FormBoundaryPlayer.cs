@@ -30,18 +30,13 @@ namespace AgOpenGPS
                 mf.gf.geoFenceArr.Add(new CGeoFenceLines());
                 mf.hd.headArr.Add(new CHeadLines());
 
-                for (int i = 0; i < mf.bnd.bndBeingMadePts.Count; i++)
-                {
-                    mf.bnd.bndArr[mf.bnd.bndArr.Count-1].bndLine.Add(mf.bnd.bndBeingMadePts[i]);
-                }
-
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].bndLine.AddRange(mf.bnd.bndBeingMadePts);
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.tool.toolWidth);
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.bnd.bndArr.Count - 1, mf.tool.toolWidth);
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
-
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
-                if (mf.bnd.bndArr.Count == 1) mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].isOwnField = true;
-                else mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].isOwnField = false;
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();
+
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].isOwnField = (mf.bnd.bndArr.Count == 1) ? true : false;
 
                 mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
                 mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
