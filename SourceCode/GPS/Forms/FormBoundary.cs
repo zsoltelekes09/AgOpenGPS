@@ -482,7 +482,19 @@ namespace AgOpenGPS
                                     if (mf.bnd.bndArr[i].bndLine.Count > 0)
                                     {
                                         mf.bnd.bndArr[i].isOwnField = (i == 0) ? true : false;
-                                        mf.StartWorker(true, i);
+
+                                        //mf.StartWorker(true, i);
+
+                                        //fix the points if there are gaps bigger then
+                                        mf.bnd.bndArr[i].FixBoundaryLine(mf.tool.toolWidth);
+                                        mf.bnd.bndArr[i].PreCalcBoundaryLines();
+                                        mf.bnd.bndArr[i].CalculateBoundaryArea();
+                                        mf.bnd.bndArr[i].CalculateBoundaryWinding();
+
+
+                                        mf.turn.BuildTurnLines(i);
+                                        mf.gf.BuildGeoFenceLines(i);
+
                                         coordinates = "";
                                         i++;
                                     }
@@ -504,6 +516,9 @@ namespace AgOpenGPS
                                 }
                             }
                         }
+                        mf.fd.UpdateFieldBoundaryGUIAreas();
+                        mf.mazeGrid.BuildMazeGridArray();
+
                         mf.FileSaveBoundary();
                         UpdateChart();
                     }

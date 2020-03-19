@@ -1795,7 +1795,24 @@ namespace AgOpenGPS
                                     double.Parse(words[2], CultureInfo.InvariantCulture));
                                     bnd.bndArr[k].bndLine.Add(vecPt);
                                 }
-                                StartWorker(true, k);
+
+
+                                //StartWorker(true, k);
+
+                                bnd.bndArr[k].FixBoundaryLine(tool.toolWidth);
+                                bnd.bndArr[k].PreCalcBoundaryLines();
+                                bnd.bndArr[k].CalculateBoundaryArea();
+                                bnd.bndArr[k].CalculateBoundaryWinding();
+
+                                if (bnd.bndArr[k].area == 0)
+                                {
+                                    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
+                                    k = k - 1;
+                                }
+
                             }
                             else
                             {
@@ -1815,6 +1832,12 @@ namespace AgOpenGPS
                         TimedMessageBox(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
+
+                    turn.BuildTurnLines(-1);
+                    gf.BuildGeoFenceLines(-1);
+                    fd.UpdateFieldBoundaryGUIAreas();
+                    mazeGrid.BuildMazeGridArray();
+                    CalculateMinMax();
                 }
             }
 
@@ -1850,8 +1873,15 @@ namespace AgOpenGPS
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
                                     hd.headArr[k].HeadLine.Add(vecPt);
+
+                                    if ((bnd.bndArr[k].isOwnField ? gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt) : !gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt))) hd.headArr[k].isDrawList.Add(true);
+                                    else hd.headArr[k].isDrawList.Add(false);
                                 }
-                                StartWorker(false, k);
+
+                                //StartWorker(false, k);
+
+                                hd.headArr[k].PreCalcHeadArea();
+                                hd.headArr[k].PreCalcHeadLines();
                             }
                         }
                     }

@@ -588,11 +588,14 @@ namespace AgOpenGPS
                     vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
                     mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
-                    if (mf.bnd.bndArr[Boundary].isOwnField && mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
-                    else if (!mf.bnd.bndArr[Boundary].isOwnField && !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
+                    if (mf.bnd.bndArr[Boundary].isOwnField ? mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt) : !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
-                mf.StartWorker(false, Boundary);
+
+                //mf.StartWorker(false, Boundary);
+
+                mf.hd.headArr[Boundary].PreCalcHeadArea();
+                mf.hd.headArr[Boundary].PreCalcHeadLines();
             }
 
             Boundary++;
@@ -630,12 +633,13 @@ namespace AgOpenGPS
                     vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
                     mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
-                    if (mf.bnd.bndArr[Boundary].isOwnField && mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
-                    else if (!mf.bnd.bndArr[Boundary].isOwnField && !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
+                    if (mf.bnd.bndArr[Boundary].isOwnField ? mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt) : !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
 
-                mf.StartWorker(false, Boundary);
+                //mf.StartWorker(false, Boundary);
+                mf.hd.headArr[Boundary].PreCalcHeadArea();
+                mf.hd.headArr[Boundary].PreCalcHeadLines();
             }
 
             Boundary--;
@@ -729,12 +733,13 @@ namespace AgOpenGPS
                     vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
                     mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
-                    if (mf.bnd.bndArr[Boundary].isOwnField && mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
-                    else if (!mf.bnd.bndArr[Boundary].isOwnField && !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
+                    if (mf.bnd.bndArr[Boundary].isOwnField ? mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt) : !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
 
                 }
-                mf.StartWorker(false, Boundary);
+                //mf.StartWorker(false, Boundary);
+                mf.hd.headArr[Boundary].PreCalcHeadArea();
+                mf.hd.headArr[Boundary].PreCalcHeadLines();
             }
             mf.FileSaveHeadland();
             Close();
