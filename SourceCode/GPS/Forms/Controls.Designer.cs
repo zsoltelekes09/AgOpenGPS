@@ -1,11 +1,11 @@
 ﻿//Please, if you use this, share the improvements
 
+using AgOpenGPS.Properties;
+using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using AgOpenGPS.Properties;
-using Microsoft.Win32;
 
 namespace AgOpenGPS
 {
@@ -37,6 +37,7 @@ namespace AgOpenGPS
             Properties.Settings.Default.setNTRIP_isOn = isNTRIP_TurnedOn;
             Properties.Settings.Default.Save();
         }
+
         private void btnManualAutoDrive_Click(object sender, EventArgs e)
         {
             //if (isInAutoDrive)
@@ -52,6 +53,7 @@ namespace AgOpenGPS
             //    btnManualAutoDrive.Text = gStr.gsAuto;
             //}
         }
+
         private void goPathMenu_Click(object sender, EventArgs e)
         {
             if (bnd.bndArr.Count == 0)
@@ -123,6 +125,7 @@ namespace AgOpenGPS
                 pausePathMenu.BackColor = Color.Lime;
             }
         }
+
         private void PausePathMenu_Click(object sender, EventArgs e)
         {
             if (recPath.isPausedDrivingRecordedPath)
@@ -139,6 +142,7 @@ namespace AgOpenGPS
             recPath.isPausedDrivingRecordedPath = !recPath.isPausedDrivingRecordedPath;
 
         }
+
         private void RecordPathMenu_Click(object sender, EventArgs e)
         {
             if (recPath.isRecordOn)
@@ -154,6 +158,7 @@ namespace AgOpenGPS
                 recordPathMenu.Image = Properties.Resources.boundaryStop;
             }
         }
+
         private void DeletePathMenu_Click(object sender, EventArgs e)
         {
             recPath.recList.Clear();
@@ -189,6 +194,7 @@ namespace AgOpenGPS
                 }
             }
         }
+
         private void BtnMakeLinesFromBoundary_Click(object sender, EventArgs e)
         {
             if (ct.isContourBtnOn)
@@ -196,7 +202,6 @@ namespace AgOpenGPS
                 TimedMessageBox(2000, gStr.gsContourOn, gStr.gsTurnOffContourFirst);
                 return;
             }
-
             if (bnd.bndArr.Count == 0)
             {
                 TimedMessageBox(2000, gStr.gsNoBoundary, gStr.gsCreateABoundaryFirst);
@@ -205,6 +210,7 @@ namespace AgOpenGPS
 
             GetAB();
         }
+
         private void btnCycleLines_Click(object sender, EventArgs e)
         {
             if (ABLine.isBtnABLineOn && ABLine.numABLines > 0)
@@ -243,6 +249,7 @@ namespace AgOpenGPS
                 if (tram.displayMode > 0) curve.BuildTram();
             }
         }
+
         private void btnABLine_Click(object sender, EventArgs e)
         {
             btnCycleLines.Text = "AB-" + ABLine.numABLineSelected;
@@ -306,6 +313,7 @@ namespace AgOpenGPS
             var form = new FormABLine(this);
                 form.Show();
         }
+
         private void btnCurve_Click(object sender, EventArgs e)
         {
             btnCycleLines.Text = "Cur-" + curve.numCurveLineSelected;
@@ -375,6 +383,7 @@ namespace AgOpenGPS
             Form form = new FormABCurve(this);
             form.Show();
         }
+
         private void btnContour_Click(object sender, EventArgs e)
         {
             ct.isContourBtnOn = !ct.isContourBtnOn;
@@ -404,6 +413,7 @@ namespace AgOpenGPS
                 btnContourPriority.Image = Properties.Resources.Snap2;
             }
         }
+
         private void btnContourPriority_Click(object sender, EventArgs e)
         {
             if (ct.isContourBtnOn)
@@ -465,6 +475,7 @@ namespace AgOpenGPS
             }
 
         }
+
         private void SnapLeft()
         {
             if (!ct.isContourBtnOn)
@@ -495,10 +506,12 @@ namespace AgOpenGPS
                 }
             }
         }
+
         private void btnSnapRight_Click(object sender, EventArgs e)
         {
             SnapRight();
         }
+
         private void btnSnapLeft_Click(object sender, EventArgs e)
         {
             SnapLeft();
@@ -528,32 +541,35 @@ namespace AgOpenGPS
             btnManualSection.Image = autoBtnState == btnStates.On ? Properties.Resources.ManualOn : Properties.Resources.ManualOff;
             btnAutoSection.Image = autoBtnState == btnStates.Auto ? Properties.Resources.SectionMasterOn : Properties.Resources.SectionMasterOff;
 
-            //turn section buttons all OFF or Auto if SectionAuto was on or off
+            //turn section buttons all On/OFF/Auto
             for (int j = 0; j < tool.numOfSections; j++)
             {
                 section[j].IsAllowedOn = (autoBtnState != 0);
                 section[j].BtnSectionState = autoBtnState;
-                ManualBtnUpdate(j, Controls[string.Format("btnSection{0}Man", j + 1)] as Button);
+                ManualBtnUpdate(j);
             }
         }
 
         //individual buttons for sections
-        private void btnSection1Man_Click(object sender, EventArgs e)
+        private void btnSectionMan_Click(object sender, EventArgs e)
         {
             if (sender is Button btn)
             {
-                int a = Convert.ToInt32(btn.Text);
-
-                if (section[a - 1].BtnSectionState == btnStates.Off)
+                if (autoBtnState != btnStates.Off)
                 {
-                    //if auto is off just have on-off for choices of section buttons
-                    if (autoBtnState != btnStates.Auto) section[a - 1].BtnSectionState = btnStates.On;
-                    else section[a - 1].BtnSectionState = btnStates.Auto;
-                }
-                else if (section[a - 1].BtnSectionState == btnStates.Auto) section[a - 1].BtnSectionState = btnStates.On;
-                else if (section[a - 1].BtnSectionState == btnStates.On) section[a - 1].BtnSectionState = btnStates.Off;
+                    int a = Convert.ToInt32(btn.Text);
 
-                ManualBtnUpdate(a - 1, btn);
+                    //if auto is off just have on-off for choices of section buttons
+                    if (section[a - 1].BtnSectionState == btnStates.Off)
+                    {
+                        if (autoBtnState != btnStates.Auto) section[a - 1].BtnSectionState = btnStates.On;
+                        else section[a - 1].BtnSectionState = btnStates.Auto;
+                    }
+                    else if (section[a - 1].BtnSectionState == btnStates.Auto) section[a - 1].BtnSectionState = btnStates.On;
+                    else if (section[a - 1].BtnSectionState == btnStates.On) section[a - 1].BtnSectionState = btnStates.Off;
+
+                    ManualBtnUpdate(a - 1);
+                }
             }
         }
 
@@ -960,6 +976,7 @@ namespace AgOpenGPS
             }
             else { TimedMessageBox(3000, gStr.gsFieldNotOpen, gStr.gsStartNewField); }
         }
+
         private void toolStripBtnMakeBndContour_Click_1(object sender, EventArgs e)
         {
             //build all the contour guidance lines from boundaries, all of them.
@@ -969,6 +986,7 @@ namespace AgOpenGPS
                 if (result == DialogResult.OK) { }
             }
         }
+
         private void deleteContourPathsToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
             //FileCreateContour();
@@ -977,6 +995,7 @@ namespace AgOpenGPS
             ct.ctList?.Clear();
             contourSaveList?.Clear();
         }
+
         private void fileExplorerToolStripItem_Click(object sender, EventArgs e)
         {
             if (isJobStarted)
@@ -985,10 +1004,12 @@ namespace AgOpenGPS
             }
             Process.Start(fieldsDirectory + currentFieldDirectory);
         }        
+
         private void topMenuFileExplorer_Click(object sender, EventArgs e)
         {
             Process.Start(baseDirectory);
         }
+
         private void toolStripDeleteApplied_Click(object sender, EventArgs e)
         {
             //FileCreateContour();
@@ -997,6 +1018,7 @@ namespace AgOpenGPS
             ct.ctList?.Clear();
             contourSaveList?.Clear();
         }
+
         private void toolStripAreYouSure_Click_1(object sender, EventArgs e)
         {
             if (isJobStarted)
@@ -1010,22 +1032,6 @@ namespace AgOpenGPS
                         MessageBoxDefaultButton.Button2);
                     if (result3 == DialogResult.Yes)
                     {
-                        //FileCreateElevation();
-
-                        //turn section buttons all OFF and zero square meters
-                        for (int j = 0; j < MAXSECTIONS; j++)
-                        {
-                            section[j].IsAllowedOn = false;
-                            section[j].BtnSectionState = btnStates.Off;
-                            //Update the button colors and text
-                            if (j < MAXSECTIONS - 1) ManualBtnUpdate(j, Controls[string.Format("btnSection{0}Man", j+1)] as Button);
-                        }
-
-
-
-                        //enable disable manual buttons
-                        LineUpManualBtns();
-
                         //clear out the contour Lists
                         ct.StopContourLine(pivotAxlePos);
                         ct.ResetContour();
@@ -1042,7 +1048,6 @@ namespace AgOpenGPS
 
                         FileCreateContour();
                         FileCreateSections();
-
                     }
                     else
                     {

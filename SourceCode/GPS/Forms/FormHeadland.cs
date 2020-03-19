@@ -69,7 +69,7 @@ namespace AgOpenGPS
             isSet = false;
 
             //Builds line
-            nudDistance.Value = (decimal)(Math.Round(mf.tool.toolWidth * 3,1));
+            nudDistance.Value = Math.Min((decimal)(Math.Round(mf.tool.toolWidth * 3,1)), nudDistance.Maximum);
             nudSetDistance.Value = 20;
             if (mf.hd.headArr.Count > Boundary && Boundary >= 0)
             {
@@ -592,8 +592,7 @@ namespace AgOpenGPS
                     else if (!mf.bnd.bndArr[Boundary].isOwnField && !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
-
-                mf.hd.headArr[Boundary].PreCalcHeadArea();
+                mf.StartWorker(false, Boundary);
             }
 
             Boundary++;
@@ -636,7 +635,7 @@ namespace AgOpenGPS
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
 
-                mf.hd.headArr[Boundary].PreCalcHeadArea();
+                mf.StartWorker(false, Boundary);
             }
 
             Boundary--;
@@ -735,8 +734,7 @@ namespace AgOpenGPS
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
 
                 }
-
-                mf.hd.headArr[Boundary].PreCalcHeadArea();
+                mf.StartWorker(false, Boundary);
             }
             mf.FileSaveHeadland();
             Close();

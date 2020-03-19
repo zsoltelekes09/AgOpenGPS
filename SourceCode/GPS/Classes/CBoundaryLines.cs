@@ -276,29 +276,6 @@ namespace AgOpenGPS
 
         public void CalculateBoundaryArea()
         {
-            var v = new ContourVertex[bndLine.Count];
-            for (int i = 0; i < bndLine.Count; i++)
-            {
-                v[i].Position = new Vec3(bndLine[i].easting, bndLine[i].northing, 0);
-            }
-
-            Tess _tess = new Tess();
-            _tess.AddContour(v, ContourOrientation.Clockwise);
-
-            _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3, null);
-
-            bndArea.Clear();
-
-            for (int i = 0; i < _tess.ElementCount; i++)
-            {
-                for (int k = 0; k < 3; k++)
-                {
-                    int index = _tess.Elements[i * 3 + k];
-                    if (index == -1) continue;
-                    bndArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
-                }
-            }
-
             int ptCount = bndLine.Count;
             if (ptCount < 1) return;
 
@@ -310,6 +287,30 @@ namespace AgOpenGPS
                 area += (bndLine[j].easting + bndLine[i].easting) * (bndLine[j].northing - bndLine[i].northing);
             }
             area = Math.Abs(area / 2);
+
+
+            var v = new ContourVertex[ptCount];
+            for (int i = 0; i < ptCount; i++)
+            {
+                v[i].Position = new Vec3(bndLine[i].easting, bndLine[i].northing, 0);
+            }
+
+            Tess _tess = new Tess();
+            _tess.AddContour(v, ContourOrientation.Clockwise);
+            _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3, null);
+
+            bndArea.Clear();
+
+            //var output = new List<Polygon>();
+            for (int i = 0; i < _tess.ElementCount; i++)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    int index = _tess.Elements[i * 3 + k];
+                    if (index == -1) continue;
+                    bndArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
+                }
+            }
         }
     }
 }

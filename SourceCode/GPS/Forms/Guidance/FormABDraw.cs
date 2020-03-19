@@ -347,7 +347,7 @@ namespace AgOpenGPS
             mf.curve.circlemode = false;
 
             mf.curve.refList?.Clear();
-            vec3 chk = new vec3(arr[start]);
+            vec2 chk = new vec2(arr[start].easting, arr[start].northing);
 
             for (int i = start; i < end; i++)
             {

@@ -368,7 +368,6 @@ namespace AgOpenGPS
             Selectedreset = true;
 
             mf.bnd.isOkToAddPoints = false;
-            mf.hd.isOn = false;
             mf.FileSaveHeadland();
 
             mf.hd.isOn = false;
@@ -483,16 +482,7 @@ namespace AgOpenGPS
                                     if (mf.bnd.bndArr[i].bndLine.Count > 0)
                                     {
                                         mf.bnd.bndArr[i].isOwnField = (i == 0) ? true : false;
-
-                                        //fix the points if there are gaps bigger then
-                                        mf.bnd.bndArr[i].FixBoundaryLine(mf.tool.toolWidth);
-                                        mf.bnd.bndArr[i].PreCalcBoundaryLines();
-                                        mf.bnd.bndArr[i].CalculateBoundaryArea();
-                                        mf.bnd.bndArr[i].CalculateBoundaryWinding();
-
-
-                                        mf.turn.BuildTurnLines(i);
-                                        mf.gf.BuildGeoFenceLines(i);
+                                        mf.StartWorker(true, i);
                                         coordinates = "";
                                         i++;
                                     }
@@ -501,6 +491,7 @@ namespace AgOpenGPS
                                         mf.bnd.bndArr.RemoveAt(mf.bnd.bndArr.Count - 1);
                                         mf.turn.turnArr.RemoveAt(mf.bnd.bndArr.Count - 1);
                                         mf.gf.geoFenceArr.RemoveAt(mf.bnd.bndArr.Count - 1);
+                                        mf.hd.headArr.RemoveAt(mf.bnd.bndArr.Count - 1);
                                     }
                                 }
                                 else
@@ -514,8 +505,6 @@ namespace AgOpenGPS
                             }
                         }
                         mf.FileSaveBoundary();
-                        mf.fd.UpdateFieldBoundaryGUIAreas();
-                        mf.mazeGrid.BuildMazeGridArray();
                         UpdateChart();
                     }
                     catch (Exception)

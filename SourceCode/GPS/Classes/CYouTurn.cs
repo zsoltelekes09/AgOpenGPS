@@ -1572,9 +1572,6 @@ namespace AgOpenGPS
                     double dz = ytList[B].northing - ytList[A].northing;
                     if (Math.Abs(dx) < Double.Epsilon && Math.Abs(dz) < Double.Epsilon) return;
 
-                    //abHeading = Math.Atan2(dz, dx);
-                    double abHeading = ytList[A].heading;
-
                     //how far from current AB Line is fix
                     distanceFromCurrentLine = ((dz * pivot.easting) - (dx * pivot.northing) + (ytList[B].easting
                                 * ytList[A].northing) - (ytList[B].northing * ytList[A].easting))

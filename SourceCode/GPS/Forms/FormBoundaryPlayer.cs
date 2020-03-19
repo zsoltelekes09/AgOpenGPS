@@ -29,22 +29,11 @@ namespace AgOpenGPS
                 mf.turn.turnArr.Add(new CTurnLines());
                 mf.gf.geoFenceArr.Add(new CGeoFenceLines());
                 mf.hd.headArr.Add(new CHeadLines());
-
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].bndLine.AddRange(mf.bnd.bndBeingMadePts);
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.tool.toolWidth);
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();
-
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].isOwnField = (mf.bnd.bndArr.Count == 1) ? true : false;
 
-                mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
-                mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
+                mf.StartWorker(true, mf.bnd.bndArr.Count - 1);
 
-                mf.fd.UpdateFieldBoundaryGUIAreas();
-                mf.mazeGrid.BuildMazeGridArray();
-
-                mf.CalculateMinMax();
                 mf.FileSaveBoundary();
             }
 

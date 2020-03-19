@@ -5,6 +5,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -69,9 +70,10 @@ namespace AgOpenGPS
         private readonly Stopwatch testHalfSecond = new Stopwatch();
         private readonly Stopwatch testOneSecond = new Stopwatch();
         private readonly Stopwatch testThreeSecond = new Stopwatch();
-        public readonly Stopwatch testNMEA = new Stopwatch();
+        public readonly Stopwatch testNMEAa = new Stopwatch();
+        public readonly Stopwatch testNMEAb = new Stopwatch();
 
-        public long testHalfSecond1 = 0, testOneSecond1 = 0, testThreeSecond1 = 0, testNMEA1 = 0;
+        public long testHalfSecond1 = 0, testOneSecond1 = 0, testThreeSecond1 = 0, testNMEA1a = 0, testNMEA1b = 0;
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         private readonly Stopwatch swHz = new Stopwatch();
@@ -148,7 +150,7 @@ namespace AgOpenGPS
         /// Just the tool attachment that includes the sections
         /// </summary>
         public CTool tool;
-        
+
         /// <summary>
         /// All the structs for recv and send of information out ports
         /// </summary>
@@ -213,7 +215,6 @@ namespace AgOpenGPS
         /// The font class
         /// </summary>
         public CFont font;
-
         public bool LeftMouseDownOnOpenGL { get; set; }
         public double FrameTime { get; set; } = 0;
         public double HzTime { get; set; } = 5;
@@ -222,6 +223,64 @@ namespace AgOpenGPS
         public int TenMinuteCounter { get; set; } = 1;
         public int NtripCounter { get; set; } = 0;
         public FormTimedMessage Form { get; set; } = new FormTimedMessage();
+
+        public BackgroundWorker Worker { get; set; } = new BackgroundWorker();
+
+        readonly List<Tuple<bool, int>> WorkerList = new List<Tuple<bool, int>>();
+
+        public void StartWorker(bool BndHd, int number)
+        {
+            WorkerList.Add(Tuple.Create(BndHd, number));
+            if (!Worker.IsBusy)
+            {
+                Worker.RunWorkerAsync(WorkerList[0]);
+            }
+        }
+
+        void Workers_Complete(object sender, RunWorkerCompletedEventArgs e)
+        {
+            WorkerList.RemoveAt(0);
+            if (WorkerList.Count > 0)
+            {
+                Worker.RunWorkerAsync(WorkerList[0]);
+            }
+            else
+            {
+
+                fd.UpdateFieldBoundaryGUIAreas();
+                mazeGrid.BuildMazeGridArray();
+                CalculateMinMax();
+
+            }
+        }
+
+        public void Workers_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Tuple<bool, int> genericlist = e.Argument as Tuple<bool,int>;
+
+            if (genericlist.Item1)
+            {
+                bnd.bndArr[genericlist.Item2].FixBoundaryLine(tool.toolWidth);
+                bnd.bndArr[genericlist.Item2].PreCalcBoundaryLines();
+                bnd.bndArr[genericlist.Item2].CalculateBoundaryArea();
+                bnd.bndArr[genericlist.Item2].CalculateBoundaryWinding();
+
+                turn.BuildTurnLines(genericlist.Item2);
+                gf.BuildGeoFenceLines(genericlist.Item2);
+            }
+            else
+            {
+                for (int i = 0; i < hd.headArr[genericlist.Item2].HeadLine.Count; i++)
+                {
+                    vec3 vecPt = new vec3(hd.headArr[genericlist.Item2].HeadLine[i]);
+                    if (bnd.bndArr[genericlist.Item2].isOwnField ? gf.geoFenceArr[genericlist.Item2].IsPointInGeoFenceArea(vecPt) : !gf.geoFenceArr[genericlist.Item2].IsPointInGeoFenceArea(vecPt)) hd.headArr[genericlist.Item2].isDrawList.Add(true);
+                    else hd.headArr[genericlist.Item2].isDrawList.Add(false);
+                }
+
+                hd.headArr[genericlist.Item2].PreCalcHeadArea();
+                hd.headArr[genericlist.Item2].PreCalcHeadLines();
+            }
+        }
 
         #endregion // Class Props and instances
 
@@ -330,7 +389,23 @@ namespace AgOpenGPS
             //create a new section and set left and right positions
             //created whether used or not, saves restarting program
             section = new CSection[MAXSECTIONS];
-            for (int j = 0; j < MAXSECTIONS; j++) section[j] = new CSection(this);
+            for (int j = 0; j < MAXSECTIONS; j++)
+            {
+                section[j] = new CSection(this);
+
+
+                this.Controls.Add(section[j].SectionButton);
+                section[j].SectionButton.BringToFront();
+                section[j].SectionButton.Text = (j + 1).ToString();
+                section[j].SectionButton.Click += new System.EventHandler(this.btnSectionMan_Click);
+
+                section[j].SectionButton.Enabled = false;
+                section[j].SectionButton.FlatAppearance.BorderColor = SystemColors.ActiveCaptionText;
+                section[j].SectionButton.FlatStyle = FlatStyle.Flat;
+                section[j].SectionButton.TextAlign = ContentAlignment.MiddleCenter;
+                section[j].SectionButton.UseVisualStyleBackColor = false;
+                section[j].SectionButton.BackColor = Color.Silver;
+            }
 
             //our NMEA parser
             pn = new CNMEA(this);
@@ -363,7 +438,7 @@ namespace AgOpenGPS
             gf = new CGeoFence(this);
 
             //headland object
-            hd = new CHead( this);
+            hd = new CHead(this);
 
             //headland entry/exit sequences
             seq = new CSequence(this);
@@ -397,6 +472,9 @@ namespace AgOpenGPS
 
             //access to font class
             font = new CFont(this);
+
+            Worker.RunWorkerCompleted += Workers_Complete;
+            Worker.DoWork += Workers_DoWork;
         }
 
         private void ZoomByMouseWheel(object sender, MouseEventArgs e)
@@ -529,8 +607,6 @@ namespace AgOpenGPS
             if (wasAutoSteerConnectedLastRun) SerialPortAutoSteerOpen();
 
             //Set width of section and positions for each section
-            SectionSetPosition();
-
             //Calculate total width and each section width
             SectionCalcWidths();
 
@@ -930,6 +1006,7 @@ namespace AgOpenGPS
                         bitmap.UnlockBits(data);
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+
                     }
                 }
             }
@@ -1052,24 +1129,14 @@ namespace AgOpenGPS
 
         public void GetHeadland()
         {
-            using (var form = new FormHeadland (this))
+            using (var form = new FormHeadland(this))
             {
                 var result = form.ShowDialog();
                 if (result == DialogResult.OK)
                 {
                 }
             }
-
-            if (hd.headArr.Count > 0)
-            {
-                hd.isOn = true;
-                btnHeadlandOnOff.Image = Resources.HeadlandOn;
-            }
-            else
-            {
-                hd.isOn = false;
-                btnHeadlandOnOff.Image = Resources.HeadlandOff;
-            }
+            btnHeadlandOnOff.Image = (hd.isOn = hd.headArr.Count > 0) ? Resources.HeadlandOn : Resources.HeadlandOff;
         }
 
         public void GetAB()
@@ -1160,8 +1227,10 @@ namespace AgOpenGPS
         }
 
         //function to set section positions
-        public void SectionSetPosition()
+        //function to calculate the width of each section and update
+        public void SectionCalcWidths()
         {
+
             section[0].positionLeft = (double)Vehicle.Default.setSection_position1 + Vehicle.Default.setVehicle_toolOffset;
             section[0].positionRight = (double)Vehicle.Default.setSection_position2 + Vehicle.Default.setVehicle_toolOffset;
 
@@ -1209,11 +1278,7 @@ namespace AgOpenGPS
 
             section[15].positionLeft = (double)Vehicle.Default.setSection_position16 + Vehicle.Default.setVehicle_toolOffset;
             section[15].positionRight = (double)Vehicle.Default.setSection_position17 + Vehicle.Default.setVehicle_toolOffset;
-        }
 
-        //function to calculate the width of each section and update
-        public void SectionCalcWidths()
-        {
             for (int j = 0; j < MAXSECTIONS; j++)
             {
                 section[j].sectionWidth = section[j].positionRight - section[j].positionLeft;
@@ -1254,39 +1319,14 @@ namespace AgOpenGPS
             autoBtnState = btnStates.Off;
             btnSection_Update();
 
-            btnSection1Man.BackColor = Color.Red;
-            btnSection2Man.BackColor = Color.Red;
-            btnSection3Man.BackColor = Color.Red;
-            btnSection4Man.BackColor = Color.Red;
-            btnSection5Man.BackColor = Color.Red;
-            btnSection6Man.BackColor = Color.Red;
-            btnSection7Man.BackColor = Color.Red;
-            btnSection8Man.BackColor = Color.Red;
-            btnSection9Man.BackColor = Color.Red;
-            btnSection10Man.BackColor = Color.Red;
-            btnSection11Man.BackColor = Color.Red;
-            btnSection12Man.BackColor = Color.Red;
-            btnSection13Man.BackColor = Color.Red;
-            btnSection14Man.BackColor = Color.Red;
-            btnSection15Man.BackColor = Color.Red;
-            btnSection16Man.BackColor = Color.Red;
 
-            btnSection1Man.Enabled = true;
-            btnSection2Man.Enabled = true;
-            btnSection3Man.Enabled = true;
-            btnSection4Man.Enabled = true;
-            btnSection5Man.Enabled = true;
-            btnSection6Man.Enabled = true;
-            btnSection7Man.Enabled = true;
-            btnSection8Man.Enabled = true;
-            btnSection9Man.Enabled = true;
-            btnSection10Man.Enabled = true;
-            btnSection11Man.Enabled = true;
-            btnSection12Man.Enabled = true;
-            btnSection13Man.Enabled = true;
-            btnSection14Man.Enabled = true;
-            btnSection15Man.Enabled = true;
-            btnSection16Man.Enabled = true;
+            for (int j = 0; j < tool.numOfSections; j++)
+            {
+                section[j].SectionButton.BackColor = Color.Red;
+                section[j].SectionButton.Enabled = true;
+            }
+
+
 
 
             btnABLine.Enabled = true;
@@ -1352,17 +1392,6 @@ namespace AgOpenGPS
             pn.latStart = 0;
             pn.lonStart = 0;
 
-            //turn section buttons all OFF
-            for (int j = 0; j < MAXSECTIONS; j++)
-            {
-                section[j].IsAllowedOn = false;
-                section[j].BtnSectionState = btnStates.Off;
-                //Update the button colors and text
-                if (j < MAXSECTIONS - 1)
-                ManualBtnUpdate(j, Controls[string.Format("btnSection{0}Man", j+1)] as Button);
-            }
-
-
             //fix auto button
             btnManualSection.Enabled = false;
             btnAutoSection.Enabled = false;
@@ -1370,48 +1399,12 @@ namespace AgOpenGPS
             autoBtnState = btnStates.Off;
             btnSection_Update();
 
-
-            //enable disable manual buttons
-            LineUpManualBtns();
-
-            btnSection1Man.Enabled = false;
-            btnSection2Man.Enabled = false;
-            btnSection3Man.Enabled = false;
-            btnSection4Man.Enabled = false;
-            btnSection5Man.Enabled = false;
-            btnSection6Man.Enabled = false;
-            btnSection7Man.Enabled = false;
-            btnSection8Man.Enabled = false;
-            btnSection9Man.Enabled = false;
-            btnSection10Man.Enabled = false;
-            btnSection11Man.Enabled = false;
-            btnSection12Man.Enabled = false;
-            btnSection13Man.Enabled = false;
-            btnSection14Man.Enabled = false;
-            btnSection15Man.Enabled = false;
-            btnSection16Man.Enabled = false;
-
-            btnSection1Man.BackColor = Color.Silver;
-            btnSection2Man.BackColor = Color.Silver;
-            btnSection3Man.BackColor = Color.Silver;
-            btnSection4Man.BackColor = Color.Silver;
-            btnSection5Man.BackColor = Color.Silver;
-            btnSection6Man.BackColor = Color.Silver;
-            btnSection7Man.BackColor = Color.Silver;
-            btnSection8Man.BackColor = Color.Silver;
-            btnSection9Man.BackColor = Color.Silver;
-            btnSection10Man.BackColor = Color.Silver;
-            btnSection11Man.BackColor = Color.Silver;
-            btnSection12Man.BackColor = Color.Silver;
-            btnSection13Man.BackColor = Color.Silver;
-            btnSection14Man.BackColor = Color.Silver;
-            btnSection15Man.BackColor = Color.Silver;
-            btnSection16Man.BackColor = Color.Silver;
-
-            //clear the section lists
             for (int j = 0; j < MAXSECTIONS; j++)
             {
-                //clean out the lists
+                //turn section buttons all OFF
+                section[j].SectionButton.Enabled = false;
+                section[j].SectionButton.BackColor = Color.Silver;
+                //clear the section lists
                 section[j].patchList?.Clear();
                 section[j].triangleList?.Clear();
             }
@@ -1499,12 +1492,6 @@ namespace AgOpenGPS
             //bring up dialog if no job active, close job if one is
             if (!isJobStarted)
             {
-                //if (toolStripBtnGPSStength.Image.Height == 40)
-                //{
-                //    TimedMessageBox(3000, gStr.gsNoGPS, gStr.gsGPSSourceOff);
-                //    return;
-                //}
-
                 using (var form = new FormJob(this))
                 {
                     var result = form.ShowDialog();
@@ -1578,7 +1565,7 @@ namespace AgOpenGPS
         //Does the logic to process section on off requests
         private void ProcessSectionOnOffRequests()
         {
-            for (int j = 0; j < tool.numOfSections + 1; j++)
+            for (int j = 0; j < tool.numSuperSection; j++)
             {
                 //SECTIONS - 
                 if (section[j].SectionOnRequest)
@@ -1609,7 +1596,7 @@ namespace AgOpenGPS
 
                 if (section[j].IsSectionOn)
                 {
-                    section[j].MappingOffTimer = (int)(0.8 * fixUpdateHz+1);
+                    section[j].MappingOffTimer = (int)(0.8 * fixUpdateHz + 1);
                 }
                 else
                 {
@@ -1798,15 +1785,15 @@ namespace AgOpenGPS
         {
             //match grid to cam distance and redo perspective
             if (camera.camSetDistance <= -20000) camera.gridZoom = 2000;
-            else if (camera.camSetDistance >= -20000 && camera.camSetDistance < -10000) camera.gridZoom = 2012*2;
-            else if (camera.camSetDistance >= -10000 && camera.camSetDistance < -5000) camera.gridZoom = 1006 *2;
-            else if (camera.camSetDistance >= -5000 && camera.camSetDistance < -2000) camera.gridZoom = 503 *2;
-            else if (camera.camSetDistance >= -2000 && camera.camSetDistance < -1000) camera.gridZoom = 201.2 *2;
-            else if (camera.camSetDistance >= -1000 && camera.camSetDistance < -500) camera.gridZoom = 100.6 *2;
-            else if (camera.camSetDistance >= -500 && camera.camSetDistance < -250) camera.gridZoom = 50.3 *2;
-            else if (camera.camSetDistance >= -250 && camera.camSetDistance < -150) camera.gridZoom = 25.15 *2;
-            else if (camera.camSetDistance >= -150 && camera.camSetDistance < -50) camera.gridZoom = 10.06 *2;
-            else if (camera.camSetDistance >= -50 && camera.camSetDistance < -1) camera.gridZoom = 5.03 *2;
+            else if (camera.camSetDistance >= -20000 && camera.camSetDistance < -10000) camera.gridZoom = 2012 * 2;
+            else if (camera.camSetDistance >= -10000 && camera.camSetDistance < -5000) camera.gridZoom = 1006 * 2;
+            else if (camera.camSetDistance >= -5000 && camera.camSetDistance < -2000) camera.gridZoom = 503 * 2;
+            else if (camera.camSetDistance >= -2000 && camera.camSetDistance < -1000) camera.gridZoom = 201.2 * 2;
+            else if (camera.camSetDistance >= -1000 && camera.camSetDistance < -500) camera.gridZoom = 100.6 * 2;
+            else if (camera.camSetDistance >= -500 && camera.camSetDistance < -250) camera.gridZoom = 50.3 * 2;
+            else if (camera.camSetDistance >= -250 && camera.camSetDistance < -150) camera.gridZoom = 25.15 * 2;
+            else if (camera.camSetDistance >= -150 && camera.camSetDistance < -50) camera.gridZoom = 10.06 * 2;
+            else if (camera.camSetDistance >= -50 && camera.camSetDistance < -1) camera.gridZoom = 5.03 * 2;
             //1.216 2.532
 
             oglMain.MakeCurrent();
@@ -1824,7 +1811,7 @@ namespace AgOpenGPS
             if (ct.isContourOn) ct.StopContourLine(pivotAxlePos);
 
             //turn off all the sections
-            for (int j = 0; j < tool.numOfSections + 1; j++)
+            for (int j = 0; j < tool.numSuperSection; j++)
             {
                 if (section[j].IsMappingOn) section[j].TurnMappingOff();
                 section[j].SectionOnRequest = false;

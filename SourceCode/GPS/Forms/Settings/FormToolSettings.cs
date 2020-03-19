@@ -453,8 +453,6 @@ namespace AgOpenGPS
             mf.LineUpManualBtns();
 
             //update the sections to newly configured widths and positions in main
-            mf.SectionSetPosition();
-
             //update the widths of sections and tool width in main
             mf.SectionCalcWidths();
 
@@ -778,12 +776,11 @@ namespace AgOpenGPS
             
             if (mf.isMetric)
             {
-            if (numberOfSections * wide > 4800) wide = 99;
-                
+            if (numberOfSections * wide > 4800) wide = 4800 / numberOfSections;
             }
             else
             {
-                if (numberOfSections * wide > 1900) wide = 19;
+                if (numberOfSections * wide > 1900) wide = 19 / numberOfSections;
             }
 
             nudSection1.ValueChanged -= NudSection1_ValueChanged;
@@ -1312,6 +1309,7 @@ namespace AgOpenGPS
                     }
 
             }
+            lblVehicleToolWidth.Text = "48";
             //update in settings dialog ONLY total tool width
             SectionFeetInchesTotalWidthLabelUpdate();
         }

@@ -11,7 +11,6 @@ namespace AgOpenGPS
         public double toolWidth;
         public double toolFarLeftSpeed = 0;
         public double toolFarRightSpeed = 0;
-        //public double toolFarLeftContourSpeed = 0, toolFarRightContourSpeed = 0;
 
         public double toolOverlap;
         public double toolTrailingHitchLength, toolTankTrailingHitchLength;
@@ -22,6 +21,13 @@ namespace AgOpenGPS
 
         public double lookAheadDistanceOnPixelsLeft, lookAheadDistanceOnPixelsRight;
         public double lookAheadDistanceOffPixelsLeft, lookAheadDistanceOffPixelsRight;
+
+
+        //!speed
+        public bool isLeftSideInHeadland = true, isRightSideInHeadland = true;
+
+        public bool isSuperSectionAllowedOn;
+
 
         public bool isToolTrailing, isToolTBT;
         public bool isToolBehindPivot;
@@ -45,7 +51,6 @@ namespace AgOpenGPS
         //Constructor called by FormGPS
         public CTool(FormGPS _f)
         {
-            
             mf = _f;
 
             //from settings grab the vehicle specifics
@@ -74,7 +79,6 @@ namespace AgOpenGPS
 
         public void DrawTool()
         {
-
             //translate and rotate at pivot axle
             GL.Translate(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0);
             GL.PushMatrix();

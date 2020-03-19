@@ -412,64 +412,30 @@ namespace AgOpenGPS
 
             Size Size = new System.Drawing.Size(Math.Min((oglMain.Width * 3 / 4) / tool.numOfSections, 120), 30);
 
-            for (int i = 1; i < MAXSECTIONS; i++)
+            for (int i = 0; i < MAXSECTIONS; i++)
             {
-                Button btn = this.Controls[string.Format("btnSection{0}Man", i)] as Button;
-                if (i <= tool.numOfSections)
+                if (i < tool.numOfSections)
                 {
-                    btn.Top = Height - top;
-                    btn.Size = Size;
-                    btn.Left = (oglCenter) - (tool.numOfSections * Size.Width) / 2 + Size.Width * (i - 1);
-                    btn.Visible = true;
+                    section[i].SectionButton.Top = Height - top;
+                    section[i].SectionButton.Size = Size;
+                    section[i].SectionButton.Left = (oglCenter) - (tool.numOfSections * Size.Width) / 2 + Size.Width * i;
+                    section[i].SectionButton.Visible = true;
                 }
-                else btn.Visible = false;
+                else section[i].SectionButton.Visible = false;
             }
         }
 
         //update individual btn based on state after push
-        private void ManualBtnUpdate(int sectNumber, Button btn)
+        private void ManualBtnUpdate(int sectNumber)
         {
-            switch (section[sectNumber].BtnSectionState)
-            {
-                case btnStates.Off:
-                    if (isDay)
-                    {
-                        btn.ForeColor = Color.Black;
-                        btn.BackColor = Color.Red;
-                    }
-                    else
-                    {
-                        btn.BackColor = Color.Crimson;
-                        btn.ForeColor = Color.White;
-                    }
-                    break;
-            
-                case btnStates.Auto:
-                    if (isDay)
-                    {
-                        btn.BackColor = Color.Lime;
-                        btn.ForeColor = Color.Black;
-                    }
-                    else
-                    {
-                        btn.BackColor = Color.ForestGreen;
-                        btn.ForeColor = Color.White;
-                    }
-                    break;
+            if (section[sectNumber].BtnSectionState == btnStates.On)
+                section[sectNumber].SectionButton.BackColor = isDay ? Color.Yellow : Color.DarkGoldenrod;
+            else if (section[sectNumber].BtnSectionState == btnStates.Auto)
+                section[sectNumber].SectionButton.BackColor = isDay ? Color.Lime : Color.ForestGreen;
+            else
+                section[sectNumber].SectionButton.BackColor = isDay ? Color.Red : Color.Crimson;
 
-                case btnStates.On:
-                    if (isDay)
-                    {
-                        btn.BackColor = Color.Yellow;
-                        btn.ForeColor = Color.Black;
-                    }
-                    else
-                    {
-                        btn.BackColor = Color.DarkGoldenrod;
-                        btn.ForeColor = Color.White;
-                    }
-                    break;
-            }
+            section[sectNumber].SectionButton.ForeColor = isDay ? Color.Black : Color.White;
         }
 
         //Mouse Clicks 
@@ -591,6 +557,11 @@ namespace AgOpenGPS
             oglMain.Refresh();
         }
 
+
+
+        double lasta, lastb, lastc, lastd;
+
+
         private void HalfSecond_Update(object sender, EventArgs e)
         {
             HalfSecondUpdate.Enabled = false;
@@ -623,10 +594,12 @@ namespace AgOpenGPS
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
 
             testHalfSecond1 = testHalfSecond.ElapsedMilliseconds;
-            lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
-            lblHz.Text = NMEAHz + ".0 Hz\r\n" + (testNMEA1 / (double)System.Diagnostics.Stopwatch.Frequency * 1000).ToString("N3");
-            lblHz2.Text = (int)(FrameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();
-            lblHz2.Text = (int)(FrameTime) + "\r\n" + testNMEA1.ToString() + "t ";
+            //lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
+            //lblHz2.Text = (int)(FrameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1a.ToString();
+
+            lblHz.Text = lasta.ToString("N3") + "\r\n" + lastb.ToString("N3");
+            lblHz2.Text = lastc.ToString("N0") + "t " + "\r\n" + lastd.ToString("N0") + "t " + ((100.0 / lastc) * lastd).ToString("N1");
+
 
 
             HalfSecondUpdate.Enabled = true;
@@ -640,7 +613,6 @@ namespace AgOpenGPS
 
             //counter used for saving field in background
             MinuteCounter++;
-            TenMinuteCounter++;
 
             if (isRTK)
             {

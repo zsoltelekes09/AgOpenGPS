@@ -890,30 +890,6 @@ namespace AgOpenGPS
         //function to open a previously saved field
         public bool FileOpenTool(string fileName)
         {
-            //OpenFileDialog ofd = new OpenFileDialog();
-
-            ////get the directory where the fields are stored
-            //string directoryName = toolsDirectory;
-
-            ////make sure the directory exists, if not, create it
-            //if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
-            //{ Directory.CreateDirectory(directoryName); }
-
-            ////the initial directory, fields, for the open dialog
-            //ofd.InitialDirectory = directoryName;
-
-            ////When leaving dialog put windows back where it was
-            //ofd.RestoreDirectory = true;
-
-            ////set the filter to text files only
-            //ofd.Filter = "txt files (*.txt)|*.txt";
-
-            ////was a file selected
-            //if (ofd.ShowDialog() == DialogResult.OK)
-            //{
-            //    //if job started close it
-            //    if (isJobStarted) JobClose();
-
             //make sure the file if fully valid and vehicle matches sections
             using (StreamReader reader = new StreamReader(fileName))
             {
@@ -1093,8 +1069,6 @@ namespace AgOpenGPS
                         mc.isWorkSwitchManual = Properties.Settings.Default.setF_IsWorkSwitchManual;
 
                         //Set width of section and positions for each section
-                        SectionSetPosition();
-
                         //Calculate total width and each section width
                         SectionCalcWidths();
 
@@ -1821,20 +1795,7 @@ namespace AgOpenGPS
                                     double.Parse(words[2], CultureInfo.InvariantCulture));
                                     bnd.bndArr[k].bndLine.Add(vecPt);
                                 }
-
-                                bnd.bndArr[k].FixBoundaryLine(tool.toolWidth);
-                                bnd.bndArr[k].PreCalcBoundaryLines();
-                                bnd.bndArr[k].CalculateBoundaryArea();
-                                bnd.bndArr[k].CalculateBoundaryWinding();
-
-                                if (bnd.bndArr[k].area == 0)
-                                {
-                                    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
-                                    k = k - 1;
-                                }
+                                StartWorker(true, k);
                             }
                             else
                             {
@@ -1854,12 +1815,6 @@ namespace AgOpenGPS
                         TimedMessageBox(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
-
-                    turn.BuildTurnLines(-1);
-                    gf.BuildGeoFenceLines(-1);
-                    fd.UpdateFieldBoundaryGUIAreas();
-                    mazeGrid.BuildMazeGridArray();
-                    CalculateMinMax();
                 }
             }
 
@@ -1895,12 +1850,8 @@ namespace AgOpenGPS
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
                                     hd.headArr[k].HeadLine.Add(vecPt);
-
-                                    if (bnd.bndArr[k].isOwnField && gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt)) hd.headArr[k].isDrawList.Add(true);
-                                    else if (!bnd.bndArr[k].isOwnField && !gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt)) hd.headArr[k].isDrawList.Add(true);
-                                    else hd.headArr[k].isDrawList.Add(false);
                                 }
-                                hd.headArr[k].PreCalcHeadArea();
+                                StartWorker(false, k);
                             }
                         }
                     }
@@ -1913,9 +1864,8 @@ namespace AgOpenGPS
                 }
             }
 
-             hd.isOn = false;
+            hd.isOn = false;
 
-            //if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
             btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
 
             //Recorded Path
