@@ -1797,13 +1797,13 @@ namespace AgOpenGPS
                                 }
 
 
-                                //StartWorker(true, k);
+                                StartWorker(true, k);
 
-                                bnd.bndArr[k].FixBoundaryLine(tool.toolWidth);
-                                bnd.bndArr[k].PreCalcBoundaryLines();
-                                bnd.bndArr[k].CalculateBoundaryArea();
-                                bnd.bndArr[k].CalculateBoundaryWinding();
-
+                                //bnd.bndArr[k].FixBoundaryLine(tool.toolWidth);
+                                //bnd.bndArr[k].PreCalcBoundaryLines();
+                                //bnd.bndArr[k].CalculateBoundaryArea();
+                                //bnd.bndArr[k].CalculateBoundaryWinding();
+                                /*
                                 if (bnd.bndArr[k].area == 0)
                                 {
                                     bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
@@ -1812,7 +1812,7 @@ namespace AgOpenGPS
                                     hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
                                     k = k - 1;
                                 }
-
+                                */
                             }
                             else
                             {
@@ -1833,11 +1833,11 @@ namespace AgOpenGPS
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
 
-                    turn.BuildTurnLines(-1);
-                    gf.BuildGeoFenceLines(-1);
-                    fd.UpdateFieldBoundaryGUIAreas();
-                    mazeGrid.BuildMazeGridArray();
-                    CalculateMinMax();
+                    //turn.BuildTurnLines(-1);
+                    //gf.BuildGeoFenceLines(-1);
+                    //fd.UpdateFieldBoundaryGUIAreas();
+                    //mazeGrid.BuildMazeGridArray();
+                    //CalculateMinMax();
                 }
             }
 
@@ -1878,10 +1878,10 @@ namespace AgOpenGPS
                                     else hd.headArr[k].isDrawList.Add(false);
                                 }
 
-                                //StartWorker(false, k);
+                                StartWorker(false, k);
 
-                                hd.headArr[k].PreCalcHeadArea();
-                                hd.headArr[k].PreCalcHeadLines();
+                                //hd.headArr[k].PreCalcHeadArea();
+                                //hd.headArr[k].PreCalcHeadLines();
                             }
                         }
                     }

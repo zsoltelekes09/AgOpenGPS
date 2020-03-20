@@ -32,19 +32,19 @@ namespace AgOpenGPS
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].bndLine.AddRange(mf.bnd.bndBeingMadePts);
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].isOwnField = (mf.bnd.bndArr.Count == 1) ? true : false;
 
-                //mf.StartWorker(true, mf.bnd.bndArr.Count - 1);
+                mf.StartWorker(true, mf.bnd.bndArr.Count - 1);
 
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.tool.toolWidth);
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();
+                //mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.tool.toolWidth);
+                //mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
+                //mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
+                //mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();
 
 
-                mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
-                mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
+                //mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
+                //mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
 
-                mf.fd.UpdateFieldBoundaryGUIAreas();
-                mf.mazeGrid.BuildMazeGridArray();
+                //mf.fd.UpdateFieldBoundaryGUIAreas();
+                //mf.mazeGrid.BuildMazeGridArray();
 
                 mf.FileSaveBoundary();
             }
@@ -85,6 +85,16 @@ namespace AgOpenGPS
             //mf.bnd.isOkToAddPoints = false;
             btnPausePlay.Image = Properties.Resources.BoundaryRecord;
             mf.Focus();
+
+            if (mf.isMetric)
+            {
+                lblArea.Text = Math.Round(0.0, 2) + " Ha";
+            }
+            else
+            {
+                lblArea.Text = Math.Round(0.0, 2) + " Acre";
+            }
+            lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
         }
 
         private void Timer1_Tick(object sender, EventArgs e)

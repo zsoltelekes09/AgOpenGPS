@@ -12,7 +12,18 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         private bool Selectedreset = true;
-        private int position = 0;
+        private int Position = 0;
+        private int oldposition = 0;
+        private bool scroll = false;
+        private double viewableRatio = 0;
+        private double contentHeight = 0;
+        private int oldY = 0;
+        private double thumbHeight = 0;
+        private readonly int scrollmaxheight = 0;
+        private readonly int startscrollY = 0;
+        private readonly int startscrollX = 0;
+        private readonly int items = 0;
+        private readonly int rowheight = 0;
 
         private double easting, northing, latK, lonK;
 
@@ -25,6 +36,14 @@ namespace AgOpenGPS
             InitializeComponent();
 
             nudBndOffset.Controls[0].Enabled = false;
+
+            scrollmaxheight = button4.Size.Height;
+            startscrollY = button4.Location.Y;
+            startscrollX = button4.Location.X;
+            rowheight = (int)tableLayoutPanel1.RowStyles[0].Height;
+            items = (int)(tableLayoutPanel1.Height / rowheight + 0.5);
+
+            UpdateScroll(-1);
 
             this.Text = gStr.gsStartDeleteABoundary;
 
@@ -45,34 +64,52 @@ namespace AgOpenGPS
             btnLoadMultiBoundaryFromGE.Visible = false;
         }
 
+        void UpdateScroll(double pos)
+        {
+            contentHeight = (mf.bnd.bndArr.Count) * rowheight;
+            viewableRatio = tableLayoutPanel1.Size.Height / contentHeight;
+            if (viewableRatio >= 1)
+            {
+                button4.Size = new Size(rowheight, scrollmaxheight);
+                button4.Location = new Point(startscrollX, startscrollY);
+            }
+            else
+            {
+                thumbHeight = (scrollmaxheight * viewableRatio < rowheight * 2) ? rowheight * 2 : (scrollmaxheight * viewableRatio);
+                button4.Size = new Size(rowheight, (int)(thumbHeight + 0.5));
+                if (pos < 0)
+                {
+                    button4.Location = new Point(startscrollX, (int)(startscrollY + Position * ((scrollmaxheight - thumbHeight) / (mf.bnd.bndArr.Count - items)) + 0.5));
+                }
+                else
+                {
+                    button4.Location = new Point(startscrollX, (int)(startscrollY + pos));
+                }
+            }
+        }
+
         private void UpdateChart()
         {
             int field = 1;
             int inner = 1;
 
-            for (int i = 0; i < mf.bnd.bndArr.Count + 1 && i < position + 9; i++)
+            for (int i = 0; i <= mf.bnd.bndArr.Count && i <= Position + items; i++)
             {
-                if (i < position && i < mf.bnd.bndArr.Count)
+                if (i < Position && i < mf.bnd.bndArr.Count)
                 {
-                    if (i==0)
-                    {
-                        field += 1;
-                    }
-                    else
-                    {
-                        inner += 1;
-                    }
+                    if (mf.bnd.bndArr[i].isOwnField) field += 1;
+                    else inner += 1;
                 }
                 else
                 {
-                    Control aa = tableLayoutPanel1.GetControlFromPosition(0, i - position);
+                    Control aa = tableLayoutPanel1.GetControlFromPosition(0, i - Position);
                     if (aa == null)
                     {
                         var a = new Button
                         {
                             Margin = new Padding(0),
-                            Size = new Size(280, 40),
-                            Name = string.Format("{0}", i - position),
+                            Size = new Size(280, 50),
+                            Name = string.Format("{0}", i - Position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
                         a.Click += B_Click;
@@ -86,16 +123,16 @@ namespace AgOpenGPS
                         var c = new Button
                         {
                             Margin = new Padding(0),
-                            Size = new System.Drawing.Size(80, 40),
-                            Name = string.Format("{0}", i - position),
+                            Size = new System.Drawing.Size(80, 50),
+                            Name = string.Format("{0}", i - Position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
                         c.Click += DriveThru_Click;
                         var d = new Button
                         {
                             Margin = new Padding(0),
-                            Size = new System.Drawing.Size(80, 40),
-                            Name = string.Format("{0}", i - position),
+                            Size = new System.Drawing.Size(80, 50),
+                            Name = string.Format("{0}", i - Position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
                         d.Click += DriveAround_Click;
@@ -103,53 +140,51 @@ namespace AgOpenGPS
                         var e = new Button
                         {
                             Margin = new Padding(0),
-                            Size = new System.Drawing.Size(80, 40),
-                            Name = string.Format("{0}", i - position),
+                            Size = new System.Drawing.Size(80, 50),
+                            Name = string.Format("{0}", i - Position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
                         e.Click += OwnField_Click;
 
-
-                        tableLayoutPanel1.Controls.Add(a, 0, i - position);
-                        tableLayoutPanel1.Controls.Add(c, 2, i - position);
-                        tableLayoutPanel1.Controls.Add(d, 3, i - position);
-                        tableLayoutPanel1.Controls.Add(e, 4, i - position);
+                        tableLayoutPanel1.Controls.Add(a, 0, i - Position);
+                        tableLayoutPanel1.Controls.Add(c, 2, i - Position);
+                        tableLayoutPanel1.Controls.Add(d, 3, i - Position);
+                        tableLayoutPanel1.Controls.Add(e, 4, i - Position);
                     }
 
-                    if (i < mf.bnd.bndArr.Count)
+                    if (i < mf.bnd.bndArr.Count && i < Position + items)
                     {
                         tableLayoutPanel1.SetColumnSpan(aa, 1);
 
-                        Control bb = tableLayoutPanel1.GetControlFromPosition(1, i - position);
+                        Control bb = tableLayoutPanel1.GetControlFromPosition(1, i - Position);
                         if (bb == null)
                         {
                             var b = new Button
                             {
                                 Margin = new Padding(0),
-                                Size = new System.Drawing.Size(150, 40),
-                                Name = string.Format("{0}", i - position),
-                                TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+                                Size = new System.Drawing.Size(150, 50),
+                                TextAlign = ContentAlignment.MiddleCenter,
+                                Name = string.Format("{0}", i - Position),
                             };
                             b.Click += B_Click;
                             b.FlatStyle = FlatStyle.Flat;
                             b.FlatAppearance.BorderColor = BackColor;
                             b.FlatAppearance.MouseOverBackColor = BackColor;
                             b.FlatAppearance.MouseDownBackColor = BackColor;
-                            tableLayoutPanel1.Controls.Add(b, 1, i - position);
+                            tableLayoutPanel1.Controls.Add(b, 1, i - Position);
                             bb = b;
                         }
-                        Control cc = tableLayoutPanel1.GetControlFromPosition(2, i - position);
+                        Control cc = tableLayoutPanel1.GetControlFromPosition(2, i - Position);
                         cc.Visible = true;
-                        Control dd = tableLayoutPanel1.GetControlFromPosition(3, i - position);
+                        Control dd = tableLayoutPanel1.GetControlFromPosition(3, i - Position);
                         dd.Visible = true;
-                        Control ee = tableLayoutPanel1.GetControlFromPosition(4, i - position);
+                        Control ee = tableLayoutPanel1.GetControlFromPosition(4, i - Position);
                         ee.Visible = true;
 
                         Font backupfont = new Font(aa.Font.FontFamily, 18F, FontStyle.Bold);
 
                         if (mf.bnd.bndArr[i].isOwnField)
                         {
-                            //cc.Text = "Field";
                             aa.Text = string.Format(gStr.gsOuter + " {0}", field);
                             field += 1;
                             cc.Enabled = false;
@@ -164,7 +199,6 @@ namespace AgOpenGPS
                         }
                         else
                         {
-                            //cc.Text = "Inner";
                             aa.Text = string.Format(gStr.gsInner + " {0}", inner);
                             inner += 1;
                             cc.Enabled = true;
@@ -204,7 +238,7 @@ namespace AgOpenGPS
                     }
                     else
                     {
-                        Control bb = tableLayoutPanel1.GetControlFromPosition(0, i - position);
+                        Control bb = tableLayoutPanel1.GetControlFromPosition(0, i - Position);
                         //delete rest of buttons
                         while (true)
                         {
@@ -225,6 +259,7 @@ namespace AgOpenGPS
             btnDelete.Enabled = false;
 
             //update the list view with real data
+            UpdateScroll(-1);
             UpdateChart();
             nudBndOffset.Value = (decimal)(mf.tool.toolWidth * 0.5);
         }
@@ -233,7 +268,7 @@ namespace AgOpenGPS
         {
             if (sender is Button b)
             {
-                int pos = Convert.ToInt32(b.Name) + position;
+                int pos = Convert.ToInt32(b.Name) + Position;
                 mf.bnd.bndArr[pos].isDriveThru = !mf.bnd.bndArr[pos].isDriveThru;
                 UpdateChart();
                 mf.FileSaveBoundary();
@@ -244,7 +279,7 @@ namespace AgOpenGPS
         {
             if (sender is Button b)
             {
-                int pos = Convert.ToInt32(b.Name) + position;
+                int pos = Convert.ToInt32(b.Name) + Position;
                 mf.bnd.bndArr[pos].isDriveAround = !mf.bnd.bndArr[pos].isDriveAround;
                 UpdateChart();
                 mf.FileSaveBoundary();
@@ -255,13 +290,18 @@ namespace AgOpenGPS
         {
             if (sender is Button b)
             {
-                int pos = Convert.ToInt32(b.Name) + position;
+                int pos = Convert.ToInt32(b.Name) + Position;
 
                 mf.bnd.bndArr[pos].isOwnField = !mf.bnd.bndArr[pos].isOwnField;
 
-                //mf.bnd.bndArr[pos].CalculateBoundaryArea();
-                //mf.gf.BuildGeoFenceLines(pos);
-                //mf.turn.BuildTurnLines(pos);
+
+
+                mf.turn.BuildTurnLines(pos);
+                mf.gf.BuildGeoFenceLines(pos);
+
+                mf.fd.UpdateFieldBoundaryGUIAreas();
+                mf.mazeGrid.BuildMazeGridArray();
+                mf.CalculateMinMax();
 
                 UpdateChart();
                 mf.FileSaveBoundary();
@@ -273,7 +313,7 @@ namespace AgOpenGPS
             if (sender is Button b)
             {
 
-                mf.bnd.boundarySelected = Convert.ToInt32(b.Name) + position;
+                mf.bnd.boundarySelected = Convert.ToInt32(b.Name) + Position;
 
                 Selectedreset = false;
 
@@ -313,16 +353,21 @@ namespace AgOpenGPS
             if (mf.bnd.bndArr.Count == 0) mf.hd.isOn = false;
 
             mf.bnd.boundarySelected = -1;
+
+            if (Position + items >= mf.bnd.bndArr.Count) Position--;
+            if (Position < 0) Position = 0;
+
             Selectedreset = true;
             mf.fd.UpdateFieldBoundaryGUIAreas();
             mf.mazeGrid.BuildMazeGridArray();
 
             UpdateChart();
+            UpdateScroll(-1);
         }
 
         private void ResetAllBoundary()
         {
-            position = 0;
+            Position = 0;
 
             mf.bnd.bndArr.Clear();
             mf.turn.turnArr.Clear();
@@ -334,6 +379,7 @@ namespace AgOpenGPS
             tableLayoutPanel1.RowStyles.Clear();
 
             UpdateChart();
+            UpdateScroll(-1);
 
             btnDelete.Enabled = false;
         }
@@ -348,7 +394,7 @@ namespace AgOpenGPS
         private void NudBndOffset_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
-            btnCancel.Focus();
+            //btnCancel.Focus();
         }
 
         private void BtnGo_Click(object sender, EventArgs e)
@@ -358,7 +404,6 @@ namespace AgOpenGPS
 
             this.DialogResult = DialogResult.OK;
         }
-
 
         private void BtnDeleteAll_Click(object sender, EventArgs e)
         {
@@ -375,6 +420,96 @@ namespace AgOpenGPS
             mf.mazeGrid.BuildMazeGridArray();
 
         }
+
+        private void Up_Scroll_Click(object sender, EventArgs e)
+        {
+            if (Position > 0) Position--;
+            UpdateChart();
+            UpdateScroll(-1);
+        }
+
+        private void Down_Scroll_Click(object sender, EventArgs e)
+        {
+            if (Position + items < mf.bnd.bndArr.Count) Position++;
+            UpdateChart();
+            UpdateScroll(-1);
+        }
+
+        void MouseWheel_Scroll(object sender, MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                if (Position > 0) Position -= (e.Delta / 120);
+            }
+            else
+            {
+                if (Position + items < mf.bnd.bndArr.Count) Position -= (e.Delta / 120);
+            }
+            UpdateChart();
+            UpdateScroll(-1);
+        }
+
+        void Mouse_Down(object sender, MouseEventArgs e)
+        {
+            oldY = MousePosition.Y;
+            scroll = true;
+        }
+
+        void Mouse_Up(object sender, MouseEventArgs e)
+        {
+            scroll = false;
+        }
+
+        void Mouse_Leave(object sender, EventArgs e)
+        {
+            scroll = false;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        void Mouse_Move(object sender, MouseEventArgs e)
+        {
+            if (scroll == true && viewableRatio < 1)
+            {
+                if (!(oldY == MousePosition.Y))
+                {
+                    if (button4.Location.Y + (MousePosition.Y - oldY) > startscrollY)
+                    {
+                        if ((button4.Location.Y + (MousePosition.Y - oldY)) < (startscrollY + scrollmaxheight - thumbHeight))
+                        {
+
+                            Position = (int)(((button4.Location.Y + MousePosition.Y - oldY) - startscrollY) / ((scrollmaxheight - thumbHeight) / (mf.bnd.bndArr.Count - items)) + 0.5);
+
+
+
+                            UpdateScroll((button4.Location.Y + (MousePosition.Y - oldY) - startscrollY));
+                        }
+                        else
+                        {
+                            Position = mf.bnd.bndArr.Count - items;
+                            UpdateScroll(scrollmaxheight - thumbHeight);
+                        }
+                    }
+                    else
+                    {
+                        Position = 0;
+                        UpdateScroll(0);
+                    }
+                    if (Position != oldposition)
+                    {
+                        oldposition = Position;
+                        UpdateChart();
+                    }
+                    oldY = MousePosition.Y;
+                }
+            }
+        }
+
+
+
 
         private void BtnLoadBoundaryFromGE_Click(object sender, EventArgs e)
         {
@@ -483,17 +618,17 @@ namespace AgOpenGPS
                                     {
                                         mf.bnd.bndArr[i].isOwnField = (i == 0) ? true : false;
 
-                                        //mf.StartWorker(true, i);
+                                        mf.StartWorker(true, i);
 
                                         //fix the points if there are gaps bigger then
-                                        mf.bnd.bndArr[i].FixBoundaryLine(mf.tool.toolWidth);
-                                        mf.bnd.bndArr[i].PreCalcBoundaryLines();
-                                        mf.bnd.bndArr[i].CalculateBoundaryArea();
-                                        mf.bnd.bndArr[i].CalculateBoundaryWinding();
+                                        //mf.bnd.bndArr[i].FixBoundaryLine(mf.tool.toolWidth);
+                                        //mf.bnd.bndArr[i].PreCalcBoundaryLines();
+                                        //mf.bnd.bndArr[i].CalculateBoundaryArea();
+                                        //mf.bnd.bndArr[i].CalculateBoundaryWinding();
 
 
-                                        mf.turn.BuildTurnLines(i);
-                                        mf.gf.BuildGeoFenceLines(i);
+                                        //mf.turn.BuildTurnLines(i);
+                                        //mf.gf.BuildGeoFenceLines(i);
 
                                         coordinates = "";
                                         i++;
@@ -516,11 +651,12 @@ namespace AgOpenGPS
                                 }
                             }
                         }
-                        mf.fd.UpdateFieldBoundaryGUIAreas();
-                        mf.mazeGrid.BuildMazeGridArray();
+                        //mf.fd.UpdateFieldBoundaryGUIAreas();
+                        //mf.mazeGrid.BuildMazeGridArray();
 
                         mf.FileSaveBoundary();
                         UpdateChart();
+                        UpdateScroll(-1);
                     }
                     catch (Exception)
                     {

@@ -159,7 +159,7 @@ namespace AgOpenGPS
             }
         }
 
-        public bool IsPointInTramBndArea(vec2 testPointv2)
+        public bool IsPointInTramBndArea(vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = outArr.Count - 1;
@@ -168,10 +168,10 @@ namespace AgOpenGPS
             //test against the constant and multiples list the test point
             for (int i = 0; i < outArr.Count; j = i++)
             {
-                if ((outArr[i].northing < testPointv2.northing && outArr[j].northing >= testPointv2.northing)
-                ||  (outArr[j].northing < testPointv2.northing && outArr[i].northing >= testPointv2.northing))
+                if ((outArr[i].northing < TestPoint.northing && outArr[j].northing >= TestPoint.northing)
+                ||  (outArr[j].northing < TestPoint.northing && outArr[i].northing >= TestPoint.northing))
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
                 }
             }
             return oddNodes; //true means inside.

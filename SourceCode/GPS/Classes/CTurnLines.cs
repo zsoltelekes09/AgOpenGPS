@@ -49,7 +49,7 @@ namespace AgOpenGPS
         {
             //count the points from the boundary
             int lineCount = turnLine.Count;
-            double distance = 0;
+            double distance;
 
             //int headCount = mf.bndArr[inTurnNum].bndLine.Count;
             int bndCount = curBnd.Count;
@@ -69,7 +69,7 @@ namespace AgOpenGPS
                     }
                 }
             }
-
+            /*
             //make sure distance isn't too small between points on turnLine
             bndCount = turnLine.Count;
 
@@ -84,7 +84,9 @@ namespace AgOpenGPS
                     i--;
                 }
             }
+            
 
+            */
             //make sure distance isn't too big between points on Turn
             bndCount = turnLine.Count;
             for (int i = 0; i < bndCount; i++)
@@ -102,7 +104,6 @@ namespace AgOpenGPS
                 }
             }
 
-            //make sure headings are correct for calculated points
 
             //Tate Button contributed this bug fix.
             if (turnLine.Count > 0)
@@ -155,42 +156,42 @@ namespace AgOpenGPS
             }
         }
 
-        public bool IsPointInTurnWorkArea(vec3 testPointv3)
+        public bool IsPointInTurnWorkArea(vec3 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = turnLine.Count - 1;
             bool oddNodes = false;
 
-            if (testPointv3.northing > Northingmin || testPointv3.northing < Northingmax || testPointv3.easting > Eastingmin || testPointv3.easting < Eastingmax)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
                 //test against the constant and multiples list the test point
                 for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    if ((turnLine[i].northing < testPointv3.northing && turnLine[j].northing >= testPointv3.northing)
-                    || (turnLine[j].northing < testPointv3.northing && turnLine[i].northing >= testPointv3.northing))
+                    if ((turnLine[i].northing < TestPoint.northing && turnLine[j].northing >= TestPoint.northing)
+                    || (turnLine[j].northing < TestPoint.northing && turnLine[i].northing >= TestPoint.northing))
                     {
-                        oddNodes ^= ((testPointv3.northing * calcList[i].northing) + calcList[i].easting < testPointv3.easting);
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
                     }
                 }
             }
             return oddNodes; //true means inside.
         }
 
-        public bool IsPointInTurnWorkArea(vec2 testPointv2)
+        public bool IsPointInTurnWorkArea(vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = turnLine.Count - 1;
             bool oddNodes = false;
 
-            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
                 //test against the constant and multiples list the test point
                 for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    if ((turnLine[i].northing < testPointv2.northing && turnLine[j].northing >= testPointv2.northing)
-                    || (turnLine[j].northing < testPointv2.northing && turnLine[i].northing >= testPointv2.northing))
+                    if ((turnLine[i].northing < TestPoint.northing && turnLine[j].northing >= TestPoint.northing)
+                    || (turnLine[j].northing < TestPoint.northing && turnLine[i].northing >= TestPoint.northing))
                     {
-                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
                     }
                 }
             }

@@ -1031,31 +1031,6 @@ namespace AgOpenGPS
                                 }
                                 GetOutHdOn:
 
-                                //    //is headline in base to off area
-                                //    tagged = 0;
-                                //    mOn = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-
-                                //    start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                                //    end = section[j].rpSectionWidth - 1 + start;
-
-                                //    for (int pos = start; pos <= end; pos++)
-                                //    {
-                                //        endHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                                //        for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                                //        {
-                                //            if (grnPixels[a] == 250)
-                                //            {
-                                //                //tagged++;
-                                //                //if (tagged > tool.toolMinUnappliedPixels)
-                                //                {
-                                //                    isHeadlandInLookOff = true;
-                                //                    goto GetOutHdOff;
-                                //                }
-                                //            }
-                                //        }
-                                //    }
-                                //GetOutHdOff:
 
 
                                 if (section[j].isSectionRequiredOn && section[j].isLookOnInHeadland && !isHeadlandInLookOn)
@@ -1235,7 +1210,7 @@ namespace AgOpenGPS
 
 
             testNMEAb.Stop();
-
+            testNMEA1b = testNMEAb.ElapsedTicks;
 
 
 
@@ -1269,7 +1244,7 @@ namespace AgOpenGPS
 
             for (int i = 0; i < bnd.bndArr.Count; i++)
             {
-                if (bnd.bndArr[i].isOwnField)
+                if (bnd.bndArr[i].isOwnField && (i == bnd.LastBoundary || bnd.LastBoundary == -1))
                 {
                     if (hd.isOn && hd.headArr[i].HeadLine.Count > 0) hd.headArr[i].DrawHeadBackBuffer();
                     else bnd.bndArr[i].DrawBoundaryBackBuffer();
@@ -1289,9 +1264,9 @@ namespace AgOpenGPS
 
 
             //patch color
-            //GL.Color4(0.0, 0.1, 0.0, 0.1);
+            GL.Color4(0.0, 0.1, 0.0, 0.1);
 
-            GL.Color3(0.0, 0.1, 0.0);
+            //GL.Color3(0.0, 0.1, 0.0);
             //to draw or not the triangle patch
 
 
@@ -1435,16 +1410,11 @@ namespace AgOpenGPS
                                     totalPixs++;
                                     if (GreenPixels[a] == 255 || (bnd.bndArr.Count == 0 && GreenPixels[a] == 0))
                                     {
-                                        if (++tagged > tool.toolMinUnappliedPixels)
-                                        {
-                                            goto GetOutTool;
-                                        }
+                                        ++tagged;
                                     }
                                 }
                             }
                         }
-
-                        GetOutTool:
 
                         if (tagged != 0 && (tagged * 100) / totalPixs > tool.toolMinUnappliedPixels)
                         {
@@ -1495,7 +1465,6 @@ namespace AgOpenGPS
             testNMEAa.Stop();
 
             testNMEA1a = testNMEAa.ElapsedTicks;
-            testNMEA1b = testNMEAb.ElapsedTicks;
 
 
 

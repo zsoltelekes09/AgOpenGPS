@@ -14,42 +14,42 @@ namespace AgOpenGPS
 
         public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
-        public bool IsPointInGeoFenceArea(vec3 testPointv2)
+        public bool IsPointInGeoFenceArea(vec3 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = geoFenceLine.Count - 1;
             bool oddNodes = false;
 
-            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
                 //test against the constant and multiples list the test point
                 for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
-                    || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                    if ((geoFenceLine[i].northing < TestPoint.northing && geoFenceLine[j].northing >= TestPoint.northing)
+                    || (geoFenceLine[j].northing < TestPoint.northing && geoFenceLine[i].northing >= TestPoint.northing))
                     {
-                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
                     }
                 }
             }
             return oddNodes; //true means inside.
         }
 
-        public bool IsPointInGeoFenceArea(vec2 testPointv2)
+        public bool IsPointInGeoFenceArea(vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = geoFenceLine.Count - 1;
             bool oddNodes = false;
 
-            if (testPointv2.northing > Northingmin || testPointv2.northing < Northingmax || testPointv2.easting > Eastingmin || testPointv2.easting < Eastingmax)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
                 //test against the constant and multiples list the test point
                 for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
-                    || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                    if ((geoFenceLine[i].northing < TestPoint.northing && geoFenceLine[j].northing >= TestPoint.northing)
+                    || (geoFenceLine[j].northing < TestPoint.northing && geoFenceLine[i].northing >= TestPoint.northing))
                     {
-                        oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
                     }
                 }
             }

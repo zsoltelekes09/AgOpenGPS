@@ -267,6 +267,7 @@ namespace AgOpenGPS
 
                 turn.BuildTurnLines(genericlist.Item2);
                 gf.BuildGeoFenceLines(genericlist.Item2);
+                CalculateMinMax();
             }
             else
             {

@@ -592,10 +592,10 @@ namespace AgOpenGPS
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
 
-                //mf.StartWorker(false, Boundary);
+                mf.StartWorker(false, Boundary);
 
-                mf.hd.headArr[Boundary].PreCalcHeadArea();
-                mf.hd.headArr[Boundary].PreCalcHeadLines();
+                //mf.hd.headArr[Boundary].PreCalcHeadArea();
+                //mf.hd.headArr[Boundary].PreCalcHeadLines();
             }
 
             Boundary++;
@@ -637,9 +637,9 @@ namespace AgOpenGPS
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
                 }
 
-                //mf.StartWorker(false, Boundary);
-                mf.hd.headArr[Boundary].PreCalcHeadArea();
-                mf.hd.headArr[Boundary].PreCalcHeadLines();
+                mf.StartWorker(false, Boundary);
+                //mf.hd.headArr[Boundary].PreCalcHeadArea();
+                //mf.hd.headArr[Boundary].PreCalcHeadLines();
             }
 
             Boundary--;
@@ -737,9 +737,9 @@ namespace AgOpenGPS
                     else mf.hd.headArr[Boundary].isDrawList.Add(false);
 
                 }
-                //mf.StartWorker(false, Boundary);
-                mf.hd.headArr[Boundary].PreCalcHeadArea();
-                mf.hd.headArr[Boundary].PreCalcHeadLines();
+                mf.StartWorker(false, Boundary);
+                //mf.hd.headArr[Boundary].PreCalcHeadArea();
+                //mf.hd.headArr[Boundary].PreCalcHeadLines();
             }
             mf.FileSaveHeadland();
             Close();
