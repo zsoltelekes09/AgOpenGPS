@@ -168,8 +168,9 @@ namespace AgOpenGPS
                                 //read header
                                 line = reader.ReadLine();//Boundary
 
-                                if (!reader.EndOfStream) //empty boundary field
+                                for (int k = 0; true; k++)
                                 {
+                                    if (reader.EndOfStream) break;
                                     //True or False OR points from older boundary files
                                     line = reader.ReadLine();
 
@@ -183,6 +184,13 @@ namespace AgOpenGPS
                                     //Check for latest boundary files, then above line string is num of points
                                     if (line == "True" || line == "False")
                                     {
+                                        line = reader.ReadLine(); //number of points
+                                    }
+
+                                    //Check for latest boundary files, then above line string is num of points
+                                    if (line == "True" || line == "False")
+                                    {
+                                        line = reader.ReadLine(); //number of points
                                         line = reader.ReadLine(); //number of points
                                     }
 
@@ -223,12 +231,13 @@ namespace AgOpenGPS
                                         if (oddNodes)
                                         {
                                             numFields++;
-                                            if (string.IsNullOrEmpty(infieldList))
-                                                infieldList += Path.GetFileName(dir); 
-                                            else
-                                                infieldList += "," + Path.GetFileName(dir);
+                                            if (string.IsNullOrEmpty(infieldList)) infieldList += Path.GetFileName(dir);
+                                            else infieldList += "," + Path.GetFileName(dir);
+                                            break;
                                         }
                                     }
+
+                                    if (reader.EndOfStream) break;
                                 }
                             }
                             catch (Exception)

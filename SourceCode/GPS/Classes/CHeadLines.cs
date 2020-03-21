@@ -77,64 +77,6 @@ namespace AgOpenGPS
             }
         }
 
-
-
-
-
-
-
-
-
-        //!speed
-        public bool IsPointInHeadArea(vec3 TestPoint)
-        {
-            if (calcList.Count < 3) return false;
-            int j = HeadLine.Count - 1;
-            bool oddNodes = false;
-
-            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
-            {
-                //test against the constant and multiples list the test point
-                for (int i = 0; i < HeadLine.Count; j = i++)
-                {
-                    if ((HeadLine[i].northing < TestPoint.northing && HeadLine[j].northing >= TestPoint.northing)
-                    || (HeadLine[j].northing < TestPoint.northing && HeadLine[i].northing >= TestPoint.northing))
-                    {
-                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
-                    }
-                }
-            }
-            return oddNodes; //true means inside.
-        }
-
-
-        //!speed
-        public bool IsPointInHeadArea(vec2 TestPoint)
-        {
-            if (calcList.Count < 3) return false;
-            int j = HeadLine.Count - 1;
-            bool oddNodes = false;
-
-            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
-            {
-                //test against the constant and multiples list the test point
-                for (int i = 0; i < HeadLine.Count; j = i++)
-                {
-                    if ((HeadLine[i].northing < TestPoint.northing && HeadLine[j].northing >= TestPoint.northing)
-                    || (HeadLine[j].northing < TestPoint.northing && HeadLine[i].northing >= TestPoint.northing))
-                    {
-                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
-                    }
-                }
-            }
-            return oddNodes; //true means inside.
-        }
-
-
-
-
-
-
         public void PreCalcHeadLines()
         {
             int j = HeadLine.Count - 1;
@@ -170,14 +112,6 @@ namespace AgOpenGPS
                 }
             }
         }
-
-
-
-
-
-
-
-
 
         public void DrawHeadBackBuffer()
         {
@@ -215,59 +149,6 @@ namespace AgOpenGPS
                     int index = _tess.Elements[i * 3 + k];
                     if (index == -1) continue;
                     HeadArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
-                }
-            }
-        }
-
-
-
-
-
-
-
-        //!speed
-        public void DrawHeadLineBackBuffer()
-        {
-            if (HeadLine.Count < 2) return;
-            int ptCount = HeadLine.Count;
-            int cntr = 0;
-            if (ptCount > 1)
-            {
-                GL.LineWidth(3);
-                GL.Color3((byte)0, (byte)250, (byte)0);
-
-                while (cntr < ptCount)
-                {
-                    if (isDrawList.Count > cntr)
-                    {
-                        if (isDrawList[cntr])
-                        {
-                            GL.Begin(PrimitiveType.LineStrip);
-
-                            if (cntr > 0) GL.Vertex3(HeadLine[cntr - 1].easting, HeadLine[cntr - 1].northing, 0);
-                            else GL.Vertex3(HeadLine[HeadLine.Count - 1].easting, HeadLine[HeadLine.Count - 1].northing, 0);
-
-
-                            for (int i = cntr; i < ptCount; i++)
-                            {
-                                cntr++;
-                                if (!isDrawList[i]) break;
-                                GL.Vertex3(HeadLine[i].easting, HeadLine[i].northing, 0);
-                            }
-                            if (cntr < ptCount - 1)
-                                GL.Vertex3(HeadLine[cntr + 1].easting, HeadLine[cntr + 1].northing, 0);
-
-                            GL.End();
-                        }
-                        else
-                        {
-                            cntr++;
-                        }
-                    }
-                    else
-                    {
-                        cntr++;
-                    }
                 }
             }
         }

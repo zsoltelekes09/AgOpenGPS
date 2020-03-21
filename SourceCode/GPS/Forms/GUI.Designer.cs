@@ -594,13 +594,8 @@ namespace AgOpenGPS
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
 
             testHalfSecond1 = testHalfSecond.ElapsedMilliseconds;
-            //lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
-            //lblHz2.Text = (int)(FrameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1a.ToString();
-
-            lblHz.Text = lasta.ToString("N3") + "\r\n" + lastb.ToString("N3");
-            lblHz2.Text = lastc.ToString("N0") + "t " + "\r\n" + lastd.ToString("N0") + "t " + ((100.0 / lastc) * lastd).ToString("N1");
-
-
+            lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
+            lblHz2.Text = (int)(FrameTime) + "\r\n" + testHalfSecond1.ToString() + " " + testOneSecond1.ToString() + " " + testThreeSecond1.ToString() + " " + testNMEA1.ToString();
 
             HalfSecondUpdate.Enabled = true;
         }

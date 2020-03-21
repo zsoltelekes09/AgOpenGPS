@@ -22,13 +22,6 @@ namespace AgOpenGPS
         public double lookAheadDistanceOnPixelsLeft, lookAheadDistanceOnPixelsRight;
         public double lookAheadDistanceOffPixelsLeft, lookAheadDistanceOffPixelsRight;
 
-
-        //!speed
-        public bool isLeftSideInHeadland = true, isRightSideInHeadland = true;
-
-        public bool isSuperSectionAllowedOn;
-
-
         public bool isToolTrailing, isToolTBT;
         public bool isToolBehindPivot;
         public string toolAttachType;

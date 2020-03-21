@@ -163,10 +163,6 @@ namespace AgOpenGPS
 
             }
 
-
-
-            CalculateSectionLookAhead(toolPos.northing, toolPos.easting, cosSectionHeading, sinSectionHeading);
-
             //test if travelled far enough for new boundary point
             if (glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryPoint();
 
@@ -499,8 +495,8 @@ namespace AgOpenGPS
             #endregion
 
             //update main window
-            oglMain.MakeCurrent();
-            oglMain.Refresh();
+            //oglBack.MakeCurrent();
+            oglBack.Refresh();
 
             //end of UppdateFixPosition
             swFrame.Stop();
@@ -910,9 +906,6 @@ namespace AgOpenGPS
                 else section[j].speedPixels = rightSpeed * 0.36;
             }
 
-            testNMEAa.Restart();
-            testNMEAa.Start();
-
             //fill in tool positions
             section[tool.numOfSections].leftPoint = section[0].leftPoint;
             section[tool.numOfSections].rightPoint = section[tool.numOfSections-1].rightPoint;
@@ -924,166 +917,6 @@ namespace AgOpenGPS
             tool.lookAheadDistanceOnPixelsRight =   Math.Min(tool.toolFarRightSpeed * tool.LookAheadOnSetting * 10, 200);
             tool.lookAheadDistanceOffPixelsLeft =   Math.Min(tool.toolFarLeftSpeed * tool.LookAheadOffSetting * 10, 160);
             tool.lookAheadDistanceOffPixelsRight =  Math.Min(tool.toolFarRightSpeed * tool.LookAheadOffSetting * 10, 160);
-
-
-            testNMEAa.Stop();
-
-
-
-
-
-
-            //!speed
-
-            testNMEAb.Restart();
-            testNMEAb.Start();
-
-
-
-
-            //set the look ahead for hyd Lift in pixels per second
-            vehicle.hydLiftLookAheadDistanceLeft = tool.toolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10;
-            vehicle.hydLiftLookAheadDistanceRight = tool.toolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10;
-
-            if (vehicle.hydLiftLookAheadDistanceLeft > 200) vehicle.hydLiftLookAheadDistanceLeft = 200;
-            if (vehicle.hydLiftLookAheadDistanceRight > 200) vehicle.hydLiftLookAheadDistanceRight = 200;
-
-            tool.lookAheadDistanceOnPixelsLeft = tool.toolFarLeftSpeed * tool.LookAheadOnSetting * 10;
-            tool.lookAheadDistanceOnPixelsRight = tool.toolFarRightSpeed * tool.LookAheadOnSetting * 10;
-
-            if (tool.lookAheadDistanceOnPixelsLeft > 200) tool.lookAheadDistanceOnPixelsLeft = 200;
-            if (tool.lookAheadDistanceOnPixelsRight > 200) tool.lookAheadDistanceOnPixelsRight = 200;
-
-            tool.lookAheadDistanceOffPixelsLeft = tool.toolFarLeftSpeed * tool.LookAheadOffSetting * 10;
-            tool.lookAheadDistanceOffPixelsRight = tool.toolFarRightSpeed * tool.LookAheadOffSetting * 10;
-
-            if (tool.lookAheadDistanceOffPixelsLeft > 160) tool.lookAheadDistanceOffPixelsLeft = 160;
-            if (tool.lookAheadDistanceOffPixelsRight > 160) tool.lookAheadDistanceOffPixelsRight = 160;
-
-
-
-            //determine where the tool is wrt to headland
-            if (hd.isOn)
-            {
-                if (hd.headArr[0].HeadLine.Count == 0)
-                {
-                    return;
-                }
-                else
-                {
-                    bool isLeftInWk, isRightInWk = true;
-
-                    if (hd.isOn)
-                    {
-                        for (int j = 0; j < tool.numOfSections; j++)
-                        {
-                            if (j == 0)
-                            {
-                                //only one first left point, the rest are all rights moved over to left
-                                isLeftInWk = hd.headArr[0].IsPointInHeadArea(section[j].leftPoint);
-                                isRightInWk = hd.headArr[0].IsPointInHeadArea(section[j].rightPoint);
-
-                                //save left side
-                                tool.isLeftSideInHeadland = !isLeftInWk;
-
-                                //merge the two sides into in or out
-                                section[j].isInHeadlandArea = !isLeftInWk && !isRightInWk;
-
-                            }
-                            else
-                            {
-                                //grab the right of previous section, its the left of this section
-                                isLeftInWk = isRightInWk;
-                                isRightInWk = hd.headArr[0].IsPointInHeadArea(section[j].rightPoint);
-
-                                section[j].isInHeadlandArea = !isLeftInWk && !isRightInWk;
-                            }
-                        }
-
-                        //save right side
-                        tool.isRightSideInHeadland = !isRightInWk;
-
-                        //is the tool in or out based on endpoints
-                        hd.isToolOuterPointsInHeadland = tool.isLeftSideInHeadland && tool.isRightSideInHeadland;
-                    }
-                    else
-                    {
-                        //set all to true;
-                        hd.isToolOuterPointsInHeadland = true;
-                    }
-                }
-            }
-
-            //set up the super for youturn
-            section[tool.numOfSections].isInBoundary = true;
-
-            //determine if section is in boundary and headland using the section left/right positions
-            bool isLeftIn = true, isRightIn = true;
-
-            for (int j = 0; j < tool.numOfSections; j++)
-            {
-                if (bnd.bndArr.Count > 0)
-                {
-                    if (j == 0)
-                    {
-                        //only one first left point, the rest are all rights moved over to left
-                        isLeftIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].leftPoint);
-                        isRightIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].rightPoint);
-
-                        for (int i = 1; i < bnd.bndArr.Count; i++)
-                        {
-                            //inner boundaries should normally NOT have point inside
-                                isLeftIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].leftPoint);
-                                isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
-                        }
-
-                        //merge the two sides into in or out
-                        if (isLeftIn && isRightIn) section[j].isInBoundary = true;
-                        else section[j].isInBoundary = false;
-                    }
-
-                    else
-                    {
-                        //grab the right of previous section, its the left of this section
-                        isLeftIn = isRightIn;
-                        isRightIn = bnd.bndArr[0].IsPointInsideBoundary(section[j].rightPoint);
-                        for (int i = 1; i < bnd.bndArr.Count; i++)
-                        {
-                            //inner boundaries should normally NOT have point inside
-                            isRightIn &= !bnd.bndArr[i].IsPointInsideBoundary(section[j].rightPoint);
-                        }
-
-                        if (isLeftIn && isRightIn) section[j].isInBoundary = true;
-                        else section[j].isInBoundary = false;
-                    }
-                    section[tool.numOfSections].isInBoundary &= section[j].isInBoundary;
-
-                }
-
-                //no boundary created so always inside
-                else
-                {
-                    section[j].isInBoundary = true;
-                    section[tool.numOfSections].isInBoundary = false;
-                }
-            }
-
-
-
-
-            testNMEAb.Stop();
-
-
-
-
-
-
-
-
-
-
-
-
         }
 
         //the start of first few frames to initialize entire program
@@ -1105,19 +938,17 @@ namespace AgOpenGPS
             //Draw a grid once we know where in the world we are.
             worldGrid.CreateWorldGrid(0, 0);
 
-
-
             //in radians
             fixHeading = Math.Atan2(pn.fix.easting - stepFixPts[totalFixSteps - 1].easting, pn.fix.northing - stepFixPts[totalFixSteps - 1].northing);
             if (fixHeading < 0) fixHeading += glm.twoPI;
             toolPos.heading = fixHeading;
 
-                //send out initial zero settings
-                //set up the modules
+            //send out initial zero settings
+            //set up the modules
             mc.ResetAllModuleCommValues();
 
-                    SendSteerSettingsOutAutoSteerPort();
-                    //SendArduinoSettingsOutToAutoSteerPort();
+            SendSteerSettingsOutAutoSteerPort();
+            //SendArduinoSettingsOutToAutoSteerPort();
 
             IsBetweenSunriseSunset(pn.latitude, pn.longitude);
 
@@ -1129,8 +960,7 @@ namespace AgOpenGPS
 
                 if (isAutoDayNight)
                 {
-                    isDay = isDayTime;
-                    isDay = !isDay;
+                    isDay = !isDayTime;
                     SwapDayNightMode();
                 }
             isGPSPositionInitialized = true;

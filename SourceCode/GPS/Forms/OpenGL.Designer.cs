@@ -54,6 +54,9 @@ namespace AgOpenGPS
         StringBuilder sb = new StringBuilder();
         private void oglMain_Paint(object sender, PaintEventArgs e)
         {
+
+            oglMain.MakeCurrent();
+
             if (recvCounter > 133)
             {
                 GL.Enable(EnableCap.Blend);
@@ -483,9 +486,6 @@ namespace AgOpenGPS
 
                     if (LeftMouseDownOnOpenGL) MakeFlagMark();
 
-                    //draw the section control window off screen buffer
-                    oglBack.Refresh();
-
                     //draw the zoom window
                     if (isJobStarted)
                     {
@@ -521,705 +521,15 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Modelview);
         }
 
-
-        //!speed
-        private bool isHeadlandClose = false, isBoundaryClose = false;
-
-
-
-
-
         private void oglBack_Paint(object sender, PaintEventArgs e)
         {
-            byte[] GreenPixels = new byte[250001];
+            oglBack.MakeCurrent();
 
             double mOn, mOff;
             int start, end, tagged, rpHeight, totalPixs;
             bool isDraw;
 
-
-            //testNMEAb.Restart();
-            testNMEAb.Start();
-
-
-
-            oglBack.MakeCurrent();
-
-            GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-            GL.LoadIdentity();					// Reset The View
-
-            //back the camera up
-            GL.Translate(0, 0, -480);
-
-            //rotate camera so heading matched fix heading in the world
-            GL.Rotate(glm.toDegrees(toolPos.heading), 0, 0, 1);
-
-            //translate to that spot in the world 
-            GL.Translate(-toolPos.easting, -toolPos.northing, 0);
-
-            //patch color
-            GL.Color3(0.0f, 0.5f, 0.0f);
-
-            //calculate the frustum for the section control window
-            CalcFrustum();
-
-
-
-
-
-            //draw patches j= # of sections
-            for (int j = 0; j < tool.numSuperSection; j++)
-            {
-                //every time the section turns off and on is a new patch
-                int patchCount = section[j].patchList.Count;
-
-                if (patchCount > 0)
-                {
-                    //for every new chunk of patch
-                    foreach (var triList in section[j].patchList)
-                    {
-                        isDraw = false;
-                        int count2 = triList.Count;
-                        for (int i = 1; i < count2; i += 3)
-                        {
-                            //determine if point is in frustum or not
-                            if (frustum[0] * triList[i].easting + frustum[1] * triList[i].northing + frustum[3] <= 0)
-                                continue;//right
-                            if (frustum[4] * triList[i].easting + frustum[5] * triList[i].northing + frustum[7] <= 0)
-                                continue;//left
-                            if (frustum[16] * triList[i].easting + frustum[17] * triList[i].northing + frustum[19] <= 0)
-                                continue;//bottom
-                            if (frustum[20] * triList[i].easting + frustum[21] * triList[i].northing + frustum[23] <= 0)
-                                continue;//top
-
-                            //point is in frustum so draw the entire patch
-                            isDraw = true;
-                            break;
-                        }
-
-                        if (isDraw)
-                        {
-                            //draw the triangles in each triangle strip
-                            GL.Begin(PrimitiveType.TriangleStrip);
-                            for (int i = 1; i < count2; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0);
-                            GL.End();
-                        }
-                    }
-                }
-            }
-
-
-            //draw bright green on back buffer
-            if (bnd.bndArr.Count > 0)
-            {
-                ////draw the bnd line 
-                int ptCount = bnd.bndArr[0].bndLine.Count;
-                if (ptCount > 3)
-                {
-                    GL.LineWidth(3);
-                    GL.Color3((byte)0, (byte)240, (byte)0);
-                    GL.Begin(PrimitiveType.LineStrip);
-                    for (int h = 0; h < ptCount; h++) GL.Vertex3(bnd.bndArr[0].bndLine[h].easting, bnd.bndArr[0].bndLine[h].northing, 0);
-                    GL.End();
-                }
-            }
-
-            //draw the headland
-            if (hd.isOn) if (hd.headArr[0].HeadLine.Count > 0 && hd.isOn) hd.headArr[0].DrawHeadLineBackBuffer();
-
-            //finish it up - we need to read the ram of video card
-            GL.Flush();
-
-            //determine farthest ahead lookahead - is the height of the readpixel line
-
-            rpHeight = 0;
-            double rpOnHeight = 0;
-            double rpToolHeight = 0;
-
-            //pick the larger side
-            if (vehicle.hydLiftLookAheadDistanceLeft > vehicle.hydLiftLookAheadDistanceRight) rpToolHeight = vehicle.hydLiftLookAheadDistanceLeft;
-            else rpToolHeight = vehicle.hydLiftLookAheadDistanceRight;
-
-            if (tool.lookAheadDistanceOnPixelsLeft > tool.lookAheadDistanceOnPixelsRight) rpOnHeight = tool.lookAheadDistanceOnPixelsLeft;
-            else rpOnHeight = tool.lookAheadDistanceOnPixelsRight;
-
-            //assume all sections are on and super can be on, if not set false to turn off.
-            tool.isSuperSectionAllowedOn = true;
-            isHeadlandClose = false;
-            isBoundaryClose = false;
-
-            //find any off buttons, any outside of boundary, going backwards, and the farthest lookahead
-            for (int j = 0; j < tool.numOfSections; j++)
-            {
-                if (section[j].BtnSectionState == btnStates.Off) tool.isSuperSectionAllowedOn = false;
-                if (!section[j].isInBoundary) tool.isSuperSectionAllowedOn = false;
-
-                //check if any sections going backwards, section turned off waaay below
-                if (section[j].speedPixels < 0) tool.isSuperSectionAllowedOn = false;
-            }
-
-            //if only one section, or going slow no need for super section 
-            if (tool.numOfSections == 1 | pn.speed < vehicle.slowSpeedCutoff)
-                tool.isSuperSectionAllowedOn = false;
-
-            if ((tool.isRightSideInHeadland || tool.isLeftSideInHeadland) && hd.isOn)
-                tool.isSuperSectionAllowedOn = false;
-
-            //clamp the height after looking way ahead, this is for switching off super section only
-            rpOnHeight = Math.Abs(rpOnHeight);
-            rpToolHeight = Math.Abs(rpToolHeight);
-
-            //10 % min is required for overlap, otherwise it never would be on.
-            int pixLimit = (int)((double)(section[0].rpSectionWidth * rpOnHeight) / (double)(5.0));
-
-            if ((rpOnHeight < rpToolHeight && hd.isOn)) rpHeight = (int)rpToolHeight + 2;
-            else rpHeight = (int)rpOnHeight + 2;
-
-            if (rpHeight > 240) rpHeight = 240;
-            if (rpHeight < 8) rpHeight = 8;
-
-
-
-            //GreenPixels = new byte[(tool.rpWidth * rpHeight)];
-
-            //read the whole block of pixels up to max lookahead, one read only
-            GL.ReadPixels(tool.rpXPosition, 250, tool.rpWidth, (int)rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
-
-            //Paint to context for troubleshooting
-            //oglBack.MakeCurrent();
-            //oglBack.SwapBuffers();
-
-            //is applied area coming up?
-            totalPixs = 0;
-
-            if (bnd.bndArr.Count > 0)
-            {
-                //are there enough pixels in buffer array to warrant turning off supersection
-                for (int a = 0; a < (tool.rpWidth * rpOnHeight); a++)
-                {
-                    if (GreenPixels[a] != 0)
-                    {
-                        if (tool.isSuperSectionAllowedOn & totalPixs++ > pixLimit)
-                        {
-                            tool.isSuperSectionAllowedOn = false;
-                            break;
-                        }
-                    }
-                }
-
-                //5 pixels in is there a boundary line?
-                for (int a = 0; a < (tool.rpWidth * 5); a++)
-                {
-                    if (GreenPixels[a] == 240)
-                    {
-                        tool.isSuperSectionAllowedOn = false;
-                        isBoundaryClose = true;
-                        break;
-                    }
-                }
-
-                //determine if in or out of headland, do hydraulics if on
-                if (hd.isOn)
-                {
-                    //determine if look ahead points are completely in headland
-                    hd.WhereAreToolLookOnPoints();
-
-                    //calculate the slope
-                    double m = (vehicle.hydLiftLookAheadDistanceRight - vehicle.hydLiftLookAheadDistanceLeft) / tool.rpWidth;
-                    int height = 1;
-
-                    for (int pos = 0; pos < tool.rpWidth; pos++)
-                    {
-                        height = (int)(vehicle.hydLiftLookAheadDistanceLeft + (m * pos)) - 1;
-                        for (int a = pos; a < height * tool.rpWidth; a += tool.rpWidth)
-                        {
-                            if (GreenPixels[a] == 250)
-                            {
-                                isHeadlandClose = true;
-                                goto GetOutTool;
-                            }
-                        }
-                    }
-                    GetOutTool:
-
-                    //is the tool completely in the headland or not
-                    hd.isToolInHeadland = hd.isToolOuterPointsInHeadland && !isHeadlandClose;
-
-                    if (isHeadlandClose || hd.isToolInHeadland) tool.isSuperSectionAllowedOn = false;
-
-                    //set hydraulics based on tool in headland or not
-                    if (hd.isToolInHeadland)
-                    {
-                        mc.machineData[mc.mdHydLift] = 2;
-                        hd.isToolUp = true;
-                    }
-                    else
-                    {
-                        mc.machineData[mc.mdHydLift] = 1;
-                        hd.isToolUp = false;
-                    }
-
-                    ////
-                    //if (hd.isToolInHeadland) lblInHead.Text = "Headland";
-                    //else lblInHead.Text = "Work";
-                    //if (hd.isToolUp) lblIsHdClose.Text = "Up";
-                    //else lblIsHdClose.Text = "Down";
-                }
-            }
-            else  //supersection check by applied only
-            {
-                for (int a = 0; a < (tool.rpWidth * rpOnHeight); a++)
-                {
-                    if (GreenPixels[a] != 0)
-                    {
-                        if (tool.isSuperSectionAllowedOn & totalPixs++ > pixLimit)
-                        {
-                            tool.isSuperSectionAllowedOn = false;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            //if all manual and all on go supersection
-            if (autoBtnState == btnStates.On)
-            {
-                for (int j = 0; j < tool.numOfSections; j++)
-                {
-                    if (section[j].BtnSectionState == btnStates.Off) tool.isSuperSectionAllowedOn = false;
-                }
-            }
-
-
-            // If ALL sections are required on, No buttons are off, within boundary, turn super section on, normal sections off
-            if (tool.isSuperSectionAllowedOn)
-            {
-                for (int j = 0; j < tool.numOfSections; j++)
-                {
-                    if (section[j].IsMappingOn)
-                    {
-                        section[j].mappingOffRequest = true;
-                        section[j].mappingOnRequest = false;
-                        section[j].mappingOffTimer = 0;
-                        section[j].mappingOnTimer = 0;
-                    }
-                    if (section[j].isSectionOn)
-                    {
-                        section[j].sectionOffRequest = true;
-                        section[j].sectionOnRequest = false;
-                        section[j].sectionOffTimer = 0;
-                        section[j].sectionOnTimer = 0;
-                    }
-                }
-
-                //turn on super section
-                section[tool.numOfSections].mappingOnRequest = true;
-                section[tool.numOfSections].mappingOffRequest = false;
-
-                section[tool.numOfSections].sectionOnRequest = true;
-                section[tool.numOfSections].sectionOffRequest = false;
-            }
-
-            /* Below is priority based. The last if statement is the one that is
-                * applied and takes the highest priority. Digital input controls
-                * have the highest priority and overide all buttons except
-                * the manual button which exits the loop and just turns sections on....
-                * Because isn't that what manual means! */
-
-            //turn on indivdual sections as super section turn off
-            else
-            {
-                //if the superSection is on, turn it off
-                if (section[tool.numOfSections].isSectionOn)
-                {
-                    section[tool.numOfSections].sectionOffRequest = true;
-                    section[tool.numOfSections].sectionOnRequest = false;
-                    section[tool.numOfSections].sectionOffTimer = 0;
-                    section[tool.numOfSections].sectionOnTimer = 0;
-                }
-
-                //if the superSection is on, turn it off
-                if (section[tool.numOfSections].isMappingOn)
-                {
-                    section[tool.numOfSections].mappingOffRequest = true;
-                    section[tool.numOfSections].mappingOnRequest = false;
-                    section[tool.numOfSections].mappingOffTimer = 0;
-                    section[tool.numOfSections].mappingOnTimer = 0;
-                }
-
-                //Mapping   ---------------------------------------------------------------------------------------------------
-                int endHeight = 1, startHeight = 1;
-
-                for (int j = 0; j < tool.numOfSections; j++)
-                {
-                    section[j].isMappingRequiredOn = false;
-
-                    //calculate slope
-                    mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-
-                    //start and end point to scan across buffer
-                    start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                    end = section[j].rpSectionWidth - 1 + start;
-                    tagged = 0;
-
-                    for (int pos = start; pos <= end; pos++)
-                    {
-                        //block 5 pixels high (50 cm look ahead)
-                        endHeight = 5 * tool.rpWidth + pos;
-
-                        for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                        {
-                            if (GreenPixels[a] == 0)
-                            {
-                                tagged++;
-                                if (tagged > tool.toolMinUnappliedPixels)
-                                {
-                                    section[j].isMappingRequiredOn = true;
-                                    goto GetOutMappingOn;
-                                }
-                            }
-                        }
-                    }
-                    GetOutMappingOn:
-                    start = 0;
-
-                    if (bnd.bndArr.Count > 0)
-                    {
-                        //if out of boundary, turn it off
-                        if (!section[j].isInBoundary)
-                        {
-                            section[j].isMappingRequiredOn = false;
-                            section[j].mappingOffRequest = true;
-                            section[j].mappingOnRequest = false;
-                            section[j].mappingOffTimer = 0;
-                            section[j].mappingOnTimer = 0;
-                        }
-
-                        else if (section[j].isInHeadlandArea & hd.isOn)
-                        {
-                            // if headland is on and out, turn off                             
-                            section[j].isMappingRequiredOn = false;
-                            section[j].mappingOffRequest = true;
-                            section[j].mappingOnRequest = false;
-                            section[j].mappingOffTimer = 0;
-                            section[j].mappingOnTimer = 0;
-                        }
-                    }
-                }
-
-                ///////////////////////////////////////////   Section control        ssssssssssssssssssssss
-                for (int j = 0; j < tool.numOfSections; j++)
-                {
-                    //If any nowhere applied, send OnRequest, if its all green send an offRequest
-                    //ensure it starts off
-                    section[j].isSectionRequiredOn = false;
-
-                    if (bnd.bndArr.Count > 0)
-                    {
-                        //if out of boundary, turn it off
-                        if (!section[j].isInBoundary)
-                        {
-                            section[j].isSectionRequiredOn = false;
-                            section[j].sectionOffRequest = true;
-                            section[j].sectionOnRequest = false;
-                            section[j].sectionOffTimer = 0;
-                            section[j].sectionOnTimer = 0;
-                        }
-                        else
-                        {
-                            mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                            start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                            end = section[j].rpSectionWidth - 1 + start;
-                            tagged = 0;
-
-                            for (int pos = start; pos <= end; pos++)
-                            {
-                                if (isBoundaryClose) endHeight = tool.rpWidth + pos;
-                                else endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                                for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                                {
-                                    if (GreenPixels[a] == 0)
-                                    {
-                                        tagged++;
-                                        if (tagged > tool.toolMinUnappliedPixels)
-                                        {
-                                            section[j].isSectionRequiredOn = true;
-                                            goto GetOutSectionOn;
-                                        }
-                                    }
-                                }
-
-                            }
-                            GetOutSectionOn:
-                            tagged = 0;
-
-                            //only turn off if on
-                            if (section[j].isSectionRequiredOn == true)
-                            {
-                                section[j].isSectionRequiredOn = false;
-                                //calculate the slopes of the lines
-                                mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                                mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-                                start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                                end = section[j].rpSectionWidth - 1 + start;
-                                tagged = 0;
-
-                                for (int pos = start; pos <= end; pos++)
-                                {
-                                    if (isBoundaryClose)
-                                    {
-                                        endHeight = tool.rpWidth + pos;
-                                        startHeight = pos;
-                                    }
-                                    else
-                                    {
-                                        startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
-                                        endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-                                    }
-
-                                    for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
-                                    {
-                                        if (GreenPixels[a] == 0)
-                                        {
-                                            tagged++;
-                                            if (tagged > tool.toolMinUnappliedPixels)
-                                            {
-                                                section[j].isSectionRequiredOn = true;
-                                                goto GetOutSectionOff;
-                                            }
-                                        }
-                                    }
-                                }
-                                GetOutSectionOff:
-                                start = 0;
-                            }
-
-                            //is headland coming up
-                            if (hd.isOn)
-                            {
-                                bool isHeadlandInLookOn = false;
-
-                                //is headline in off to on area
-                                mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                                mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-
-                                start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-
-                                end = section[j].rpSectionWidth - 1 + start;
-                                tagged = 0;
-
-                                for (int pos = start; pos <= end; pos++)
-                                {
-                                    startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
-                                    endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                                    for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
-                                    {
-                                        if (a < 0)
-                                            mOn = 0;
-                                        if (GreenPixels[a] == 250)
-                                        {
-                                            //tagged++;
-                                            //if (tagged > tool.toolMinUnappliedPixels)
-                                            {
-                                                isHeadlandInLookOn = true;
-                                                goto GetOutHdOn;
-                                            }
-                                        }
-                                    }
-                                }
-                                GetOutHdOn:
-
-
-
-                                if (section[j].isSectionRequiredOn && section[j].isLookOnInHeadland && !isHeadlandInLookOn)
-                                {
-                                    section[j].isSectionRequiredOn = false;
-                                    section[j].sectionOffRequest = true;
-                                    section[j].sectionOnRequest = false;
-                                }
-
-                                if (section[j].isSectionRequiredOn && !section[j].isLookOnInHeadland && isHeadlandInLookOn)
-                                {
-                                    section[j].isSectionRequiredOn = true;
-                                    section[j].sectionOffRequest = false;
-                                    section[j].sectionOnRequest = true;
-                                }
-                            }
-                        }
-                    }
-
-                    else  //Section Control in no boundary field
-                    {
-                        tagged = 0;
-                        mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-
-                        start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-                        end = section[j].rpSectionWidth - 1 + start;
-
-                        for (int pos = start; pos <= end; pos++)
-                        {
-                            endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                            for (int a = pos; a <= endHeight; a += tool.rpWidth)
-                            {
-                                if (GreenPixels[a] == 0)
-                                {
-                                    tagged++;
-                                    if (tagged > tool.toolMinUnappliedPixels)
-                                    {
-                                        section[j].isSectionRequiredOn = true;
-                                        goto GetOutSectionOn;
-                                    }
-                                }
-                            }
-                        }
-                        GetOutSectionOn:
-
-                        //only turn off if on
-                        if (section[j].isSectionRequiredOn == true)
-                        {
-                            section[j].isSectionRequiredOn = false;
-                            //calculate the slopes of the lines
-                            mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                            mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-
-                            start = section[j].rpSectionPosition - section[0].rpSectionPosition;
-
-                            end = section[j].rpSectionWidth - 1 + start;
-                            tagged = 0;
-
-                            for (int pos = start; pos <= end; pos++)
-                            {
-                                startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
-                                endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                                for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
-                                {
-                                    if (a < 0)
-                                        mOn = 0;
-                                    if (GreenPixels[a] == 0)
-                                    {
-                                        tagged++;
-                                        if (tagged > tool.toolMinUnappliedPixels)
-                                        {
-                                            section[j].isSectionRequiredOn = true;
-                                            goto GetOutSectionOff;
-                                        }
-                                    }
-                                }
-                            }
-                            GetOutSectionOff:
-                            start = 0;
-                        }
-
-                        start = 0; end = 0;
-                    }
-
-                    if (section[j].speedPixels < 0)
-                    {
-                        section[j].isSectionRequiredOn = false;
-
-                        section[j].isMappingRequiredOn = false;
-                        section[j].mappingOffRequest = true;
-                        section[j].mappingOnRequest = false;
-                    }
-                }  // end of go thru all sections "for"
-
-                //if Master Auto is on
-                for (int j = 0; j < tool.numOfSections; j++)
-                {
-                    if (section[j].isSectionRequiredOn && section[j].IsAllowedOn)
-                    {
-                        //global request to turn on section
-                        section[j].sectionOnRequest = true;
-                        section[j].sectionOffRequest = false;
-                    }
-
-                    else if (!section[j].isSectionRequiredOn)
-                    {
-                        //global request to turn off section
-                        section[j].sectionOffRequest = true;
-                        section[j].sectionOnRequest = false;
-                    }
-
-                    // Manual on, force the section On and exit loop so digital is also overidden
-                    if (section[j].BtnSectionState == btnStates.On)
-                    {
-                        section[j].sectionOnRequest = true;
-                        section[j].sectionOffRequest = false;
-                        continue;
-                    }
-
-                    if (section[j].BtnSectionState == btnStates.Off)
-                    {
-                        section[j].sectionOnRequest = false;
-                        section[j].sectionOffRequest = true;
-                    }
-
-                    //if going too slow turn off sections
-                    if (pn.speed < vehicle.slowSpeedCutoff)
-                    {
-                        section[j].sectionOnRequest = false;
-                        section[j].sectionOffRequest = true;
-                    }
-                }
-
-                for (int j = 0; j < tool.numOfSections; j++)
-                {
-                    //now for  mapping
-                    if (section[j].isMappingRequiredOn && section[j].IsAllowedOn)
-                    {
-                        //global request to turn on section
-                        section[j].mappingOnRequest = true;
-                        section[j].mappingOffRequest = false;
-                    }
-
-                    else if (!section[j].isMappingRequiredOn)
-                    {
-                        //global request to turn off section
-                        section[j].mappingOffRequest = true;
-                        section[j].mappingOnRequest = false;
-                    }
-
-                    // Manual on, force the section On and exit loop so digital is also overidden
-                    if (section[j].BtnSectionState == btnStates.On)
-                    {
-                        section[j].mappingOnRequest = true;
-                        section[j].mappingOffRequest = false;
-                        continue;
-                    }
-
-                    if (section[j].BtnSectionState == btnStates.Off)
-                    {
-                        section[j].mappingOnRequest = false;
-                        section[j].mappingOffRequest = true;
-                    }
-
-                    //if going too slow turn off sections
-                    if (pn.speed < vehicle.slowSpeedCutoff)
-                    {
-                        section[j].mappingOnRequest = false;
-                        section[j].mappingOffRequest = true;
-                    }
-
-                }
-            } // end of supersection is off
-
-
-
-            testNMEAb.Stop();
-            testNMEA1b = testNMEAb.ElapsedTicks;
-
-
-
-
-            //testNMEAa.Restart();
-            testNMEAa.Start();
-
-
-            oglBack.MakeCurrent();
+            CalculateSectionLookAhead(toolPos.northing, toolPos.easting, cosSectionHeading, sinSectionHeading);
 
             GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
             GL.LoadIdentity();// Reset The View
@@ -1236,12 +546,13 @@ namespace AgOpenGPS
             //calculate the frustum for the section control window
             CalcFrustum();
 
+            //calculate the frustum for the section control window
+            CalcFrustum();
 
             if (hd.isOn && vehicle.isHydLiftOn) GL.Enable(EnableCap.Blend);
             else GL.Disable(EnableCap.Blend);
 
             GL.Color3((byte)0, (byte)255, (byte)0);
-
             for (int i = 0; i < bnd.bndArr.Count; i++)
             {
                 if (bnd.bndArr[i].isOwnField && (i == bnd.LastBoundary || bnd.LastBoundary == -1))
@@ -1262,13 +573,8 @@ namespace AgOpenGPS
                 }
             }
 
-
             //patch color
             GL.Color4(0.0, 0.1, 0.0, 0.1);
-
-            //GL.Color3(0.0, 0.1, 0.0);
-            //to draw or not the triangle patch
-
 
             //draw patches j= # of sections
             for (int j = 0; j < tool.numSuperSection; j++)
@@ -1307,19 +613,20 @@ namespace AgOpenGPS
                             for (int i = 1; i < count2; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0);
                             GL.End();
                         }
-
                     }
                 }
             }
 
-
-
-
             //finish it up - we need to read the ram of video card
             GL.Flush();
 
+            //determine farthest ahead lookahead - is the height of the readpixel line
             rpHeight = (int)Math.Min(Math.Max(Math.Max((hd.isOn ? Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft) : 0), Math.Max(tool.lookAheadDistanceOnPixelsRight, tool.lookAheadDistanceOnPixelsLeft)) + 2, 8), 240);
 
+
+            byte[] GreenPixels = new byte[(tool.rpWidth * rpHeight)];
+
+            //read the whole block of pixels up to max lookahead, one read only
             GL.ReadPixels(tool.rpXPosition, 250, tool.rpWidth, rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
 
             //Paint to context for troubleshooting
@@ -1462,18 +769,6 @@ namespace AgOpenGPS
                 }
             }
 
-            testNMEAa.Stop();
-
-            testNMEA1a = testNMEAa.ElapsedTicks;
-
-
-
-            lasta = lasta * 0.95 + (testNMEA1a / (double)System.Diagnostics.Stopwatch.Frequency * 1000) * 0.05;
-            lastb = lastb * 0.95 + (testNMEA1b / (double)System.Diagnostics.Stopwatch.Frequency * 1000) * 0.05;
-            lastc = lastc * 0.95 + testNMEA1a * 0.05;
-            lastd = lastd * 0.95 + testNMEA1b * 0.05;
-
-
             //Determine if sections want to be on or off
             ProcessSectionOnOffRequests();
 
@@ -1486,6 +781,9 @@ namespace AgOpenGPS
             ////send machine data to autosteer if checked
             if (mc.isMachineDataSentToAutoSteer)
                 SendOutUSBAutoSteerPort(mc.machineData, CModuleComm.pgnSentenceLength);
+
+            //draw the section control window off screen buffer
+            oglMain.Refresh();
 
             //if a minute has elapsed save the field in case of crash and to be able to resume            
             if (MinuteCounter > 60 && recvCounter < 134)
@@ -1513,8 +811,7 @@ namespace AgOpenGPS
 
                     if (isDayTime != isDay)
                     {
-                        isDay = isDayTime;
-                        isDay = !isDay;
+                        isDay = !isDayTime;
                         SwapDayNightMode();
                     }
 
@@ -2438,74 +1735,6 @@ namespace AgOpenGPS
             GL.PopMatrix();
 
         }
-
-        private void DrawFieldText()
-        {
-            if (isMetric)
-            {
-                if (bnd.bndArr.Count > 0)
-                {
-                    sb.Clear();
-                    sb.Append(((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ha).ToString("N3"));
-                    sb.Append("Ha ");
-                    sb.Append(fd.overlapPercent.ToString("N2"));
-                    sb.Append("%  ");
-                    sb.Append((fd.areaBoundaryOuterLessInner * glm.m2ha).ToString("N2"));
-                    sb.Append("-");
-                    sb.Append((fd.actualAreaCovered * glm.m2ha).ToString("N2"));
-                    sb.Append(" = ");
-                    sb.Append(((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ha).ToString("N2"));
-                    sb.Append("Ha  ");
-                    sb.Append(fd.TimeTillFinished);
-                    GL.Color3(0.95, 0.95, 0.95);
-                    font.DrawText(-sb.Length * 7, oglMain.Height - 32, sb.ToString());
-                }
-                else
-                {
-                    sb.Clear();
-                    //sb.Append("Overlap ");
-                    sb.Append(fd.overlapPercent.ToString("N3"));
-                    sb.Append("%   ");
-                    sb.Append((fd.actualAreaCovered * glm.m2ha).ToString("N3"));
-                    sb.Append("Ha");
-                    GL.Color3(0.95, 0.95, 0.95);
-                    font.DrawText(0, oglMain.Height - 32, sb.ToString());
-                }
-            }
-            else
-            {
-                if (bnd.bndArr.Count > 0)
-                {
-                    sb.Clear();
-                    sb.Append(((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ac).ToString("N3"));
-                    sb.Append("Ac ");
-                    sb.Append(fd.overlapPercent.ToString("N2"));
-                    sb.Append("%  ");
-                    sb.Append((fd.areaBoundaryOuterLessInner * glm.m2ac).ToString("N2"));
-                    sb.Append("-");
-                    sb.Append((fd.actualAreaCovered * glm.m2ac).ToString("N2"));
-                    sb.Append(" = ");
-                    sb.Append(((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ac).ToString("N2"));
-                    sb.Append("Ac  ");
-                    sb.Append(fd.TimeTillFinished);
-                    GL.Color3(0.95, 0.95, 0.95);
-                    font.DrawText(-sb.Length * 7, oglMain.Height - 32, sb.ToString());
-                }
-                else
-                {
-                    sb.Clear();
-                    //sb.Append("Overlap ");
-                    sb.Append(fd.overlapPercent.ToString("N3"));
-                    sb.Append("%   ");
-                    sb.Append((fd.actualAreaCovered * glm.m2ac).ToString("N3"));
-                    sb.Append("Ac");
-                    GL.Color3(0.95, 0.95, 0.95);
-                    font.DrawText(0, oglMain.Height - 32, sb.ToString());
-                }
-            }
-        }
-
-
 
         private void CalcFrustum()
         {

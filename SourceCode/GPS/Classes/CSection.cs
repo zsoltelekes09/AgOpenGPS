@@ -24,47 +24,15 @@ namespace AgOpenGPS
         public bool IsSectionOn = false;
         public bool IsAllowedOn = false;
         public bool IsSectionRequiredOn = false;
-
-        public Button SectionButton = new Button();
-
         public bool SectionOnRequest = false;
         public int SectionOverlapTimer = 0;
+        public Button SectionButton = new Button();
+
         //mapping
         public bool IsMappingOn = false;
         public bool MappingOnRequest = false;
         public int MappingOnTimer = 0;
         public int MappingOffTimer = 0;
-
-
-
-
-
-        //!speed
-        public bool isInHeadlandArea = true;
-        public bool isLookOnInHeadland = true;
-        public bool isInBoundary = true, isHydLiftInWorkArea = true;
-
-        public bool mappingOnRequest = false;
-        public bool mappingOffRequest = false;
-        public bool mappingOnOffCycle = false;
-        public int mappingOnTimer = 0;
-        public bool isMappingRequiredOn = false;
-        public int mappingOffTimer = 0;
-        public bool sectionOnRequest = false;
-        public bool sectionOffRequest = false;
-        public bool sectionOnOffCycle = false;
-        public bool isSectionOn = false;
-        public bool isSectionRequiredOn = false;
-        public bool isMappingOn = false;
-
-        public int sectionOnTimer = 0;
-        public int sectionOffTimer = 0;
-
-
-
-
-
-
 
         public double speedPixels = 0;
 

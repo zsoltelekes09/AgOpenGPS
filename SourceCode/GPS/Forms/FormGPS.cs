@@ -70,10 +70,9 @@ namespace AgOpenGPS
         private readonly Stopwatch testHalfSecond = new Stopwatch();
         private readonly Stopwatch testOneSecond = new Stopwatch();
         private readonly Stopwatch testThreeSecond = new Stopwatch();
-        public readonly Stopwatch testNMEAa = new Stopwatch();
-        public readonly Stopwatch testNMEAb = new Stopwatch();
+        public readonly Stopwatch testNMEA = new Stopwatch();
 
-        public long testHalfSecond1 = 0, testOneSecond1 = 0, testThreeSecond1 = 0, testNMEA1a = 0, testNMEA1b = 0;
+        public long testHalfSecond1 = 0, testOneSecond1 = 0, testThreeSecond1 = 0, testNMEA1 = 0;
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         private readonly Stopwatch swHz = new Stopwatch();
