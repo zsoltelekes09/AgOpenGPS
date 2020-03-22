@@ -145,9 +145,7 @@
             this.lblSunrise = new System.Windows.Forms.Label();
             this.lblTrigger = new System.Windows.Forms.Label();
             this.btnStartStopNtrip = new System.Windows.Forms.Button();
-            this.lblIsHdClose = new System.Windows.Forms.Label();
             this.btnTestIsMapping = new System.Windows.Forms.Button();
-            this.lblInHead = new System.Windows.Forms.Label();
             this.lblWatch = new System.Windows.Forms.Label();
             this.lblNTRIPSeconds = new System.Windows.Forms.Label();
             this.lblUturnByte = new System.Windows.Forms.Label();
@@ -1277,16 +1275,12 @@
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panelBatman.BackColor = System.Drawing.Color.Transparent;
             this.panelBatman.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelBatman.Controls.Add(this.lblNorth);
-            this.panelBatman.Controls.Add(this.lblEast);
             this.panelBatman.Controls.Add(this.label3);
             this.panelBatman.Controls.Add(this.lblSunset);
             this.panelBatman.Controls.Add(this.lblSunrise);
             this.panelBatman.Controls.Add(this.lblTrigger);
             this.panelBatman.Controls.Add(this.btnStartStopNtrip);
-            this.panelBatman.Controls.Add(this.lblIsHdClose);
             this.panelBatman.Controls.Add(this.btnTestIsMapping);
-            this.panelBatman.Controls.Add(this.lblInHead);
             this.panelBatman.Controls.Add(this.lblRoll);
             this.panelBatman.Controls.Add(this.label10);
             this.panelBatman.Controls.Add(this.label16);
@@ -1400,21 +1394,6 @@
             this.btnStartStopNtrip.UseVisualStyleBackColor = false;
             this.btnStartStopNtrip.Click += new System.EventHandler(this.btnStartStopNtrip_Click);
             // 
-            // lblIsHdClose
-            // 
-            this.lblIsHdClose.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblIsHdClose.AutoSize = true;
-            this.lblIsHdClose.BackColor = System.Drawing.Color.Transparent;
-            this.lblIsHdClose.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblIsHdClose.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lblIsHdClose.Location = new System.Drawing.Point(11, 352);
-            this.lblIsHdClose.Name = "lblIsHdClose";
-            this.lblIsHdClose.Size = new System.Drawing.Size(51, 19);
-            this.lblIsHdClose.TabIndex = 453;
-            this.lblIsHdClose.Text = "False";
-            this.lblIsHdClose.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // btnTestIsMapping
             // 
             this.btnTestIsMapping.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1427,21 +1406,6 @@
             this.btnTestIsMapping.Text = "Mapping";
             this.btnTestIsMapping.UseVisualStyleBackColor = false;
             this.btnTestIsMapping.Click += new System.EventHandler(this.BtnTestIsMapping_Click);
-            // 
-            // lblInHead
-            // 
-            this.lblInHead.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblInHead.AutoSize = true;
-            this.lblInHead.BackColor = System.Drawing.Color.Transparent;
-            this.lblInHead.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblInHead.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lblInHead.Location = new System.Drawing.Point(11, 333);
-            this.lblInHead.Name = "lblInHead";
-            this.lblInHead.Size = new System.Drawing.Size(51, 19);
-            this.lblInHead.TabIndex = 329;
-            this.lblInHead.Text = "False";
-            this.lblInHead.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblWatch
             // 
@@ -2703,7 +2667,6 @@
             // 
             // pbarUDPComm
             // 
-            this.pbarUDPComm.Maximum = 256;
             this.pbarUDPComm.Name = "pbarUDPComm";
             this.pbarUDPComm.Size = new System.Drawing.Size(68, 7);
             this.pbarUDPComm.Value = 10;
@@ -3461,8 +3424,6 @@
         private System.Windows.Forms.ToolStripDropDownButton snapToCurrent;
         private System.Windows.Forms.ToolStripDropDownButton snapRightBigStrip;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label lblInHead;
-        private System.Windows.Forms.Label lblIsHdClose;
         private System.Windows.Forms.Timer HalfSecondUpdate;
         private System.Windows.Forms.Timer OneSecondUpdate;
         private System.Windows.Forms.Timer ThreeSecondUpdate;

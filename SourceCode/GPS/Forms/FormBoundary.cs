@@ -337,7 +337,19 @@ namespace AgOpenGPS
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
-            btnDelete.Enabled = false;
+            DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
+                gStr.gsDeleteForSure,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2);
+
+            if (result3 == DialogResult.Yes)
+            {
+
+                btnLeftRight.Enabled = false;
+                btnGo.Enabled = false;
+                btnDelete.Enabled = false;
+                nudBndOffset.Enabled = false;
 
             if (mf.bnd.bndArr.Count > mf.bnd.boundarySelected)
             {
@@ -361,8 +373,13 @@ namespace AgOpenGPS
             mf.fd.UpdateFieldBoundaryGUIAreas();
             mf.mazeGrid.BuildMazeGridArray();
 
-            UpdateChart();
-            UpdateScroll(-1);
+                UpdateChart();
+                UpdateScroll(-1);
+            }
+            else
+            {
+                mf.TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
+            }
         }
 
         private void ResetAllBoundary()
@@ -407,17 +424,27 @@ namespace AgOpenGPS
 
         private void BtnDeleteAll_Click(object sender, EventArgs e)
         {
-            ResetAllBoundary();
+            DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
+                gStr.gsDeleteForSure,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2);
 
-            mf.bnd.boundarySelected = -1;
-            Selectedreset = true;
+            if (result3 == DialogResult.Yes)
+            {
 
-            mf.bnd.isOkToAddPoints = false;
-            mf.FileSaveHeadland();
+                ResetAllBoundary();
 
-            mf.hd.isOn = false;
-            mf.fd.UpdateFieldBoundaryGUIAreas();
-            mf.mazeGrid.BuildMazeGridArray();
+                mf.bnd.boundarySelected = -1;
+                Selectedreset = true;
+
+                mf.bnd.isOkToAddPoints = false;
+                mf.FileSaveHeadland();
+
+                mf.hd.isOn = false;
+                mf.fd.UpdateFieldBoundaryGUIAreas();
+                mf.mazeGrid.BuildMazeGridArray();
+            }
 
         }
 
@@ -464,12 +491,7 @@ namespace AgOpenGPS
         {
             scroll = false;
         }
-
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        
         void Mouse_Move(object sender, MouseEventArgs e)
         {
             if (scroll == true && viewableRatio < 1)

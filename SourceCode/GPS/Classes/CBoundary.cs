@@ -16,8 +16,6 @@ namespace AgOpenGPS
         public List<CBoundaryLines> bndArr = new List<CBoundaryLines>();
         public List<vec3> bndBeingMadePts = new List<vec3>();
 
-        private readonly double scanWidth, boxLength;
-
         public double createBndOffset;
         public bool isBndBeingMade;
 
@@ -27,8 +25,6 @@ namespace AgOpenGPS
         {
             mf = _f;
             boundarySelected = -1;
-            scanWidth = 1.0;
-            boxLength = 2000;
             LastBoundary = -1;
             //boundaries array
         }

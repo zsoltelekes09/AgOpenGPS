@@ -557,11 +557,6 @@ namespace AgOpenGPS
             oglMain.Refresh();
         }
 
-
-
-        double lasta, lastb, lastc, lastd;
-
-
         private void HalfSecond_Update(object sender, EventArgs e)
         {
             HalfSecondUpdate.Enabled = false;
@@ -723,8 +718,8 @@ namespace AgOpenGPS
             if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent) statusStripBottom.BackColor = Color.Tomato;
             else if (!mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato) statusStripBottom.BackColor = Color.Transparent;
 
-                    lblEast.Text = ((int)(pn.actualEasting)).ToString();
-                    lblNorth.Text = ((int)(pn.actualNorthing)).ToString();
+                    //lblEast.Text = ((int)(pn.actualEasting)).ToString();
+                    //lblNorth.Text = ((int)(pn.actualNorthing)).ToString();
 
             testOneSecond1 = testOneSecond.ElapsedMilliseconds;
             OneSecondUpdate.Enabled = true;

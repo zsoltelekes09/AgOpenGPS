@@ -914,12 +914,12 @@ namespace AgOpenGPS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool setIMU_isRollFromExtUDP {
+        public bool setIMU_isRollFromOGI {
             get {
-                return ((bool)(this["setIMU_isRollFromExtUDP"]));
+                return ((bool)(this["setIMU_isRollFromOGI"]));
             }
             set {
-                this["setIMU_isRollFromExtUDP"] = value;
+                this["setIMU_isRollFromOGI"] = value;
             }
         }
         
@@ -1269,6 +1269,18 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setDisplay_isStartFullScreen"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool setUDP_isInterAppOn {
+            get {
+                return ((bool)(this["setUDP_isInterAppOn"]));
+            }
+            set {
+                this["setUDP_isInterAppOn"] = value;
             }
         }
     }

@@ -159,7 +159,7 @@ namespace AgOpenGPS
                         }
                     }
 
-                    FileList.Add(area.ToString("0.#"));
+                    //fileList.Add(area.ToString("000.#"));
                 }
                     
                 filename = dir + "\\Field.txt";
