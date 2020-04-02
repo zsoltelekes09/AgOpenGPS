@@ -240,13 +240,26 @@ namespace AgOpenGPS
             if (pbarUDP++ > 98) pbarUDP = 0;
 
             //if it starts with a $, its an nmea sentence
-            if (data[0] == 36)
+            if (data[0] == 0x24)
             {
                 pn.rawBuffer.AddRange(data);
                 return;
             }
+            else if (data[0] == 0xB5 && data[1] == 0x62 && data[2] == 0x01)//Daniel P
+            {
+                if (data[3] == 0x07)//UBX-NAV-PVT
+                {
+                    pn.rawBuffer.AddRange(data);
+                    return;
+                }
+                else if (data[3] == 0x3C)//UBX-NAV-RELPOSNED
+                {
+                    pn.rawBuffer2.AddRange(data);
+                    return;
+                }
+            }
 
-            if (data[0] == 35 && data[1] == 35)
+            if (data[0] == 0x23 && data[1] == 0x23)
             {
                 string buff = Encoding.ASCII.GetString(data);
                 return;
@@ -255,12 +268,12 @@ namespace AgOpenGPS
             //quick check
             if (data.Length != 10) return;
 
-            if (data[0] == 127)
+            if (data[0] == 0x7F)
             {
                 switch (data[1])
                 {
                     //autosteer FD - 253
-                    case 253:
+                    case 0xFD:
                         {
                             //Steer angle actual
                             double actualSteerAngle = (Int16)((data[2] << 8) + data[3]);
@@ -332,20 +345,19 @@ namespace AgOpenGPS
                                 }
                             }
                             byte pwm = data[9];
-
                             actualSteerAngleDisp = actualSteerAngle;
                             break;
                         }
 
                     //From Machine Data
-                    case 224:
+                    case 0xE0:
                         {
                             mc.recvUDPSentence = DateTime.Now.ToString() + "," + data[2].ToString();
                             break;
                         }
 
                     //lidar
-                    case 241:
+                    case 0xF1:
                         {
                             mc.lidarDistance = (Int16)((data[2] << 8) + data[3]);
                             //mc.recvUDPSentence = DateTime.Now.ToString() + "," + mc.lidarDistance.ToString();
@@ -353,7 +365,7 @@ namespace AgOpenGPS
                         }
 
                     //Ext UDP IMU
-                    case 238:
+                    case 0xEE:
                         {
                             //by Matthias Hammer Jan 2019
                             if (ahrs.isHeadingCorrectionFromExtUDP)
@@ -369,21 +381,21 @@ namespace AgOpenGPS
                             break;
                         }
 
-                    case 249://MTZ8302 Feb 2020
+                    case 0xF9://MTZ8302 Feb 2020
                         {
-
                             /*rate stuff
+                            
                             //left or single actual rate
                             //int.TryParse(data[0], out mc.incomingInt);
                             mc.rateActualLeft = (double)data[2] * 0.01;
-
                             //right actual rate
                             mc.rateActualRight = (double)data[3] * 0.01;
-
                             //Volume for dual and single
                             mc.dualVolumeActual = data[4];
 
                             rate stuff  */
+
+
 
                             //header
                             mc.ss[mc.swHeaderLo] = 0xF9;

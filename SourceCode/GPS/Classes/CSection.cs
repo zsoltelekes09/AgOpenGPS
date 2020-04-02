@@ -47,7 +47,6 @@ namespace AgOpenGPS
 
         public double positionLeft = -4;
         public double positionRight = 4;
-        public double positionForeward = 0;
         public double sectionWidth = 0;
 
         public double foreDistance = 0;

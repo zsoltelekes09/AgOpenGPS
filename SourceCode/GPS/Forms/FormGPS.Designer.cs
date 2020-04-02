@@ -1675,7 +1675,7 @@
             this.hsbarStepDistance.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.hsbarStepDistance.LargeChange = 2;
             this.hsbarStepDistance.Location = new System.Drawing.Point(82, 1);
-            this.hsbarStepDistance.Minimum = -6;
+            this.hsbarStepDistance.Minimum = -16;
             this.hsbarStepDistance.Name = "hsbarStepDistance";
             this.hsbarStepDistance.Size = new System.Drawing.Size(191, 37);
             this.hsbarStepDistance.TabIndex = 178;
