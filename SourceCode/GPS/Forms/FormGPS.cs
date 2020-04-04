@@ -1080,7 +1080,7 @@ namespace AgOpenGPS
             }
             catch (Exception e)
             {
-                WriteErrorLog("UDP Server" + e);
+                //WriteErrorLog("UDP Server" + e);
                 MessageBox.Show("Load Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
