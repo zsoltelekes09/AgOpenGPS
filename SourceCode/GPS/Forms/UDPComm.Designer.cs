@@ -237,7 +237,7 @@ namespace AgOpenGPS
         private void UpdateRecvMessage(int port, byte[] data)
         {
             //update progress bar for autosteer
-            if (pbarUDP++ > 98) pbarUDP = 0;
+            if (pbarUDP++ > 99) pbarUDP = 0;
 
             //if it starts with a $, its an nmea sentence
             if (data[0] == 0x24)
@@ -249,6 +249,10 @@ namespace AgOpenGPS
             {
                 if (data[3] == 0x07)//UBX-NAV-PVT
                 {
+                    testNMEA1 = testNMEA.ElapsedTicks+1;
+
+                    testNMEA.Restart();
+                    testNMEA.Start();
                     pn.rawBuffer.AddRange(data);
                     return;
                 }

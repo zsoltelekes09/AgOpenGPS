@@ -253,8 +253,9 @@ Field	Meaning
         {
             for (int i = 0; i < rawBuffer.Count - 5; i++)
             {
-                if (rawBuffer[i] == 0x24)//$
+                /*if (rawBuffer[i] == 0x24)//$
                 {
+
                     if (i > 0) rawBuffer.RemoveRange(0, i);
                     i = 0;
                     for (int j = 2; j < rawBuffer.Count; j++)
@@ -294,7 +295,9 @@ Field	Meaning
                         }
                     }
                 }
-                else if (rawBuffer.Count > 99 + i)//100 bytes
+                */
+                //else
+                if (rawBuffer.Count > 99 + i)//100 bytes
                 {
                     if (rawBuffer[i] == 0xB5 && rawBuffer[i + 1] == 0x62 && rawBuffer[i + 2] == 0x01 && rawBuffer[i + 3] == 0x07)//UBX-PVT
                     {
