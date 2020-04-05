@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Drawing;
+using System.Globalization;
 
 namespace AgOpenGPS
 {
@@ -239,28 +240,126 @@ namespace AgOpenGPS
             //update progress bar for autosteer
             if (pbarUDP++ > 99) pbarUDP = 0;
 
-            //if it starts with a $, its an nmea sentence
-            if (data[0] == 0x24)
-            {
-                pn.rawBuffer.AddRange(data);
-                return;
-            }
-            else if (data[0] == 0xB5 && data[1] == 0x62 && data[2] == 0x01)//Daniel P
+            if (data[0] == 0xB5 && data[1] == 0x62 && data[2] == 0x01)//Daniel P
             {
                 if (data[3] == 0x07)//UBX-NAV-PVT
                 {
-                    testNMEA1 = testNMEA.ElapsedTicks+1;
-
+                    testNMEA1 = testNMEA.ElapsedTicks + 1;
                     testNMEA.Restart();
                     testNMEA.Start();
-                    pn.rawBuffer.AddRange(data);
+
+                    if (data.Length == 100)
+                    {
+                        int CK_A = 0;
+                        int CK_B = 0;
+
+                        for (int j = 2; j < 98; j += 1)// start with Class and end by Checksum
+                        {
+                            CK_A = (CK_A + data[j]) & 0xFF;
+                            CK_B = (CK_B + CK_A) & 0xFF;
+                        }
+
+                        if (data[98] == CK_A && data[99] == CK_B)
+                        {
+                            long itow = data[6] | (data[7] << 8) | (data[8] << 16) | (data[9] << 24);
+
+                            if (data[84] == 0x00)
+                            {
+                                if ((data[27] & 0x81) == 0x81)
+                                {
+                                    pn.fixQuality = 4;
+                                    pn.EnableHeadRoll = true;
+                                }
+                                else if ((data[27] & 0x41) == 0x41)
+                                {
+                                    pn.fixQuality = 5;
+                                    pn.EnableHeadRoll = true;
+                                }
+                                else
+                                {
+                                    pn.fixQuality = 1;
+                                    pn.EnableHeadRoll = false;
+                                }
+
+                                pn.satellitesTracked = data[29];
+
+                                pn.longitude = (data[30] | (data[31] << 8) | (data[32] << 16) | (data[33] << 24)) * 0.0000001;//to deg
+                                pn.latitude = (data[34] | (data[35] << 8) | (data[36] << 16) | (data[37] << 24)) * 0.0000001;//to deg
+                                pn.altitude = (data[42] | (data[43] << 8) | (data[44] << 16) | (data[45] << 24)) * 0.001;//to meters
+
+                                pn.hdop = (data[46] | (data[47] << 8) | (data[48] << 16) | (data[49] << 24)) * 0.01;
+
+                                pn.UpdateNorthingEasting();
+
+                                pn.speed = (data[66] | (data[67] << 8) | (data[68] << 16) | (data[69] << 24)) * 0.0036;//to km/h
+
+                                //average the speed
+                                pn.AverageTheSpeed();
+
+                                recvSentenceSettings[2] = recvSentenceSettings[0];
+                                recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                            }
+                            else
+                            {
+                                pn.fixQuality = 0;
+                                recvSentenceSettings[2] = recvSentenceSettings[0];
+                                recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
+                            }
+                        }
+                        //mf.testNMEA1 = mf.testNMEA.ElapsedMilliseconds;
+                    }
                     return;
                 }
                 else if (data[3] == 0x3C)//UBX-NAV-RELPOSNED
                 {
-                    pn.rawBuffer2.AddRange(data);
+                    if (data.Length == 72)
+                    {
+                        int CK_A = 0;
+                        int CK_B = 0;
+
+                        for (int j = 2; j < 70; j += 1)// start with Class and end by Checksum
+                        {
+                            CK_A = (CK_A + data[j]) & 0xFF;
+                            CK_B = (CK_B + CK_A) & 0xFF;
+                        }
+
+                        if (data[70] == CK_A && data[71] == CK_B)
+                        {
+                            long itow = data[10] | (data[11] << 8) | (data[12] << 16) | (data[13] << 24);
+
+                            if (pn.EnableHeadRoll && ((data[67] & 0x01) == 0x01) && (((data[66] & 0x2D) == 0x2D) || ((data[66] & 0x35) == 0x35)))
+                            {
+                                int relposlength = data[26] | (data[27] << 8) | (data[28] << 16) | (data[29] << 24);//in cm!
+
+                                if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
+                                {
+                                    //save dist?
+                                }
+
+                                pn.headingHDT = (data[30] | (data[31] << 8) | (data[32] << 16) | (data[33] << 24)) * 0.00001;
+                                ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2((data[22] | (data[23] << 8) | (data[24] << 16) | (data[25] << 24)) + data[40] * 0.1, pn.DualAntennaDistance)) * 16);
+
+                                //ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2(BitConverter.ToInt32(Data, 22) + BitConverter.ToInt32(Data, 40) / 100, mf.DualAntennaDistance * 10.0)) * 16);
+
+                                recvSentenceSettings[3] = recvSentenceSettings[1];
+                                recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.headingHDT.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + ahrs.rollX16.ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                            }
+                            else //Bad Quality
+                            {
+                                ahrs.rollX16 = 9999;
+                                pn.headingHDT = 9999;
+                                recvSentenceSettings[3] = recvSentenceSettings[1];
+                                recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
+                            }
+                        }
+                    }
                     return;
                 }
+            }
+            else if (data[0] == 0x24)//if it starts with a $, its an nmea sentence
+            {
+                pn.rawBuffer += Encoding.ASCII.GetString(data);
+                return;
             }
 
             if (data[0] == 0x23 && data[1] == 0x23)

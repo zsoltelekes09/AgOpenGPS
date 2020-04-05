@@ -1686,7 +1686,7 @@ namespace AgOpenGPS
         private void simulatorOnToolStripMenuItem_Click(object sender, EventArgs e)
         {
             
-            if (SerialGPS.IsOpen)
+            if (sp.IsOpen)
             {
                 simulatorOnToolStripMenuItem.Checked = false;
                 panelSim.Visible = false;
@@ -2028,7 +2028,7 @@ namespace AgOpenGPS
         private void timerSim_Tick(object sender, EventArgs e)
         {
             //if a GPS is connected disable sim
-            if (!SerialGPS.IsOpen)
+            if (!sp.IsOpen)
             {
                 if (isAutoSteerBtnOn && (guidanceLineDistanceOff != 32000)) sim.DoSimTick(guidanceLineSteerAngle * 0.01);
                 else if (recPath.isDrivingRecordedPath) sim.DoSimTick(guidanceLineSteerAngle * 0.01);

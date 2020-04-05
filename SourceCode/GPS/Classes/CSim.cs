@@ -83,8 +83,7 @@ namespace AgOpenGPS
 
             //sbSendText.Append(sbOGI.ToString());
 
-            mf.pn.rawBuffer.AddRange(Encoding.ASCII.GetBytes(sbSendText.ToString()));
-            //mf.pn.rawBuffer += sbSendText.ToString();
+            mf.pn.rawBuffer += sbSendText.ToString();
 
             sbSendText.Clear();
         }

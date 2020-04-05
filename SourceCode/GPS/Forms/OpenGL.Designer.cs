@@ -117,7 +117,7 @@ namespace AgOpenGPS
 
                 font.DrawText(edge, line, "NMEA: " + recvSentenceSettings, 1);
                 line += 30;
-                if (SerialGPS.IsOpen)
+                if (sp.IsOpen)
                 {
                     font.DrawText(edge, line, "GPS Port: Connected", 1);
                 }

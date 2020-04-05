@@ -195,8 +195,7 @@ namespace AgOpenGPS
             tboxCurrentLon.Text = mf.pn.longitude.ToString();
         }
 
-
-        private List<string> dataList = new List<string>();
+        public List<string> DataList { get; set; } = new List<string>();
 
         private void BtnGetSourceTable_Click(object sender, EventArgs e)
         {
@@ -204,7 +203,7 @@ namespace AgOpenGPS
             int casterPort = (int)nudCasterPort.Value; //Select correct port (usually 80)
 
             Socket sckt;
-            dataList?.Clear();
+            DataList?.Clear();
 
             try
             {
@@ -243,7 +242,7 @@ namespace AgOpenGPS
 
                         if (words2[0] == "STR")
                         {
-                            dataList.Add(words2[1].Trim().ToString() + "," + words2[9].ToString() + "," + words2[10].ToString()
+                            DataList.Add(words2[1].Trim().ToString() + "," + words2[9].ToString() + "," + words2[10].ToString()
                           + "," + words2[3].Trim().ToString() + "," + words2[6].Trim().ToString()
                                 );
                         }
@@ -251,22 +250,22 @@ namespace AgOpenGPS
                 }
             }
 
-            catch (SocketException se)
+            catch (SocketException)
             {
                 mf.TimedMessageBox(2000, "Socket Exception", "Invalid IP:Port");
                 return;
             }
 
-            catch (Exception ee)
+            catch (Exception)
             {
                 mf.TimedMessageBox(2000, "Exception", "Get Source Table Error");
                 return;
             }
 
-            if (dataList.Count > 0)
+            if (DataList.Count > 0)
             {
                 string syte = "http://monitor.use-snip.com/?hostUrl=" + tboxCasterIP.Text + "&port=" + nudCasterPort.Value.ToString();
-                var form = new FormSource(dataList, mf.pn.latitude, mf.pn.longitude, syte);
+                var form = new FormSource(DataList, mf.pn.latitude, mf.pn.longitude, syte);
                 form.ShowDialog();
             }
             else

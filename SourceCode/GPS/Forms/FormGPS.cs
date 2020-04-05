@@ -578,11 +578,6 @@ namespace AgOpenGPS
             baudRateGPS = Settings.Default.setPort_baudRate;
             portNameGPS = Settings.Default.setPort_portNameGPS;
 
-            baudRateGPS2 = Settings.Default.setPort_baudRate2;
-            portNameGPS2 = Settings.Default.setPort_portNameGPS2;
-
-
-
             if (Settings.Default.setMenu_isSimulatorOn)
             {
                 simulatorOnToolStripMenuItem.Checked = true;
@@ -593,7 +588,6 @@ namespace AgOpenGPS
             {
                 //try and open
                 SerialPortOpenGPS();
-                SerialPortOpenGPS2();
             }
 
             //same for SectionMachine port

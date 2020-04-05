@@ -197,13 +197,9 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    if (SerialGPS2.IsOpen)
+                    if (sp.IsOpen)
                     {
-                        SerialGPS2.Write(data, 0, data.Length);
-                    }
-                    else if (SerialGPS.IsOpen)
-                    {
-                        SerialGPS.Write(data, 0, data.Length);
+                        sp.Write(data, 0, data.Length);
                     }
                 }
                 catch (Exception ex)

@@ -14,8 +14,6 @@ namespace AgOpenGPS
         public static string portNameGPS = "COM GPS";
         public static int baudRateGPS = 4800;
 
-        public static string portNameGPS2 = "COM GPS";
-        public static int baudRateGPS2 = 4800;
         public static string portNameMachine = "COM Sect";
         public static int baudRateMachine = 38400;
 
@@ -34,8 +32,7 @@ namespace AgOpenGPS
         public bool wasAutoSteerConnectedLastRun = false;
 
         //serial port gps is connected to
-        public SerialPort SerialGPS = new SerialPort(portNameGPS, baudRateGPS, Parity.None, 8, StopBits.One);
-        public SerialPort SerialGPS2 = new SerialPort(portNameGPS2, baudRateGPS2, Parity.None, 8, StopBits.One);
+        public SerialPort sp = new SerialPort(portNameGPS, baudRateGPS, Parity.None, 8, StopBits.One);
 
         //serial port Arduino is connected to
         public SerialPort spMachine = new SerialPort(portNameMachine, baudRateMachine, Parity.None, 8, StopBits.One);
@@ -142,7 +139,7 @@ namespace AgOpenGPS
         {
             //spit it out no matter what it says
             mc.serialRecvAutoSteerStr = sentence;
-            if (pbarSteer++ > 98) pbarSteer=0;
+            if (pbarSteer++ > 99) pbarSteer=0;
 
             // Find end of sentence and a comma, if not a CR, return
             int end = sentence.IndexOf("\r");
@@ -540,48 +537,22 @@ namespace AgOpenGPS
         //serial port receive in its own thread
         private void sp_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            if (SerialGPS.IsOpen)
+            if (sp.IsOpen)
             {
                 try
                 {
-                    int bytesToRead;
-                    if ((bytesToRead = SerialGPS.BytesToRead) > 0)
-                    {
-                        byte[] rawBuffer = new byte[bytesToRead];
-                        SerialGPS.Read(rawBuffer, 0, bytesToRead);
-                        BeginInvoke((MethodInvoker)(() => pn.rawBuffer.AddRange(rawBuffer)));
+                    //give it a sec to spit it out
+                    //System.Threading.Thread.Sleep(2000);
 
-                        if (SerialGPS2.IsOpen)
-                        {
-                            SerialGPS2.Write(rawBuffer, 0, bytesToRead);
-                        }
-                    }
+                    //read whatever is in port
+                    string sentence = sp.ReadExisting();
+                    BeginInvoke((MethodInvoker)(() => pn.rawBuffer += sentence));
                 }
                 catch (Exception ex)
                 {
                     WriteErrorLog("GPS Data Recv" + ex.ToString());
-                }
-            }
-        }
 
-        //serial port receive in its own thread
-        private void sp_DataReceived2(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        {
-            if (SerialGPS2.IsOpen)
-            {
-                try
-                {
-                    int bytesToRead;
-                    if ((bytesToRead = SerialGPS2.BytesToRead) > 0)
-                    {
-                        byte[] rawBuffer = new byte[bytesToRead];
-                        SerialGPS2.Read(rawBuffer, 0, bytesToRead);
-                        BeginInvoke((MethodInvoker)(() => pn.rawBuffer2.AddRange(rawBuffer)));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    WriteErrorLog("GPS Data Recv" + ex.ToString());
+                    //MessageBox.Show(ex.Message + "\n\r" + "\n\r" + "Go to Settings -> COM Ports to Fix", "ComPort Failure!");
                 }
             }
         }
@@ -591,24 +562,26 @@ namespace AgOpenGPS
             //close it first
             SerialPortCloseGPS();
 
-            if (Properties.Settings.Default.setMenu_isSimulatorOn)
+            if (sp.IsOpen)
             {
                 simulatorOnToolStripMenuItem.Checked = false;
                 panelSim.Visible = false;
                 timerSim.Enabled = false;
+
                 Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
                 Settings.Default.Save();
             }
 
-            if (!SerialGPS.IsOpen)
+
+            if (!sp.IsOpen)
             {
-                SerialGPS.PortName = portNameGPS;
-                SerialGPS.BaudRate = baudRateGPS;
-                SerialGPS.DataReceived += sp_DataReceived;
-                SerialGPS.WriteTimeout = 1000;
+                sp.PortName = portNameGPS;
+                sp.BaudRate = baudRateGPS;
+                sp.DataReceived += sp_DataReceived;
+                sp.WriteTimeout = 1000;
             }
 
-            try { SerialGPS.Open(); }
+            try { sp.Open(); }
             catch (Exception)
             {
                 //MessageBox.Show(exc.Message + "\n\r" + "\n\r" + "Go to Settings -> COM Ports to Fix", "No Serial Port Active");
@@ -622,13 +595,13 @@ namespace AgOpenGPS
                 //SettingsPageOpen(0);
             }
 
-            if (SerialGPS.IsOpen)
+            if (sp.IsOpen)
             {
                 //btnOpenSerial.Enabled = false;
 
                 //discard any stuff in the buffers
-                SerialGPS.DiscardOutBuffer();
-                SerialGPS.DiscardInBuffer();
+                sp.DiscardOutBuffer();
+                sp.DiscardInBuffer();
 
                 //update port status label
                 //stripPortGPS.Text = portNameGPS + " " + baudRateGPS.ToString();
@@ -640,69 +613,21 @@ namespace AgOpenGPS
             }
         }
 
-        public void SerialPortOpenGPS2()
-        {
-            //close it first
-            SerialPortCloseGPS2();
-
-
-
-            if (!SerialGPS2.IsOpen)
-            {
-                SerialGPS2.PortName = portNameGPS2;
-                SerialGPS2.BaudRate = baudRateGPS2;
-                SerialGPS2.DataReceived += sp_DataReceived2;
-                SerialGPS2.WriteTimeout = 1000;
-            }
-
-            try { SerialGPS2.Open(); }
-            catch (Exception)
-            {
-            }
-
-            if (SerialGPS2.IsOpen)
-            {
-                SerialGPS2.DiscardOutBuffer();
-                SerialGPS2.DiscardInBuffer();
-
-                Properties.Settings.Default.setPort_portNameGPS2 = portNameGPS2;
-                Properties.Settings.Default.setPort_baudRate2 = baudRateGPS2;
-                Properties.Settings.Default.Save();
-
-            }
-        }
         public void SerialPortCloseGPS()
         {
-            //if (sp.IsOpen)
+            sp.DataReceived -= sp_DataReceived;
+            try { sp.Close(); }
+            catch (Exception e)
             {
-                SerialGPS.DataReceived -= sp_DataReceived;
-                try { SerialGPS.Close(); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Closing GPS Port" + e.ToString());
-                    MessageBox.Show(e.Message, "Connection already terminated?");
-                }
+                WriteErrorLog("Closing GPS Port" + e.ToString());
+                MessageBox.Show(e.Message, "Connection already terminated?");
+            }
 
-                //update port status labels
-                //stripPortGPS.Text = " * * " + baudRateGPS.ToString();
-                //stripPortGPS.ForeColor = Color.ForestGreen;
-                //stripOnlineGPS.Value = 1;
-                SerialGPS.Dispose();
-            }
-        }
-        public void SerialPortCloseGPS2()
-        {
-            //if (sp.IsOpen)
-            {
-                SerialGPS2.DataReceived -= sp_DataReceived2;
-                try { SerialGPS2.Close(); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Closing GPS Port 2" + e.ToString());
-                    MessageBox.Show(e.Message, "Connection already terminated?");
-                };
-                SerialGPS2.Dispose();
-            }
+            //update port status labels
+            //stripPortGPS.Text = " * * " + baudRateGPS.ToString();
+            //stripPortGPS.ForeColor = Color.ForestGreen;
+            //stripOnlineGPS.Value = 1;
+            sp.Dispose();
         }
 
         #endregion SerialPortGPS
