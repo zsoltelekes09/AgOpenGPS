@@ -6,7 +6,7 @@ namespace AgOpenGPS
     public partial class FormSmoothAB : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private int smoothCount = 20;
 
@@ -22,7 +22,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsSmoothABCurve;
         }
 
-        private void bntOK_Click(object sender, EventArgs e)
+        private void BntOK_Click(object sender, EventArgs e)
         {
             mf.curve.isSmoothWindowOpen = false;
             mf.curve.SaveSmoothAsRefList();
@@ -37,28 +37,28 @@ namespace AgOpenGPS
             lblSmooth.Text = "**";
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             mf.curve.isSmoothWindowOpen = false;
             mf.curve.smooList?.Clear();
             Close();
         }
 
-        private void btnNorth_MouseDown(object sender, MouseEventArgs e)
+        private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
         {
             if (smoothCount++ > 100) smoothCount = 100;
             mf.curve.SmoothAB(smoothCount * 2);
             lblSmooth.Text = smoothCount.ToString();
         }
 
-        private void btnSouth_MouseDown(object sender, MouseEventArgs e)
+        private void BtnSouth_MouseDown(object sender, MouseEventArgs e)
         {
             if (smoothCount-- < 2) smoothCount = 2;
             mf.curve.SmoothAB(smoothCount * 2);
             lblSmooth.Text = smoothCount.ToString();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private void BtnSave_Click(object sender, EventArgs e)
         {
             mf.curve.isSmoothWindowOpen = false;
             mf.curve.SaveSmoothAsRefList();

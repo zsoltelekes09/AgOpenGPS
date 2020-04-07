@@ -9,7 +9,7 @@ namespace AgOpenGPS
     public partial class FormUDP : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormUDP(Form callingForm)
         {
@@ -33,7 +33,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsEthernetConfiguration;
         }
 
-        private void btnSerialOK_Click(object sender, EventArgs e)
+        private void BtnSerialOK_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setIP_thisPort = (int)nudThisPort.Value;
 
@@ -114,7 +114,7 @@ namespace AgOpenGPS
             return true;
         }
 
-        private void tboxAutoSteerIP_Validating(object sender, CancelEventArgs e)
+        private void TboxAutoSteerIP_Validating(object sender, CancelEventArgs e)
         {
             if (!CheckIPValid(tboxAutoSteerIP.Text))
             {

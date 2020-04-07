@@ -1,6 +1,4 @@
-﻿//Please, if you use this, share the improvements
-
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text;
 
@@ -134,12 +132,11 @@ Field	Meaning
 
         public double latStart, lonStart;
 
-        public double actualEasting, actualNorthing;
-        public double zone;
+        public double actualEasting, actualNorthing, zone;
         public double centralMeridian, convergenceAngle;
 
-        public bool updatedGGA, updatedOGI, updatedRMC;
-
+        public int DualAntennaDistance = 0;
+        public bool UpdatedLatLon, EnableHeadRoll;
         public string rawBuffer = "";
         private string[] words;
         private string nextNMEASentence = "";
@@ -161,7 +158,7 @@ Field	Meaning
         public double upProjection, baselineLength, baselineCourse;
 
         //imu
-        public double nRoll, nPitch, nYaw, nAngularVelocity;
+        public double nRoll, nYaw, nAngularVelocity;
 
         public bool isValidIMU;
         public int fixQuality;
@@ -206,6 +203,8 @@ Field	Meaning
             //compensate for the fact the zones lines are a grid and the world is round
             fix.easting = (Math.Cos(-convergenceAngle) * east) - (Math.Sin(-convergenceAngle) * nort);
             fix.northing = (Math.Sin(-convergenceAngle) * east) + (Math.Cos(-convergenceAngle) * nort);
+
+            UpdatedLatLon = true;
 
             //east = fix.easting;
             //nort = fix.northing;
@@ -288,6 +287,11 @@ Field	Meaning
                 nextNMEASentence = Parse();
                 if (nextNMEASentence == null) return;
 
+                mf.recvSentenceSettings[3] = mf.recvSentenceSettings[2];
+                mf.recvSentenceSettings[2] = mf.recvSentenceSettings[1];
+                mf.recvSentenceSettings[1] = mf.recvSentenceSettings[0];
+                mf.recvSentenceSettings[0] = nextNMEASentence;
+
                 //parse them accordingly
                 words = nextNMEASentence.Split(',');
                 if (words.Length < 3) return;
@@ -309,7 +313,7 @@ Field	Meaning
         private readonly double varRoll = 0.1; // variance, smaller, more faster filtering
         private readonly double varProcess = 0.0003;
 
-        private void AverageTheSpeed()
+        public void AverageTheSpeed()
         {
             //average the speed
             mf.avgSpeed = (mf.avgSpeed * 0.9) + (speed * 0.1);
@@ -444,7 +448,7 @@ Field	Meaning
 
                     { if (words[5] == "W") longitude *= -1; }
 
-                    //calculate zone and UTM coords
+                    //calculate zone and UTM coords, roll calcs
                     UpdateNorthingEasting();
                 }
 
@@ -463,8 +467,6 @@ Field	Meaning
                 //age of differential
                 double.TryParse(words[11], NumberStyles.Float, CultureInfo.InvariantCulture, out ageDiff);
 
-                updatedGGA = true;
-                mf.recvCounter = 0;
             }
         }
 
@@ -495,6 +497,9 @@ Field	Meaning
                     longitude += temp * 0.01666666666666666666666666666667;
 
                     { if (words[5] == "W") longitude *= -1; }
+
+                    //calculate zone and UTM coords, roll calcs
+                    UpdateNorthingEasting();
 
                 }
 
@@ -540,17 +545,12 @@ Field	Meaning
                 else mf.ahrs.rollX16 = 0;
 
                 //pitch
-                double.TryParse(words[14], NumberStyles.Float, CultureInfo.InvariantCulture, out nPitch);
+                //double.TryParse(words[14], NumberStyles.Float, CultureInfo.InvariantCulture, out nPitch);
 
                 //Angular velocity
                 double.TryParse(words[15], NumberStyles.Float, CultureInfo.InvariantCulture, out nAngularVelocity);
 
-                //calculate zone and UTM coords, roll calcs
-                UpdateNorthingEasting();
 
-                //update the watchdog
-                mf.recvCounter = 0;
-                updatedOGI = true;
 
                 AverageTheSpeed();
 
@@ -694,9 +694,7 @@ Field	Meaning
                 double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
                 // Console.WriteLine(nRoll);
 
-                int trasolution;
-
-                int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out trasolution);
+                int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out int trasolution);
                 if (trasolution != 4) nRoll = 0;
 
                 mf.ahrs.rollX16 = mf.ahrs.isRollFromGPS ? (int)(nRoll * 16) : 0;
@@ -731,7 +729,7 @@ Field	Meaning
 
                     if (words[6] == "W") longitude *= -1;
 
-                    //calculate zone and UTM coords
+                    //calculate zone and UTM coords, roll calcs
                     UpdateNorthingEasting();
                 }
 
@@ -756,8 +754,6 @@ Field	Meaning
                     }
                 }
 
-                mf.recvCounter = 0;
-                updatedRMC = true;
 
                 //average the speed
                 AverageTheSpeed();
@@ -852,7 +848,7 @@ Field	Meaning
         public double[] DecDeg2UTM(double latitude, double longitude)
         {
             //only calculate the zone once!
-            if (!mf.isFirstFixPositionSet) zone = Math.Floor((longitude + 180.0) * 0.16666666666666666666666666666667) + 1;
+            if (!mf.isGPSPositionInitialized) zone = Math.Floor((longitude + 180.0) * 0.16666666666666666666666666666667) + 1;
 
             double[] xy = MapLatLonToXY(latitude * 0.01745329251994329576923690766743,
                                         longitude * 0.01745329251994329576923690766743,
@@ -914,7 +910,6 @@ Field	Meaning
 //                    }
 
 //                    //update the receive counter that detects loss of communication
-//                    mainForm.recvCounter = 0;
 //                    //update that RMC data is newly updated
 //                    updatedRMC = true;
 //                }//end $GPRMC

@@ -46,16 +46,16 @@
             this.oglSelf.Size = new System.Drawing.Size(700, 700);
             this.oglSelf.TabIndex = 183;
             this.oglSelf.VSync = false;
-            this.oglSelf.Load += new System.EventHandler(this.oglSelf_Load);
-            this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.oglSelf_Paint);
-            this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.oglSelf_MouseDown);
-            this.oglSelf.Resize += new System.EventHandler(this.oglSelf_Resize);
+            this.oglSelf.Load += new System.EventHandler(this.OglSelf_Load);
+            this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.OglSelf_Paint);
+            this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OglSelf_MouseDown);
+            this.oglSelf.Resize += new System.EventHandler(this.OglSelf_Resize);
             // 
             // timer1
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 250;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // btnExit
             // 
@@ -69,7 +69,7 @@
             this.btnExit.Size = new System.Drawing.Size(123, 70);
             this.btnExit.TabIndex = 234;
             this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
             // 
             // btnCancelTouch
             // 

@@ -131,7 +131,6 @@ namespace AgOpenGPS
         //build contours for boundaries
         public void BuildBoundaryContours(int pass, int spacingInt)
         {
-
             if (mf.bnd.bndArr.Count == 0)
             {
                 mf.TimedMessageBox(1500, "Boundary Contour Error", "No Boundaries Made");
@@ -143,50 +142,29 @@ namespace AgOpenGPS
             spacing *= 0.01;
 
             vec3 point = new vec3();
-            double totalHeadWidth = 0;
-            int signPass = -1;
+            double totalHeadWidth;
+            int signPass;
 
             if (pass == 1)
             {
                 signPass = -1;
                 //determine how wide a headland space
-                totalHeadWidth = ((mf.tool.toolWidth - mf.tool.toolOverlap) * 0.5) - spacing;
+                totalHeadWidth = ((mf.tool.ToolWidth - mf.tool.toolOverlap) * 0.5) - spacing;
             }
 
             else
             {
                 signPass = 1;
-                totalHeadWidth = ((mf.tool.toolWidth - mf.tool.toolOverlap) * pass) + spacing +
-                    ((mf.tool.toolWidth - mf.tool.toolOverlap) * 0.5);
+                totalHeadWidth = ((mf.tool.ToolWidth - mf.tool.toolOverlap) * pass) + spacing +
+                    ((mf.tool.ToolWidth - mf.tool.toolOverlap) * 0.5);
             }
 
-
-            //outside boundary
-
-            //count the points from the boundary
-            int ptCount = mf.bnd.bndArr[0].bndLine.Count;
-
-            ptList = new List<vec3>();
-            stripList.Add(ptList);
-
-            for (int i = ptCount - 1; i >= 0; i--)
+            for (int j = 0; j < mf.bnd.bndArr.Count; j++)
             {
-                //calculate the point inside the boundary
-                point.easting = mf.bnd.bndArr[0].bndLine[i].easting - (signPass * Math.Sin(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * totalHeadWidth);
-                point.northing = mf.bnd.bndArr[0].bndLine[i].northing - (signPass * Math.Cos(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * totalHeadWidth);
-                point.heading = mf.bnd.bndArr[0].bndLine[i].heading - Math.PI;
-                if (point.heading < -glm.twoPI) point.heading += glm.twoPI;
-                ptList.Add(point);
-            }
-
-            //totalHeadWidth = (mf.tool.toolWidth - mf.tool.toolOverlap) * 0.5 + 0.2 + (mf.tool.toolWidth - mf.tool.toolOverlap);
-
-            for (int j = 1; j < mf.bnd.bndArr.Count; j++)
-            {
-                if (!mf.bnd.bndArr[j].isSet) continue;
+                int ChangeDirection = j == 0 ? 1 : -1;
 
                 //count the points from the boundary
-                ptCount = mf.bnd.bndArr[j].bndLine.Count;
+                int ptCount = mf.bnd.bndArr[j].bndLine.Count;
 
                 ptList = new List<vec3>();
                 stripList.Add(ptList);
@@ -194,10 +172,9 @@ namespace AgOpenGPS
                 for (int i = ptCount - 1; i >= 0; i--)
                 {
                     //calculate the point inside the boundary
-                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting - (signPass * Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth);
-                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing - (signPass * Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth);
+                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting - (signPass * Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
+                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing - (signPass * Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading - Math.PI;
-                    if (point.heading < -glm.twoPI) point.heading += glm.twoPI;
 
                     //only add if inside actual field boundary
                     ptList.Add(point);
@@ -213,15 +190,15 @@ namespace AgOpenGPS
         //determine closest point on left side
         public void BuildContourGuidanceLine(vec3 pivot)
         {
-            double toolWid = mf.tool.toolWidth;
+            double toolWid = mf.tool.ToolWidth;
 
             double sinH = Math.Sin(pivot.heading) * 2.0 * toolWid;
             double cosH = Math.Cos(pivot.heading) * 2.0 * toolWid;
 
-            double sin2HL = 0;
-            double cos2HL = 0;
-            double sin2HR = 0;
-            double cos2HR = 0;
+            double sin2HL;
+            double cos2HL;
+            double sin2HR;
+            double cos2HR;
 
             if (mf.tool.toolOffset < 0)
             {
@@ -243,7 +220,7 @@ namespace AgOpenGPS
             }
 
             //narrow equipment needs bigger bounding box.
-            if (mf.tool.toolWidth < 6)
+            if (mf.tool.ToolWidth < 6)
             {
                 sinH = Math.Sin(pivot.heading) * 4 * toolWid;
                 cosH = Math.Cos(pivot.heading) * 4 * toolWid;
@@ -509,7 +486,7 @@ namespace AgOpenGPS
             }
 
             //move the Guidance Line over based on the overlap, width, and offset amount set in vehicle
-            double widthMinusOverlap = mf.tool.toolWidth - mf.tool.toolOverlap + toolOffset;
+            double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap + toolOffset;
 
             //absolute the distance
             distanceFromRefLine = Math.Abs(distanceFromRefLine);

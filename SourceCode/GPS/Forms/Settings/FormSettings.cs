@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormSettings : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private double antennaHeight, antennaOffset, antennaPivot, wheelbase, minTurningRadius;
 
@@ -139,25 +139,25 @@ namespace AgOpenGPS
                 nudMinTurnRadius.Minimum /= 2.54M;
             }
 
-            nudAntennaHeight.ValueChanged -= nudAntennaHeight_ValueChanged;
+            nudAntennaHeight.ValueChanged -= NudAntennaHeight_ValueChanged;
             nudAntennaHeight.Value = (decimal)(antennaHeight * m2MetImp);
-            nudAntennaHeight.ValueChanged += nudAntennaHeight_ValueChanged;
+            nudAntennaHeight.ValueChanged += NudAntennaHeight_ValueChanged;
 
-            nudAntennaOffset.ValueChanged -= nudAntennaOffset_ValueChanged;
+            nudAntennaOffset.ValueChanged -= NudAntennaOffset_ValueChanged;
             nudAntennaOffset.Value = (decimal)(antennaOffset * m2MetImp);
-            nudAntennaOffset.ValueChanged += nudAntennaOffset_ValueChanged;
+            nudAntennaOffset.ValueChanged += NudAntennaOffset_ValueChanged;
 
-            nudAntennaPivot.ValueChanged -= nudAntennaPivot_ValueChanged;
+            nudAntennaPivot.ValueChanged -= NudAntennaPivot_ValueChanged;
             nudAntennaPivot.Value = (decimal)(antennaPivot * m2MetImp);
-            nudAntennaPivot.ValueChanged += nudAntennaPivot_ValueChanged;
+            nudAntennaPivot.ValueChanged += NudAntennaPivot_ValueChanged;
 
-            nudWheelbase.ValueChanged -= nudWheelbase_ValueChanged;
+            nudWheelbase.ValueChanged -= NudWheelbase_ValueChanged;
             nudWheelbase.Value = (decimal)(wheelbase * m2MetImp);
-            nudWheelbase.ValueChanged += nudWheelbase_ValueChanged;
+            nudWheelbase.ValueChanged += NudWheelbase_ValueChanged;
 
-            nudMinTurnRadius.ValueChanged -= nudMinTurnRadius_ValueChanged;
+            nudMinTurnRadius.ValueChanged -= NudMinTurnRadius_ValueChanged;
             nudMinTurnRadius.Value = (decimal)(minTurningRadius * m2MetImp);
-            nudMinTurnRadius.ValueChanged += nudMinTurnRadius_ValueChanged;
+            nudMinTurnRadius.ValueChanged += NudMinTurnRadius_ValueChanged;
 
             nudLineWidth.Value = Properties.Settings.Default.setDisplay_lineWidth;
 
@@ -174,7 +174,7 @@ namespace AgOpenGPS
             btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOK_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setDisplay_lightbarCmPerPixel = lightbarCmPerPixie;
             mf.lightbarCmPerPixel = lightbarCmPerPixie;
@@ -212,7 +212,7 @@ namespace AgOpenGPS
             Properties.Settings.Default.setDisplay_lineWidth = (int)(nudLineWidth.Value);
             mf.ABLine.lineWidth = (int)(nudLineWidth.Value);
 
-            mf.tram.abOffset = (Math.Round((mf.tool.toolWidth - mf.tool.toolOverlap) / 2.0, 3));
+            mf.tram.abOffset = (Math.Round((mf.tool.ToolWidth - mf.tool.toolOverlap) / 2.0, 3));
 
             Properties.Vehicle.Default.setVehicle_vehicleType = vehicleType;
             mf.vehicle.vehicleType = vehicleType;
@@ -292,7 +292,7 @@ namespace AgOpenGPS
             btnCancel.Focus();
         }
 
-        private void nudLineWidth_Enter(object sender, EventArgs e)
+        private void NudLineWidth_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
@@ -314,16 +314,16 @@ namespace AgOpenGPS
         }
 
         //don't save anything, leave the settings as before
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         { DialogResult = DialogResult.Cancel; Close(); }
 
-        private void nudHydLiftSecs_Enter(object sender, EventArgs e)
+        private void NudHydLiftSecs_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void btnChangeAttachment_Click(object sender, EventArgs e)
+        private void BtnChangeAttachment_Click(object sender, EventArgs e)
         {
             btnChangeAttachment.Enabled = false;
             btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
@@ -350,7 +350,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void rbtn4WD_CheckedChanged(object sender, EventArgs e)
+        private void Rbtn4WD_CheckedChanged(object sender, EventArgs e)
         {
             var radioButton = sender as RadioButton;
 
@@ -361,7 +361,6 @@ namespace AgOpenGPS
                 btnChangeAttachment.Enabled = true;
                 btnChangeAttachment.BackColor = System.Drawing.SystemColors.ActiveCaption;
             }
-
         }
 
         private void FixRadioButtonsAndImages()
@@ -387,27 +386,27 @@ namespace AgOpenGPS
 
         #region Vehicle //----------------------------------------------------------------
 
-        private void nudAntennaHeight_ValueChanged(object sender, EventArgs e)
+        private void NudAntennaHeight_ValueChanged(object sender, EventArgs e)
         {
             antennaHeight = (double)nudAntennaHeight.Value * metImp2m;
         }
 
-        private void nudAntennaPivot_ValueChanged(object sender, EventArgs e)
+        private void NudAntennaPivot_ValueChanged(object sender, EventArgs e)
         {
             antennaPivot = (double)nudAntennaPivot.Value * metImp2m;
         }
 
-        private void nudAntennaOffset_ValueChanged(object sender, EventArgs e)
+        private void NudAntennaOffset_ValueChanged(object sender, EventArgs e)
         {
             antennaOffset = (double)nudAntennaOffset.Value * metImp2m;
         }
 
-        private void nudMinTurnRadius_ValueChanged(object sender, EventArgs e)
+        private void NudMinTurnRadius_ValueChanged(object sender, EventArgs e)
         {
             minTurningRadius = (double)nudMinTurnRadius.Value * metImp2m;
         }
 
-        private void nudWheelbase_ValueChanged(object sender, EventArgs e)
+        private void NudWheelbase_ValueChanged(object sender, EventArgs e)
         {
             wheelbase = (double)nudWheelbase.Value * metImp2m;
         }

@@ -19,6 +19,8 @@ namespace AgOpenGPS
         //list of the list of patch data individual triangles for contour tracking
         public List<List<vec3>> contourSaveList = new List<List<vec3>>();
 
+        public List<CAutoLoadField> Fields = new List<CAutoLoadField>();
+
         public void FileSaveCurveLines()
         {
             curve.moveDistance = 0;
@@ -48,6 +50,8 @@ namespace AgOpenGPS
                             writer.WriteLine(curve.curveArr[i].Name);
 
                             //write out the aveheading
+                            //writer.WriteLine(curve.curveArr[i].spiralmode.ToString(CultureInfo.InvariantCulture));
+                            //writer.WriteLine(curve.curveArr[i].circlemode.ToString(CultureInfo.InvariantCulture));
                             writer.WriteLine(curve.curveArr[i].aveHeading.ToString(CultureInfo.InvariantCulture));
 
                             //write out the points of ref line
@@ -132,6 +136,24 @@ namespace AgOpenGPS
                             curve.curveArr[curve.numCurveLines].Name = reader.ReadLine();
                             // get the average heading
                             line = reader.ReadLine();
+                            if (line == "True" || line == "False")
+                            {
+                                curve.curveArr[curve.numCurveLines].spiralmode = bool.Parse(line);
+                                line = reader.ReadLine();
+                            }
+                            else
+                            {
+                                curve.curveArr[curve.numCurveLines].spiralmode = false;
+                            }
+                            if (line == "True" || line == "False")
+                            {
+                                curve.curveArr[curve.numCurveLines].circlemode = bool.Parse(line);
+                                line = reader.ReadLine();
+                            }
+                            else
+                            {
+                                curve.curveArr[curve.numCurveLines].circlemode = false;
+                            }
                             curve.curveArr[curve.numCurveLines].aveHeading = double.Parse(line, CultureInfo.InvariantCulture);
 
                             line = reader.ReadLine();
@@ -163,8 +185,7 @@ namespace AgOpenGPS
                     }
                     catch (Exception er)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsCurveLineFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsCurveLineFileIsCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Curve Line" + er.ToString());
                     }
                 }
@@ -274,8 +295,7 @@ namespace AgOpenGPS
                     }
                     catch (Exception er)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsABLineFileIsCorrupt, "Please delete it!!!");
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsABLineFileIsCorrupt, "Please delete it!!!");
                         WriteErrorLog("FieldOpen, Loading ABLine, Corrupt ABLine File" + er);
                     }
                 }
@@ -407,10 +427,9 @@ namespace AgOpenGPS
                 writer.WriteLine("Empty," + "10");
             }
 
-            //little show to say saved and where
-            var form = new FormTimedMessage(3000, gStr.gsSavedInFolder, vehiclesDirectory);
-            form.Show();
-        }
+                //little show to say saved and where
+                TimedMessageBox(3000, gStr.gsSavedInFolder, vehiclesDirectory);
+            }
 
         //function to open a previously saved field
         public bool FileOpenVehicle(string filename)
@@ -451,11 +470,10 @@ namespace AgOpenGPS
 
                     //if (words[0] != "Version")
 
-                    //{
-                    //    var form = new FormTimedMessage(2000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                    //    form.Show();
-                    //    return false;
-                    //}
+                        //{
+                        //    TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
+                        //    return false;
+                        //}
 
                     string vers = words[1].Replace('.','0');
                     int fileVersion = int.Parse(vers, CultureInfo.InvariantCulture);
@@ -469,8 +487,7 @@ namespace AgOpenGPS
 
                     if (fileVersion < appVersion)
                     {
-                        var form = new FormTimedMessage(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                        form.Show();
+                        TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                         return false;
                     }
                     else
@@ -868,38 +885,13 @@ namespace AgOpenGPS
                 writer.WriteLine("Empty," + "10");
             }
 
-            //little show to say saved and where
-            var form = new FormTimedMessage(3000, gStr.gsSavedInFolder, toolsDirectory);
-            form.Show();
-        }        
+                //little show to say saved and where
+                TimedMessageBox(3000, gStr.gsSavedInFolder, toolsDirectory);
+            }
 
         //function to open a previously saved field
         public bool FileOpenTool(string fileName)
         {
-            //OpenFileDialog ofd = new OpenFileDialog();
-
-            ////get the directory where the fields are stored
-            //string directoryName = toolsDirectory;
-
-            ////make sure the directory exists, if not, create it
-            //if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
-            //{ Directory.CreateDirectory(directoryName); }
-
-            ////the initial directory, fields, for the open dialog
-            //ofd.InitialDirectory = directoryName;
-
-            ////When leaving dialog put windows back where it was
-            //ofd.RestoreDirectory = true;
-
-            ////set the filter to text files only
-            //ofd.Filter = "txt files (*.txt)|*.txt";
-
-            ////was a file selected
-            //if (ofd.ShowDialog() == DialogResult.OK)
-            //{
-            //    //if job started close it
-            //    if (isJobStarted) JobClose();
-
             //make sure the file if fully valid and vehicle matches sections
             using (StreamReader reader = new StreamReader(fileName))
             {
@@ -922,8 +914,7 @@ namespace AgOpenGPS
 
                     if (fileVersion < appVersion)
                     {
-                        var form = new FormTimedMessage(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                        form.Show();
+                        TimedMessageBox(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                         return false;
                     }
 
@@ -1061,9 +1052,9 @@ namespace AgOpenGPS
                         tool.toolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
                         tool.toolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
 
-                        tool.lookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
-                        tool.lookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
-                        tool.turnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
+                        tool.LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
+                        tool.LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
+                        tool.TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
 
                         tool.toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
 
@@ -1078,9 +1069,6 @@ namespace AgOpenGPS
                         mc.isWorkSwitchEnabled = Properties.Settings.Default.setF_IsWorkSwitchEnabled;
                         mc.isWorkSwitchActiveLow = Properties.Settings.Default.setF_IsWorkSwitchActiveLow;
                         mc.isWorkSwitchManual = Properties.Settings.Default.setF_IsWorkSwitchManual;
-
-                        //Set width of section and positions for each section
-                        SectionSetPosition();
 
                         //Calculate total width and each section width
                         SectionCalcWidths();
@@ -1193,9 +1181,7 @@ namespace AgOpenGPS
             }
 
                 //little show to say saved and where
-                var form = new FormTimedMessage(3000, gStr.gsSavedInFolder, envDirectory);
-                form.Show();
-            
+                TimedMessageBox(3000, gStr.gsSavedInFolder, envDirectory);
         }
 
         //function to open a previously saved field
@@ -1224,8 +1210,7 @@ namespace AgOpenGPS
 
                     if (fileVersion < appVersion)
                     {
-                        var form = new FormTimedMessage(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
-                        form.Show();
+                        TimedMessageBox(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                         return DialogResult.Abort;
                     }
 
@@ -1387,7 +1372,6 @@ namespace AgOpenGPS
                 fileAndDirectory = _openType;
                 _openType = "Load";
             }
-
             else fileAndDirectory = "Cancel";
 
             //get the directory where the fields are stored
@@ -1492,9 +1476,8 @@ namespace AgOpenGPS
                 {
                     WriteErrorLog("While Opening Field" + e.ToString());
 
-                    var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                    TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
 
-                    form.Show();
                     JobClose();
                     return;
                 }
@@ -1545,8 +1528,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Sections.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingSectionFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingSectionFile, gStr.gsButFieldIsLoaded);
                 //return;
             }
             else
@@ -1605,8 +1587,7 @@ namespace AgOpenGPS
                     {
                         WriteErrorLog("Section file" + e.ToString());
 
-                        var form = new FormTimedMessage(2000, gStr.gsSectionFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsSectionFileIsCorrupt, gStr.gsButFieldIsLoaded);
                     }
 
                 }
@@ -1626,8 +1607,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Contour.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingContourFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingContourFile, gStr.gsButFieldIsLoaded);
                 //return;
             }
             
@@ -1667,8 +1647,7 @@ namespace AgOpenGPS
                     {
                         WriteErrorLog("Loading Contour file" + e.ToString());
 
-                        var form = new FormTimedMessage(2000, gStr.gsContourFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsContourFileIsCorrupt, gStr.gsButFieldIsLoaded);
                     }
                 }
             }
@@ -1680,8 +1659,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Flags.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingFlagsFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingFlagsFile, gStr.gsButFieldIsLoaded);
             }
 
             else
@@ -1744,8 +1722,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsFlagFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsFlagFileIsCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("FieldOpen, Loading Flags, Corrupt Flag File" + e.ToString());
                     }
                 }
@@ -1756,8 +1733,7 @@ namespace AgOpenGPS
                 fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Boundary.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                var form = new FormTimedMessage(2000, gStr.gsMissingBoundaryFile, gStr.gsButFieldIsLoaded);
-                form.Show();
+                TimedMessageBox(2000, gStr.gsMissingBoundaryFile, gStr.gsButFieldIsLoaded);
             }
             else
             {
@@ -1765,7 +1741,6 @@ namespace AgOpenGPS
                 {
                     try
                     {
-
                         //read header
                         line = reader.ReadLine();//Boundary
 
@@ -1776,6 +1751,7 @@ namespace AgOpenGPS
                             bnd.bndArr.Add(new CBoundaryLines());
                             turn.turnArr.Add(new CTurnLines());
                             gf.geoFenceArr.Add(new CGeoFenceLines());
+                            hd.headArr.Add(new CHeadLines());
 
                             //True or False OR points from older boundary files
                             line = reader.ReadLine();
@@ -1785,11 +1761,7 @@ namespace AgOpenGPS
                             {
                                 bnd.bndArr[k].isDriveThru = bool.Parse(line);
                                 line = reader.ReadLine(); //number of points
-                            }
 
-                            //Check for latest boundary files, then above line string is num of points
-                            if (line == "True" || line == "False")
-                            {
                                 bnd.bndArr[k].isDriveAround = bool.Parse(line);
                                 line = reader.ReadLine(); //number of points
                             }
@@ -1807,43 +1779,46 @@ namespace AgOpenGPS
                                     double.Parse(words[0], CultureInfo.InvariantCulture),
                                     double.Parse(words[1], CultureInfo.InvariantCulture),
                                     double.Parse(words[2], CultureInfo.InvariantCulture));
-
-                                    //if (turnheading)
-                                    //{
-                                    //    vecPt.heading = vecPt.heading + Math.PI;
-                                    //}
                                     bnd.bndArr[k].bndLine.Add(vecPt);
                                 }
 
-                                bnd.bndArr[k].CalculateBoundaryArea();
+                                bnd.bndArr[k].FixBoundaryLine(k, tool.ToolWidth);
                                 bnd.bndArr[k].PreCalcBoundaryLines();
-                                if (bnd.bndArr[k].area > 0) bnd.bndArr[k].isSet = true;
-                                else bnd.bndArr[k].isSet = false;
+                                bnd.bndArr[k].CalculateBoundaryArea();
+                                bnd.bndArr[k].CalculateBoundaryWinding();
+                                if (bnd.bndArr[k].area == 0)
+                                {
+                                    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
+                                    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
+                                    k = k - 1;
+                                }
                             }
                             else
                             {
                                 bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
                                 turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
                                 gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
+                                hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
                                 k = k - 1;
                             }
                             if (reader.EndOfStream) break;
                         }
 
-                        CalculateMinMax();
-                        turn.BuildTurnLines();
-                        gf.BuildGeoFenceLines();
-                        mazeGrid.BuildMazeGridArray();
                     }
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
 
-
+                    turn.BuildTurnLines(-1);
+                    gf.BuildGeoFenceLines(-1);
+                    fd.UpdateFieldBoundaryGUIAreas();
+                    mazeGrid.BuildMazeGridArray();
+                    CalculateMinMax();
                 }
             }
 
@@ -1863,18 +1838,12 @@ namespace AgOpenGPS
                         {
                             if (reader.EndOfStream) break;
 
-                            hd.headArr[0].hdLine.Clear();
-
                             //read the number of points
                             line = reader.ReadLine();
                             int numPoints = int.Parse(line);
 
-                            if (numPoints > 0 && bnd.bndArr.Count >= hd.headArr.Count)
+                            if (numPoints > 0 && hd.headArr.Count > k)
                             {
-
-                                hd.headArr[k].hdLine.Clear();
-                                hd.headArr[k].calcList.Clear();
-
                                 //load the line
                                 for (int i = 0; i < numPoints; i++)
                                 {
@@ -1884,11 +1853,13 @@ namespace AgOpenGPS
                                         double.Parse(words[0], CultureInfo.InvariantCulture),
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
-                                    hd.headArr[k].hdLine.Add(vecPt);
+                                    hd.headArr[k].HeadLine.Add(vecPt);
 
-                                    if (gf.geoFenceArr[0].IsPointInGeoFenceArea(vecPt)) hd.headArr[0].isDrawList.Add(true);
-                                    else hd.headArr[0].isDrawList.Add(false);
+                                    if ((k == 0 ? gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt) : !gf.geoFenceArr[k].IsPointInGeoFenceArea(vecPt))) hd.headArr[k].isDrawList.Add(true);
+                                    else hd.headArr[k].isDrawList.Add(false);
                                 }
+
+                                hd.headArr[k].PreCalcHeadArea();
                                 hd.headArr[k].PreCalcHeadLines();
                             }
                         }
@@ -1896,17 +1867,14 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, "Headland File is Corrupt", "But Field is Loaded");
-                        form.Show();
+                        TimedMessageBox(2000, "Headland File is Corrupt", "But Field is Loaded");
                         WriteErrorLog("Load Headland Loop" + e.ToString());
                     }
                 }
             }
 
-            //if (hd.headArr[0].hdLine.Count > 0) hd.isOn = true;
-             hd.isOn = false;
+            hd.isOn = false;
 
-            //if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
             btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
 
             //Recorded Path
@@ -1944,8 +1912,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        var form = new FormTimedMessage(2000, gStr.gsRecordedPathFileIsCorrupt, gStr.gsButFieldIsLoaded);
-                        form.Show();
+                        TimedMessageBox(2000, gStr.gsRecordedPathFileIsCorrupt, gStr.gsButFieldIsLoaded);
                         WriteErrorLog("Load Recorded Path" + e.ToString());
                     }
                 }
@@ -1965,8 +1932,7 @@ namespace AgOpenGPS
 
             if (!isJobStarted)
             {
-                using (var form = new FormTimedMessage(3000, gStr.gsFieldNotOpen, gStr.gsCreateNewField))
-                { form.Show(); }
+                TimedMessageBox(3000, gStr.gsFieldNotOpen, gStr.gsCreateNewField);
                 return;
             }
             string myFileName, dirField;
@@ -2013,8 +1979,7 @@ namespace AgOpenGPS
 
             //if (!isJobStarted)
             //{
-            //    using (var form = new FormTimedMessage(3000, "Ooops, Job Not Started", "Start a Job First"))
-            //    { form.Show(); }
+            //    TimedMessageBox(3000, "Ooops, Job Not Started", "Start a Job First")
             //    return;
             //}
 
@@ -2200,15 +2165,14 @@ namespace AgOpenGPS
                 {
                     writer.WriteLine(bnd.bndArr[i].isDriveThru);
                     writer.WriteLine(bnd.bndArr[i].isDriveAround);
-                    //writer.WriteLine(bnd.bndArr[i].isOwnField);
 
                     writer.WriteLine(bnd.bndArr[i].bndLine.Count.ToString(CultureInfo.InvariantCulture));
                     if (bnd.bndArr[i].bndLine.Count > 0)
                     {
                         for (int j = 0; j < bnd.bndArr[i].bndLine.Count; j++)
-                            writer.WriteLine(Math.Round(bnd.bndArr[i].bndLine[j].easting,3).ToString(CultureInfo.InvariantCulture) + "," +
+                            writer.WriteLine(Math.Round(bnd.bndArr[i].bndLine[j].easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
                                                 Math.Round(bnd.bndArr[i].bndLine[j].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                                    Math.Round(bnd.bndArr[i].bndLine[j].heading,5).ToString(CultureInfo.InvariantCulture));
+                                                    Math.Round(bnd.bndArr[i].bndLine[j].heading, 5).ToString(CultureInfo.InvariantCulture));
                     }
                 }
             }
@@ -2219,7 +2183,6 @@ namespace AgOpenGPS
         {
             //get the directory and make sure it exists, create if not
             string dirField = fieldsDirectory + currentFieldDirectory + "\\";
-
             string directoryName = Path.GetDirectoryName(dirField);
             if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
             { Directory.CreateDirectory(directoryName); }
@@ -2228,19 +2191,15 @@ namespace AgOpenGPS
             using (StreamWriter writer = new StreamWriter(dirField + "Headland.Txt"))
             {
                 writer.WriteLine("$Headland");
-
-                if (hd.headArr[0].hdLine.Count > 0)
+                for (int i = 0; i < hd.headArr.Count; i++)
                 {
-                    for (int i = 0; i < hd.headArr.Count; i++)
+                    writer.WriteLine(hd.headArr[i].HeadLine.Count.ToString(CultureInfo.InvariantCulture));
+                    if (hd.headArr[i].HeadLine.Count > 0)
                     {
-                        writer.WriteLine(hd.headArr[i].hdLine.Count.ToString(CultureInfo.InvariantCulture));
-                        if (hd.headArr[0].hdLine.Count > 0)
-                        {
-                            for (int j = 0; j < hd.headArr[i].hdLine.Count; j++)
-                                writer.WriteLine(Math.Round(hd.headArr[i].hdLine[j].easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                                 Math.Round(hd.headArr[i].hdLine[j].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                                 Math.Round(hd.headArr[i].hdLine[j].heading, 3).ToString(CultureInfo.InvariantCulture));
-                        }
+                        for (int j = 0; j < hd.headArr[i].HeadLine.Count; j++)
+                            writer.WriteLine(Math.Round(hd.headArr[i].HeadLine[j].easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                                             Math.Round(hd.headArr[i].HeadLine[j].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                                             Math.Round(hd.headArr[i].HeadLine[j].heading, 3).ToString(CultureInfo.InvariantCulture));
                     }
                 }
             }
@@ -2289,11 +2248,11 @@ namespace AgOpenGPS
                 {
                     for (int j = 0; j < recPath.recList.Count; j++)
                         writer.WriteLine(
-                            Math.Round(recPath.recList[j].easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                            Math.Round(recPath.recList[j].northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                            Math.Round(recPath.recList[j].heading, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                            Math.Round(recPath.recList[j].speed, 1).ToString(CultureInfo.InvariantCulture) + "," +
-                            (recPath.recList[j].autoBtnState).ToString());
+                            Math.Round(recPath.recList[j].Easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(recPath.recList[j].Northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(recPath.recList[j].Heading, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                            Math.Round(recPath.recList[j].Speed, 1).ToString(CultureInfo.InvariantCulture) + "," +
+                            (recPath.recList[j].AutoBtnState).ToString());
 
                     //Clear list
                     //recPath.recList.Clear();

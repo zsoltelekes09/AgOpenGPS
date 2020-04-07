@@ -86,8 +86,8 @@
             0,
             0,
             65536});
-            this.nudSnapAdj.ValueChanged += new System.EventHandler(this.nudSnapAdj_ValueChanged);
-            this.nudSnapAdj.Enter += new System.EventHandler(this.nudSnapAdj_Enter);
+            this.nudSnapAdj.ValueChanged += new System.EventHandler(this.NudSnapAdj_ValueChanged);
+            this.nudSnapAdj.Enter += new System.EventHandler(this.NudSnapAdj_Enter);
             // 
             // nudEqWidth
             // 
@@ -117,8 +117,8 @@
             0,
             0,
             131072});
-            this.nudEqWidth.ValueChanged += new System.EventHandler(this.nudEqWidth_ValueChanged);
-            this.nudEqWidth.Enter += new System.EventHandler(this.nudEqWidth_Enter);
+            this.nudEqWidth.ValueChanged += new System.EventHandler(this.NudEqWidth_ValueChanged);
+            this.nudEqWidth.Enter += new System.EventHandler(this.NudEqWidth_Enter);
             // 
             // nudWheelSpacing
             // 
@@ -147,8 +147,8 @@
             0,
             0,
             131072});
-            this.nudWheelSpacing.ValueChanged += new System.EventHandler(this.nudWheelSpacing_ValueChanged);
-            this.nudWheelSpacing.Enter += new System.EventHandler(this.nudWheelSpacing_Enter);
+            this.nudWheelSpacing.ValueChanged += new System.EventHandler(this.NudWheelSpacing_ValueChanged);
+            this.nudWheelSpacing.Enter += new System.EventHandler(this.NudWheelSpacing_Enter);
             // 
             // lblSmallSnapRight
             // 
@@ -206,8 +206,8 @@
             0,
             0,
             0});
-            this.nudPasses.ValueChanged += new System.EventHandler(this.nudPasses_ValueChanged);
-            this.nudPasses.Enter += new System.EventHandler(this.nudPasses_Enter);
+            this.nudPasses.ValueChanged += new System.EventHandler(this.NudPasses_ValueChanged);
+            this.nudPasses.Enter += new System.EventHandler(this.NudPasses_Enter);
             // 
             // label3
             // 
@@ -258,8 +258,8 @@
             0,
             65536});
             this.nudOffset.Visible = false;
-            this.nudOffset.ValueChanged += new System.EventHandler(this.nudOffset_ValueChanged);
-            this.nudOffset.Enter += new System.EventHandler(this.nudOffset_Enter);
+            this.nudOffset.ValueChanged += new System.EventHandler(this.NudOffset_ValueChanged);
+            this.nudOffset.Enter += new System.EventHandler(this.NudOffset_Enter);
             // 
             // panel1
             // 
@@ -290,7 +290,7 @@
             this.btnMode.Size = new System.Drawing.Size(70, 59);
             this.btnMode.TabIndex = 455;
             this.btnMode.UseVisualStyleBackColor = true;
-            this.btnMode.Click += new System.EventHandler(this.btnMode_Click);
+            this.btnMode.Click += new System.EventHandler(this.BtnMode_Click);
             // 
             // btnLeft
             // 
@@ -306,7 +306,7 @@
             this.btnLeft.Size = new System.Drawing.Size(87, 32);
             this.btnLeft.TabIndex = 452;
             this.btnLeft.UseVisualStyleBackColor = false;
-            this.btnLeft.Click += new System.EventHandler(this.btnLeft_Click);
+            this.btnLeft.Click += new System.EventHandler(this.BtnLeft_Click);
             // 
             // btnRight
             // 
@@ -322,7 +322,7 @@
             this.btnRight.Size = new System.Drawing.Size(87, 32);
             this.btnRight.TabIndex = 453;
             this.btnRight.UseVisualStyleBackColor = false;
-            this.btnRight.Click += new System.EventHandler(this.btnRight_Click);
+            this.btnRight.Click += new System.EventHandler(this.BtnRight_Click);
             // 
             // btnTriggerDistanceDn
             // 
@@ -337,7 +337,7 @@
             this.btnTriggerDistanceDn.Size = new System.Drawing.Size(66, 53);
             this.btnTriggerDistanceDn.TabIndex = 439;
             this.btnTriggerDistanceDn.UseVisualStyleBackColor = true;
-            this.btnTriggerDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnTriggerDistanceDn_MouseDown);
+            this.btnTriggerDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceDn_MouseDown);
             // 
             // btnTriggerDistanceUp
             // 
@@ -352,7 +352,7 @@
             this.btnTriggerDistanceUp.Size = new System.Drawing.Size(66, 53);
             this.btnTriggerDistanceUp.TabIndex = 440;
             this.btnTriggerDistanceUp.UseVisualStyleBackColor = true;
-            this.btnTriggerDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnTriggerDistanceUp_MouseDown);
+            this.btnTriggerDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceUp_MouseDown);
             // 
             // btnSwapAB
             // 
@@ -365,7 +365,7 @@
             this.btnSwapAB.Size = new System.Drawing.Size(70, 53);
             this.btnSwapAB.TabIndex = 438;
             this.btnSwapAB.UseVisualStyleBackColor = true;
-            this.btnSwapAB.Click += new System.EventHandler(this.btnSwapAB_Click);
+            this.btnSwapAB.Click += new System.EventHandler(this.BtnSwapAB_Click);
             // 
             // btnCancel
             // 
@@ -382,7 +382,7 @@
             this.btnCancel.Size = new System.Drawing.Size(51, 58);
             this.btnCancel.TabIndex = 421;
             this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // btnAdjLeft
             // 
@@ -398,7 +398,7 @@
             this.btnAdjLeft.Size = new System.Drawing.Size(76, 45);
             this.btnAdjLeft.TabIndex = 416;
             this.btnAdjLeft.UseVisualStyleBackColor = false;
-            this.btnAdjLeft.Click += new System.EventHandler(this.btnAdjLeft_Click);
+            this.btnAdjLeft.Click += new System.EventHandler(this.BtnAdjLeft_Click);
             // 
             // btnSave
             // 
@@ -413,7 +413,7 @@
             this.btnSave.Size = new System.Drawing.Size(100, 58);
             this.btnSave.TabIndex = 234;
             this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
             // btnAdjRight
             // 
@@ -429,7 +429,7 @@
             this.btnAdjRight.Size = new System.Drawing.Size(76, 45);
             this.btnAdjRight.TabIndex = 415;
             this.btnAdjRight.UseVisualStyleBackColor = false;
-            this.btnAdjRight.Click += new System.EventHandler(this.btnAdjRight_Click);
+            this.btnAdjRight.Click += new System.EventHandler(this.BtnAdjRight_Click);
             // 
             // FormTramCurve
             // 

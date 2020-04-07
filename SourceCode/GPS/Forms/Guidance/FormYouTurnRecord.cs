@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormYouTurnRecord : Form
     {
         //properties
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormYouTurnRecord(Form callingForm)
         {
@@ -20,7 +20,7 @@ namespace AgOpenGPS
             this.Text = gStr.gsYouTurnRecorder;
         }
 
-        private void btnRecord_Click(object sender, EventArgs e)
+        private void BtnRecord_Click(object sender, EventArgs e)
         {
             btnRecord.ForeColor = Color.Red;
             if (mf.yt.youFileList.Count > 0) mf.yt.youFileList.Clear();
@@ -29,7 +29,7 @@ namespace AgOpenGPS
             btnStop.Enabled = true;
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
+        private void BtnStop_Click(object sender, EventArgs e)
         {
             //go make the list
             mf.yt.isRecordingCustomYouTurn = false;
@@ -66,7 +66,7 @@ namespace AgOpenGPS
 
             //scale the drawing to match exactly the ABLine width
             double adjustFactor = pt[pt.Length - 1].easting;
-            adjustFactor = (mf.tool.toolWidth - mf.tool.toolOverlap + mf.tool.toolOffset) / adjustFactor;
+            adjustFactor = (mf.tool.ToolWidth - mf.tool.toolOverlap + mf.tool.toolOffset) / adjustFactor;
             for (i = 0; i < pt.Length; i++)
             {
                 pt[i].easting *= adjustFactor;

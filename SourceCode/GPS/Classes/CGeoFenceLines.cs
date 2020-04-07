@@ -12,43 +12,45 @@ namespace AgOpenGPS
         //the list of constants and multiples of the boundary
         public List<vec2> calcList = new List<vec2>();
 
-        public void ResetGeoFence()
-        {
-            calcList?.Clear();
-            geoFenceLine?.Clear();
-        }
+        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
-        public bool IsPointInGeoFenceArea(vec3 testPointv2)
+        public bool IsPointInGeoFenceArea(vec3 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = geoFenceLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < geoFenceLine.Count; j = i++)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
-                if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
-                || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((geoFenceLine[i].northing < TestPoint.northing && geoFenceLine[j].northing >= TestPoint.northing)
+                    || (geoFenceLine[j].northing < TestPoint.northing && geoFenceLine[i].northing >= TestPoint.northing))
+                    {
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
         }
 
-        public bool IsPointInGeoFenceArea(vec2 testPointv2)
+        public bool IsPointInGeoFenceArea(vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = geoFenceLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < geoFenceLine.Count; j = i++)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
-                if ((geoFenceLine[i].northing < testPointv2.northing && geoFenceLine[j].northing >= testPointv2.northing)
-                || (geoFenceLine[j].northing < testPointv2.northing && geoFenceLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((geoFenceLine[i].northing < TestPoint.northing && geoFenceLine[j].northing >= TestPoint.northing)
+                    || (geoFenceLine[j].northing < TestPoint.northing && geoFenceLine[i].northing >= TestPoint.northing))
+                    {
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -62,9 +64,9 @@ namespace AgOpenGPS
             GL.LineWidth(3);
             GL.Color3(0.96555f, 0.1232f, 0.50f);
             //GL.PointSize(4);
-            GL.Begin(PrimitiveType.LineStrip);
+
+            GL.Begin(PrimitiveType.LineLoop);
             for (int h = 0; h < ptCount; h++) GL.Vertex3(geoFenceLine[h].easting, geoFenceLine[h].northing, 0);
-            GL.Vertex3(geoFenceLine[0].easting, geoFenceLine[0].northing, 0);
             GL.End();
         }
 
@@ -72,11 +74,11 @@ namespace AgOpenGPS
         {
             //count the points from the boundary
             int lineCount = geoFenceLine.Count;
-            double distance = 0;
 
             //int headCount = mf.bndArr[inTurnNum].bndLine.Count;
             int bndCount = curBnd.Count;
 
+            double distance;
             //remove the points too close to boundary
             for (int i = 0; i < bndCount; i++)
             {
@@ -131,28 +133,40 @@ namespace AgOpenGPS
 
         public void PreCalcTurnLines()
         {
-            int j = geoFenceLine.Count - 1;
-            //clear the list, constant is easting, multiple is northing
-            calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
-
-            for (int i = 0; i < geoFenceLine.Count; j = i++)
+            if (geoFenceLine.Count > 3)
             {
-                //check for divide by zero
-                if (Math.Abs(geoFenceLine[i].northing - geoFenceLine[j].northing) < double.Epsilon)
+                int j = geoFenceLine.Count - 1;
+                //clear the list, constant is easting, multiple is northing
+                calcList.Clear();
+                vec2 constantMultiple = new vec2(0, 0);
+
+                Northingmin = Northingmax = geoFenceLine[0].northing;
+                Eastingmin = Eastingmax = geoFenceLine[0].easting;
+
+
+                for (int i = 0; i < geoFenceLine.Count; j = i++)
                 {
-                    constantMultiple.easting = geoFenceLine[i].easting;
-                    constantMultiple.northing = 0;
-                    calcList.Add(constantMultiple);
-                }
-                else
-                {
-                    //determine constant and multiple and add to list
-                    constantMultiple.easting = geoFenceLine[i].easting - ((geoFenceLine[i].northing * geoFenceLine[j].easting)
-                                    / (geoFenceLine[j].northing - geoFenceLine[i].northing)) + ((geoFenceLine[i].northing * geoFenceLine[i].easting)
-                                        / (geoFenceLine[j].northing - geoFenceLine[i].northing));
-                    constantMultiple.northing = (geoFenceLine[j].easting - geoFenceLine[i].easting) / (geoFenceLine[j].northing - geoFenceLine[i].northing);
-                    calcList.Add(constantMultiple);
+                    if (Northingmin > geoFenceLine[i].northing) Northingmin = geoFenceLine[i].northing;
+                    if (Northingmax < geoFenceLine[i].northing) Northingmax = geoFenceLine[i].northing;
+                    if (Eastingmin > geoFenceLine[i].easting) Eastingmin = geoFenceLine[i].easting;
+                    if (Eastingmax < geoFenceLine[i].easting) Eastingmax = geoFenceLine[i].easting;
+
+                    //check for divide by zero
+                    if (Math.Abs(geoFenceLine[i].northing - geoFenceLine[j].northing) < double.Epsilon)
+                    {
+                        constantMultiple.easting = geoFenceLine[i].easting;
+                        constantMultiple.northing = 0;
+                        calcList.Add(constantMultiple);
+                    }
+                    else
+                    {
+                        //determine constant and multiple and add to list
+                        constantMultiple.easting = geoFenceLine[i].easting - ((geoFenceLine[i].northing * geoFenceLine[j].easting)
+                                        / (geoFenceLine[j].northing - geoFenceLine[i].northing)) + ((geoFenceLine[i].northing * geoFenceLine[i].easting)
+                                            / (geoFenceLine[j].northing - geoFenceLine[i].northing));
+                        constantMultiple.northing = (geoFenceLine[j].easting - geoFenceLine[i].easting) / (geoFenceLine[j].northing - geoFenceLine[i].northing);
+                        calcList.Add(constantMultiple);
+                    }
                 }
             }
         }

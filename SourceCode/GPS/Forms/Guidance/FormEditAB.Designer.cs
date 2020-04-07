@@ -78,7 +78,7 @@
             this.tboxHeading.TabIndex = 4;
             this.tboxHeading.Text = "359.123456";
             this.tboxHeading.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.tboxHeading.Enter += new System.EventHandler(this.tboxHeading_Enter);
+            this.tboxHeading.Enter += new System.EventHandler(this.TboxHeading_Enter);
             // 
             // nudMinTurnRadius
             // 
@@ -101,8 +101,8 @@
             0,
             0,
             0});
-            this.nudMinTurnRadius.ValueChanged += new System.EventHandler(this.nudMinTurnRadius_ValueChanged);
-            this.nudMinTurnRadius.Enter += new System.EventHandler(this.nudMinTurnRadius_Enter);
+            this.nudMinTurnRadius.ValueChanged += new System.EventHandler(this.NudMinTurnRadius_ValueChanged);
+            this.nudMinTurnRadius.Enter += new System.EventHandler(this.NudMinTurnRadius_Enter);
             // 
             // btnSwapAB
             // 
@@ -115,7 +115,7 @@
             this.btnSwapAB.Size = new System.Drawing.Size(71, 63);
             this.btnSwapAB.TabIndex = 5;
             this.btnSwapAB.UseVisualStyleBackColor = true;
-            this.btnSwapAB.Click += new System.EventHandler(this.btnSwapAB_Click);
+            this.btnSwapAB.Click += new System.EventHandler(this.BtnSwapAB_Click);
             // 
             // btnBPoint
             // 
@@ -130,7 +130,7 @@
             this.btnBPoint.Size = new System.Drawing.Size(64, 56);
             this.btnBPoint.TabIndex = 2;
             this.btnBPoint.UseVisualStyleBackColor = false;
-            this.btnBPoint.Click += new System.EventHandler(this.btnBPoint_Click);
+            this.btnBPoint.Click += new System.EventHandler(this.BtnBPoint_Click);
             // 
             // btnCancel
             // 
@@ -147,7 +147,7 @@
             this.btnCancel.Size = new System.Drawing.Size(67, 58);
             this.btnCancel.TabIndex = 0;
             this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -165,7 +165,7 @@
             this.bntOK.TabIndex = 1;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = false;
-            this.bntOK.Click += new System.EventHandler(this.bntOk_Click);
+            this.bntOK.Click += new System.EventHandler(this.BntOk_Click);
             // 
             // btnAdjLeft
             // 
@@ -180,7 +180,7 @@
             this.btnAdjLeft.Size = new System.Drawing.Size(70, 45);
             this.btnAdjLeft.TabIndex = 6;
             this.btnAdjLeft.UseVisualStyleBackColor = false;
-            this.btnAdjLeft.Click += new System.EventHandler(this.btnAdjLeft_Click);
+            this.btnAdjLeft.Click += new System.EventHandler(this.BtnAdjLeft_Click);
             // 
             // btnAdjRight
             // 
@@ -195,7 +195,7 @@
             this.btnAdjRight.Size = new System.Drawing.Size(70, 45);
             this.btnAdjRight.TabIndex = 7;
             this.btnAdjRight.UseVisualStyleBackColor = false;
-            this.btnAdjRight.Click += new System.EventHandler(this.btnAdjRight_Click);
+            this.btnAdjRight.Click += new System.EventHandler(this.BtnAdjRight_Click);
             // 
             // btnContourPriority
             // 
@@ -212,7 +212,7 @@
             this.btnContourPriority.TabIndex = 3;
             this.btnContourPriority.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnContourPriority.UseVisualStyleBackColor = false;
-            this.btnContourPriority.Click += new System.EventHandler(this.btnContourPriority_Click);
+            this.btnContourPriority.Click += new System.EventHandler(this.BtnContourPriority_Click);
             // 
             // btnLeftHalfWidth
             // 
@@ -227,7 +227,7 @@
             this.btnLeftHalfWidth.Size = new System.Drawing.Size(70, 45);
             this.btnLeftHalfWidth.TabIndex = 8;
             this.btnLeftHalfWidth.UseVisualStyleBackColor = false;
-            this.btnLeftHalfWidth.Click += new System.EventHandler(this.btnLeftHalfWidth_Click);
+            this.btnLeftHalfWidth.Click += new System.EventHandler(this.BtnLeftHalfWidth_Click);
             // 
             // btnRightHalfWidth
             // 
@@ -242,7 +242,7 @@
             this.btnRightHalfWidth.Size = new System.Drawing.Size(70, 45);
             this.btnRightHalfWidth.TabIndex = 9;
             this.btnRightHalfWidth.UseVisualStyleBackColor = false;
-            this.btnRightHalfWidth.Click += new System.EventHandler(this.btnRightHalfWidth_Click);
+            this.btnRightHalfWidth.Click += new System.EventHandler(this.BtnRightHalfWidth_Click);
             // 
             // label3
             // 

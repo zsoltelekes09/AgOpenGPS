@@ -64,21 +64,21 @@ namespace AgOpenGPS
             nudCasterPort.Value = Properties.Settings.Default.setNTRIP_casterPort;
             nudSendToUDPPort.Value = Properties.Settings.Default.setNTRIP_sendToUDPPort;
 
-            cboxIsNTRIPOn.CheckedChanged -= cboxIsNTRIPOn_CheckedChanged;
+            cboxIsNTRIPOn.CheckedChanged -= CboxIsNTRIPOn_CheckedChanged;
             cboxIsNTRIPOn.Checked = Properties.Settings.Default.setNTRIP_isOn;
-            cboxIsNTRIPOn.CheckedChanged += cboxIsNTRIPOn_CheckedChanged;
+            cboxIsNTRIPOn.CheckedChanged += CboxIsNTRIPOn_CheckedChanged;
 
             tboxUserName.Text = Properties.Settings.Default.setNTRIP_userName;
             tboxUserPassword.Text = Properties.Settings.Default.setNTRIP_userPassword;
             tboxMount.Text = Properties.Settings.Default.setNTRIP_mount;
 
-            nudGGAInterval.ValueChanged -= nudGGAInterval_ValueChanged;
+            nudGGAInterval.ValueChanged -= NudGGAInterval_ValueChanged;
             nudGGAInterval.Value = Properties.Settings.Default.setNTRIP_sendGGAInterval;
-            nudGGAInterval.ValueChanged += nudGGAInterval_ValueChanged;
+            nudGGAInterval.ValueChanged += NudGGAInterval_ValueChanged;
 
-            nudSendToUDPPort.ValueChanged -= nudSendToUDPPort_ValueChanged;
+            nudSendToUDPPort.ValueChanged -= NudSendToUDPPort_ValueChanged;
             nudSendToUDPPort.Value = Properties.Settings.Default.setNTRIP_sendToUDPPort;
-            nudSendToUDPPort.ValueChanged += nudSendToUDPPort_ValueChanged;
+            nudSendToUDPPort.ValueChanged += NudSendToUDPPort_ValueChanged;
 
             nudLatitude.Value = (decimal)Properties.Settings.Default.setNTRIP_manualLat;
             nudLongitude.Value = (decimal)Properties.Settings.Default.setNTRIP_manualLon;
@@ -108,7 +108,7 @@ namespace AgOpenGPS
             return IP4Address;
         }
 
-        private void btnGetIP_Click(object sender, EventArgs e)
+        private void BtnGetIP_Click(object sender, EventArgs e)
         {
             string actualIP = tboxEnterURL.Text.Trim();
             try
@@ -149,7 +149,7 @@ namespace AgOpenGPS
             return true;
         }
 
-        private void tboxCasterIP_Validating(object sender, CancelEventArgs e)
+        private void TboxCasterIP_Validating(object sender, CancelEventArgs e)
         {
             if (!CheckIPValid(tboxCasterIP.Text))
             {
@@ -159,7 +159,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnSerialOK_Click(object sender, EventArgs e)
+        private void BtnSerialOK_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setNTRIP_casterIP = tboxCasterIP.Text;
             Properties.Settings.Default.setNTRIP_casterPort = (int)nudCasterPort.Value;
@@ -183,28 +183,27 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnSetManualPosition_Click(object sender, EventArgs e)
+        private void BtnSetManualPosition_Click(object sender, EventArgs e)
         {
             nudLatitude.Value = (decimal)mf.pn.latitude;
             nudLongitude.Value = (decimal)mf.pn.longitude;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             tboxCurrentLat.Text = mf.pn.latitude.ToString();
             tboxCurrentLon.Text = mf.pn.longitude.ToString();
         }
 
+        public List<string> DataList { get; set; } = new List<string>();
 
-        private List<string> dataList = new List<string>();
-
-        private void btnGetSourceTable_Click(object sender, EventArgs e)
+        private void BtnGetSourceTable_Click(object sender, EventArgs e)
         {
             IPAddress casterIP = IPAddress.Parse(tboxCasterIP.Text.Trim()); //Select correct Address
             int casterPort = (int)nudCasterPort.Value; //Select correct port (usually 80)
 
             Socket sckt;
-            dataList?.Clear();
+            DataList?.Clear();
 
             try
             {
@@ -242,7 +241,7 @@ namespace AgOpenGPS
 
                         if (words2[0] == "STR")
                         {
-                            dataList.Add(words2[1].Trim().ToString() + "," + words2[9].ToString() + "," + words2[10].ToString()
+                            DataList.Add(words2[1].Trim().ToString() + "," + words2[9].ToString() + "," + words2[10].ToString()
                           + "," + words2[3].Trim().ToString() + "," + words2[6].Trim().ToString()
                                 );
                         }
@@ -250,22 +249,22 @@ namespace AgOpenGPS
                 }
             }
 
-            catch (SocketException se)
+            catch (SocketException)
             {
                 mf.TimedMessageBox(2000, "Socket Exception", "Invalid IP:Port");
                 return;
             }
 
-            catch (Exception ee)
+            catch (Exception)
             {
                 mf.TimedMessageBox(2000, "Exception", "Get Source Table Error");
                 return;
             }
 
-            if (dataList.Count > 0)
+            if (DataList.Count > 0)
             {
                 string syte = "http://monitor.use-snip.com/?hostUrl=" + tboxCasterIP.Text + "&port=" + nudCasterPort.Value.ToString();
-                var form = new FormSource(this, dataList, mf.pn.latitude, mf.pn.longitude, syte);
+                var form = new FormSource(this, DataList, mf.pn.latitude, mf.pn.longitude, syte);
                 form.ShowDialog();
             }
             else
@@ -278,15 +277,15 @@ namespace AgOpenGPS
             // Process.Start(syte);
         }
 
-        private void cboxIsNTRIPOn_CheckedChanged(object sender, EventArgs e)
+        private void CboxIsNTRIPOn_CheckedChanged(object sender, EventArgs e)
         {
         }
 
-        private void nudGGAInterval_ValueChanged(object sender, EventArgs e)
+        private void NudGGAInterval_ValueChanged(object sender, EventArgs e)
         {
         }
 
-        private void nudSendToUDPPort_ValueChanged(object sender, EventArgs e)
+        private void NudSendToUDPPort_ValueChanged(object sender, EventArgs e)
         {
         }
 
@@ -320,19 +319,19 @@ namespace AgOpenGPS
             btnSerialCancel.Focus();
         }
 
-        private void tboxEnterURL_Click(object sender, EventArgs e)
+        private void TboxEnterURL_Click(object sender, EventArgs e)
         {
         }
 
-        private void tboxMount_Click(object sender, EventArgs e)
+        private void TboxMount_Click(object sender, EventArgs e)
         {
         }
 
-        private void tboxUserName_Click(object sender, EventArgs e)
+        private void TboxUserName_Click(object sender, EventArgs e)
         {
         }
 
-        private void tboxUserPassword_Click(object sender, EventArgs e)
+        private void TboxUserPassword_Click(object sender, EventArgs e)
         {
         }
     }

@@ -9,7 +9,7 @@ namespace AgOpenGPS
     public partial class FormFieldDir : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormFieldDir(Form _callingForm)
         {
@@ -32,7 +32,7 @@ namespace AgOpenGPS
             lblFilename.Text = "";
         }
 
-        private void tboxFieldName_TextChanged(object sender, EventArgs e)
+        private void TboxFieldName_TextChanged(object sender, EventArgs e)
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
@@ -52,7 +52,7 @@ namespace AgOpenGPS
                 + " " + tboxVehicle.Text.Trim() + " " + DateTime.Now.ToString("yyyy.MMM.dd HH_mm", CultureInfo.InvariantCulture);
         }
 
-        private void tboxTask_TextChanged(object sender, EventArgs e)
+        private void TboxTask_TextChanged(object sender, EventArgs e)
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
@@ -63,7 +63,7 @@ namespace AgOpenGPS
                 + " " + tboxVehicle.Text.Trim() + " " + DateTime.Now.ToString("yyyy.MMM.dd HH_mm", CultureInfo.InvariantCulture);
         }
 
-        private void tboxVehicle_TextChanged(object sender, EventArgs e)
+        private void TboxVehicle_TextChanged(object sender, EventArgs e)
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
@@ -74,12 +74,12 @@ namespace AgOpenGPS
                 + " " + tboxVehicle.Text.Trim() + " " + DateTime.Now.ToString("yyyy.MMM.dd HH_mm", CultureInfo.InvariantCulture);
         }
 
-        private void btnSerialCancel_Click(object sender, EventArgs e)
+        private void BtnSerialCancel_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private void BtnSave_Click(object sender, EventArgs e)
         {
             //fill something in
             if (String.IsNullOrEmpty(tboxFieldName.Text.Trim()))

@@ -9,7 +9,7 @@ namespace AgOpenGPS
 {
     public partial class FormModules : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         double disp = 0;
         int dispInt = 0;
@@ -20,7 +20,7 @@ namespace AgOpenGPS
             InitializeComponent();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             string[] words = mf.mc.serialRecvAutoSteerStr.Split(',');
             if (words.Length == 5)

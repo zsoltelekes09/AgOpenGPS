@@ -12,7 +12,7 @@ namespace AgOpenGPS
     public partial class FormTramCurve : Form
     {
         //access to the main GPS form and all its variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private double snapAdj = 0;
 
@@ -37,27 +37,27 @@ namespace AgOpenGPS
 
         private void FormTram_Load(object sender, EventArgs e)
         { 
-            nudSnapAdj.ValueChanged -= nudSnapAdj_ValueChanged;
-            snapAdj = (Math.Round((mf.tool.toolWidth - mf.tool.toolOverlap)/2.0,3));
+            nudSnapAdj.ValueChanged -= NudSnapAdj_ValueChanged;
+            snapAdj = (Math.Round((mf.tool.ToolWidth - mf.tool.toolOverlap)/2.0,3));
             nudSnapAdj.Value = (decimal)snapAdj;
-            nudSnapAdj.ValueChanged += nudSnapAdj_ValueChanged;
+            nudSnapAdj.ValueChanged += NudSnapAdj_ValueChanged;
 
-            nudEqWidth.ValueChanged -= nudEqWidth_ValueChanged;
+            nudEqWidth.ValueChanged -= NudEqWidth_ValueChanged;
             nudEqWidth.Value = (decimal)Properties.Settings.Default.setTram_eqWidth;
-            nudEqWidth.ValueChanged += nudEqWidth_ValueChanged;
+            nudEqWidth.ValueChanged += NudEqWidth_ValueChanged;
 
-            nudWheelSpacing.ValueChanged -= nudWheelSpacing_ValueChanged;
+            nudWheelSpacing.ValueChanged -= NudWheelSpacing_ValueChanged;
             nudWheelSpacing.Value = (decimal)Properties.Settings.Default.setTram_wheelSpacing;
-            nudWheelSpacing.ValueChanged += nudWheelSpacing_ValueChanged;
+            nudWheelSpacing.ValueChanged += NudWheelSpacing_ValueChanged;
 
-            nudPasses.ValueChanged -= nudPasses_ValueChanged;
+            nudPasses.ValueChanged -= NudPasses_ValueChanged;
             nudPasses.Value = Properties.Settings.Default.setTram_passes;
-            nudPasses.ValueChanged += nudPasses_ValueChanged;
+            nudPasses.ValueChanged += NudPasses_ValueChanged;
 
-            nudOffset.ValueChanged -= nudOffset_ValueChanged;
+            nudOffset.ValueChanged -= NudOffset_ValueChanged;
             nudOffset.Value = (decimal)snapAdj;
             mf.tram.abOffset = snapAdj;
-            nudOffset.ValueChanged += nudOffset_ValueChanged;
+            nudOffset.ValueChanged += NudOffset_ValueChanged;
 
             mf.curve.BuildTram();
             mf.curve.isEditing = true;
@@ -84,7 +84,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private void BtnSave_Click(object sender, EventArgs e)
         {
             //mf.ABLine.moveDistance = 0;
             mf.curve.isEditing = false;
@@ -119,39 +119,39 @@ namespace AgOpenGPS
 
         }
 
-        private void btnLeft_Click(object sender, EventArgs e)
+        private void BtnLeft_Click(object sender, EventArgs e)
         {
             double dist = -0.1;
             mf.curve.MoveABCurve(dist);
             mf.curve.BuildTram();
         }
 
-        private void btnRight_Click(object sender, EventArgs e)
+        private void BtnRight_Click(object sender, EventArgs e)
         {
             double dist = 0.1;
             mf.curve.MoveABCurve(dist);
             mf.curve.BuildTram();
         }
 
-        private void btnAdjLeft_Click(object sender, EventArgs e)
+        private void BtnAdjLeft_Click(object sender, EventArgs e)
         {
             mf.curve.MoveABCurve(-snapAdj);
             mf.curve.BuildTram();
         }
 
-        private void btnAdjRight_Click(object sender, EventArgs e)
+        private void BtnAdjRight_Click(object sender, EventArgs e)
         {
             mf.curve.MoveABCurve(snapAdj);
             mf.curve.BuildTram();
         }
 
-        private void nudSnapAdj_Enter(object sender, EventArgs e)
+        private void NudSnapAdj_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudPasses_ValueChanged(object sender, EventArgs e)
+        private void NudPasses_ValueChanged(object sender, EventArgs e)
         {
             mf.tram.passes = (int)nudPasses.Value;
             Properties.Settings.Default.setTram_passes = mf.tram.passes;
@@ -159,13 +159,13 @@ namespace AgOpenGPS
             mf.curve.BuildTram();
         }
 
-        private void nudPasses_Enter(object sender, EventArgs e)
+        private void NudPasses_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudOffset_ValueChanged(object sender, EventArgs e)
+        private void NudOffset_ValueChanged(object sender, EventArgs e)
         {
             mf.tram.abOffset = (double)nudOffset.Value;
             Properties.Settings.Default.setTram_offset = mf.tram.abOffset;
@@ -173,13 +173,13 @@ namespace AgOpenGPS
             mf.curve.BuildTram();
         }
 
-        private void nudOffset_Enter(object sender, EventArgs e)
+        private void NudOffset_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void btnSwapAB_Click(object sender, EventArgs e)
+        private void BtnSwapAB_Click(object sender, EventArgs e)
         {
             int cnt = mf.curve.refList.Count;
             if (cnt > 0)
@@ -191,15 +191,13 @@ namespace AgOpenGPS
                 mf.curve.refList.CopyTo(arr);
                 mf.curve.refList.Clear();
 
-                mf.curve.aveLineHeading += Math.PI;
-                if (mf.curve.aveLineHeading < 0) mf.curve.aveLineHeading += glm.twoPI;
-                if (mf.curve.aveLineHeading > glm.twoPI) mf.curve.aveLineHeading -= glm.twoPI;
+                mf.curve.aveLineHeading = (mf.curve.aveLineHeading + Math.PI) % glm.twoPI;
 
                 for (int i = 1; i < cnt; i++)
                 {
                     vec3 pt3 = arr[i];
                     pt3.heading += Math.PI;
-                    if (pt3.heading > glm.twoPI) pt3.heading -= glm.twoPI;
+                    pt3.heading %= glm.twoPI;
                     if (pt3.heading < 0) pt3.heading += glm.twoPI;
                     mf.curve.refList.Add(pt3);
                 }
@@ -207,19 +205,19 @@ namespace AgOpenGPS
             mf.curve.BuildTram();
         }
 
-        private void btnTriggerDistanceUp_MouseDown(object sender, MouseEventArgs e)
+        private void BtnTriggerDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
             nudPasses.UpButton();
             //mf.curve.BuildTram();
         }
 
-        private void btnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
+        private void BtnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
             nudPasses.DownButton();
             //mf.curve.BuildTram();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             mf.curve.tramArr?.Clear();
             mf.curve.tramList?.Clear();
@@ -235,7 +233,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void nudSnapAdj_ValueChanged(object sender, EventArgs e)
+        private void NudSnapAdj_ValueChanged(object sender, EventArgs e)
         {
             snapAdj = (double)nudSnapAdj.Value;
             Properties.Settings.Default.setTram_snapAdj = snapAdj;
@@ -243,7 +241,7 @@ namespace AgOpenGPS
             mf.curve.BuildTram();
         }
 
-        private void nudEqWidth_ValueChanged(object sender, EventArgs e)
+        private void NudEqWidth_ValueChanged(object sender, EventArgs e)
         {
             mf.tram.tramWidth  = (double)nudEqWidth.Value;
             Properties.Settings.Default.setTram_eqWidth = mf.tram.tramWidth;
@@ -252,13 +250,13 @@ namespace AgOpenGPS
 
         }
 
-        private void nudEqWidth_Enter(object sender, EventArgs e)
+        private void NudEqWidth_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudWheelSpacing_ValueChanged(object sender, EventArgs e)
+        private void NudWheelSpacing_ValueChanged(object sender, EventArgs e)
         {
             mf.tram.wheelTrack = (double)nudWheelSpacing.Value;
             mf.tram.halfWheelTrack = mf.tram.wheelTrack * 0.5;
@@ -269,13 +267,13 @@ namespace AgOpenGPS
             mf.curve.BuildTram();
         }
 
-        private void nudWheelSpacing_Enter(object sender, EventArgs e)
+        private void NudWheelSpacing_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();        
         }
 
-        private void btnMode_Click(object sender, EventArgs e)
+        private void BtnMode_Click(object sender, EventArgs e)
         {
             mf.tram.displayMode++;
             if (mf.tram.displayMode > 3) mf.tram.displayMode = 0;

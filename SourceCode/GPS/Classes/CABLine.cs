@@ -108,11 +108,11 @@ namespace AgOpenGPS
 
             if (!isEditing)
             {
-                if (mf.isSideGuideLines && mf.camera.camSetDistance > mf.tool.toolWidth * -120)
+                if (mf.isSideGuideLines && mf.camera.camSetDistance > mf.tool.ToolWidth * -120)
                 {
                     //get the tool offset and width
                     double toolOffset = mf.tool.toolOffset * 2;
-                    double toolWidth = mf.tool.toolWidth - mf.tool.toolOverlap;
+                    double toolWidth = mf.tool.ToolWidth - mf.tool.toolOverlap;
                     double cosHeading = Math.Cos(-abHeading);
                     double sinHeading = Math.Sin(-abHeading);
 
@@ -157,7 +157,7 @@ namespace AgOpenGPS
 
             if (isEditing)
             {
-                double toolWidth2 = mf.tool.toolWidth - mf.tool.toolOverlap;
+                double toolWidth2 = mf.tool.ToolWidth - mf.tool.toolOverlap;
                 double cosHeading2 = Math.Cos(-mf.ABLine.abHeading);
                 double sinHeading2 = Math.Sin(-mf.ABLine.abHeading);
 
@@ -174,7 +174,7 @@ namespace AgOpenGPS
                     {
                         GL.Vertex3((cosHeading2 * toolWidth2) + mf.ABLine.refABLineP1.easting, (sinHeading2 * toolWidth2) + mf.ABLine.refABLineP1.northing, 0);
                         GL.Vertex3((cosHeading2 * toolWidth2) + mf.ABLine.refABLineP2.easting, (sinHeading2 * toolWidth2) + mf.ABLine.refABLineP2.northing, 0);
-                        toolWidth2 = toolWidth2 + mf.tool.toolWidth - mf.tool.toolOverlap;
+                        toolWidth2 = toolWidth2 + mf.tool.ToolWidth - mf.tool.toolOverlap;
                     }
 
                     GL.End();
@@ -236,11 +236,10 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < tramList.Count; i++)
                 {
-                    int middle = 0;
                     GL.Color4(0.8630f, 0.93692f, 0.8260f, 0.752);
                     if (tramList[i].Count > 1)
                     {
-                        middle = tramList[i].Count - 1;
+                        int middle = tramList[i].Count - 1;
                         mf.font.DrawText3D(tramList[i][middle].easting, tramList[i][middle].northing, (i + 1).ToString());
                         mf.font.DrawText3D(tramList[i][0].easting, tramList[i][0].northing, (i + 1).ToString());
 
@@ -256,8 +255,6 @@ namespace AgOpenGPS
             tramList?.Clear();
             tramArr?.Clear();
             List<vec2> tramRef = new List<vec2>();
-
-            bool isBndExist = mf.bnd.bndArr.Count != 0;
 
             double pass = 0.5;
             double hsin = Math.Sin(abHeading);
@@ -290,7 +287,7 @@ namespace AgOpenGPS
                     P1.easting =  (hsin * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + tramRef[j].easting;
                     P1.northing = (hcos * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + tramRef[j].northing;
 
-                    if (isBndExist)
+                    if (mf.bnd.bndArr.Count > 0)
                     {
                         if (mf.bnd.bndArr[0].IsPointInsideBoundary(P1))
                         {
@@ -313,11 +310,6 @@ namespace AgOpenGPS
 
             tramRef?.Clear();
             //outside tram
-
-            if (mf.bnd.bndArr.Count == 0 || mf.tram.passes != 0)
-            {                               
-                //return;
-            }
         }
 
         public void GetCurrentABLine(vec3 pivot, vec3 steer)
@@ -326,7 +318,7 @@ namespace AgOpenGPS
             if (mf.isStanleyUsed)
             {
                 //move the ABLine over based on the overlap amount set in vehicle
-                double widthMinusOverlap = mf.tool.toolWidth - mf.tool.toolOverlap;
+                double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
 
                 //x2-x1
                 double dx = refABLineP2.easting - refABLineP1.easting;
@@ -460,7 +452,7 @@ namespace AgOpenGPS
             else
             {
                 //move the ABLine over based on the overlap amount set in vehicle
-                double widthMinusOverlap = mf.tool.toolWidth - mf.tool.toolOverlap;
+                double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
 
                 //x2-x1
                 double dx = refABLineP2.easting - refABLineP1.easting;

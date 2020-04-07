@@ -99,7 +99,7 @@
             this.linkLabelGit.TabIndex = 11;
             this.linkLabelGit.TabStop = true;
             this.linkLabelGit.Text = "https://github.com/farmerbriantee/AgOpenGPS";
-            this.linkLabelGit.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelGit_LinkClicked);
+            this.linkLabelGit.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelGit_LinkClicked);
             // 
             // linkLabelCombineForum
             // 
@@ -111,7 +111,7 @@
             this.linkLabelCombineForum.TabIndex = 12;
             this.linkLabelCombineForum.TabStop = true;
             this.linkLabelCombineForum.Text = "https://agopengps.discourse.forum";
-            this.linkLabelCombineForum.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelCombineForum_LinkClicked);
+            this.linkLabelCombineForum.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelCombineForum_LinkClicked);
             // 
             // button1
             // 
@@ -126,7 +126,7 @@
             this.button1.Text = "I Agree to the Terms and Conditions";
             this.button1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // label12
             // 
@@ -202,7 +202,7 @@
             this.button2.Text = "I Do Not Agree";
             this.button2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // btnFlag
             // 

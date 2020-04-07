@@ -12,7 +12,7 @@ namespace AgOpenGPS
     public partial class FormTouchPick : Form
     {
         //access to the main GPS form and all its variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private double maxFieldX, maxFieldY, minFieldX, minFieldY, fieldCenterX, fieldCenterY, maxFieldDistance;
         private Point fixPt;
@@ -71,7 +71,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                            mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
                         }
                     }
                 }
@@ -89,7 +89,7 @@ namespace AgOpenGPS
 
         }
 
-        private void oglSelf_MouseDown(object sender, MouseEventArgs e)
+        private void OglSelf_MouseDown(object sender, MouseEventArgs e)
         {
             btnCancelTouch.Enabled = true;
 
@@ -115,7 +115,7 @@ namespace AgOpenGPS
         }
 
 
-        private void oglSelf_Paint(object sender, PaintEventArgs e)
+        private void OglSelf_Paint(object sender, PaintEventArgs e)
         {
             oglSelf.MakeCurrent();
 
@@ -139,18 +139,18 @@ namespace AgOpenGPS
             oglSelf.SwapBuffers();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             oglSelf.Refresh();
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void BtnExit_Click(object sender, EventArgs e)
         {
             
             Close();
         }
 
-        private void oglSelf_Resize(object sender, EventArgs e)
+        private void OglSelf_Resize(object sender, EventArgs e)
         {
             oglSelf.MakeCurrent();
             GL.MatrixMode(MatrixMode.Projection);
@@ -163,7 +163,7 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Modelview);
         }
 
-        private void oglSelf_Load(object sender, EventArgs e)
+        private void OglSelf_Load(object sender, EventArgs e)
         {
             oglSelf.MakeCurrent();
             GL.Enable(EnableCap.CullFace);
@@ -189,7 +189,7 @@ namespace AgOpenGPS
                     foreach (var triList in mf.section[j].patchList)
                     {
                         int count2 = triList.Count;
-                        for (int i = 0; i < count2; i += 3)
+                        for (int i = 1; i < count2; i += 3)
                         {
                             double x = triList[i].easting;
                             double y = triList[i].northing;
@@ -206,18 +206,10 @@ namespace AgOpenGPS
                 //min max of the boundary
                 if (mf.bnd.bndArr.Count > 0)
                 {
-                    int bndCnt = mf.bnd.bndArr[0].bndLine.Count;
-                    for (int i = 0; i < bndCnt; i++)
-                    {
-                        double x = mf.bnd.bndArr[0].bndLine[i].easting;
-                        double y = mf.bnd.bndArr[0].bndLine[i].northing;
-
-                        //also tally the max/min of field x and z
-                        if (minFieldX > x) minFieldX = x;
-                        if (maxFieldX < x) maxFieldX = x;
-                        if (minFieldY > y) minFieldY = y;
-                        if (maxFieldY < y) maxFieldY = y;
-                    }
+                    minFieldY = mf.bnd.bndArr[0].Northingmin;
+                    maxFieldY = mf.bnd.bndArr[0].Northingmax;
+                    minFieldX = mf.bnd.bndArr[0].Eastingmin;
+                    maxFieldX = mf.bnd.bndArr[0].Eastingmax;
                 }
 
                 if (maxFieldX == -9999999 || minFieldX == 9999999 || maxFieldY == -9999999 || minFieldY == 9999999)

@@ -8,11 +8,11 @@ namespace AgOpenGPS
 {
     public partial class FormFilePicker : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private int order;
 
-        private List<string> fileList = new List<string>();
+        public List<string> FileList { get; set; } = new List<string>();
 
         public FormFilePicker(Form callingForm)
         {
@@ -31,7 +31,7 @@ namespace AgOpenGPS
 
             string[] dirs = Directory.GetDirectories(mf.fieldsDirectory);
 
-            fileList?.Clear();
+            FileList?.Clear();
 
             foreach (string dir in dirs)
             {
@@ -67,7 +67,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                            mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
                         }
                     }
 
@@ -75,8 +75,8 @@ namespace AgOpenGPS
                     distance = Math.Sqrt(distance);
                     distance *= 100;
 
-                    fileList.Add(fieldDirectory);
-                    fileList.Add(distance.ToString("#####.##").PadLeft(10));
+                    FileList.Add(fieldDirectory);
+                    FileList.Add(distance.ToString("#####.##").PadLeft(10));
                 }
 
                 //grab the boundary area
@@ -155,15 +155,15 @@ namespace AgOpenGPS
                         }
                     }
 
-                    fileList.Add(area.ToString("####.##").PadLeft(10));
+                    FileList.Add(area.ToString("####.##").PadLeft(10));
                 }
                     
                 filename = dir + "\\Field.txt";
             }
 
-            for (int i = 0; i < fileList.Count; i += 3)
+            for (int i = 0; i < FileList.Count-2; i += 3)
             {
-                string[] fieldNames = { fileList[i], fileList[i + 1], fileList[i+2] };
+                string[] fieldNames = { FileList[i], FileList[i + 1], FileList[i+2] };
                 itm = new ListViewItem(fieldNames);
                 lvLines.Items.Add(itm);
             }
@@ -181,14 +181,9 @@ namespace AgOpenGPS
                 this.chArea.Text = "Area";
                 this.chArea.Width = 140;
             }
-            else
-            {
-                //var form2 = new FormTimedMessage(2000, gStr.gsNoFieldsCreated, gStr.gsCreateNewFieldFirst);
-                //form2.Show();
-            }
         }
 
-        private void btnByDistance_Click(object sender, EventArgs e)
+        private void BtnByDistance_Click(object sender, EventArgs e)
         {
             ListViewItem itm;
 
@@ -197,21 +192,21 @@ namespace AgOpenGPS
             if (order == 3) order = 0;
 
 
-            for (int i = 0; i < fileList.Count; i += 3)
+            for (int i = 0; i < FileList.Count-2; i += 3)
             {
                 if (order == 0)
                 {
-                    string[] fieldNames = { fileList[i], fileList[i + 1], fileList[i + 2] };
+                    string[] fieldNames = { FileList[i], FileList[i + 1], FileList[i + 2] };
                     itm = new ListViewItem(fieldNames);
                 }
                 else if (order == 1)
                 {
-                    string[] fieldNames = { fileList[i + 1], fileList[i], fileList[i + 2] };
+                    string[] fieldNames = { FileList[i + 1], FileList[i], FileList[i + 2] };
                     itm = new ListViewItem(fieldNames);
                 }
                 else
                 {
-                    string[] fieldNames = { fileList[i + 2], fileList[i], fileList[i + 1] };
+                    string[] fieldNames = { FileList[i + 2], FileList[i], FileList[i + 1] };
                     itm = new ListViewItem(fieldNames);
                 }
 
@@ -259,7 +254,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnOpenExistingLv_Click(object sender, EventArgs e)
+        private void BtnOpenExistingLv_Click(object sender, EventArgs e)
         {
             int count = lvLines.SelectedItems.Count;
             if (count > 0)
@@ -270,7 +265,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnDeleteAB_Click(object sender, EventArgs e)
+        private void BtnDeleteAB_Click(object sender, EventArgs e)
         {
             mf.filePickerFileAndDirectory = "";
         }

@@ -110,6 +110,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CAutoLoadField.cs" />
     <Compile Include="Classes\CSunTimes.cs" />
     <Compile Include="Classes\CFieldData.cs" />
     <Compile Include="Classes\CBoundaryLines.cs" />
@@ -127,7 +128,6 @@
     <Compile Include="Classes\CRecordedPath.cs" />
     <Compile Include="Classes\CSim.cs" />
     <Compile Include="Classes\CTram.cs" />
-    <Compile Include="Classes\CWorkSwitch.cs" />
     <Compile Include="Classes\CYouTurn.cs" />
     <Compile Include="Classes\CBoundary.cs" />
     <Compile Include="Classes\CFlag.cs" />
@@ -429,7 +429,6 @@
     <Compile Include="Forms\Guidance\FormTram.Designer.cs">
       <DependentUpon>FormTram.cs</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="gStr.af.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -525,6 +524,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>gStr.uk.resx</DependentUpon>
     </Compile>
+    <Compile Include="LibTessDotNet\Sweep.cs" />
+    <Compile Include="LibTessDotNet\Tess.cs" />
+    <Compile Include="LibTessDotNet\PriorityQueue.cs" />
+    <Compile Include="LibTessDotNet\PriorityHeap.cs" />
+    <Compile Include="LibTessDotNet\Dict.cs" />
+    <Compile Include="LibTessDotNet\Geom.cs" />
+    <Compile Include="LibTessDotNet\MeshUtils.cs" />
+    <Compile Include="LibTessDotNet\Mesh.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -582,6 +589,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormHeadland.resx">
       <DependentUpon>FormHeadland.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Guidance\FormEditCurve.resx">
       <DependentUpon>FormEditCurve.cs</DependentUpon>
@@ -629,6 +637,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Guidance\FormABCurve.resx">
       <DependentUpon>FormABCurve.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormBoundary.resx">
       <DependentUpon>FormBoundary.cs</DependentUpon>
@@ -752,9 +761,6 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="..\.editorconfig">
-      <Link>.editorconfig</Link>
-    </None>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>

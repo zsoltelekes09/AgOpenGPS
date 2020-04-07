@@ -205,7 +205,7 @@
             this.btnOK.TabIndex = 129;
             this.btnOK.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnOK.UseVisualStyleBackColor = true;
-            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
+            this.btnOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
             // tabEdit
             // 
@@ -236,8 +236,8 @@
             this.tabEdit.TabIndex = 4;
             this.tabEdit.Text = "Edit";
             this.tabEdit.UseVisualStyleBackColor = true;
-            this.tabEdit.Enter += new System.EventHandler(this.tabEdit_Enter);
-            this.tabEdit.Leave += new System.EventHandler(this.tabEdit_Leave);
+            this.tabEdit.Enter += new System.EventHandler(this.TabEdit_Enter);
+            this.tabEdit.Leave += new System.EventHandler(this.TabEdit_Leave);
             // 
             // label44
             // 
@@ -443,7 +443,7 @@
             this.btnEditCancel.Size = new System.Drawing.Size(105, 78);
             this.btnEditCancel.TabIndex = 132;
             this.btnEditCancel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnEditCancel.Click += new System.EventHandler(this.btnEditCancel_Click);
+            this.btnEditCancel.Click += new System.EventHandler(this.BtnEditCancel_Click);
             // 
             // btnSaveNames
             // 
@@ -458,7 +458,7 @@
             this.btnSaveNames.TabIndex = 130;
             this.btnSaveNames.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnSaveNames.UseVisualStyleBackColor = true;
-            this.btnSaveNames.Click += new System.EventHandler(this.btnSaveNames_Click);
+            this.btnSaveNames.Click += new System.EventHandler(this.BtnSaveNames_Click);
             // 
             // tabExit
             // 
@@ -547,7 +547,7 @@
             this.cboxExitFunc7.Name = "cboxExitFunc7";
             this.cboxExitFunc7.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc7.TabIndex = 84;
-            this.cboxExitFunc7.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc7_SelectedIndexChanged);
+            this.cboxExitFunc7.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc7_SelectedIndexChanged);
             // 
             // label19
             // 
@@ -630,7 +630,7 @@
             this.cboxExitFunc5.Name = "cboxExitFunc5";
             this.cboxExitFunc5.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc5.TabIndex = 78;
-            this.cboxExitFunc5.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc5_SelectedIndexChanged);
+            this.cboxExitFunc5.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc5_SelectedIndexChanged);
             // 
             // cboxExitFunc6
             // 
@@ -644,7 +644,7 @@
             this.cboxExitFunc6.Name = "cboxExitFunc6";
             this.cboxExitFunc6.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc6.TabIndex = 77;
-            this.cboxExitFunc6.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc6_SelectedIndexChanged);
+            this.cboxExitFunc6.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc6_SelectedIndexChanged);
             // 
             // label31
             // 
@@ -768,7 +768,7 @@
             this.cboxExitFunc4.Name = "cboxExitFunc4";
             this.cboxExitFunc4.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc4.TabIndex = 48;
-            this.cboxExitFunc4.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc4_SelectedIndexChanged);
+            this.cboxExitFunc4.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc4_SelectedIndexChanged);
             // 
             // cboxExitAction4
             // 
@@ -811,7 +811,7 @@
             this.cboxExitFunc3.Name = "cboxExitFunc3";
             this.cboxExitFunc3.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc3.TabIndex = 45;
-            this.cboxExitFunc3.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc3_SelectedIndexChanged);
+            this.cboxExitFunc3.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc3_SelectedIndexChanged);
             // 
             // cboxExitAction3
             // 
@@ -854,7 +854,7 @@
             this.cboxExitFunc2.Name = "cboxExitFunc2";
             this.cboxExitFunc2.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc2.TabIndex = 42;
-            this.cboxExitFunc2.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc2_SelectedIndexChanged);
+            this.cboxExitFunc2.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc2_SelectedIndexChanged);
             // 
             // cboxExitAction2
             // 
@@ -897,7 +897,7 @@
             this.cboxExitFunc1.Name = "cboxExitFunc1";
             this.cboxExitFunc1.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc1.TabIndex = 39;
-            this.cboxExitFunc1.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc1_SelectedIndexChanged);
+            this.cboxExitFunc1.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc1_SelectedIndexChanged);
             // 
             // cboxExitAction1
             // 
@@ -940,7 +940,7 @@
             this.cboxExitFunc0.Name = "cboxExitFunc0";
             this.cboxExitFunc0.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc0.TabIndex = 36;
-            this.cboxExitFunc0.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc0_SelectedIndexChanged);
+            this.cboxExitFunc0.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc0_SelectedIndexChanged);
             // 
             // cboxExitAction0
             // 
@@ -1070,7 +1070,7 @@
             this.cboxEnterFunc7.Name = "cboxEnterFunc7";
             this.cboxEnterFunc7.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc7.TabIndex = 70;
-            this.cboxEnterFunc7.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc7_SelectedIndexChanged);
+            this.cboxEnterFunc7.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc7_SelectedIndexChanged);
             // 
             // label30
             // 
@@ -1164,7 +1164,7 @@
             this.cboxEnterFunc5.Name = "cboxEnterFunc5";
             this.cboxEnterFunc5.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc5.TabIndex = 63;
-            this.cboxEnterFunc5.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc5_SelectedIndexChanged);
+            this.cboxEnterFunc5.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc5_SelectedIndexChanged);
             // 
             // cboxEnterFunc6
             // 
@@ -1178,7 +1178,7 @@
             this.cboxEnterFunc6.Name = "cboxEnterFunc6";
             this.cboxEnterFunc6.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc6.TabIndex = 62;
-            this.cboxEnterFunc6.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc6_SelectedIndexChanged);
+            this.cboxEnterFunc6.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc6_SelectedIndexChanged);
             // 
             // label24
             // 
@@ -1280,7 +1280,7 @@
             this.cboxEnterFunc4.Name = "cboxEnterFunc4";
             this.cboxEnterFunc4.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc4.TabIndex = 33;
-            this.cboxEnterFunc4.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc4_SelectedIndexChanged);
+            this.cboxEnterFunc4.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc4_SelectedIndexChanged);
             // 
             // cboxEnterAction4
             // 
@@ -1323,7 +1323,7 @@
             this.cboxEnterFunc3.Name = "cboxEnterFunc3";
             this.cboxEnterFunc3.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc3.TabIndex = 30;
-            this.cboxEnterFunc3.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc3_SelectedIndexChanged);
+            this.cboxEnterFunc3.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc3_SelectedIndexChanged);
             // 
             // cboxEnterAction3
             // 
@@ -1366,7 +1366,7 @@
             this.cboxEnterFunc2.Name = "cboxEnterFunc2";
             this.cboxEnterFunc2.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc2.TabIndex = 27;
-            this.cboxEnterFunc2.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc2_SelectedIndexChanged);
+            this.cboxEnterFunc2.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc2_SelectedIndexChanged);
             // 
             // cboxEnterAction2
             // 
@@ -1409,7 +1409,7 @@
             this.cboxEnterFunc1.Name = "cboxEnterFunc1";
             this.cboxEnterFunc1.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc1.TabIndex = 24;
-            this.cboxEnterFunc1.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc1_SelectedIndexChanged);
+            this.cboxEnterFunc1.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc1_SelectedIndexChanged);
             // 
             // cboxEnterAction1
             // 
@@ -1452,7 +1452,7 @@
             this.cboxEnterFunc0.Name = "cboxEnterFunc0";
             this.cboxEnterFunc0.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc0.TabIndex = 0;
-            this.cboxEnterFunc0.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc0_SelectedIndexChanged);
+            this.cboxEnterFunc0.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc0_SelectedIndexChanged);
             // 
             // cboxEnterAction0
             // 
@@ -1496,7 +1496,7 @@
             this.btnTurnAllOff.Size = new System.Drawing.Size(109, 95);
             this.btnTurnAllOff.TabIndex = 132;
             this.btnTurnAllOff.Text = "Turn All Off";
-            this.btnTurnAllOff.Click += new System.EventHandler(this.btnTurnAllOff_Click);
+            this.btnTurnAllOff.Click += new System.EventHandler(this.BtnTurnAllOff_Click);
             // 
             // btnToggle6
             // 
@@ -1512,7 +1512,7 @@
             this.btnToggle6.TabIndex = 137;
             this.btnToggle6.Text = "Toggle 6";
             this.btnToggle6.UseVisualStyleBackColor = false;
-            this.btnToggle6.Click += new System.EventHandler(this.btnToggle6_Click);
+            this.btnToggle6.Click += new System.EventHandler(this.BtnToggle6_Click);
             // 
             // btnToggle3
             // 
@@ -1528,7 +1528,7 @@
             this.btnToggle3.TabIndex = 134;
             this.btnToggle3.Text = "Toggle 3";
             this.btnToggle3.UseVisualStyleBackColor = false;
-            this.btnToggle3.Click += new System.EventHandler(this.btnToggle3_Click);
+            this.btnToggle3.Click += new System.EventHandler(this.BtnToggle3_Click);
             // 
             // btnToggle7
             // 
@@ -1544,7 +1544,7 @@
             this.btnToggle7.TabIndex = 138;
             this.btnToggle7.Text = "Toggle 7";
             this.btnToggle7.UseVisualStyleBackColor = false;
-            this.btnToggle7.Click += new System.EventHandler(this.btnToggle7_Click);
+            this.btnToggle7.Click += new System.EventHandler(this.BtnToggle7_Click);
             // 
             // btnToggle8
             // 
@@ -1560,7 +1560,7 @@
             this.btnToggle8.TabIndex = 139;
             this.btnToggle8.Text = "Toggle 8";
             this.btnToggle8.UseVisualStyleBackColor = false;
-            this.btnToggle8.Click += new System.EventHandler(this.btnToggle8_Click);
+            this.btnToggle8.Click += new System.EventHandler(this.BtnToggle8_Click);
             // 
             // btnToggle5
             // 
@@ -1576,7 +1576,7 @@
             this.btnToggle5.TabIndex = 136;
             this.btnToggle5.Text = "Toggle 5";
             this.btnToggle5.UseVisualStyleBackColor = false;
-            this.btnToggle5.Click += new System.EventHandler(this.btnToggle5_Click);
+            this.btnToggle5.Click += new System.EventHandler(this.BtnToggle5_Click);
             // 
             // btnDistanceDn
             // 
@@ -1589,7 +1589,7 @@
             this.btnDistanceDn.Size = new System.Drawing.Size(59, 69);
             this.btnDistanceDn.TabIndex = 145;
             this.btnDistanceDn.UseVisualStyleBackColor = true;
-            this.btnDistanceDn.Click += new System.EventHandler(this.btnDistanceDn_Click);
+            this.btnDistanceDn.Click += new System.EventHandler(this.BtnDistanceDn_Click);
             // 
             // btnToggle4
             // 
@@ -1605,7 +1605,7 @@
             this.btnToggle4.TabIndex = 135;
             this.btnToggle4.Text = "Toggle 4";
             this.btnToggle4.UseVisualStyleBackColor = false;
-            this.btnToggle4.Click += new System.EventHandler(this.btnToggle4_Click);
+            this.btnToggle4.Click += new System.EventHandler(this.BtnToggle4_Click);
             // 
             // btnDistanceUp
             // 
@@ -1618,7 +1618,7 @@
             this.btnDistanceUp.Size = new System.Drawing.Size(59, 69);
             this.btnDistanceUp.TabIndex = 146;
             this.btnDistanceUp.UseVisualStyleBackColor = true;
-            this.btnDistanceUp.Click += new System.EventHandler(this.btnDistanceUp_Click);
+            this.btnDistanceUp.Click += new System.EventHandler(this.BtnDistanceUp_Click);
             // 
             // lblDistance
             // 
@@ -1665,7 +1665,7 @@
             this.btnTriggerDistanceDn.Size = new System.Drawing.Size(59, 69);
             this.btnTriggerDistanceDn.TabIndex = 158;
             this.btnTriggerDistanceDn.UseVisualStyleBackColor = true;
-            this.btnTriggerDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnTriggerDistanceDn_MouseDown);
+            this.btnTriggerDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceDn_MouseDown);
             // 
             // btnTriggerDistanceUp
             // 
@@ -1678,7 +1678,7 @@
             this.btnTriggerDistanceUp.Size = new System.Drawing.Size(59, 69);
             this.btnTriggerDistanceUp.TabIndex = 159;
             this.btnTriggerDistanceUp.UseVisualStyleBackColor = true;
-            this.btnTriggerDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnTriggerDistanceUp_MouseDown);
+            this.btnTriggerDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceUp_MouseDown);
             // 
             // lblTriggerDistance
             // 
@@ -1738,7 +1738,7 @@
             this.btnGeoFenceDistanceDn.Size = new System.Drawing.Size(59, 69);
             this.btnGeoFenceDistanceDn.TabIndex = 163;
             this.btnGeoFenceDistanceDn.UseVisualStyleBackColor = true;
-            this.btnGeoFenceDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnGeoFenceDistanceDn_MouseDown);
+            this.btnGeoFenceDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnGeoFenceDistanceDn_MouseDown);
             // 
             // btnGeoFenceDistanceUp
             // 
@@ -1751,7 +1751,7 @@
             this.btnGeoFenceDistanceUp.Size = new System.Drawing.Size(59, 69);
             this.btnGeoFenceDistanceUp.TabIndex = 164;
             this.btnGeoFenceDistanceUp.UseVisualStyleBackColor = true;
-            this.btnGeoFenceDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnGeoFenceDistanceUp_MouseDown);
+            this.btnGeoFenceDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnGeoFenceDistanceUp_MouseDown);
             // 
             // label49
             // 
@@ -1805,7 +1805,7 @@
             this.cboxRowWidth.Name = "cboxRowWidth";
             this.cboxRowWidth.Size = new System.Drawing.Size(52, 47);
             this.cboxRowWidth.TabIndex = 65;
-            this.cboxRowWidth.SelectedIndexChanged += new System.EventHandler(this.cboxRowWidth_SelectedIndexChanged);
+            this.cboxRowWidth.SelectedIndexChanged += new System.EventHandler(this.CboxRowWidth_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -1830,7 +1830,7 @@
             this.btnIsUsingDubins.TabIndex = 131;
             this.btnIsUsingDubins.Text = "Dubins";
             this.btnIsUsingDubins.UseVisualStyleBackColor = false;
-            this.btnIsUsingDubins.Click += new System.EventHandler(this.btnIsUsingDubins_Click);
+            this.btnIsUsingDubins.Click += new System.EventHandler(this.BtnIsUsingDubins_Click);
             // 
             // groupBox1
             // 
@@ -1861,7 +1861,7 @@
             this.btnYouTurnWideReturn.TabIndex = 149;
             this.btnYouTurnWideReturn.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnYouTurnWideReturn.UseVisualStyleBackColor = false;
-            this.btnYouTurnWideReturn.Click += new System.EventHandler(this.btnYouTurnWideReturn_Click);
+            this.btnYouTurnWideReturn.Click += new System.EventHandler(this.BtnYouTurnWideReturn_Click);
             // 
             // btnYouTurnKeyHole
             // 
@@ -1875,7 +1875,7 @@
             this.btnYouTurnKeyHole.TabIndex = 7;
             this.btnYouTurnKeyHole.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnYouTurnKeyHole.UseVisualStyleBackColor = false;
-            this.btnYouTurnKeyHole.Click += new System.EventHandler(this.btnYouTurnKeyHole_Click);
+            this.btnYouTurnKeyHole.Click += new System.EventHandler(this.BtnYouTurnKeyHole_Click);
             // 
             // btnYouTurnSemiCircle
             // 
@@ -1889,7 +1889,7 @@
             this.btnYouTurnSemiCircle.TabIndex = 9;
             this.btnYouTurnSemiCircle.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnYouTurnSemiCircle.UseVisualStyleBackColor = false;
-            this.btnYouTurnSemiCircle.Click += new System.EventHandler(this.btnYouTurnSemiCircle_Click);
+            this.btnYouTurnSemiCircle.Click += new System.EventHandler(this.BtnYouTurnSemiCircle_Click);
             // 
             // btnYouTurnRecord
             // 
@@ -1905,7 +1905,7 @@
             this.btnYouTurnRecord.Text = "Record";
             this.btnYouTurnRecord.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnYouTurnRecord.UseVisualStyleBackColor = false;
-            this.btnYouTurnRecord.Click += new System.EventHandler(this.btnYouTurnRecord_Click);
+            this.btnYouTurnRecord.Click += new System.EventHandler(this.BtnYouTurnRecord_Click);
             // 
             // btnYouTurnCustom
             // 
@@ -1920,7 +1920,7 @@
             this.btnYouTurnCustom.Text = "Custom";
             this.btnYouTurnCustom.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnYouTurnCustom.UseVisualStyleBackColor = false;
-            this.btnYouTurnCustom.Click += new System.EventHandler(this.btnYouTurnCustom_Click);
+            this.btnYouTurnCustom.Click += new System.EventHandler(this.BtnYouTurnCustom_Click);
             // 
             // tabControl1
             // 

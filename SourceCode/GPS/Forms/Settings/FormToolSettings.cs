@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormToolSettings : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private double toolOverlap, toolTrailingHitchLength, tankTrailingHitchLength, toolOffset, toolTurnOffDelay, toolLookAheadOn, toolLookAheadOff;
         private double hitchLength;
@@ -276,45 +276,45 @@ namespace AgOpenGPS
                 cutoffMetricImperial = 1;
             }
 
-            nudHitchLength.ValueChanged -= nudHitchLength_ValueChanged;
+            nudHitchLength.ValueChanged -= NudHitchLength_ValueChanged;
             nudHitchLength.Value = (decimal)(hitchLength * m2MetImp);
-            nudHitchLength.ValueChanged += nudHitchLength_ValueChanged;
+            nudHitchLength.ValueChanged += NudHitchLength_ValueChanged;
 
-            nudMinApplied.ValueChanged -= nudMinApplied_ValueChanged;
+            nudMinApplied.ValueChanged -= NudMinApplied_ValueChanged;
             nudMinApplied.Value = (decimal)(minApplied);
-            nudMinApplied.ValueChanged += nudMinApplied_ValueChanged;
+            nudMinApplied.ValueChanged += NudMinApplied_ValueChanged;
 
-            nudOverlap.ValueChanged -= nudOverlap_ValueChanged;
+            nudOverlap.ValueChanged -= NudOverlap_ValueChanged;
             nudOverlap.Value = (decimal)(toolOverlap * m2MetImp);
-            nudOverlap.ValueChanged += nudOverlap_ValueChanged;
+            nudOverlap.ValueChanged += NudOverlap_ValueChanged;
 
-            nudForeAft.ValueChanged -= nudForeAft_ValueChanged;
+            nudForeAft.ValueChanged -= NudForeAft_ValueChanged;
             nudForeAft.Value = (decimal)(toolTrailingHitchLength * m2MetImp);
-            nudForeAft.ValueChanged += nudForeAft_ValueChanged;
+            nudForeAft.ValueChanged += NudForeAft_ValueChanged;
 
-            nudTankHitch.ValueChanged -= nudTankHitch_ValueChanged;
+            nudTankHitch.ValueChanged -= NudTankHitch_ValueChanged;
             nudTankHitch.Value = (decimal)(tankTrailingHitchLength * m2MetImp);
-            nudTankHitch.ValueChanged += nudTankHitch_ValueChanged;
+            nudTankHitch.ValueChanged += NudTankHitch_ValueChanged;
 
-            nudOffset.ValueChanged -= nudOffset_ValueChanged;
+            nudOffset.ValueChanged -= NudOffset_ValueChanged;
             nudOffset.Value = (decimal)(toolOffset * m2MetImp);
-            nudOffset.ValueChanged += nudOffset_ValueChanged;
+            nudOffset.ValueChanged += NudOffset_ValueChanged;
 
-            nudDefaultSectionWidth.ValueChanged -= nudOffset_ValueChanged;
+            nudDefaultSectionWidth.ValueChanged -= NudOffset_ValueChanged;
             nudDefaultSectionWidth.Value = (decimal)(defaultSectionWidth * m2MetImp);
-            nudDefaultSectionWidth.ValueChanged += nudOffset_ValueChanged;
+            nudDefaultSectionWidth.ValueChanged += NudOffset_ValueChanged;
 
-            nudTurnOffDelay.ValueChanged -= nudTurnOffDelay_ValueChanged;
+            nudTurnOffDelay.ValueChanged -= NudTurnOffDelay_ValueChanged;
             nudTurnOffDelay.Value = (decimal)(toolTurnOffDelay);
-            nudTurnOffDelay.ValueChanged += nudTurnOffDelay_ValueChanged;
+            nudTurnOffDelay.ValueChanged += NudTurnOffDelay_ValueChanged;
 
-            nudLookAhead.ValueChanged -= nudLookAhead_ValueChanged;
+            nudLookAhead.ValueChanged -= NudLookAhead_ValueChanged;
             nudLookAhead.Value = (decimal)(toolLookAheadOn);
-            nudLookAhead.ValueChanged += nudLookAhead_ValueChanged;
+            nudLookAhead.ValueChanged += NudLookAhead_ValueChanged;
 
-            nudLookAheadOff.ValueChanged -= nudLookAheadOff_ValueChanged;
+            nudLookAheadOff.ValueChanged -= NudLookAheadOff_ValueChanged;
             nudLookAheadOff.Value = (decimal)(toolLookAheadOff);
-            nudLookAheadOff.ValueChanged += nudLookAheadOff_ValueChanged;
+            nudLookAheadOff.ValueChanged += NudLookAheadOff_ValueChanged;
 
             cboxNumSections.Text = numberOfSections.ToString();
 
@@ -341,21 +341,21 @@ namespace AgOpenGPS
 
             isWorkSwActiveLow = Properties.Settings.Default.setF_IsWorkSwitchActiveLow;
 
-            chkWorkSwActiveLow.CheckedChanged -= chkWorkSwActiveLow_CheckedChanged;
+            chkWorkSwActiveLow.CheckedChanged -= ChkWorkSwActiveLow_CheckedChanged;
             chkWorkSwActiveLow.Checked = isWorkSwActiveLow;
-            chkWorkSwActiveLow.CheckedChanged += chkWorkSwActiveLow_CheckedChanged;
+            chkWorkSwActiveLow.CheckedChanged += ChkWorkSwActiveLow_CheckedChanged;
 
             isWorkSwEn = Properties.Settings.Default.setF_IsWorkSwitchEnabled;
 
-            chkEnableWorkSwitch.CheckedChanged -= chkEnableWorkSwitch_CheckedChanged;
+            chkEnableWorkSwitch.CheckedChanged -= ChkEnableWorkSwitch_CheckedChanged;
             chkEnableWorkSwitch.Checked = isWorkSwEn;
-            chkEnableWorkSwitch.CheckedChanged += chkEnableWorkSwitch_CheckedChanged;
+            chkEnableWorkSwitch.CheckedChanged += ChkEnableWorkSwitch_CheckedChanged;
 
             isWorkSwitchManual = Properties.Settings.Default.setF_IsWorkSwitchManual;
 
-            checkWorkSwitchManual.CheckedChanged -= checkWorkSwitchManual_CheckedChanged;
+            checkWorkSwitchManual.CheckedChanged -= CheckWorkSwitchManual_CheckedChanged;
             checkWorkSwitchManual.Checked = isWorkSwitchManual;
-            checkWorkSwitchManual.CheckedChanged += checkWorkSwitchManual_CheckedChanged;
+            checkWorkSwitchManual.CheckedChanged += CheckWorkSwitchManual_CheckedChanged;
 
             btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
             btnChangeAttachment.Enabled = false;
@@ -366,12 +366,12 @@ namespace AgOpenGPS
             if (nudCutoffSpeed.CheckValue(ref temp)) nudCutoffSpeed.BackColor = System.Drawing.Color.OrangeRed;
             cutoffSpeed = (double)temp;
 
-            nudCutoffSpeed.ValueChanged -= nudCutoffSpeed_ValueChanged;
+            nudCutoffSpeed.ValueChanged -= NudCutoffSpeed_ValueChanged;
             nudCutoffSpeed.Value = (decimal)cutoffSpeed;
-            nudCutoffSpeed.ValueChanged += nudCutoffSpeed_ValueChanged;
+            nudCutoffSpeed.ValueChanged += NudCutoffSpeed_ValueChanged;
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOK_Click(object sender, EventArgs e)
         {
             //Tool  ------------------------------------------------------------------------------------------
 
@@ -388,14 +388,14 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.setVehicle_toolOverlap = mf.tool.toolOverlap;
 
             
-            mf.tool.lookAheadOnSetting = toolLookAheadOn;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOn = mf.tool.lookAheadOnSetting;
+            mf.tool.LookAheadOnSetting = toolLookAheadOn;
+            Properties.Vehicle.Default.setVehicle_toolLookAheadOn = mf.tool.LookAheadOnSetting;
            
-            mf.tool.lookAheadOffSetting = toolLookAheadOff;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOff = mf.tool.lookAheadOffSetting;
+            mf.tool.LookAheadOffSetting = toolLookAheadOff;
+            Properties.Vehicle.Default.setVehicle_toolLookAheadOff = mf.tool.LookAheadOffSetting;
 
-            mf.tool.turnOffDelay = toolTurnOffDelay;
-            Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.tool.turnOffDelay;
+            mf.tool.TurnOffDelay = toolTurnOffDelay;
+            Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.tool.TurnOffDelay;
 
 
             mf.tool.toolOffset = toolOffset;
@@ -453,13 +453,11 @@ namespace AgOpenGPS
             mf.LineUpManualBtns();
 
             //update the sections to newly configured widths and positions in main
-            mf.SectionSetPosition();
-
             //update the widths of sections and tool width in main
             mf.SectionCalcWidths();
 
             //update toolwidth in mainform
-            Properties.Vehicle.Default.setVehicle_toolWidth = mf.tool.toolWidth;
+            Properties.Vehicle.Default.setVehicle_toolWidth = mf.tool.ToolWidth;
 
             //WorkSwitch settings
             mf.mc.isWorkSwitchActiveLow = isWorkSwActiveLow;
@@ -471,7 +469,7 @@ namespace AgOpenGPS
             mf.mc.isWorkSwitchManual = isWorkSwitchManual;
             Properties.Settings.Default.setF_IsWorkSwitchManual = isWorkSwitchManual;
 
-            mf.tram.abOffset = (Math.Round((mf.tool.toolWidth - mf.tool.toolOverlap) / 2.0, 3));
+            mf.tram.abOffset = (Math.Round((mf.tool.ToolWidth - mf.tool.toolOverlap) / 2.0, 3));
 
             Properties.Vehicle.Default.setTool_defaultSectionWidth = (double)nudDefaultSectionWidth.Value * 0.01;
 
@@ -489,7 +487,7 @@ namespace AgOpenGPS
             btnCancel.Focus();
         }
 
-        private void nudCutoffSpeed_ValueChanged(object sender, EventArgs e)
+        private void NudCutoffSpeed_ValueChanged(object sender, EventArgs e)
         {
             cutoffSpeed = (double)nudCutoffSpeed.Value;
         }
@@ -554,7 +552,7 @@ namespace AgOpenGPS
             btnCancel.Focus();
         }
 
-        private void nudDefaultSectionWidth_Enter(object sender, EventArgs e)
+        private void NudDefaultSectionWidth_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
@@ -615,7 +613,7 @@ namespace AgOpenGPS
             btnCancel.Focus();
         }
 
-        private void nudLookAheadOff_Enter(object sender, EventArgs e)
+        private void NudLookAheadOff_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
@@ -645,25 +643,25 @@ namespace AgOpenGPS
             btnCancel.Focus();
         }
 
-        private void nudSection13_Enter(object sender, EventArgs e)
+        private void NudSection13_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudSection14_Enter(object sender, EventArgs e)
+        private void NudSection14_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudSection15_Enter(object sender, EventArgs e)
+        private void NudSection15_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
         }
 
-        private void nudSection16_Enter(object sender, EventArgs e)
+        private void NudSection16_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
@@ -675,7 +673,7 @@ namespace AgOpenGPS
             btnCancel.Focus();
         }
 
-        private void rbtnFront_CheckedChanged(object sender, EventArgs e)
+        private void RbtnFront_CheckedChanged(object sender, EventArgs e)
         {
             var radioButton = sender as RadioButton;
 
@@ -760,7 +758,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnChangeAttachment_Click(object sender, EventArgs e)
+        private void BtnChangeAttachment_Click(object sender, EventArgs e)
         {
             btnChangeAttachment.Enabled = false;
             btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
@@ -778,106 +776,105 @@ namespace AgOpenGPS
             
             if (mf.isMetric)
             {
-            if (numberOfSections * wide > 4800) wide = 99;
-                
+                if (numberOfSections * wide > 4800) wide = 4800 / numberOfSections;
             }
             else
             {
-                if (numberOfSections * wide > 1900) wide = 19;
+                if (numberOfSections * wide > 1900) wide = 19 / numberOfSections;
             }
 
-            nudSection1.ValueChanged -= nudSection1_ValueChanged;
+            nudSection1.ValueChanged -= NudSection1_ValueChanged;
             nudSection1.Value = wide;
-            nudSection1.ValueChanged += nudSection1_ValueChanged;
+            nudSection1.ValueChanged += NudSection1_ValueChanged;
 
-            nudSection2.ValueChanged -= nudSection2_ValueChanged;
+            nudSection2.ValueChanged -= NudSection2_ValueChanged;
             nudSection2.Value = wide;
-            nudSection2.ValueChanged += nudSection2_ValueChanged;
+            nudSection2.ValueChanged += NudSection2_ValueChanged;
 
-            nudSection3.ValueChanged -= nudSection3_ValueChanged;
+            nudSection3.ValueChanged -= NudSection3_ValueChanged;
             nudSection3.Value = wide;
-            nudSection3.ValueChanged += nudSection3_ValueChanged;
+            nudSection3.ValueChanged += NudSection3_ValueChanged;
 
-            nudSection4.ValueChanged -= nudSection4_ValueChanged;
+            nudSection4.ValueChanged -= NudSection4_ValueChanged;
             nudSection4.Value = wide;
-            nudSection4.ValueChanged += nudSection4_ValueChanged;
+            nudSection4.ValueChanged += NudSection4_ValueChanged;
 
-            nudSection5.ValueChanged -= nudSection5_ValueChanged;
+            nudSection5.ValueChanged -= NudSection5_ValueChanged;
             nudSection5.Value = wide;
-            nudSection5.ValueChanged += nudSection5_ValueChanged;
+            nudSection5.ValueChanged += NudSection5_ValueChanged;
 
-            nudSection6.ValueChanged -= nudSection6_ValueChanged;
+            nudSection6.ValueChanged -= NudSection6_ValueChanged;
             nudSection6.Value = wide;
-            nudSection6.ValueChanged += nudSection6_ValueChanged;
+            nudSection6.ValueChanged += NudSection6_ValueChanged;
 
-            nudSection7.ValueChanged -= nudSection7_ValueChanged;
+            nudSection7.ValueChanged -= NudSection7_ValueChanged;
             nudSection7.Value = wide;
-            nudSection7.ValueChanged += nudSection7_ValueChanged;
+            nudSection7.ValueChanged += NudSection7_ValueChanged;
 
-            nudSection8.ValueChanged -= nudSection8_ValueChanged;
+            nudSection8.ValueChanged -= NudSection8_ValueChanged;
             nudSection8.Value = wide;
-            nudSection8.ValueChanged += nudSection8_ValueChanged;
+            nudSection8.ValueChanged += NudSection8_ValueChanged;
 
-            nudSection9.ValueChanged -= nudSection9_ValueChanged;
+            nudSection9.ValueChanged -= NudSection9_ValueChanged;
             nudSection9.Value = wide;
-            nudSection9.ValueChanged += nudSection9_ValueChanged;
+            nudSection9.ValueChanged += NudSection9_ValueChanged;
 
-            nudSection10.ValueChanged -= nudSection10_ValueChanged;
+            nudSection10.ValueChanged -= NudSection10_ValueChanged;
             nudSection10.Value = wide;
-            nudSection10.ValueChanged += nudSection10_ValueChanged;
+            nudSection10.ValueChanged += NudSection10_ValueChanged;
 
-            nudSection11.ValueChanged -= nudSection11_ValueChanged;
+            nudSection11.ValueChanged -= NudSection11_ValueChanged;
             nudSection11.Value = wide;
-            nudSection11.ValueChanged += nudSection11_ValueChanged;
+            nudSection11.ValueChanged += NudSection11_ValueChanged;
 
-            nudSection12.ValueChanged -= nudSection12_ValueChanged;
+            nudSection12.ValueChanged -= NudSection12_ValueChanged;
             nudSection12.Value = wide;
-            nudSection12.ValueChanged += nudSection12_ValueChanged;
+            nudSection12.ValueChanged += NudSection12_ValueChanged;
 
-            nudSection13.ValueChanged -= nudSection13_ValueChanged;
+            nudSection13.ValueChanged -= NudSection13_ValueChanged;
             nudSection13.Value = wide;
-            nudSection13.ValueChanged += nudSection13_ValueChanged;
+            nudSection13.ValueChanged += NudSection13_ValueChanged;
 
-            nudSection14.ValueChanged -= nudSection14_ValueChanged;
+            nudSection14.ValueChanged -= NudSection14_ValueChanged;
             nudSection14.Value = wide;
-            nudSection14.ValueChanged += nudSection14_ValueChanged;
+            nudSection14.ValueChanged += NudSection14_ValueChanged;
 
-            nudSection15.ValueChanged -= nudSection15_ValueChanged;
+            nudSection15.ValueChanged -= NudSection15_ValueChanged;
             nudSection15.Value = wide;
-            nudSection15.ValueChanged += nudSection15_ValueChanged;
+            nudSection15.ValueChanged += NudSection15_ValueChanged;
 
-            nudSection16.ValueChanged -= nudSection16_ValueChanged;
+            nudSection16.ValueChanged -= NudSection16_ValueChanged;
             nudSection16.Value = wide;
-            nudSection16.ValueChanged += nudSection16_ValueChanged;
+            nudSection16.ValueChanged += NudSection16_ValueChanged;
 
             UpdateSpinners();
         }
 
         //don't save anything, leave the settings as before
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         { DialogResult = DialogResult.Cancel; Close(); }
 
-        private void nudHitchLength_ValueChanged(object sender, EventArgs e)
+        private void NudHitchLength_ValueChanged(object sender, EventArgs e)
         {
             hitchLength = (double)nudHitchLength.Value * metImp2m;
         }
 
-        private void nudForeAft_ValueChanged(object sender, EventArgs e)
+        private void NudForeAft_ValueChanged(object sender, EventArgs e)
         {
             toolTrailingHitchLength = (double)(nudForeAft.Value) * metImp2m;
         }
 
-        private void nudTankHitch_ValueChanged(object sender, EventArgs e)
+        private void NudTankHitch_ValueChanged(object sender, EventArgs e)
         {
             tankTrailingHitchLength = (double)(nudTankHitch.Value) * metImp2m;
         }
 
-        private void nudOffset_ValueChanged(object sender, EventArgs e)
+        private void NudOffset_ValueChanged(object sender, EventArgs e)
         {
             toolOffset = (double)nudOffset.Value * metImp2m;
         }
 
-        private void nudLookAhead_ValueChanged(object sender, EventArgs e)
+        private void NudLookAhead_ValueChanged(object sender, EventArgs e)
         {
             if (nudLookAheadOff.Value > (nudLookAhead.Value * 0.8m))
             {
@@ -887,7 +884,7 @@ namespace AgOpenGPS
             toolLookAheadOn = (double)nudLookAhead.Value;
         }
 
-        private void nudLookAheadOff_ValueChanged(object sender, EventArgs e)
+        private void NudLookAheadOff_ValueChanged(object sender, EventArgs e)
         {
             if (nudLookAheadOff.Value > (nudLookAhead.Value * 0.8m))
             {
@@ -902,7 +899,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void nudTurnOffDelay_ValueChanged(object sender, EventArgs e)
+        private void NudTurnOffDelay_ValueChanged(object sender, EventArgs e)
         {
             toolTurnOffDelay = (double)nudTurnOffDelay.Value;
 
@@ -912,7 +909,8 @@ namespace AgOpenGPS
                 toolLookAheadOff = 0;
             }
         }
-        private void nudOverlap_ValueChanged(object sender, EventArgs e)
+
+        private void NudOverlap_ValueChanged(object sender, EventArgs e)
         {
             toolOverlap = (double)nudOverlap.Value * metImp2m;
         }
@@ -1309,7 +1307,6 @@ namespace AgOpenGPS
                             + nudSection13.Value + nudSection14.Value + nudSection15.Value + nudSection16.Value));
                         break;
                     }
-
             }
             //update in settings dialog ONLY total tool width
             SectionFeetInchesTotalWidthLabelUpdate();
@@ -1317,7 +1314,7 @@ namespace AgOpenGPS
 
         //the minimum speed before sections turn off
 
-        private void nudMinApplied_ValueChanged(object sender, EventArgs e)
+        private void NudMinApplied_ValueChanged(object sender, EventArgs e)
         {
             minApplied = (int)nudMinApplied.Value;
         }
@@ -1719,97 +1716,97 @@ namespace AgOpenGPS
         }
 
         //Did user spin a section distance spinner?
-        private void nudSection1_ValueChanged(object sender, EventArgs e)
+        private void NudSection1_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection1.Value--;
         }
 
-        private void nudSection2_ValueChanged(object sender, EventArgs e)
+        private void NudSection2_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection2.Value--;
         }
 
-        private void nudSection3_ValueChanged(object sender, EventArgs e)
+        private void NudSection3_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection3.Value--;
         }
 
-        private void nudSection4_ValueChanged(object sender, EventArgs e)
+        private void NudSection4_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection4.Value--;
         }
 
-        private void nudSection5_ValueChanged(object sender, EventArgs e)
+        private void NudSection5_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection5.Value--;
         }
 
-        private void nudSection6_ValueChanged(object sender, EventArgs e)
+        private void NudSection6_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection6.Value--;
         }
 
-        private void nudSection7_ValueChanged(object sender, EventArgs e)
+        private void NudSection7_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection7.Value--;
         }
 
-        private void nudSection8_ValueChanged(object sender, EventArgs e)
+        private void NudSection8_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection8.Value--;
         }
 
-        private void nudSection9_ValueChanged(object sender, EventArgs e)
+        private void NudSection9_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection9.Value--;
         }
 
-        private void nudSection10_ValueChanged(object sender, EventArgs e)
+        private void NudSection10_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection10.Value--;
         }
 
-        private void nudSection11_ValueChanged(object sender, EventArgs e)
+        private void NudSection11_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection11.Value--;
         }
 
-        private void nudSection12_ValueChanged(object sender, EventArgs e)
+        private void NudSection12_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection12.Value--;
         }
 
-        private void nudSection13_ValueChanged(object sender, EventArgs e)
+        private void NudSection13_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection13.Value--;
         }
 
-        private void nudSection14_ValueChanged(object sender, EventArgs e)
+        private void NudSection14_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection14.Value--;
         }
 
-        private void nudSection15_ValueChanged(object sender, EventArgs e)
+        private void NudSection15_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection15.Value--;
         }
 
-        private void nudSection16_ValueChanged(object sender, EventArgs e)
+        private void NudSection16_ValueChanged(object sender, EventArgs e)
         {
             UpdateSpinners();
             if (Convert.ToDouble(lblVehicleToolWidth.Text) > maxWidth) nudSection16.Value--;
@@ -1819,19 +1816,19 @@ namespace AgOpenGPS
 
         #region WorkSwitch //---------------------------------------------------------
 
-        private void chkWorkSwActiveLow_CheckedChanged(object sender, EventArgs e)
+        private void ChkWorkSwActiveLow_CheckedChanged(object sender, EventArgs e)
         {
             isWorkSwActiveLow = !isWorkSwActiveLow;
             chkWorkSwActiveLow.Checked = isWorkSwActiveLow;
         }
 
-        private void chkEnableWorkSwitch_CheckedChanged(object sender, EventArgs e)
+        private void ChkEnableWorkSwitch_CheckedChanged(object sender, EventArgs e)
         {
             isWorkSwEn = !isWorkSwEn;
             chkEnableWorkSwitch.Checked = isWorkSwEn;
         }
 
-        private void checkWorkSwitchManual_CheckedChanged(object sender, EventArgs e)
+        private void CheckWorkSwitchManual_CheckedChanged(object sender, EventArgs e)
         {
             isWorkSwitchManual = !isWorkSwitchManual;
             checkWorkSwitchManual.Checked = isWorkSwitchManual;

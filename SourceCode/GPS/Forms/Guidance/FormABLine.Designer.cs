@@ -54,7 +54,7 @@
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 500;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // lblFixHeading
             // 
@@ -101,7 +101,7 @@
             this.tboxHeading.TabIndex = 83;
             this.tboxHeading.Text = "359.123456";
             this.tboxHeading.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.tboxHeading.TextChanged += new System.EventHandler(this.tboxHeading_TextChanged);
+            this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
             this.tboxHeading.Enter += new System.EventHandler(this.TboxHeading_Enter);
             // 
             // btnDnABHeadingBy1
@@ -147,7 +147,7 @@
             this.tboxABLineName.Size = new System.Drawing.Size(306, 30);
             this.tboxABLineName.TabIndex = 152;
             this.tboxABLineName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.tboxABLineName.Enter += new System.EventHandler(this.tboxABLineName_Enter);
+            this.tboxABLineName.Enter += new System.EventHandler(this.TboxABLineName_Enter);
             // 
             // lvLines
             // 
@@ -170,7 +170,7 @@
             this.lvLines.UseCompatibleStateImageBehavior = false;
             this.lvLines.View = System.Windows.Forms.View.Tile;
             this.lvLines.Visible = false;
-            this.lvLines.SelectedIndexChanged += new System.EventHandler(this.lvLines_SelectedIndexChanged);
+            this.lvLines.SelectedIndexChanged += new System.EventHandler(this.LvLines_SelectedIndexChanged);
             // 
             // chField
             // 
@@ -192,7 +192,7 @@
             this.btnAddAndGo.TabIndex = 155;
             this.btnAddAndGo.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnAddAndGo.UseVisualStyleBackColor = false;
-            this.btnAddAndGo.Click += new System.EventHandler(this.btnAddAndGo_Click);
+            this.btnAddAndGo.Click += new System.EventHandler(this.BtnAddAndGo_Click);
             // 
             // btnNewABLine
             // 
@@ -225,7 +225,7 @@
             this.btnListUse.TabIndex = 86;
             this.btnListUse.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnListUse.UseVisualStyleBackColor = true;
-            this.btnListUse.Click += new System.EventHandler(this.btnListUse_Click);
+            this.btnListUse.Click += new System.EventHandler(this.BtnListUse_Click);
             // 
             // btnListDelete
             // 
@@ -240,7 +240,7 @@
             this.btnListDelete.TabIndex = 85;
             this.btnListDelete.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnListDelete.UseVisualStyleBackColor = true;
-            this.btnListDelete.Click += new System.EventHandler(this.btnListDelete_Click);
+            this.btnListDelete.Click += new System.EventHandler(this.BtnListDelete_Click);
             // 
             // btnAddToFile
             // 
@@ -257,7 +257,7 @@
             this.btnAddToFile.TabIndex = 82;
             this.btnAddToFile.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnAddToFile.UseVisualStyleBackColor = false;
-            this.btnAddToFile.Click += new System.EventHandler(this.btnAddToFile_Click);
+            this.btnAddToFile.Click += new System.EventHandler(this.BtnAddToFile_Click);
             // 
             // btnTurnOffAB
             // 
@@ -274,7 +274,7 @@
             this.btnTurnOffAB.TabIndex = 0;
             this.btnTurnOffAB.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnTurnOffAB.UseVisualStyleBackColor = false;
-            this.btnTurnOffAB.Click += new System.EventHandler(this.btnTurnOffAB_Click);
+            this.btnTurnOffAB.Click += new System.EventHandler(this.BtnTurnOffAB_Click);
             // 
             // btnBPoint
             // 
@@ -289,7 +289,7 @@
             this.btnBPoint.Size = new System.Drawing.Size(80, 80);
             this.btnBPoint.TabIndex = 58;
             this.btnBPoint.UseVisualStyleBackColor = true;
-            this.btnBPoint.Click += new System.EventHandler(this.btnBPoint_Click);
+            this.btnBPoint.Click += new System.EventHandler(this.BtnBPoint_Click);
             // 
             // btnAPoint
             // 
@@ -304,7 +304,7 @@
             this.btnAPoint.Size = new System.Drawing.Size(80, 80);
             this.btnAPoint.TabIndex = 57;
             this.btnAPoint.UseVisualStyleBackColor = true;
-            this.btnAPoint.Click += new System.EventHandler(this.btnAPoint_Click);
+            this.btnAPoint.Click += new System.EventHandler(this.BtnAPoint_Click);
             // 
             // btnCancel
             // 
@@ -321,7 +321,7 @@
             this.btnCancel.Size = new System.Drawing.Size(78, 74);
             this.btnCancel.TabIndex = 421;
             this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // FormABLine
             // 

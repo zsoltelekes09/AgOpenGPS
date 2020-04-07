@@ -37,7 +37,7 @@ namespace AgOpenGPS
             halfWheelTrack = wheelTrack * 0.5;
 
             passes = Properties.Settings.Default.setTram_passes;
-            abOffset = (Math.Round((mf.tool.toolWidth - mf.tool.toolOverlap) / 2.0, 3));
+            abOffset = (Math.Round((mf.tool.ToolWidth - mf.tool.toolOverlap) / 2.0, 3));
             displayMode = 0;
         }
 
@@ -54,11 +54,7 @@ namespace AgOpenGPS
 
         public void BuildTramBnd()
         {
-            //abOffset = (Math.Round((mf.tool.toolWidth - mf.tool.toolOverlap) / 2.0, 3));
-
-            bool isBndExist = mf.bnd.bndArr.Count != 0;
-
-            if (isBndExist)
+            if (mf.bnd.bndArr.Count > 0)
             {
                 CreateBndTramRef();
                 CreateOuterTram();
@@ -82,7 +78,7 @@ namespace AgOpenGPS
 
             double distSq = ((tramWidth * 0.5) - halfWheelTrack) * ((tramWidth * 0.5) - halfWheelTrack) * 0.97;
             bool fail = false;
-
+            
             //make the boundary tram outer array
             for (int i = 0; i < ptCount; i++)
             {
@@ -157,7 +153,7 @@ namespace AgOpenGPS
             }
         }
 
-        public bool IsPointInTramBndArea(vec2 testPointv2)
+        public bool IsPointInTramBndArea(vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = outArr.Count - 1;
@@ -166,10 +162,10 @@ namespace AgOpenGPS
             //test against the constant and multiples list the test point
             for (int i = 0; i < outArr.Count; j = i++)
             {
-                if ((outArr[i].northing < testPointv2.northing && outArr[j].northing >= testPointv2.northing)
-                ||  (outArr[j].northing < testPointv2.northing && outArr[i].northing >= testPointv2.northing))
+                if ((outArr[i].northing < TestPoint.northing && outArr[j].northing >= TestPoint.northing)
+                ||  (outArr[j].northing < TestPoint.northing && outArr[i].northing >= TestPoint.northing))
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
                 }
             }
             return oddNodes; //true means inside.

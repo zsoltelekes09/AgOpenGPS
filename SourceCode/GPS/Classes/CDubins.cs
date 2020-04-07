@@ -47,7 +47,6 @@ namespace AgOpenGPS
             //clear out existing path of vec3 points
             dubinsShortestPathList.Clear();
 
-            int pathsCnt = pathDataList.Count;
             if (pathDataList.Count > 0)
             {
                 int cnt = pathDataList[0].pathCoordinates.Count;
@@ -476,22 +475,24 @@ namespace AgOpenGPS
         //Calculate center positions of the Right circle
         public static vec2 GetRightCircleCenterPos(vec2 circlePos, double heading)
         {
-            vec2 rightCirclePos = new vec2(0, 0);
-
-            //The circle is 90 degrees (pi/2 radians) to the right of the car's heading
-            rightCirclePos.easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading + glm.PIBy2));
-            rightCirclePos.northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading + glm.PIBy2));
+            vec2 rightCirclePos = new vec2(0, 0)
+            {
+                //The circle is 90 degrees (pi/2 radians) to the right of the car's heading
+                easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading + glm.PIBy2)),
+                northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading + glm.PIBy2))
+            };
             return rightCirclePos;
         }
 
         //Calculate center positions of the Left circle
         public static vec2 GetLeftCircleCenterPos(vec2 circlePos, double heading)
         {
-            vec2 rightCirclePos = new vec2(0, 0);
-
-            //The circle is 90 degrees (pi/2 radians) to the left of the car's heading
-            rightCirclePos.easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading - glm.PIBy2));
-            rightCirclePos.northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading - glm.PIBy2));
+            vec2 rightCirclePos = new vec2(0, 0)
+            {
+                //The circle is 90 degrees (pi/2 radians) to the left of the car's heading
+                easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading - glm.PIBy2)),
+                northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading - glm.PIBy2))
+            };
             return rightCirclePos;
         }
 
@@ -500,8 +501,7 @@ namespace AgOpenGPS
         //
 
         //Outer tangent (LSL and RSR)
-        public static void LSLorRSR(vec2 startCircle, vec2 goalCircle, bool isBottom,
-                                        out vec2 startTangent, out vec2 goalTangent)
+        public static void LSLorRSR(vec2 startCircle, vec2 goalCircle, bool isBottom, out vec2 startTangent, out vec2 goalTangent)
         {
             //The angle to the first tangent coordinate is always 90 degrees if the both circles have the same radius
             double theta = glm.PIBy2;
@@ -529,12 +529,7 @@ namespace AgOpenGPS
         }
 
         //Inner tangent (RSL and LSR)
-        public static void RSLorLSR(
-            vec2 startCircle,
-            vec2 goalCircle,
-            bool isBottom,
-            out vec2 startTangent,
-            out vec2 goalTangent)
+        public static void RSLorLSR( vec2 startCircle, vec2 goalCircle, bool isBottom, out vec2 startTangent, out vec2 goalTangent)
         {
             //Find the distance between the circles
             double D = (startCircle - goalCircle).GetLength();
@@ -571,13 +566,7 @@ namespace AgOpenGPS
         }
 
         //Get the RLR or LRL tangent points
-        public static void GetRLRorLRLTangents(
-            vec2 startCircle,
-            vec2 goalCircle,
-            bool isLRL,
-            out vec2 startTangent,
-            out vec2 goalTangent,
-            out vec2 middleCircle)
+        public static void GetRLRorLRLTangents( vec2 startCircle, vec2 goalCircle, bool isLRL, out vec2 startTangent, out vec2 goalTangent, out vec2 middleCircle)
         {
             //The distance between the circles
             double D = (startCircle - goalCircle).GetLength();
@@ -610,11 +599,7 @@ namespace AgOpenGPS
         }
 
         //Calculate the length of an circle arc depending on which direction we are driving
-        public static double GetArcLength(
-            vec2 circleCenterPos,
-            vec2 startPos,
-            vec2 goalPos,
-            bool isLeftCircle)
+        public static double GetArcLength( vec2 circleCenterPos, vec2 startPos, vec2 goalPos, bool isLeftCircle)
         {
             vec2 V1 = startPos - circleCenterPos;
             vec2 V2 = goalPos - circleCenterPos;
@@ -626,13 +611,7 @@ namespace AgOpenGPS
         }
 
         //Loops through segments of a path and add new coordinates to the final path
-        public static void AddCoordinatesToPath(
-            ref vec2 currentPos,
-            ref double theta,
-            List<vec2> finalPath,
-            int segments,
-            bool isTurning,
-            bool isTurningRight)
+        public static void AddCoordinatesToPath( ref vec2 currentPos, ref double theta, List<vec2> finalPath, int segments, bool isTurning, bool isTurningRight)
         {
             for (int i = 0; i <= segments; i++)
             {

@@ -32,7 +32,7 @@ namespace AgOpenGPS
         public double latitude, longitude;
 
         private double latDeg, latMinu, longDeg, longMinu, latNMEA, longNMEA;
-        public double speed = 0.6, headingTrue, stepDistance = 0.05, steerAngle;
+        public double speed = 0.6, headingTrue, stepDistance = 1.3889, steerAngle;
         public double steerAngleScrollBar = 0;
         private double degrees;
 
@@ -51,7 +51,7 @@ namespace AgOpenGPS
         public void DoSimTick(double _st)
         {
             steerAngle = _st;
-            double temp = (stepDistance * Math.Tan(steerAngle * 0.0165329252) / 3.3);
+            double temp = (stepDistance / mf.fixUpdateHz * Math.Tan(steerAngle * 0.0165329252) / 3.3);
             headingTrue += temp;
             if (headingTrue > (2.0 * Math.PI)) headingTrue -= (2.0 * Math.PI);
             if (headingTrue < 0) headingTrue += (2.0 * Math.PI);
@@ -59,11 +59,11 @@ namespace AgOpenGPS
 
             //Calculate the next Lat Long based on heading and distance
             degrees = glm.toDegrees(headingTrue);
-            CalculateNewPostionFromBearingDistance(latitude, longitude, degrees, stepDistance / 1000.0);
+            CalculateNewPostionFromBearingDistance(latitude, longitude, degrees, (stepDistance / mf.fixUpdateHz) / 1000.0);
 
             //calc the speed
             //speed = Math.Round(1.944 * stepDistance * (double)nudHz.Value, 1);
-            speed = Math.Round(1.944 * stepDistance * 10, 1);
+            speed = Math.Round(1.944 * stepDistance, 1);
             //lblSpeed.Text = (Math.Round(1.852 * speed, 1)).ToString();
 
             //BuildOGI();
@@ -82,8 +82,8 @@ namespace AgOpenGPS
             //sbSendText.Append(sbHDT.ToString());
 
             //sbSendText.Append(sbOGI.ToString());
+
             mf.pn.rawBuffer += sbSendText.ToString();
-            mf.recvSentenceSettings = sbSendText.ToString();
 
             sbSendText.Clear();
         }

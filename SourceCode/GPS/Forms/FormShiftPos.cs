@@ -6,7 +6,7 @@ namespace AgOpenGPS
     public partial class FormShiftPos : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormShiftPos(Form callingForm)
         {
@@ -27,41 +27,41 @@ namespace AgOpenGPS
             nudNorth.Value = (decimal)mf.pn.fixOffset.northing * 100;
         }
 
-        private void btnNorth_MouseDown(object sender, MouseEventArgs e)
+        private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
         {
             nudNorth.UpButton();
             mf.pn.fixOffset.northing = (double)nudNorth.Value / 100;
         }
 
-        private void btnSouth_MouseDown(object sender, MouseEventArgs e)
+        private void BtnSouth_MouseDown(object sender, MouseEventArgs e)
         {
             nudNorth.DownButton();
             mf.pn.fixOffset.northing = (double)nudNorth.Value / 100;
         }
 
-        private void btnWest_MouseDown(object sender, MouseEventArgs e)
+        private void BtnWest_MouseDown(object sender, MouseEventArgs e)
         {
             nudEast.DownButton();
             mf.pn.fixOffset.easting = (double)nudEast.Value / 100;
         }
 
-        private void btnEast_MouseDown(object sender, MouseEventArgs e)
+        private void BtnEast_MouseDown(object sender, MouseEventArgs e)
         {
             nudEast.UpButton();
             mf.pn.fixOffset.easting = (double)nudEast.Value / 100;
         }
 
-        private void nudNorth_ValueChanged(object sender, EventArgs e)
+        private void NudNorth_ValueChanged(object sender, EventArgs e)
         {
             mf.pn.fixOffset.northing = (double)nudNorth.Value / 100;
         }
 
-        private void nudEast_ValueChanged(object sender, EventArgs e)
+        private void NudEast_ValueChanged(object sender, EventArgs e)
         {
             mf.pn.fixOffset.easting = (double)nudEast.Value / 100;
         }
 
-        private void btnZero_Click(object sender, EventArgs e)
+        private void BtnZero_Click(object sender, EventArgs e)
         {
             nudEast.Value = 0;
             nudNorth.Value = 0;
@@ -69,7 +69,7 @@ namespace AgOpenGPS
             mf.pn.fixOffset.northing = 0;
         }
 
-        private void bntOK_Click(object sender, EventArgs e)
+        private void BntOK_Click(object sender, EventArgs e)
         {
             Close();
         }

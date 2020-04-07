@@ -5,6 +5,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -52,8 +53,6 @@ namespace AgOpenGPS
 
         //current fields and field directory
         public string fieldsDirectory, currentFieldDirectory;
-
-        private bool leftMouseDownOnOpenGL; //mousedown event in opengl window
         public int flagNumberPicked = 0;
 
         //bool for whether or not a job is active
@@ -68,38 +67,11 @@ namespace AgOpenGPS
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         private readonly Stopwatch swFrame = new Stopwatch();
 
-        //private readonly Stopwatch swDraw = new Stopwatch();
-        //swDraw.Reset();
-        //swDraw.Start();
-        //swDraw.Stop();
-        //label3.Text = ((double) swDraw.ElapsedTicks / (double) System.Diagnostics.Stopwatch.Frequency * 1000).ToString();
-
-        //Time to do fix position update and draw routine
-        private double frameTime = 0;
-
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         private readonly Stopwatch swHz = new Stopwatch();
 
-        //Time to do fix position update and draw routine
-        private double HzTime = 5;
-
-        //For field saving in background
-        private int minuteCounter = 1;
-        private int tenMinuteCounter = 1;
-
-        //for the NTRIP CLient counting
-        private int ntripCounter = 10;
-
         //whether or not to use Stanley control
         public bool isStanleyUsed = true;
-
-        //used to update the screen status bar etc
-        private int displayUpdateHalfSecondCounter = 0, displayUpdateOneSecondCounter = 0, displayUpdateOneFifthCounter = 0, displayUpdateThreeSecondCounter = 0;
-
-        private int threeSecondCounter = 0, threeSeconds = 0;
-        private int oneSecondCounter = 0, oneSecond = 0;
-        private int oneHalfSecondCounter = 0, oneHalfSecond = 0;
-        private int oneFifthSecondCounter = 0, oneFifthSecond = 0;
 
         public int pbarSteer, pbarMachine, pbarUDP;
 
@@ -107,8 +79,6 @@ namespace AgOpenGPS
 
         //used by filePicker Form to return picked file and directory
         public string filePickerFileAndDirectory;
-
-        //private int fiveSecondCounter = 0, fiveSeconds = 0;
 
         //the autoManual drive button. Assume in Auto
         public bool isInAutoDrive = true;
@@ -172,7 +142,7 @@ namespace AgOpenGPS
         /// Just the tool attachment that includes the sections
         /// </summary>
         public CTool tool;
-        
+
         /// <summary>
         /// All the structs for recv and send of information out ports
         /// </summary>
@@ -234,19 +204,17 @@ namespace AgOpenGPS
         public CGeoFence gf;
 
         /// <summary>
-        /// Class containing workswitch functionality
-        /// </summary>
-        public CWorkSwitch workSwitch;
-
-        /// <summary>
-        /// Sound for approaching boundary
-        /// </summary>
-        public SoundPlayer sndBoundaryAlarm;
-
-        /// <summary>
         /// The font class
         /// </summary>
         public CFont font;
+        public bool LeftMouseDownOnOpenGL { get; set; }
+        public double FrameTime { get; set; } = 0;
+        public double HzTime { get; set; } = 5;
+        public SoundPlayer SndBoundaryAlarm { get; set; }
+        public int MinuteCounter { get; set; } = 1;
+        public int TenMinuteCounter { get; set; } = 1;
+        public int NtripCounter { get; set; } = 0;
+        public FormTimedMessage Form { get; set; } = new FormTimedMessage();
 
         #endregion // Class Props and instances
 
@@ -355,7 +323,23 @@ namespace AgOpenGPS
             //create a new section and set left and right positions
             //created whether used or not, saves restarting program
             section = new CSection[MAXSECTIONS];
-            for (int j = 0; j < MAXSECTIONS; j++) section[j] = new CSection(this);
+            for (int j = 0; j < MAXSECTIONS; j++)
+            {
+                section[j] = new CSection(this);
+
+
+                this.Controls.Add(section[j].SectionButton);
+                section[j].SectionButton.BringToFront();
+                section[j].SectionButton.Text = (j + 1).ToString();
+                section[j].SectionButton.Click += new System.EventHandler(this.btnSectionMan_Click);
+
+                section[j].SectionButton.Enabled = false;
+                section[j].SectionButton.FlatAppearance.BorderColor = SystemColors.ActiveCaptionText;
+                section[j].SectionButton.FlatStyle = FlatStyle.Flat;
+                section[j].SectionButton.TextAlign = ContentAlignment.MiddleCenter;
+                section[j].SectionButton.UseVisualStyleBackColor = false;
+                section[j].SectionButton.BackColor = Color.Silver;
+            }
 
             //our NMEA parser
             pn = new CNMEA(this);
@@ -388,7 +372,7 @@ namespace AgOpenGPS
             gf = new CGeoFence(this);
 
             //headland object
-            hd = new CHead( this);
+            hd = new CHead(this);
 
             //headland entry/exit sequences
             seq = new CSequence(this);
@@ -419,9 +403,6 @@ namespace AgOpenGPS
 
             // Add Message Event handler for Form decoupling from client socket thread
             updateRTCM_DataEvent = new UpdateRTCM_Data(OnAddMessage);
-
-            // Access to workswitch functionality
-            workSwitch = new CWorkSwitch(this);
 
             //access to font class
             font = new CFont(this);
@@ -499,11 +480,11 @@ namespace AgOpenGPS
             string wave = Path.Combine(directoryName, "Dependencies\\Audio", "Boundary.Wav");
             if (File.Exists(wave))
             {
-                sndBoundaryAlarm = new SoundPlayer(wave);
+                SndBoundaryAlarm = new SoundPlayer(wave);
             }
             else
             {
-                sndBoundaryAlarm = new SoundPlayer(Properties.Resources.Alarm10);
+                SndBoundaryAlarm = new SoundPlayer(Properties.Resources.Alarm10);
             }
 
             //grab the current vehicle filename - make sure it exists
@@ -511,11 +492,13 @@ namespace AgOpenGPS
             toolFileName = Vehicle.Default.setVehicle_toolName;
             envFileName = Vehicle.Default.setVehicle_envName;
 
-            fixUpdateHz = Properties.Settings.Default.setPort_NMEAHz;
+            fixUpdateHz = Settings.Default.setPort_NMEAHz;
 
             if (timerSim.Enabled) fixUpdateHz = 10;
 
             fixUpdateTime = 1 / (double)fixUpdateHz;
+
+            timerSim.Interval = (int)((1.0 / (double)fixUpdateHz) * 1000.0);
 
             //get the abLines directory, if not exist, create
             ablinesDirectory = baseDirectory + "ABLines\\";
@@ -526,17 +509,16 @@ namespace AgOpenGPS
             baudRateGPS = Settings.Default.setPort_baudRate;
             portNameGPS = Settings.Default.setPort_portNameGPS;
 
-            //try and open
-            SerialPortOpenGPS();
-
-            if (sp.IsOpen)
+            if (Settings.Default.setMenu_isSimulatorOn)
             {
-                simulatorOnToolStripMenuItem.Checked = false;
-                panelSim.Visible = false;
-                timerSim.Enabled = false;
-
-                Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
-                Settings.Default.Save();
+                simulatorOnToolStripMenuItem.Checked = true;
+                panelSim.Visible = true;
+                timerSim.Enabled = true;
+            }
+            else
+            {
+                //try and open
+                SerialPortOpenGPS();
             }
 
             //same for SectionMachine port
@@ -548,9 +530,6 @@ namespace AgOpenGPS
             portNameAutoSteer = Settings.Default.setPort_portNameAutoSteer;
             wasAutoSteerConnectedLastRun = Settings.Default.setPort_wasAutoSteerConnected;
             if (wasAutoSteerConnectedLastRun) SerialPortAutoSteerOpen();
-
-            //Set width of section and positions for each section
-            SectionSetPosition();
 
             //Calculate total width and each section width
             SectionCalcWidths();
@@ -572,15 +551,19 @@ namespace AgOpenGPS
             if (Properties.Settings.Default.setUDP_isInterAppOn) StartLocalUDPServer();
 
             //start NTRIP if required
-                if (Properties.Settings.Default.setNTRIP_isOn)
+            if (Settings.Default.setNTRIP_isOn)
             {
-                isNTRIP_RequiredOn = true;
+                isNTRIP_TurnedOn = true;
                 btnStartStopNtrip.Text = gStr.gsStop;
+                lblWatch.Text = gStr.gsWaiting;
             }
             else
             {
-                isNTRIP_RequiredOn = false;
+                isNTRIP_TurnedOn = false;
+                lblNTRIPSeconds.Text = gStr.gsOffline;
                 btnStartStopNtrip.Text = gStr.gsStart;
+                lblWatch.Text = gStr.gsStopped;
+
             }
 
             //remembered window position
@@ -1103,7 +1086,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnTestIsMapping_Click(object sender, EventArgs e)
+        private void BtnTestIsMapping_Click(object sender, EventArgs e)
         {
             isMapping = !isMapping;
             if (isMapping) btnTestIsMapping.Text = "Mapping";
@@ -1112,24 +1095,14 @@ namespace AgOpenGPS
 
         public void GetHeadland()
         {
-            using (var form = new FormHeadland (this))
+            using (var form = new FormHeadland(this))
             {
                 var result = form.ShowDialog();
                 if (result == DialogResult.OK)
                 {
                 }
             }
-
-            if (hd.headArr[0].hdLine.Count > 0)
-            {
-                hd.isOn = true;
-                btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
-            }
-            else
-            {
-                hd.isOn = false;
-                btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
-            }
+            btnHeadlandOnOff.Image = (hd.isOn = hd.headArr.Count > 0) ? Resources.HeadlandOn : Resources.HeadlandOff;
         }
 
         public void GetAB()
@@ -1220,8 +1193,10 @@ namespace AgOpenGPS
         }
 
         //function to set section positions
-        public void SectionSetPosition()
+        //function to calculate the width of each section and update
+        public void SectionCalcWidths()
         {
+
             section[0].positionLeft = (double)Vehicle.Default.setSection_position1 + Vehicle.Default.setVehicle_toolOffset;
             section[0].positionRight = (double)Vehicle.Default.setSection_position2 + Vehicle.Default.setVehicle_toolOffset;
 
@@ -1269,33 +1244,26 @@ namespace AgOpenGPS
 
             section[15].positionLeft = (double)Vehicle.Default.setSection_position16 + Vehicle.Default.setVehicle_toolOffset;
             section[15].positionRight = (double)Vehicle.Default.setSection_position17 + Vehicle.Default.setVehicle_toolOffset;
-        }
 
-        //function to calculate the width of each section and update
-        public void SectionCalcWidths()
-        {
             for (int j = 0; j < MAXSECTIONS; j++)
             {
-                section[j].sectionWidth = (section[j].positionRight - section[j].positionLeft);
-                section[j].rpSectionPosition = 250 + (int)(Math.Round(section[j].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
-                section[j].rpSectionWidth = (int)(Math.Round(section[j].sectionWidth * 10, 0, MidpointRounding.AwayFromZero));
+                section[j].sectionWidth = section[j].positionRight - section[j].positionLeft;
+                section[j].rpSectionPosition = 250 + (int)Math.Round(section[j].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
+                section[j].rpSectionWidth = (int)Math.Round(section[j].sectionWidth * 10, 0, MidpointRounding.AwayFromZero);
             }
 
             //calculate tool width based on extreme right and left values
-            tool.toolWidth = Math.Abs(section[0].positionLeft) + Math.Abs(section[tool.numOfSections - 1].positionRight);
+            tool.ToolWidth = Math.Abs(section[0].positionLeft) + Math.Abs(section[tool.numOfSections - 1].positionRight);
 
-            //left and right tool position
-            tool.toolFarLeftPosition = section[0].positionLeft;
-            tool.toolFarRightPosition = section[tool.numOfSections - 1].positionRight;
 
             //now do the full width section
-            section[tool.numOfSections].sectionWidth = tool.toolWidth;
-            section[tool.numOfSections].positionLeft = tool.toolFarLeftPosition;
-            section[tool.numOfSections].positionRight = tool.toolFarRightPosition;
+            section[tool.numOfSections].sectionWidth = tool.ToolWidth;
+            section[tool.numOfSections].positionLeft = section[0].positionLeft;
+            section[tool.numOfSections].positionRight = section[tool.numOfSections - 1].positionRight;
 
             //find the right side pixel position
-            tool.rpXPosition = 250 + (int)(Math.Round(tool.toolFarLeftPosition * 10, 0, MidpointRounding.AwayFromZero));
-            tool.rpWidth = (int)(Math.Round(tool.toolWidth * 10, 0, MidpointRounding.AwayFromZero));
+            tool.rpXPosition = 250 + (int)(Math.Round(section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
+            tool.rpWidth = (int)(Math.Round(tool.ToolWidth * 10, 0, MidpointRounding.AwayFromZero));
         }
 
         //request a new job
@@ -1307,56 +1275,24 @@ namespace AgOpenGPS
                 oglZoom.Width = 300;
                 oglZoom.Height = 300;
             }
-                //isGPSPositionInitialized = false;
-                //offset = 0;
-                //pn.latStart = pn.latitude;
-                //pn.lonStart = pn.longitude;
 
-                SendSteerSettingsOutAutoSteerPort();
+            SendSteerSettingsOutAutoSteerPort();
             isJobStarted = true;
-            startCounter = 0;
 
-            btnManualOffOn.Enabled = true;
-            manualBtnState = btnStates.Off;
-            btnManualOffOn.Image = Properties.Resources.ManualOff;
+            btnManualSection.Enabled = true;
+            btnAutoSection.Enabled = true;
 
-            btnSectionOffAutoOn.Enabled = true;
             autoBtnState = btnStates.Off;
-            btnSectionOffAutoOn.Image = Properties.Resources.SectionMasterOff;
+            btnSection_Update();
 
-            btnSection1Man.BackColor = Color.Red;
-            btnSection2Man.BackColor = Color.Red;
-            btnSection3Man.BackColor = Color.Red;
-            btnSection4Man.BackColor = Color.Red;
-            btnSection5Man.BackColor = Color.Red;
-            btnSection6Man.BackColor = Color.Red;
-            btnSection7Man.BackColor = Color.Red;
-            btnSection8Man.BackColor = Color.Red;
-            btnSection9Man.BackColor = Color.Red;
-            btnSection10Man.BackColor = Color.Red;
-            btnSection11Man.BackColor = Color.Red;
-            btnSection12Man.BackColor = Color.Red;
-            btnSection13Man.BackColor = Color.Red;
-            btnSection14Man.BackColor = Color.Red;
-            btnSection15Man.BackColor = Color.Red;
-            btnSection16Man.BackColor = Color.Red;
 
-            btnSection1Man.Enabled = true;
-            btnSection2Man.Enabled = true;
-            btnSection3Man.Enabled = true;
-            btnSection4Man.Enabled = true;
-            btnSection5Man.Enabled = true;
-            btnSection6Man.Enabled = true;
-            btnSection7Man.Enabled = true;
-            btnSection8Man.Enabled = true;
-            btnSection9Man.Enabled = true;
-            btnSection10Man.Enabled = true;
-            btnSection11Man.Enabled = true;
-            btnSection12Man.Enabled = true;
-            btnSection13Man.Enabled = true;
-            btnSection14Man.Enabled = true;
-            btnSection15Man.Enabled = true;
-            btnSection16Man.Enabled = true;
+            for (int j = 0; j < tool.numOfSections; j++)
+            {
+                section[j].SectionButton.BackColor = Color.Red;
+                section[j].SectionButton.Enabled = true;
+            }
+
+
 
 
             btnABLine.Enabled = true;
@@ -1410,7 +1346,7 @@ namespace AgOpenGPS
             bnd.bndArr?.Clear();
             gf.geoFenceArr?.Clear();
             turn.turnArr?.Clear();
-            hd.headArr[0].hdLine?.Clear();
+            hd.headArr?.Clear();
 
             layoutPanelRight.Enabled = false;
             toolStripBtnDropDownBoundaryTools.Enabled = false;
@@ -1422,67 +1358,19 @@ namespace AgOpenGPS
             pn.latStart = 0;
             pn.lonStart = 0;
 
-            //turn section buttons all OFF
-            for (int j = 0; j < MAXSECTIONS; j++)
-            {
-                section[j].isAllowedOn = false;
-                section[j].manBtnState = manBtn.On;
-            }
-
-            //fix ManualOffOnAuto buttons
-            btnManualOffOn.Enabled = false;
-            manualBtnState = btnStates.Off;
-            btnManualOffOn.Image = Properties.Resources.ManualOff;
-
             //fix auto button
-            btnSectionOffAutoOn.Enabled = false;
+            btnManualSection.Enabled = false;
+            btnAutoSection.Enabled = false;
+
             autoBtnState = btnStates.Off;
-            btnSectionOffAutoOn.Image = Properties.Resources.SectionMasterOff;
+            btnSection_Update();
 
-            //Update the button colors and text
-            ManualAllBtnsUpdate();
-
-            //enable disable manual buttons
-            LineUpManualBtns();
-
-            btnSection1Man.Enabled = false;
-            btnSection2Man.Enabled = false;
-            btnSection3Man.Enabled = false;
-            btnSection4Man.Enabled = false;
-            btnSection5Man.Enabled = false;
-            btnSection6Man.Enabled = false;
-            btnSection7Man.Enabled = false;
-            btnSection8Man.Enabled = false;
-            btnSection9Man.Enabled = false;
-            btnSection10Man.Enabled = false;
-            btnSection11Man.Enabled = false;
-            btnSection12Man.Enabled = false;
-            btnSection13Man.Enabled = false;
-            btnSection14Man.Enabled = false;
-            btnSection15Man.Enabled = false;
-            btnSection16Man.Enabled = false;
-
-            btnSection1Man.BackColor = Color.Silver;
-            btnSection2Man.BackColor = Color.Silver;
-            btnSection3Man.BackColor = Color.Silver;
-            btnSection4Man.BackColor = Color.Silver;
-            btnSection5Man.BackColor = Color.Silver;
-            btnSection6Man.BackColor = Color.Silver;
-            btnSection7Man.BackColor = Color.Silver;
-            btnSection8Man.BackColor = Color.Silver;
-            btnSection9Man.BackColor = Color.Silver;
-            btnSection10Man.BackColor = Color.Silver;
-            btnSection11Man.BackColor = Color.Silver;
-            btnSection12Man.BackColor = Color.Silver;
-            btnSection13Man.BackColor = Color.Silver;
-            btnSection14Man.BackColor = Color.Silver;
-            btnSection15Man.BackColor = Color.Silver;
-            btnSection16Man.BackColor = Color.Silver;
-
-            //clear the section lists
             for (int j = 0; j < MAXSECTIONS; j++)
             {
-                //clean out the lists
+                //turn section buttons all OFF
+                section[j].SectionButton.Enabled = false;
+                section[j].SectionButton.BackColor = Color.Silver;
+                //clear the section lists
                 section[j].patchList?.Clear();
                 section[j].triangleList?.Clear();
             }
@@ -1544,10 +1432,10 @@ namespace AgOpenGPS
             fd.workedAreaTotal = 0;
 
             //reset boundaries
-            bnd.ResetBoundaries();
+            bnd.bndArr.Clear();
 
             //reset turn lines
-            turn.ResetTurnLines();
+            turn.turnArr.Clear();
 
             //reset GUI areas
             fd.UpdateFieldBoundaryGUIAreas();
@@ -1570,13 +1458,6 @@ namespace AgOpenGPS
             //bring up dialog if no job active, close job if one is
             if (!isJobStarted)
             {
-                //if (toolStripBtnGPSStength.Image.Height == 64)
-                //{
-                //    var form = new FormTimedMessage(3000, gStr.gsNoGPS, gStr.gsGPSSourceOff);
-                //    form.Show();
-                //    return;
-                //}
-
                 using (var form = new FormJob(this))
                 {
                     var result = form.ShowDialog();
@@ -1650,102 +1531,99 @@ namespace AgOpenGPS
         //Does the logic to process section on off requests
         private void ProcessSectionOnOffRequests()
         {
+            for (int j = 0; j < tool.numSuperSection; j++)
             {
-                for (int j = 0; j < tool.numOfSections + 1; j++)
+                //SECTIONS - 
+                if (section[j].SectionOnRequest)
                 {
-                    //SECTIONS - 
+                    section[j].IsSectionOn = true;
+                    section[j].SectionOverlapTimer = (int)((double)fixUpdateHz * tool.TurnOffDelay + 1);
 
-
-                    if (section[j].sectionOnRequest)
-                        section[j].isSectionOn = true;
-
-                    if (!section[j].sectionOffRequest) section[j].sectionOffTimer = (int)((double)fixUpdateHz * tool.turnOffDelay);
-
-                    if (section[j].sectionOffTimer > 0) section[j].sectionOffTimer--;
-
-                    if (section[j].sectionOffRequest & section[j].sectionOffTimer == 0)
-                    {
-                        if (section[j].isSectionOn) section[j].isSectionOn = false;
-                    }
-
-                    //MAPPING - 
-
-                    //easy just turn it on
-                    if (section[j].mappingOnRequest)
-                    {
-                        if (!section[j].isMappingOn && isMapping) section[j].TurnMappingOn(); //**************************************** un comment to enable mappping again
-                    }
-
-                    //turn off
-                    double sped = 1 / ((pn.speed+5) * 0.2);
-                    if (sped < 0.2) sped = 0.2;
-
-                    //keep setting the timer so full when ready to turn off
-                    if (!section[j].mappingOffRequest)
-                        section[j].mappingOffTimer = (int)(fixUpdateHz * 1 * sped + ((double)fixUpdateHz * tool.turnOffDelay));
-
-                    //decrement the off timer
-                    if (section[j].mappingOffTimer > 0) section[j].mappingOffTimer--;
-
-                    //if Off mapping timer is zero, turn off the section, reset everything
-                    if (section[j].mappingOffTimer == 0 && section[j].mappingOffRequest)
-                    {
-                        if (section[j].isMappingOn) section[j].TurnMappingOff();
-                        section[j].mappingOffRequest = false;
-                    }
-
-                    #region notes
-                    //Turn ON
-                    //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
-                    //if (section[j].sectionOnRequest && !section[j].sectionOnOffCycle)
-                    //{
-                    //    section[j].sectionOnTimer = (int)(pn.speed * section[j].lookAheadOn) + 1;
-                    //    if (section[j].sectionOnTimer > fixUpdateHz + 3) section[j].sectionOnTimer = fixUpdateHz + 3;
-                    //    section[j].sectionOnOffCycle = true;
-                    //}
-
-                    ////reset the ON request
-                    //section[j].sectionOnRequest = false;
-
-                    ////decrement the timer if not zero
-                    //if (section[j].sectionOnTimer > 0)
-                    //{
-                    //    //turn the section ON if not and decrement timer
-                    //    section[j].sectionOnTimer--;
-                    //    if (!section[j].isSectionOn) section[j].isSectionOn = true;
-
-                    //    //keep resetting the section OFF timer while the ON is active
-                    //    //section[j].sectionOffTimer = (int)(fixUpdateHz * tool.toolTurnOffDelay);
-                    //}
-                    //if (!section[j].sectionOffRequest) 
-                    //    section[j].sectionOffTimer = (int)(fixUpdateHz * tool.turnOffDelay);
-
-                    ////decrement the off timer
-                    //if (section[j].sectionOffTimer > 0 && section[j].sectionOnTimer == 0) section[j].sectionOffTimer--;
-
-                    ////Turn OFF
-                    ////if Off section timer is zero, turn off the section
-                    //if (section[j].sectionOffTimer == 0 && section[j].sectionOnTimer == 0 && section[j].sectionOffRequest)
-                    //{
-                    //    if (section[j].isSectionOn) section[j].isSectionOn = false;
-                    //    //section[j].sectionOnOffCycle = false;
-                    //    section[j].sectionOffRequest = false;
-                    //    //}
-                    //}
-                    //Turn ON
-                    //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
-                    //if (section[j].mappingOnRequest && !section[j].mappingOnOffCycle)
-                    //{
-                    //    section[j].mappingOnTimer = (int)(fixUpdateHz * 1) + 1;
-                    //    section[j].mappingOnOffCycle = true;
-                    //}
-
-                    ////reset the ON request
-                    //section[j].mappingOnRequest = false;
-
-                    //decrement the timer if not zero
-                    #endregion notes
+                    if (section[j].MappingOnTimer == 0) section[j].MappingOnTimer = fixUpdateHz * 1;
                 }
+                else
+                {
+                    if (section[j].SectionOverlapTimer > 0) section[j].SectionOverlapTimer--;
+                    if (section[j].IsSectionOn && section[j].SectionOverlapTimer == 0)
+                    {
+                        section[j].IsSectionOn = false;
+                    }
+                }
+
+                //MAPPING -
+                if (!section[j].IsMappingOn && isMapping && section[j].MappingOnTimer > 0)
+                {
+                    if (section[j].MappingOnTimer > 0) section[j].MappingOnTimer--;
+                    if (section[j].MappingOnTimer == 0)
+                    {
+                        section[j].TurnMappingOn();
+                    }
+                }
+
+                if (section[j].IsSectionOn)
+                {
+                    section[j].MappingOffTimer = (int)(0.8 * fixUpdateHz + 1);
+                }
+                else
+                {
+                    if (section[j].MappingOffTimer > 0) section[j].MappingOffTimer--;
+                    if (section[j].MappingOffTimer == 0)
+                    {
+                        if (section[j].IsMappingOn)
+                        {
+                            section[j].TurnMappingOff();
+                            section[j].MappingOnTimer = 0;
+                        }
+                    }
+                }
+
+
+
+                #region notes
+                //Turn ON
+                //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
+                //if (section[j].sectionOnRequest)
+                //{
+                //    section[j].sectionOnTimer = (int)(pn.speed * section[j].lookAheadOn) + 1;
+                //    if (section[j].sectionOnTimer > fixUpdateHz + 3) section[j].sectionOnTimer = fixUpdateHz + 3;
+                //}
+
+                ////reset the ON request
+                //section[j].sectionOnRequest = false;
+
+                ////decrement the timer if not zero
+                //if (section[j].sectionOnTimer > 0)
+                //{
+                //    //turn the section ON if not and decrement timer
+                //    section[j].sectionOnTimer--;
+                //    if (!section[j].IsSectionOn) section[j].IsSectionOn = true;
+
+                //    //keep resetting the section OFF timer while the ON is active
+                //    //section[j].sectionOffTimer = (int)(fixUpdateHz * tool.toolTurnOffDelay);
+                //}
+                //if (!section[j].sectionOffRequest) 
+                //    section[j].sectionOffTimer = (int)(fixUpdateHz * tool.turnOffDelay);
+
+                ////decrement the off timer
+                //if (section[j].sectionOffTimer > 0 && section[j].sectionOnTimer == 0) section[j].sectionOffTimer--;
+
+                ////Turn OFF
+                ////if Off section timer is zero, turn off the section
+                //if (section[j].sectionOffTimer == 0 && section[j].sectionOnTimer == 0 && section[j].sectionOffRequest)
+                //{
+                //    if (section[j].IsSectionOn) section[j].IsSectionOn = false;
+                //    //section[j].sectionOnOffCycle = false;
+                //    section[j].sectionOffRequest = false;
+                //    //}
+                //}
+                //Turn ON
+                //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
+
+                ////reset the ON request
+                //section[j].mappingOnRequest = false;
+
+                //decrement the timer if not zero
+                #endregion notes
             }
         }
 
@@ -1761,34 +1639,26 @@ namespace AgOpenGPS
                 case 1: //Manual button
                     if (action == 0) //turn auto off
                     {
-                        if (manualBtnState != btnStates.Off)
-                        {
-                            btnManualOffOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.Off;
+                        btnSection_Update();
                     }
                     else
                     {
-                        if (manualBtnState != btnStates.On)
-                        {
-                            btnManualOffOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.On;
+                        btnSection_Update();
                     }
                     break;
 
                 case 2: //Auto Button
                     if (action == 0) //turn auto off
                     {
-                        if (autoBtnState != btnStates.Off)
-                        {
-                            btnSectionOffAutoOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.Off;
+                        btnSection_Update();
                     }
                     else
                     {
-                        if (autoBtnState != btnStates.Auto)
-                        {
-                            btnSectionOffAutoOn.PerformClick();
-                        }
+                        autoBtnState = btnStates.Auto;
+                        btnSection_Update();
                     }
                     break;
 
@@ -1880,15 +1750,15 @@ namespace AgOpenGPS
         {
             //match grid to cam distance and redo perspective
             if (camera.camSetDistance <= -20000) camera.gridZoom = 2000;
-            else if (camera.camSetDistance >= -20000 && camera.camSetDistance < -10000) camera.gridZoom = 2012*2;
-            else if (camera.camSetDistance >= -10000 && camera.camSetDistance < -5000) camera.gridZoom = 1006 *2;
-            else if (camera.camSetDistance >= -5000 && camera.camSetDistance < -2000) camera.gridZoom = 503 *2;
-            else if (camera.camSetDistance >= -2000 && camera.camSetDistance < -1000) camera.gridZoom = 201.2 *2;
-            else if (camera.camSetDistance >= -1000 && camera.camSetDistance < -500) camera.gridZoom = 100.6 *2;
-            else if (camera.camSetDistance >= -500 && camera.camSetDistance < -250) camera.gridZoom = 50.3 *2;
-            else if (camera.camSetDistance >= -250 && camera.camSetDistance < -150) camera.gridZoom = 25.15 *2;
-            else if (camera.camSetDistance >= -150 && camera.camSetDistance < -50) camera.gridZoom = 10.06 *2;
-            else if (camera.camSetDistance >= -50 && camera.camSetDistance < -1) camera.gridZoom = 5.03 *2;
+            else if (camera.camSetDistance >= -20000 && camera.camSetDistance < -10000) camera.gridZoom = 2012 * 2;
+            else if (camera.camSetDistance >= -10000 && camera.camSetDistance < -5000) camera.gridZoom = 1006 * 2;
+            else if (camera.camSetDistance >= -5000 && camera.camSetDistance < -2000) camera.gridZoom = 503 * 2;
+            else if (camera.camSetDistance >= -2000 && camera.camSetDistance < -1000) camera.gridZoom = 201.2 * 2;
+            else if (camera.camSetDistance >= -1000 && camera.camSetDistance < -500) camera.gridZoom = 100.6 * 2;
+            else if (camera.camSetDistance >= -500 && camera.camSetDistance < -250) camera.gridZoom = 50.3 * 2;
+            else if (camera.camSetDistance >= -250 && camera.camSetDistance < -150) camera.gridZoom = 25.15 * 2;
+            else if (camera.camSetDistance >= -150 && camera.camSetDistance < -50) camera.gridZoom = 10.06 * 2;
+            else if (camera.camSetDistance >= -50 && camera.camSetDistance < -1) camera.gridZoom = 5.03 * 2;
             //1.216 2.532
 
             oglMain.MakeCurrent();
@@ -1906,15 +1776,14 @@ namespace AgOpenGPS
             if (ct.isContourOn) ct.StopContourLine(pivotAxlePos);
 
             //turn off all the sections
-            for (int j = 0; j < tool.numOfSections + 1; j++)
+            for (int j = 0; j < tool.numSuperSection; j++)
             {
-                if (section[j].isMappingOn) section[j].TurnMappingOff();
-                section[j].sectionOnOffCycle = false;
-                section[j].sectionOffRequest = false;
+                if (section[j].IsMappingOn) section[j].TurnMappingOff();
+                section[j].SectionOnRequest = false;
             }
 
             //FileSaveHeadland();
-            FileSaveBoundary();
+
             FileSaveSections();
             FileSaveContour();
             FileSaveFieldKML();
@@ -1941,22 +1810,24 @@ namespace AgOpenGPS
                 MessageBox.Show("Error in WriteErrorLog: " + ex.Message, "Error Logging", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
-
         //message box pops up with info then goes away
         public void TimedMessageBox(int timeout, string s1, string s2)
         {
-            var form = new FormTimedMessage(timeout, s1, s2);
-            form.Show();
+            Form.SetTimedMessage(timeout, s1, s2, this);
+
+            Form.TopLevel = false;
+            Form.BringToFront();
+            Controls.Add(Form);
         }
     }//class FormGPS
 }//namespace AgOpenGPS
 
 /*The order is:
  *
- * The watchdog timer times out and runs this function tmrWatchdog_tick().
+ * The watchdog timer times out and runs this function ScanForNMEA_Tick().
  * 50 times per second so statusUpdateCounter counts to 25 and updates strip menu etc at 2 hz
  * it also makes sure there is new sentences showing up otherwise it shows **** No GGA....
- * saveCounter ticks 2 x per second, used at end of draw routine every minute to save a backup of field
+ * saveCounter ticks 1 x per second, used at end of draw routine every minute to save a backup of field
  * then ScanForNMEA function checks for a complete sentence if contained in pn.rawbuffer
  * if not it comes right back and waits for next watchdog trigger and starts all over
  * if a new sentence is there, UpdateFix() is called

@@ -4,21 +4,6 @@ using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
-    //public class CTurnPt
-    //{
-    //    public double easting { get; set; }
-    //    public double northing { get; set; }
-    //    public double heading { get; set; }
-
-    //    //constructor
-    //    public CTurnPt(double _easting, double _northing, double _heading)
-    //    {
-    //        easting = _easting;
-    //        northing = _northing;
-    //        heading = _heading;
-    //    }
-    //}
-
     public class CTurnLines
     {
         //list of coordinates of boundary line
@@ -26,6 +11,8 @@ namespace AgOpenGPS
 
         //the list of constants and multiples of the boundary
         public List<vec2> calcList = new List<vec2>();
+
+        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
         public void CalculateTurnHeadings()
         {
@@ -58,17 +45,11 @@ namespace AgOpenGPS
             turnLine.Add(pt3);
         }
 
-        public void ResetTurn()
-        {
-            calcList?.Clear();
-            turnLine?.Clear();
-        }
-
         public void FixTurnLine(double totalHeadWidth, List<vec3> curBnd, double spacing)
         {
             //count the points from the boundary
             int lineCount = turnLine.Count;
-            double distance = 0;
+            double distance;
 
             //int headCount = mf.bndArr[inTurnNum].bndLine.Count;
             int bndCount = curBnd.Count;
@@ -103,7 +84,7 @@ namespace AgOpenGPS
                     i--;
                 }
             }
-
+            
             //make sure distance isn't too big between points on Turn
             bndCount = turnLine.Count;
             for (int i = 0; i < bndCount; i++)
@@ -132,63 +113,83 @@ namespace AgOpenGPS
 
         public void PreCalcTurnLines()
         {
-            int j = turnLine.Count - 1;
-            //clear the list, constant is easting, multiple is northing
-            calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
-
-            for (int i = 0; i < turnLine.Count; j = i++)
+            if (turnLine.Count > 3)
             {
-                //check for divide by zero
-                if (Math.Abs(turnLine[i].northing - turnLine[j].northing) < 0.00000000001)
+                int j = turnLine.Count - 1;
+                //clear the list, constant is easting, multiple is northing
+                calcList.Clear();
+                vec2 constantMultiple = new vec2(0, 0);
+
+                Northingmin = Northingmax = turnLine[0].northing;
+                Eastingmin = Eastingmax = turnLine[0].easting;
+
+                for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    constantMultiple.easting = turnLine[i].easting;
-                    constantMultiple.northing = 0;
-                    calcList.Add(constantMultiple);
-                }
-                else
-                {
-                    //determine constant and multiple and add to list
-                    constantMultiple.easting = turnLine[i].easting - ((turnLine[i].northing * turnLine[j].easting)
-                                    / (turnLine[j].northing - turnLine[i].northing)) + ((turnLine[i].northing * turnLine[i].easting)
-                                        / (turnLine[j].northing - turnLine[i].northing));
-                    constantMultiple.northing = (turnLine[j].easting - turnLine[i].easting) / (turnLine[j].northing - turnLine[i].northing);
-                    calcList.Add(constantMultiple);
+                    if (Northingmin > turnLine[i].northing) Northingmin = turnLine[i].northing;
+
+                    if (Northingmax < turnLine[i].northing) Northingmax = turnLine[i].northing;
+
+                    if (Eastingmin > turnLine[i].easting) Eastingmin = turnLine[i].easting;
+
+                    if (Eastingmax < turnLine[i].easting) Eastingmax = turnLine[i].easting;
+
+                    //check for divide by zero
+                    if (Math.Abs(turnLine[i].northing - turnLine[j].northing) < 0.00000000001)
+                    {
+                        constantMultiple.easting = turnLine[i].easting;
+                        constantMultiple.northing = 0;
+                        calcList.Add(constantMultiple);
+                    }
+                    else
+                    {
+                        //determine constant and multiple and add to list
+                        constantMultiple.easting = turnLine[i].easting - ((turnLine[i].northing * turnLine[j].easting)
+                                        / (turnLine[j].northing - turnLine[i].northing)) + ((turnLine[i].northing * turnLine[i].easting)
+                                            / (turnLine[j].northing - turnLine[i].northing));
+                        constantMultiple.northing = (turnLine[j].easting - turnLine[i].easting) / (turnLine[j].northing - turnLine[i].northing);
+                        calcList.Add(constantMultiple);
+                    }
                 }
             }
         }
 
-        public bool IsPointInTurnWorkArea(vec3 testPointv3)
+        public bool IsPointInTurnWorkArea(vec3 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = turnLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < turnLine.Count; j = i++)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
-                if ((turnLine[i].northing < testPointv3.northing && turnLine[j].northing >= testPointv3.northing)
-                || (turnLine[j].northing < testPointv3.northing && turnLine[i].northing >= testPointv3.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv3.northing * calcList[i].northing) + calcList[i].easting < testPointv3.easting);
+                    if ((turnLine[i].northing < TestPoint.northing && turnLine[j].northing >= TestPoint.northing)
+                    || (turnLine[j].northing < TestPoint.northing && turnLine[i].northing >= TestPoint.northing))
+                    {
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
         }
 
-        public bool IsPointInTurnWorkArea(vec2 testPointv2)
+        public bool IsPointInTurnWorkArea(vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = turnLine.Count - 1;
             bool oddNodes = false;
 
-            //test against the constant and multiples list the test point
-            for (int i = 0; i < turnLine.Count; j = i++)
+            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
             {
-                if ((turnLine[i].northing < testPointv2.northing && turnLine[j].northing >= testPointv2.northing)
-                || (turnLine[j].northing < testPointv2.northing && turnLine[i].northing >= testPointv2.northing))
+                //test against the constant and multiples list the test point
+                for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    oddNodes ^= ((testPointv2.northing * calcList[i].northing) + calcList[i].easting < testPointv2.easting);
+                    if ((turnLine[i].northing < TestPoint.northing && turnLine[j].northing >= TestPoint.northing)
+                    || (turnLine[j].northing < TestPoint.northing && turnLine[i].northing >= TestPoint.northing))
+                    {
+                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
+                    }
                 }
             }
             return oddNodes; //true means inside.
@@ -199,12 +200,8 @@ namespace AgOpenGPS
             ////draw the turn line oject
             int ptCount = turnLine.Count;
             if (ptCount < 1) return;
-            GL.LineWidth(1);
-            GL.Color3(0.8555f, 0.9232f, 0.60f);
-            GL.PointSize(2);
-            GL.Begin(PrimitiveType.Points);
+            GL.Begin(PrimitiveType.LineLoop);
             for (int h = 0; h < ptCount; h++) GL.Vertex3(turnLine[h].easting, turnLine[h].northing, 0);
-            GL.Vertex3(turnLine[0].easting, turnLine[0].northing, 0);
             GL.End();
         }
     }

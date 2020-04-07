@@ -47,7 +47,7 @@
             this.btnSouth.Size = new System.Drawing.Size(72, 72);
             this.btnSouth.TabIndex = 195;
             this.btnSouth.UseVisualStyleBackColor = true;
-            this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnSouth_MouseDown);
+            this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSouth_MouseDown);
             // 
             // btnNorth
             // 
@@ -60,7 +60,7 @@
             this.btnNorth.Size = new System.Drawing.Size(72, 72);
             this.btnNorth.TabIndex = 196;
             this.btnNorth.UseVisualStyleBackColor = true;
-            this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnNorth_MouseDown);
+            this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnNorth_MouseDown);
             // 
             // bntOK
             // 
@@ -77,7 +77,7 @@
             this.bntOK.Text = "For Now";
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.bntOK.UseVisualStyleBackColor = true;
-            this.bntOK.Click += new System.EventHandler(this.bntOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BntOK_Click);
             // 
             // btnCancel
             // 
@@ -92,7 +92,7 @@
             this.btnCancel.TabIndex = 198;
             this.btnCancel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // btnSave
             // 
@@ -109,7 +109,7 @@
             this.btnSave.Text = "To File";
             this.btnSave.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
             // lblSmooth
             // 

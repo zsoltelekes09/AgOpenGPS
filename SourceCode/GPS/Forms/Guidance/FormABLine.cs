@@ -12,7 +12,7 @@ namespace AgOpenGPS
     public partial class FormABLine : Form
     {
         //access to the main GPS form and all its variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         private double upDnHeading = 0;
         private bool isFullPanel;
@@ -39,7 +39,7 @@ namespace AgOpenGPS
             tboxHeading.Enabled = false;
             tboxABLineName.Text = "";
             tboxABLineName.Enabled = false;
-            
+
             //small window
             ShowFullPanel(true);
 
@@ -50,9 +50,9 @@ namespace AgOpenGPS
             {
                 //AB line is on screen and set
                 upDnHeading = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 6);
-                this.tboxHeading.TextChanged -= new System.EventHandler(this.tboxHeading_TextChanged);
+                this.tboxHeading.TextChanged -= new System.EventHandler(this.TboxHeading_TextChanged);
                 tboxHeading.Text = upDnHeading.ToString(CultureInfo.InvariantCulture);
-                this.tboxHeading.TextChanged += new System.EventHandler(this.tboxHeading_TextChanged);
+                this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
             }
             else
             {
@@ -78,7 +78,7 @@ namespace AgOpenGPS
         }
 
 
-        private void btnAPoint_Click(object sender, EventArgs e)
+        private void BtnAPoint_Click(object sender, EventArgs e)
         {
             vec3 fix = new vec3();
             fix = mf.pivotAxlePos;
@@ -99,14 +99,14 @@ namespace AgOpenGPS
 
             btnAPoint.Enabled = false;
             upDnHeading = Math.Round(glm.toDegrees(mf.fixHeading), 1);
-            this.tboxHeading.TextChanged -= new System.EventHandler(this.tboxHeading_TextChanged);
+            this.tboxHeading.TextChanged -= new System.EventHandler(this.TboxHeading_TextChanged);
             tboxHeading.Text = upDnHeading.ToString();
-            this.tboxHeading.TextChanged += new System.EventHandler(this.tboxHeading_TextChanged);
+            this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
 
             ShowFullPanel(false);
         }
 
-        private void btnBPoint_Click(object sender, EventArgs e)
+        private void BtnBPoint_Click(object sender, EventArgs e)
         {
             mf.ABLine.SetABLineByBPoint();
             upDnHeading = Math.Round(glm.toDegrees(mf.fixHeading), 3);
@@ -114,9 +114,9 @@ namespace AgOpenGPS
             //update the default
             //if (mf.ABLine.tramPassEvery == 0) mf.mc.machineData[mf.mc.rdTramLine] = 0;
 
-            this.tboxHeading.TextChanged -= new System.EventHandler(this.tboxHeading_TextChanged);
+            this.tboxHeading.TextChanged -= new System.EventHandler(this.TboxHeading_TextChanged);
             tboxHeading.Text = glm.toDegrees(mf.ABLine.abHeading).ToString("N4");
-            this.tboxHeading.TextChanged += new System.EventHandler(this.tboxHeading_TextChanged);
+            this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
             //mf.ABLine.SetABLineByHeading();
 
             //ShowSavedPanel(true);
@@ -161,15 +161,15 @@ namespace AgOpenGPS
 
                 lvLines.Enabled = false;
                 btnAddToFile.Focus();
-                tboxABLineName.Text = (Math.Round(glm.toDegrees(mf.ABLine.abHeading), 1)).ToString(CultureInfo.InvariantCulture) 
+                tboxABLineName.Text = (Math.Round(glm.toDegrees(mf.ABLine.abHeading), 1)).ToString(CultureInfo.InvariantCulture)
                     + "\u00B0" +
                     mf.FindDirection(mf.ABLine.abHeading) + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
             }
             else // or used to initiate a new line
             {
-                this.tboxHeading.TextChanged -= new System.EventHandler(this.tboxHeading_TextChanged);
+                this.tboxHeading.TextChanged -= new System.EventHandler(this.TboxHeading_TextChanged);
                 tboxHeading.Text = "";
-                this.tboxHeading.TextChanged += new System.EventHandler(this.tboxHeading_TextChanged);
+                this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
                 tboxHeading.Enabled = false;
 
                 mf.ABLine.DeleteAB();
@@ -239,7 +239,7 @@ namespace AgOpenGPS
 
         }
 
-        private void tboxHeading_TextChanged(object sender, EventArgs e)
+        private void TboxHeading_TextChanged(object sender, EventArgs e)
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
@@ -255,7 +255,7 @@ namespace AgOpenGPS
             tboxABLineName.BackColor = Color.LightGreen;
         }
 
-        private void btnAddToFile_Click(object sender, EventArgs e)
+        private void BtnAddToFile_Click(object sender, EventArgs e)
         {
             if (mf.ABLine.isABLineSet)
             {
@@ -309,21 +309,19 @@ namespace AgOpenGPS
                 else
                 {
                     //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                    var form2 = new FormTimedMessage(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
-                    form2.Show();
+                    mf.TimedMessageBox(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
                 }
             }
             else
             {
                 //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                var form2 = new FormTimedMessage(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
-                form2.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
             }
 
             tboxABLineName.Clear();
         }
 
-        private void btnAddAndGo_Click(object sender, EventArgs e)
+        private void BtnAddAndGo_Click(object sender, EventArgs e)
         {
             if (mf.ABLine.isABLineSet)
             {
@@ -364,21 +362,19 @@ namespace AgOpenGPS
                 else
                 {
                     //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                    var form2 = new FormTimedMessage(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
-                    form2.Show();
+                    mf.TimedMessageBox(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
                 }
             }
             else
             {
                 //MessageBox.Show("Currently no ABCurve name\n      create ABCurve name");
-                var form2 = new FormTimedMessage(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
-                form2.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoABLineActive, gStr.gsPleaseCompleteABLine);
             }
 
             tboxABLineName.Clear();
         }
 
-        private void btnListDelete_Click(object sender, EventArgs e)
+        private void BtnListDelete_Click(object sender, EventArgs e)
         {
             if (lvLines.SelectedItems.Count > 0)
             {
@@ -404,7 +400,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnListUse_Click(object sender, EventArgs e)
+        private void BtnListUse_Click(object sender, EventArgs e)
         {
             mf.ABLine.moveDistance = 0;
 
@@ -431,7 +427,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnTurnOffAB_Click(object sender, EventArgs e)
+        private void BtnTurnOffAB_Click(object sender, EventArgs e)
         {
             //mf.ABLine.tramPassEvery = 0;
             //mf.ABLine.tramBasedOn = 0;
@@ -446,7 +442,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             lblFixHeading.Text = Convert.ToString(Math.Round(glm.toDegrees(mf.fixHeading), 1)) + "°";
             lblKeepGoing.Text = "";
@@ -480,7 +476,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void tboxABLineName_Enter(object sender, EventArgs e)
+        private void TboxABLineName_Enter(object sender, EventArgs e)
         {
             tboxABLineName.Text = "";
         }
@@ -490,7 +486,7 @@ namespace AgOpenGPS
             if (this.Width < 300) e.Cancel = true;
         }
 
-        private void lvLines_SelectedIndexChanged(object sender, EventArgs e)
+        private void LvLines_SelectedIndexChanged(object sender, EventArgs e)
         {
             //mf.ABLine.numABLineSelected = idx + 1;
 
@@ -520,7 +516,7 @@ namespace AgOpenGPS
                 btnAddToFile.Visible = true;
                 btnAddAndGo.Visible = true;
 
-                btnAPoint.Visible = false ;
+                btnAPoint.Visible = false;
                 btnBPoint.Visible = false;
                 btnUpABHeadingBy1.Visible = false;
                 btnDnABHeadingBy1.Visible = false;
@@ -546,7 +542,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             mf.ABLine.numABLines = mf.ABLine.lineArr.Count;
             if (mf.ABLine.numABLineSelected > mf.ABLine.numABLines) mf.ABLine.numABLineSelected = mf.ABLine.numABLines;

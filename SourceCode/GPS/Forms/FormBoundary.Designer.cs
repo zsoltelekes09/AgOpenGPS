@@ -38,7 +38,6 @@
             this.btnDriveOrExt = new System.Windows.Forms.Button();
             this.btnLoadMultiBoundaryFromGE = new System.Windows.Forms.Button();
             this.btnLoadBoundaryFromGE = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
             this.btnDeleteAll = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnSerialCancel = new System.Windows.Forms.Button();
@@ -48,19 +47,23 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.lblOffset = new System.Windows.Forms.Label();
+            this.Down_Scroll = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.Up_Scroll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudBndOffset)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel1.ColumnCount = 4;
+            this.tableLayoutPanel1.ColumnCount = 5;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 160F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 142F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 115F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 115F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 110F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel1.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 66);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(10, 70);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 7;
@@ -71,17 +74,17 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(530, 353);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(570, 350);
             this.tableLayoutPanel1.TabIndex = 205;
             // 
             // Around
             // 
             this.Around.BackColor = System.Drawing.Color.Transparent;
             this.Around.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Around.Location = new System.Drawing.Point(441, 6);
+            this.Around.Location = new System.Drawing.Point(382, 10);
             this.Around.Margin = new System.Windows.Forms.Padding(0);
             this.Around.Name = "Around";
-            this.Around.Size = new System.Drawing.Size(90, 49);
+            this.Around.Size = new System.Drawing.Size(97, 50);
             this.Around.TabIndex = 204;
             this.Around.Text = "Around?";
             this.Around.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -90,9 +93,9 @@
             // 
             this.Boundary.BackColor = System.Drawing.Color.Transparent;
             this.Boundary.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Boundary.Location = new System.Drawing.Point(18, 6);
+            this.Boundary.Location = new System.Drawing.Point(12, 10);
             this.Boundary.Name = "Boundary";
-            this.Boundary.Size = new System.Drawing.Size(150, 49);
+            this.Boundary.Size = new System.Drawing.Size(157, 50);
             this.Boundary.TabIndex = 203;
             this.Boundary.Text = "Bounds";
             this.Boundary.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -101,10 +104,10 @@
             // 
             this.Thru.BackColor = System.Drawing.Color.Transparent;
             this.Thru.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Thru.Location = new System.Drawing.Point(340, 6);
+            this.Thru.Location = new System.Drawing.Point(282, 10);
             this.Thru.Name = "Thru";
             this.Thru.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.Thru.Size = new System.Drawing.Size(80, 49);
+            this.Thru.Size = new System.Drawing.Size(97, 50);
             this.Thru.TabIndex = 202;
             this.Thru.Text = "Thru?";
             this.Thru.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -113,16 +116,15 @@
             // 
             this.Area.BackColor = System.Drawing.Color.Transparent;
             this.Area.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Area.Location = new System.Drawing.Point(176, 6);
+            this.Area.Location = new System.Drawing.Point(172, 10);
             this.Area.Name = "Area";
-            this.Area.Size = new System.Drawing.Size(116, 49);
+            this.Area.Size = new System.Drawing.Size(107, 50);
             this.Area.TabIndex = 201;
             this.Area.Text = "Area";
             this.Area.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnLeftRight
             // 
-            this.btnLeftRight.Enabled = false;
             this.btnLeftRight.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.btnLeftRight.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLeftRight.Image = global::AgOpenGPS.Properties.Resources.BoundaryLeft;
@@ -131,13 +133,12 @@
             this.btnLeftRight.Size = new System.Drawing.Size(91, 84);
             this.btnLeftRight.TabIndex = 67;
             this.btnLeftRight.UseVisualStyleBackColor = true;
-            this.btnLeftRight.Click += new System.EventHandler(this.btnLeftRight_Click);
+            this.btnLeftRight.Click += new System.EventHandler(this.BtnLeftRight_Click);
             // 
             // btnGo
             // 
             this.btnGo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnGo.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnGo.Enabled = false;
             this.btnGo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.btnGo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGo.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -152,7 +153,7 @@
             this.btnGo.Text = "Go";
             this.btnGo.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnGo.UseVisualStyleBackColor = true;
-            this.btnGo.Click += new System.EventHandler(this.btnGo_Click);
+            this.btnGo.Click += new System.EventHandler(this.BtnGo_Click);
             // 
             // btnDriveOrExt
             // 
@@ -165,7 +166,7 @@
             this.btnDriveOrExt.TabIndex = 212;
             this.btnDriveOrExt.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDriveOrExt.UseVisualStyleBackColor = true;
-            this.btnDriveOrExt.Click += new System.EventHandler(this.btnDriveOrExt_Click);
+            this.btnDriveOrExt.Click += new System.EventHandler(this.BtnDriveOrExt_Click);
             // 
             // btnLoadMultiBoundaryFromGE
             // 
@@ -173,14 +174,14 @@
             this.btnLoadMultiBoundaryFromGE.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLoadMultiBoundaryFromGE.Image = global::AgOpenGPS.Properties.Resources.BoundaryLoadMultiFromGE;
             this.btnLoadMultiBoundaryFromGE.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnLoadMultiBoundaryFromGE.Location = new System.Drawing.Point(461, 470);
+            this.btnLoadMultiBoundaryFromGE.Location = new System.Drawing.Point(446, 469);
             this.btnLoadMultiBoundaryFromGE.Name = "btnLoadMultiBoundaryFromGE";
             this.btnLoadMultiBoundaryFromGE.Size = new System.Drawing.Size(91, 84);
             this.btnLoadMultiBoundaryFromGE.TabIndex = 211;
             this.btnLoadMultiBoundaryFromGE.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnLoadMultiBoundaryFromGE.UseVisualStyleBackColor = true;
             this.btnLoadMultiBoundaryFromGE.Visible = false;
-            this.btnLoadMultiBoundaryFromGE.Click += new System.EventHandler(this.btnLoadBoundaryFromGE_Click);
+            this.btnLoadMultiBoundaryFromGE.Click += new System.EventHandler(this.BtnLoadBoundaryFromGE_Click);
             // 
             // btnLoadBoundaryFromGE
             // 
@@ -188,28 +189,14 @@
             this.btnLoadBoundaryFromGE.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnLoadBoundaryFromGE.Image = global::AgOpenGPS.Properties.Resources.BoundaryLoadFromGE;
             this.btnLoadBoundaryFromGE.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnLoadBoundaryFromGE.Location = new System.Drawing.Point(324, 470);
+            this.btnLoadBoundaryFromGE.Location = new System.Drawing.Point(307, 469);
             this.btnLoadBoundaryFromGE.Name = "btnLoadBoundaryFromGE";
             this.btnLoadBoundaryFromGE.Size = new System.Drawing.Size(91, 84);
             this.btnLoadBoundaryFromGE.TabIndex = 210;
             this.btnLoadBoundaryFromGE.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnLoadBoundaryFromGE.UseVisualStyleBackColor = true;
             this.btnLoadBoundaryFromGE.Visible = false;
-            this.btnLoadBoundaryFromGE.Click += new System.EventHandler(this.btnLoadBoundaryFromGE_Click);
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.Font = new System.Drawing.Font("Tahoma", 14.25F);
-            this.btnCancel.Image = global::AgOpenGPS.Properties.Resources.Cancel64;
-            this.btnCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnCancel.Location = new System.Drawing.Point(642, 344);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(91, 84);
-            this.btnCancel.TabIndex = 206;
-            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnLoadBoundaryFromGE.Click += new System.EventHandler(this.BtnLoadBoundaryFromGE_Click);
             // 
             // btnDeleteAll
             // 
@@ -217,26 +204,26 @@
             this.btnDeleteAll.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDeleteAll.Image = global::AgOpenGPS.Properties.Resources.BoundaryDeleteAll;
             this.btnDeleteAll.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnDeleteAll.Location = new System.Drawing.Point(655, 145);
+            this.btnDeleteAll.Location = new System.Drawing.Point(660, 130);
             this.btnDeleteAll.Name = "btnDeleteAll";
-            this.btnDeleteAll.Size = new System.Drawing.Size(78, 68);
+            this.btnDeleteAll.Size = new System.Drawing.Size(120, 90);
             this.btnDeleteAll.TabIndex = 100;
             this.btnDeleteAll.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDeleteAll.UseVisualStyleBackColor = true;
-            this.btnDeleteAll.Click += new System.EventHandler(this.btnDeleteAll_Click);
+            this.btnDeleteAll.Click += new System.EventHandler(this.BtnDeleteAll_Click);
             // 
             // btnDelete
             // 
             this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDelete.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDelete.Image = global::AgOpenGPS.Properties.Resources.BoundaryDelete;
-            this.btnDelete.Location = new System.Drawing.Point(655, 240);
+            this.btnDelete.Location = new System.Drawing.Point(660, 240);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(78, 68);
+            this.btnDelete.Size = new System.Drawing.Size(120, 90);
             this.btnDelete.TabIndex = 65;
             this.btnDelete.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDelete.UseVisualStyleBackColor = true;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            this.btnDelete.Click += new System.EventHandler(this.BtnDelete_Click);
             // 
             // btnSerialCancel
             // 
@@ -245,13 +232,13 @@
             this.btnSerialCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSerialCancel.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSerialCancel.Image = global::AgOpenGPS.Properties.Resources.back_button;
-            this.btnSerialCancel.Location = new System.Drawing.Point(612, 469);
+            this.btnSerialCancel.Location = new System.Drawing.Point(660, 460);
             this.btnSerialCancel.Margin = new System.Windows.Forms.Padding(5);
             this.btnSerialCancel.Name = "btnSerialCancel";
-            this.btnSerialCancel.Size = new System.Drawing.Size(121, 84);
+            this.btnSerialCancel.Size = new System.Drawing.Size(120, 90);
             this.btnSerialCancel.TabIndex = 64;
             this.btnSerialCancel.UseVisualStyleBackColor = true;
-            this.btnSerialCancel.Click += new System.EventHandler(this.btnSerialCancel_Click);
+            this.btnSerialCancel.Click += new System.EventHandler(this.BtnSerialCancel_Click);
             // 
             // btnOpenGoogleEarth
             // 
@@ -259,14 +246,14 @@
             this.btnOpenGoogleEarth.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnOpenGoogleEarth.Image = global::AgOpenGPS.Properties.Resources.GoogleEarth;
             this.btnOpenGoogleEarth.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnOpenGoogleEarth.Location = new System.Drawing.Point(655, 11);
+            this.btnOpenGoogleEarth.Location = new System.Drawing.Point(660, 20);
             this.btnOpenGoogleEarth.Name = "btnOpenGoogleEarth";
-            this.btnOpenGoogleEarth.Size = new System.Drawing.Size(78, 84);
+            this.btnOpenGoogleEarth.Size = new System.Drawing.Size(120, 90);
             this.btnOpenGoogleEarth.TabIndex = 213;
             this.btnOpenGoogleEarth.Text = "Google Earth";
             this.btnOpenGoogleEarth.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnOpenGoogleEarth.UseVisualStyleBackColor = true;
-            this.btnOpenGoogleEarth.Click += new System.EventHandler(this.btnOpenGoogleEarth_Click);
+            this.btnOpenGoogleEarth.Click += new System.EventHandler(this.BtnOpenGoogleEarth_Click);
             // 
             // nudBndOffset
             // 
@@ -290,7 +277,7 @@
             0,
             0,
             131072});
-            this.nudBndOffset.Enter += new System.EventHandler(this.nudBndOffset_Enter);
+            this.nudBndOffset.Enter += new System.EventHandler(this.NudBndOffset_Enter);
             // 
             // label1
             // 
@@ -343,13 +330,59 @@
             this.lblOffset.Text = "gsOffset";
             this.lblOffset.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // Down_Scroll
+            // 
+            this.Down_Scroll.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Down_Scroll.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.Down_Scroll.Location = new System.Drawing.Point(590, 381);
+            this.Down_Scroll.Margin = new System.Windows.Forms.Padding(0);
+            this.Down_Scroll.Name = "Down_Scroll";
+            this.Down_Scroll.Size = new System.Drawing.Size(50, 40);
+            this.Down_Scroll.TabIndex = 418;
+            this.Down_Scroll.Text = "▼";
+            this.Down_Scroll.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.Down_Scroll.UseVisualStyleBackColor = true;
+            this.Down_Scroll.Click += new System.EventHandler(this.Down_Scroll_Click);
+            // 
+            // button4
+            // 
+            this.button4.CausesValidation = false;
+            this.button4.Location = new System.Drawing.Point(590, 108);
+            this.button4.Margin = new System.Windows.Forms.Padding(0);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(50, 274);
+            this.button4.TabIndex = 419;
+            this.button4.TabStop = false;
+            this.button4.UseCompatibleTextRendering = true;
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Mouse_Down);
+            this.button4.MouseLeave += new System.EventHandler(this.Mouse_Leave);
+            this.button4.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Mouse_Move);
+            this.button4.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Mouse_Up);
+            // 
+            // Up_Scroll
+            // 
+            this.Up_Scroll.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Up_Scroll.Location = new System.Drawing.Point(590, 69);
+            this.Up_Scroll.Margin = new System.Windows.Forms.Padding(0);
+            this.Up_Scroll.Name = "Up_Scroll";
+            this.Up_Scroll.Size = new System.Drawing.Size(50, 40);
+            this.Up_Scroll.TabIndex = 417;
+            this.Up_Scroll.Text = "▲";
+            this.Up_Scroll.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.Up_Scroll.UseVisualStyleBackColor = true;
+            this.Up_Scroll.Click += new System.EventHandler(this.Up_Scroll_Click);
+            // 
             // FormBoundary
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ClientSize = new System.Drawing.Size(756, 568);
+            this.ClientSize = new System.Drawing.Size(798, 568);
             this.ControlBox = false;
+            this.Controls.Add(this.Down_Scroll);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.Up_Scroll);
             this.Controls.Add(this.lblOffset);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -361,7 +394,6 @@
             this.Controls.Add(this.btnDriveOrExt);
             this.Controls.Add(this.btnLoadMultiBoundaryFromGE);
             this.Controls.Add(this.btnLoadBoundaryFromGE);
-            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.Around);
             this.Controls.Add(this.Boundary);
@@ -376,13 +408,12 @@
             this.Name = "FormBoundary";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Start or Delete A Boundary";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.FormBoundary_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudBndOffset)).EndInit();
+            this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.MouseWheel_Scroll);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
@@ -397,7 +428,6 @@
         private System.Windows.Forms.Label Boundary;
         private System.Windows.Forms.Label Thru;
         private System.Windows.Forms.Label Area;
-        private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnLoadMultiBoundaryFromGE;
         private System.Windows.Forms.Button btnLoadBoundaryFromGE;
         private System.Windows.Forms.Button btnDriveOrExt;
@@ -407,5 +437,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblOffset;
+        private System.Windows.Forms.Button Down_Scroll;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button Up_Scroll;
     }
 }

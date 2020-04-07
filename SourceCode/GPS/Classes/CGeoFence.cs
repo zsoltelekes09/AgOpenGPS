@@ -42,7 +42,7 @@ namespace AgOpenGPS
                 {
                     for (int t = 1; t < mf.bnd.bndArr.Count; t++)
                     {
-                        if (!mf.bnd.bndArr[t].isSet || mf.bnd.bndArr[t].isDriveThru) continue;
+                        if (mf.bnd.bndArr[t].isDriveThru) continue;
 
                         if (mf.bnd.bndArr[t].isDriveAround)
                         {
@@ -71,9 +71,7 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    isFound = true;
                     start.easting = 88888;
-                    closestTurnNum = 0;
                     return;
                 }
                 if (isFound) break;
@@ -109,9 +107,7 @@ namespace AgOpenGPS
 
                 if (iStart >= mazeDim)
                 {
-                    isFound = true;
                     start.easting = 88888;
-                    closestTurnNum = 0;
                     return;
                 }
 
@@ -129,9 +125,7 @@ namespace AgOpenGPS
 
                 if (iStop >= mazeDim)
                 {
-                    isFound = true;
                     start.easting = 88888;
-                    closestTurnNum = 0;
                     return;
                 }
 
@@ -146,13 +140,10 @@ namespace AgOpenGPS
             {
                 for (int b = 1; b < mf.bnd.bndArr.Count; b++)
                 {
-                    if (mf.bnd.bndArr[b].isSet)
+                    if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
                     {
-                        if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
-                        {
-                            //point is in an inner turn area but inside outer
-                            return false;
-                        }
+                        //point is in an inner turn area but inside outer
+                        return false;
                     }
                 }
                 return true;
@@ -170,13 +161,10 @@ namespace AgOpenGPS
             {
                 for (int b = 1; b < mf.bnd.bndArr.Count; b++)
                 {
-                    if (mf.bnd.bndArr[b].isSet)
+                    if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
                     {
-                        if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
-                        {
-                            //point is in an inner turn area but inside outer
-                            return false;
-                        }
+                        //point is in an inner turn area but inside outer
+                        return false;
                     }
                 }
                 return true;
@@ -187,80 +175,51 @@ namespace AgOpenGPS
             }
         }
 
-        public void BuildGeoFenceLines()
+        public void BuildGeoFenceLines(int Num)
         {
-            //update the GUI values for boundaries
-            //mf.fd.UpdateFieldBoundaryGUIAreas();
-
             if (mf.bnd.bndArr.Count == 0)
             {
-                //mf.TimedMessageBox(1500, " No Boundary ", "No GeoFence Made");
                 return;
             }
 
             //to fill the list of line points
             vec3 point = new vec3();
 
-            //determine how wide a headland space
-            double totalHeadWidth = mf.yt.geoFenceDistance;
-
-            //outside boundary - count the points from the boundary
-            geoFenceArr[0].geoFenceLine.Clear();
-            int ptCount = mf.bnd.bndArr[0].bndLine.Count;
-            for (int i = ptCount - 1; i >= 0; i--)
-            {
-                //calculate the point inside the boundary
-                point.easting = mf.bnd.bndArr[0].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * totalHeadWidth);
-                point.northing = mf.bnd.bndArr[0].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * totalHeadWidth);
-                point.heading = mf.bnd.bndArr[0].bndLine[i].heading;
-                if (point.heading < -glm.twoPI) point.heading += glm.twoPI;
-
-                //only add if inside actual field boundary
-                if (mf.bnd.bndArr[0].IsPointInsideBoundary(point))
-                {
-                    vec2 tPnt = new vec2(point.easting, point.northing);
-                    geoFenceArr[0].geoFenceLine.Add(tPnt);
-                }
-            }
-            geoFenceArr[0].FixGeoFenceLine(totalHeadWidth, mf.bnd.bndArr[0].bndLine, mf.tool.toolWidth);
-            geoFenceArr[0].PreCalcTurnLines();
-
             //inside boundaries
-            for (int j = 1; j < mf.bnd.bndArr.Count; j++)
+            for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
             {
                 geoFenceArr[j].geoFenceLine.Clear();
-                if (!mf.bnd.bndArr[j].isSet || mf.bnd.bndArr[j].isDriveThru) continue;
 
-                ptCount = mf.bnd.bndArr[j].bndLine.Count;
+                int ChangeDirection = j == 0 ? 1 : -1;
+
+                int ptCount = mf.bnd.bndArr[j].bndLine.Count;
 
                 for (int i = ptCount - 1; i >= 0; i--)
                 {
                     //calculate the point outside the boundary
-                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth);
-                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth);
+                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
+                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
-                    if (point.heading < -glm.twoPI) point.heading += glm.twoPI;
 
                     //only add if outside actual field boundary
-                    if (!mf.bnd.bndArr[j].IsPointInsideBoundary(point))
+                    if ((j == 0 && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (j != 0 && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
                     {
                         vec2 tPnt = new vec2(point.easting, point.northing);
                         geoFenceArr[j].geoFenceLine.Add(tPnt);
                     }
                 }
-                geoFenceArr[j].FixGeoFenceLine(totalHeadWidth, mf.bnd.bndArr[j].bndLine, mf.tool.toolWidth * 0.5);
+                geoFenceArr[j].FixGeoFenceLine(mf.yt.geoFenceDistance, mf.bnd.bndArr[j].bndLine, mf.tool.ToolWidth * 0.5);
                 geoFenceArr[j].PreCalcTurnLines();
-            }
 
-            //mf.TimedMessageBox(800, "Turn Lines", "Turn limits Created");
+                if (Num > -1) break;
+            }
         }
 
         public void DrawGeoFenceLines()
         {
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (mf.bnd.bndArr[i].isSet)
-                    geoFenceArr[i].DrawGeoFenceLine();
+                geoFenceArr[i].DrawGeoFenceLine();
             }
         }
     }

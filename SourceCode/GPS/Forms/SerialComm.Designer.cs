@@ -1,9 +1,6 @@
-﻿//Please, if you use this, share the improvements
-
-using System.IO.Ports;
+﻿using System.IO.Ports;
 using System;
 using System.Windows.Forms;
-using System.Drawing;
 using System.Globalization;
 using AgOpenGPS.Properties;
 
@@ -26,7 +23,7 @@ namespace AgOpenGPS
 
         //used to decide to autoconnect section arduino this run
         public bool wasRateMachineConnectedLastRun = false;
-        public string recvSentenceSettings = "InitalSetting";
+        public string[] recvSentenceSettings = new string[4];
 
         //used to decide to autoconnect autosteer arduino this run
         public bool wasAutoSteerConnectedLastRun = false;
@@ -139,7 +136,7 @@ namespace AgOpenGPS
         {
             //spit it out no matter what it says
             mc.serialRecvAutoSteerStr = sentence;
-            if (pbarSteer++ > 98) pbarSteer=0;
+            if (pbarSteer++ > 99) pbarSteer=0;
 
             // Find end of sentence and a comma, if not a CR, return
             int end = sentence.IndexOf("\r");
@@ -175,9 +172,54 @@ namespace AgOpenGPS
 
                         if (ahrs.isRollFromAutoSteer) int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.rollX16);
 
-                        int.TryParse(words[6], out mc.steerSwitchValue);
-                        mc.workSwitchValue = mc.steerSwitchValue & 1;
-                        mc.steerSwitchValue = mc.steerSwitchValue & 2;
+                        byte.TryParse(words[6], out byte steerSwitchValue);
+
+
+                        if (isJobStarted && mc.isWorkSwitchEnabled)
+                        {
+                            if ((!mc.isWorkSwitchActiveLow && (steerSwitchValue & 1) == 1) || (mc.isWorkSwitchActiveLow && (steerSwitchValue & 1) == 0))
+                            {
+                                if (mc.isWorkSwitchManual)
+                                {
+                                    if (autoBtnState != FormGPS.btnStates.On)
+                                    {
+                                        autoBtnState = FormGPS.btnStates.On;
+                                        btnSection_Update();
+                                    }
+                                }
+                                else
+                                {
+                                    if (autoBtnState != FormGPS.btnStates.Auto)
+                                    {
+                                        autoBtnState = FormGPS.btnStates.Auto;
+                                        btnSection_Update();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (autoBtnState != FormGPS.btnStates.Off)
+                                {
+                                    autoBtnState = FormGPS.btnStates.Off;
+                                    btnSection_Update();
+                                }
+                            }
+                        }
+
+                        //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
+                        if (ahrs.isAutoSteerAuto)
+                        {
+                            if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLine.isBtnABLineOn || ct.isContourBtnOn || curve.isBtnCurveOn) && (steerSwitchValue & 2) == 0)
+                            {
+                                if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
+                            }
+                            else
+                            {
+                                if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
+                            }
+                        }
                         break;
                 }
             }
@@ -293,7 +335,7 @@ namespace AgOpenGPS
             int machine = 0;
 
             //check if super section is on
-            if (section[tool.numOfSections].isSectionOn)
+            if (section[tool.numOfSections].IsSectionOn)
             {
                 for (int j = 0; j < tool.numOfSections; j++)
                 {
@@ -308,7 +350,7 @@ namespace AgOpenGPS
                 for (int j = 0; j < MAXSECTIONS; j++)
                 {
                     //set if on, reset bit if off
-                    if (section[j].isSectionOn) machine = machine | set;
+                    if (section[j].IsSectionOn) machine = machine | set;
                     else machine = machine & reset;
 
                     //move set and reset over 1 bit left
@@ -330,7 +372,7 @@ namespace AgOpenGPS
         public void SendOutUSBMachinePort(byte[] items, int numItems)
         {
             //load the uturn byte with the accumulated spacing
-            if (vehicle.treeSpacing != 0) mc.machineData[mc.mdTree] = unchecked((byte)treeTrigger);
+            if (vehicle.treeSpacing != 0) mc.machineData[mc.mdTree] = unchecked((byte)((treeTrigger == true) ? 1 : 0));
 
             //speed
             mc.machineData[mc.mdSpeedXFour] = unchecked((byte)(pn.speed * 4));
@@ -386,9 +428,7 @@ namespace AgOpenGPS
             if (words.Length != 10) return; // check lenght: 2 byte header + 8 byte data
 
             // MTZ8302 Feb 2020
-            int incomingInt = 0;
-
-            int.TryParse(words[0], out incomingInt);
+            int.TryParse(words[0], out int incomingInt);
 
             if (incomingInt == 127)
             {
@@ -396,29 +436,14 @@ namespace AgOpenGPS
 
                 switch (incomingInt)
                 {
-                    case 249:  //PGN 127 249: Switch status from Section Control 
-
-                        mc.ss[mc.swHeaderLo] = 249;
-
-                        int.TryParse(words[5], out incomingInt);
-                        mc.ss[mc.swONHi] = (byte)incomingInt;
-
-                        int.TryParse(words[6], out incomingInt);
-                        mc.ss[mc.swONLo] = (byte)incomingInt;
-
-                        //read SectSWOffToAOG from Arduino
-                        int.TryParse(words[7], out incomingInt);
-                        mc.ss[mc.swOFFHi] = (byte)incomingInt;
-
-                        int.TryParse(words[8], out incomingInt);
-                        mc.ss[mc.swOFFLo] = (byte)incomingInt;
-
-                        //read MainSW+RateSW
-                        int.TryParse(words[9], out incomingInt);
-                        mc.ss[mc.swMain] = (byte)incomingInt;
-
+                    case 249:  //PGN 127 249: Switch status from Section Control
+                        mc.ss[mc.swHeaderLo] = 0xF9;
+                        byte.TryParse(words[5], out mc.ss[mc.swONHi]);  //Section On status
+                        byte.TryParse(words[6], out mc.ss[mc.swONLo]);  //Section On status
+                        byte.TryParse(words[7], out mc.ss[mc.swOFFHi]);//Section Auto status(only when On)
+                        byte.TryParse(words[8], out mc.ss[mc.swOFFLo]);//Section Auto status(only when On)
+                        byte.TryParse(words[9], out mc.ss[mc.swMain]);  //read MainSW+RateSW
                         break;
-
                     case 224:    //PGN 127 224 F7E0: Back From MAchine Module
                         break;
                 }
@@ -437,7 +462,7 @@ namespace AgOpenGPS
                 {
                     //System.Threading.Thread.Sleep(25);
                     string sentence = spMachine.ReadLine();
-                    this.BeginInvoke(new LineReceivedEventHandlerMachine(SerialLineReceivedMachine), sentence);                    
+                    this.BeginInvoke(new LineReceivedEventHandlerMachine(SerialLineReceivedMachine), sentence);
                     if (spMachine.BytesToRead > 32) spMachine.DiscardInBuffer();
                 }
                 //this is bad programming, it just ignores errors until its hooked up again.
@@ -507,16 +532,6 @@ namespace AgOpenGPS
 
         #region GPS SerialPort //--------------------------------------------------------------------------
 
-        //called by the GPS delegate every time a chunk is rec'd
-        private void SerialLineReceived(string sentence)
-        {
-            //spit it out no matter what it says
-            pn.rawBuffer += sentence;
-            //recvSentenceSettings = sbNMEAFromGPS.ToString();
-        }
-
-        private delegate void LineReceivedEventHandler(string sentence);
-
         //serial port receive in its own thread
         private void sp_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
@@ -529,7 +544,7 @@ namespace AgOpenGPS
 
                     //read whatever is in port
                     string sentence = sp.ReadExisting();
-                    this.BeginInvoke(new LineReceivedEventHandler(SerialLineReceived), sentence);
+                    BeginInvoke((MethodInvoker)(() => pn.rawBuffer += sentence));
                 }
                 catch (Exception ex)
                 {
@@ -598,22 +613,19 @@ namespace AgOpenGPS
 
         public void SerialPortCloseGPS()
         {
-            //if (sp.IsOpen)
+            sp.DataReceived -= sp_DataReceived;
+            try { sp.Close(); }
+            catch (Exception e)
             {
-                sp.DataReceived -= sp_DataReceived;
-                try { sp.Close(); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Closing GPS Port" + e.ToString());
-                    MessageBox.Show(e.Message, "Connection already terminated?");
-                }
-
-                //update port status labels
-                //stripPortGPS.Text = " * * " + baudRateGPS.ToString();
-                //stripPortGPS.ForeColor = Color.ForestGreen;
-                //stripOnlineGPS.Value = 1;
-                sp.Dispose();
+                WriteErrorLog("Closing GPS Port" + e.ToString());
+                MessageBox.Show(e.Message, "Connection already terminated?");
             }
+
+            //update port status labels
+            //stripPortGPS.Text = " * * " + baudRateGPS.ToString();
+            //stripPortGPS.ForeColor = Color.ForestGreen;
+            //stripOnlineGPS.Value = 1;
+            sp.Dispose();
         }
 
         #endregion SerialPortGPS

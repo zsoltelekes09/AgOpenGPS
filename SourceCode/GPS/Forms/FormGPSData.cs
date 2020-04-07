@@ -8,7 +8,7 @@ namespace AgOpenGPS
 {
     public partial class FormGPSData : Form
     {
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormGPSData(Form callingForm)
         {
@@ -16,7 +16,7 @@ namespace AgOpenGPS
             InitializeComponent();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             //all the fixings and position
             lblZone.Text = mf.Zone;
@@ -40,7 +40,7 @@ namespace AgOpenGPS
             lblSatsTracked.Text = mf.SatsTracked;
             lblStatus.Text = mf.Status;
             lblHDOP.Text = mf.HDOP;
-            tboxNMEASerial.Text = mf.recvSentenceSettings;
+            tboxNMEASerial.Lines = mf.recvSentenceSettings;
             lblSpeed.Text = mf.pn.speed.ToString();
 
             lblLookOnLeft.Text = mf.tool.lookAheadDistanceOnPixelsLeft.ToString("N0");
@@ -48,11 +48,11 @@ namespace AgOpenGPS
             lblLookOffLeft.Text = mf.tool.lookAheadDistanceOffPixelsLeft.ToString("N0");
             lblLookOffRight.Text = mf.tool.lookAheadDistanceOffPixelsRight.ToString("N0");
 
-            lblLeftToolSpd.Text = (mf.tool.toolFarLeftSpeed*3.6).ToString("N1");
-            lblRightToolSpd.Text = (mf.tool.toolFarRightSpeed*3.6).ToString("N1");
+            lblLeftToolSpd.Text = (mf.tool.ToolFarLeftSpeed*3.6).ToString("N1");
+            lblRightToolSpd.Text = (mf.tool.ToolFarRightSpeed*3.6).ToString("N1");
 
-            lblSectSpdLeft.Text = (mf.section[0].speedPixels*0.36).ToString("N1");
-            lblSectSpdRight.Text = (mf.section[mf.tool.numOfSections-1].speedPixels*0.36).ToString("N1");
+            lblSectSpdLeft.Text = (mf.section[0].speedPixels).ToString("N1");
+            lblSectSpdRight.Text = (mf.section[mf.tool.numOfSections-1].speedPixels).ToString("N1");
         }
     }
 }

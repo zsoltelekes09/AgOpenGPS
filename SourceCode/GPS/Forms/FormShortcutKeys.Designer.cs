@@ -109,7 +109,6 @@
             this.Name = "FormShortcutKeys";
             this.ShowInTaskbar = false;
             this.Text = "Shortcut Keys";
-            this.Load += new System.EventHandler(this.FormShortcutKeys_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

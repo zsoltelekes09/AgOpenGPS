@@ -356,3 +356,5 @@ Application/
 AgOpenGPS/
 Installer/
 Program/
+/ProgramV4
+/SourceCode/GPS/.editorconfig

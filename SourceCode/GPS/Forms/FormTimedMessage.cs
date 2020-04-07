@@ -5,31 +5,33 @@ namespace AgOpenGPS
 {
     public partial class FormTimedMessage : Form
     {
-        //class variables
-        //private FormGPS mf = null;
-
-        public FormTimedMessage(int timeInMsec, string str, string str2)
+        public void SetTimedMessage(int timeInMsec, string str, string str2, Form callingForm)
         {
-            InitializeComponent();
-
-            //get copy of the calling main form
-            //mf = callingForm as FormGPS;
-
+            timer1.Stop();
             lblMessage.Text = str;
             lblMessage2.Text = str2;
-
             timer1.Interval = timeInMsec;
+            Width = str2.Length * 15 + 120;
 
-            int messWidth = str2.Length;
-            Width = messWidth * 15 + 120;
+            this.Left = callingForm.Width / 2 - this.Width/2;
+            this.Top = 53;
+
+            this.Show();
+            this.Focus();
+            timer1.Start();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        public FormTimedMessage()
         {
-            timer1.Enabled = false;
-            timer1.Dispose();
-            Dispose();
-            Close();
+            InitializeComponent();
+            lblMessage.Text = "";
+            lblMessage2.Text = "";
+        }
+
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+            timer1.Stop();
+            this.Hide();
         }
     }
 }

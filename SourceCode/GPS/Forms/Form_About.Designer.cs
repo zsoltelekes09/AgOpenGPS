@@ -109,7 +109,7 @@
             this.linkLabelGit.TabIndex = 11;
             this.linkLabelGit.TabStop = true;
             this.linkLabelGit.Text = "https://github.com/farmerbriantee/AgOpenGPS";
-            this.linkLabelGit.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelGit_LinkClicked);
+            this.linkLabelGit.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelGit_LinkClicked);
             // 
             // linkLabelCombineForum
             // 
@@ -121,7 +121,7 @@
             this.linkLabelCombineForum.TabIndex = 12;
             this.linkLabelCombineForum.TabStop = true;
             this.linkLabelCombineForum.Text = "https://agopengps.discourse.forum";
-            this.linkLabelCombineForum.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelCombineForum_LinkClicked);
+            this.linkLabelCombineForum.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelCombineForum_LinkClicked);
             // 
             // button1
             // 
@@ -240,7 +240,7 @@
             this.button4.TabIndex = 126;
             this.button4.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.button4.UseVisualStyleBackColor = false;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.button4.Click += new System.EventHandler(this.Button4_Click);
             // 
             // label15
             // 

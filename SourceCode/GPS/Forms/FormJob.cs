@@ -9,7 +9,7 @@ namespace AgOpenGPS
     public partial class FormJob : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormJob(Form callingForm)
         {
@@ -27,14 +27,14 @@ namespace AgOpenGPS
             this.Text = gStr.gsStartNewField;
         }
 
-        private void btnJobNew_Click(object sender, EventArgs e)
+        private void BtnJobNew_Click(object sender, EventArgs e)
         {
             //back to FormGPS
             DialogResult = DialogResult.Yes;
             Close();
         }
 
-        private void btnJobResume_Click(object sender, EventArgs e)
+        private void BtnJobResume_Click(object sender, EventArgs e)
         {
             //open the Resume.txt and continue from last exit
             mf.FileOpenField("Resume");
@@ -66,7 +66,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnJobTouch_Click(object sender, EventArgs e)
+        private void BtnJobTouch_Click(object sender, EventArgs e)
         {
             mf.filePickerFileAndDirectory = "";
 
@@ -87,7 +87,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnJobOpen_Click(object sender, EventArgs e)
+        private void BtnJobOpen_Click(object sender, EventArgs e)
         {
             mf.filePickerFileAndDirectory = "";
 
@@ -108,7 +108,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnInField_Click(object sender, EventArgs e)
+        private void BtnInField_Click(object sender, EventArgs e)
         {
             string infieldList = "";
             int numFields = 0;
@@ -149,7 +149,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            var form = new FormTimedMessage(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                            mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
                         }
                     }
 
@@ -224,7 +224,7 @@ namespace AgOpenGPS
                                         {
                                             numFields++;
                                             if (string.IsNullOrEmpty(infieldList))
-                                                infieldList += Path.GetFileName(dir); 
+                                                infieldList += Path.GetFileName(dir);
                                             else
                                                 infieldList += "," + Path.GetFileName(dir);
                                         }
@@ -270,8 +270,7 @@ namespace AgOpenGPS
             }
             else //no fields found
             {
-                var form2 = new FormTimedMessage(2000, gStr.gsNoFieldsFound, gStr.gsFieldNotOpen);
-                form2.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoFieldsFound, gStr.gsFieldNotOpen);
             }
 
         }

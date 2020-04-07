@@ -43,7 +43,7 @@
             this.cboxVeh.Name = "cboxVeh";
             this.cboxVeh.Size = new System.Drawing.Size(548, 43);
             this.cboxVeh.TabIndex = 212;
-            this.cboxVeh.SelectedIndexChanged += new System.EventHandler(this.cboxVeh_SelectedIndexChanged);
+            this.cboxVeh.SelectedIndexChanged += new System.EventHandler(this.CboxVeh_SelectedIndexChanged);
             // 
             // lblLast
             // 

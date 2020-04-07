@@ -1,7 +1,7 @@
 ﻿//Please, if you use this, share the improvements
-
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
@@ -21,29 +21,18 @@ namespace AgOpenGPS
         public List<List<vec3>> patchList = new List<List<vec3>>();
 
         //is this section on or off
-        public bool isSectionOn = false;
-
-        public bool isAllowedOn = false;
-        public bool isSectionRequiredOn = false;
-
-        public bool sectionOnRequest = false;
-        public bool sectionOffRequest = false;
-        public bool sectionOnOffCycle = false;
-
-        public int sectionOnTimer = 0;
-        public int sectionOffTimer = 0;
+        public bool IsSectionOn = false;
+        public bool IsAllowedOn = false;
+        public bool IsSectionRequiredOn = false;
+        public bool SectionOnRequest = false;
+        public int SectionOverlapTimer = 0;
+        public Button SectionButton = new Button();
 
         //mapping
-        public bool isMappingOn = false;
-
-        public bool isMappingAllowedOn = false;
-        public bool isMappingRequiredOn = false;
-
-        public bool mappingOnRequest = false;
-        public bool mappingOffRequest = false;
-        public bool mappingOnOffCycle = false;
-        public int  mappingOnTimer = 0;
-        public int  mappingOffTimer = 0;
+        public bool IsMappingOn = false;
+        public bool MappingOnRequest = false;
+        public int MappingOnTimer = 0;
+        public int MappingOffTimer = 0;
 
         public double speedPixels = 0;
 
@@ -70,18 +59,11 @@ namespace AgOpenGPS
         public vec3 leftPoint;
         public vec3 rightPoint;
 
-        //used to determine left and right speed of section
-        public vec3 lastLeftPoint;
-        public vec3 lastRightPoint;
-
         //whether or not this section is in boundary, headland
-        public bool isInBoundary = true, isHydLiftInWorkArea = true;
-        public bool isInHeadlandArea = true;
-        public bool isLookOnInHeadland = true;
         public int numTriangles = 0;
 
         //used to determine state of Manual section button - Off Auto On
-        public FormGPS.manBtn manBtnState = FormGPS.manBtn.Off;
+        public FormGPS.btnStates BtnSectionState = FormGPS.btnStates.Off;
 
         //simple constructor, position is set in GPSWinForm_Load in FormGPS when creating new object
         public CSection(FormGPS _f)
@@ -95,10 +77,10 @@ namespace AgOpenGPS
             numTriangles = 0;
 
             //do not tally square meters on inital point, that would be silly
-            if (!isMappingOn)
+            if (!IsMappingOn)
             {
                //set the section bool to on
-                isMappingOn = true;
+                IsMappingOn = true;
 
                 //starting a new patch chunk so create a new triangle list
                 triangleList = new List<vec3>();
@@ -121,7 +103,7 @@ namespace AgOpenGPS
         {
             AddMappingPoint();
 
-            isMappingOn = false;
+            IsMappingOn = false;
             numTriangles = 0;
 
             if (triangleList.Count > 4)

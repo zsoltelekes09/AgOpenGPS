@@ -6,13 +6,12 @@ namespace AgOpenGPS
     public partial class FormBoundaryPlayer : Form
     {
         //properties
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         //constructor
         public FormBoundaryPlayer(Form callingForm)
         {
             mf = callingForm as FormGPS;
-
 
             InitializeComponent();
 
@@ -22,48 +21,42 @@ namespace AgOpenGPS
             this.Text = gStr.gsStopRecordPauseBoundary;
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
+        private void BtnStop_Click(object sender, EventArgs e)
         {
             if (mf.bnd.bndBeingMadePts.Count > 2)
             {
                 mf.bnd.bndArr.Add(new CBoundaryLines());
                 mf.turn.turnArr.Add(new CTurnLines());
                 mf.gf.geoFenceArr.Add(new CGeoFenceLines());
+                mf.hd.headArr.Add(new CHeadLines());
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].bndLine.AddRange(mf.bnd.bndBeingMadePts);
 
-                for (int i = 0; i < mf.bnd.bndBeingMadePts.Count; i++)
-                {
-                    mf.bnd.bndArr[mf.bnd.boundarySelected].bndLine.Add(mf.bnd.bndBeingMadePts[i]);
-                }
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.bnd.bndArr.Count - 1, mf.tool.ToolWidth);
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();
 
-                mf.bnd.bndArr[mf.bnd.boundarySelected].PreCalcBoundaryLines();
-                mf.bnd.bndArr[mf.bnd.boundarySelected].FixBoundaryLine(mf.bnd.boundarySelected, mf.tool.toolWidth);
-                mf.bnd.bndArr[mf.bnd.boundarySelected].PreCalcBoundaryLines();
-                mf.bnd.bndArr[mf.bnd.boundarySelected].isSet = true;
-                mf.bnd.bndArr[mf.bnd.boundarySelected].CalculateBoundaryArea();
+
+                mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
+                mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
+
                 mf.fd.UpdateFieldBoundaryGUIAreas();
+                mf.mazeGrid.BuildMazeGridArray();
+
+                mf.FileSaveBoundary();
             }
 
             //stop it all for adding
             mf.bnd.isOkToAddPoints = false;
             mf.bnd.isBndBeingMade = false;
 
-            //turn lines made from boundaries
-            mf.CalculateMinMax();
-            mf.FileSaveBoundary();
-            mf.turn.BuildTurnLines();
-            mf.gf.BuildGeoFenceLines();
-            //mf.hd.BuildSingleSpaceHeadLines();
-
-            //Task.Run(() => mf.mazeGrid.BuildMazeGridArray());
-            mf.mazeGrid.BuildMazeGridArray();
 
             mf.bnd.bndBeingMadePts.Clear();
-            //close window
             Close();
         }
 
         //actually the record button
-        private void btnPausePlay_Click(object sender, EventArgs e)
+        private void BtnPausePlay_Click(object sender, EventArgs e)
         {
             if (mf.bnd.isOkToAddPoints)
             {
@@ -89,9 +82,19 @@ namespace AgOpenGPS
             //mf.bnd.isOkToAddPoints = false;
             btnPausePlay.Image = Properties.Resources.BoundaryRecord;
             mf.Focus();
+
+            if (mf.isMetric)
+            {
+                lblArea.Text = Math.Round(0.0, 2) + " Ha";
+            }
+            else
+            {
+                lblArea.Text = Math.Round(0.0, 2) + " Acre";
+            }
+            lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             int ptCount = mf.bnd.bndBeingMadePts.Count;
             double area = 0;
@@ -118,7 +121,7 @@ namespace AgOpenGPS
 
         }
 
-        private void btnAddPoint_Click(object sender, EventArgs e)
+        private void BtnAddPoint_Click(object sender, EventArgs e)
         {
         
             mf.bnd.isOkToAddPoints = true;
@@ -129,7 +132,7 @@ namespace AgOpenGPS
             mf.Focus();
         }
 
-        private void btnDeleteLast_Click(object sender, EventArgs e)
+        private void BtnDeleteLast_Click(object sender, EventArgs e)
         {
             int ptCount = mf.bnd.bndBeingMadePts.Count;
             if (ptCount > 0)
@@ -138,7 +141,7 @@ namespace AgOpenGPS
             mf.Focus();
         }
 
-        private void btnRestart_Click(object sender, EventArgs e)
+        private void BtnRestart_Click(object sender, EventArgs e)
         {
             DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
                                     gStr.gsDeleteForSure,

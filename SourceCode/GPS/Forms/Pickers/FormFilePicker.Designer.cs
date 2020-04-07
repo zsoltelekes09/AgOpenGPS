@@ -95,7 +95,7 @@
             this.btnByDistance.Text = "Sort";
             this.btnByDistance.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnByDistance.UseVisualStyleBackColor = false;
-            this.btnByDistance.Click += new System.EventHandler(this.btnByDistance_Click);
+            this.btnByDistance.Click += new System.EventHandler(this.BtnByDistance_Click);
             // 
             // btnOpenExistingLv
             // 
@@ -112,7 +112,7 @@
             this.btnOpenExistingLv.Text = "Use Selected";
             this.btnOpenExistingLv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnOpenExistingLv.UseVisualStyleBackColor = false;
-            this.btnOpenExistingLv.Click += new System.EventHandler(this.btnOpenExistingLv_Click);
+            this.btnOpenExistingLv.Click += new System.EventHandler(this.BtnOpenExistingLv_Click);
             // 
             // btnDeleteAB
             // 
@@ -125,7 +125,7 @@
             this.btnDeleteAB.Size = new System.Drawing.Size(227, 63);
             this.btnDeleteAB.TabIndex = 91;
             this.btnDeleteAB.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.btnDeleteAB.Click += new System.EventHandler(this.btnDeleteAB_Click);
+            this.btnDeleteAB.Click += new System.EventHandler(this.BtnDeleteAB_Click);
             // 
             // FormFilePicker
             // 

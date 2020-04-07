@@ -46,7 +46,7 @@
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // unoChart
             // 
@@ -160,7 +160,7 @@
             this.button1.TabIndex = 234;
             this.button1.Text = "Exit";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // FormSteerGraph
             // 

@@ -8,7 +8,7 @@ namespace AgOpenGPS
     public partial class FormToolPicker : Form
     {
         //class variables
-        private readonly FormGPS mf = null;
+        private readonly FormGPS mf;
 
         public FormToolPicker(Form callingForm)
         {
@@ -28,8 +28,7 @@ namespace AgOpenGPS
             if (Files.Length == 0)
             {
                 Close();
-                var form = new FormTimedMessage(2000, gStr.gsNoToolSaved, gStr.gsSaveAToolFirst);
-                form.Show();
+                mf.TimedMessageBox(2000, gStr.gsNoToolSaved, gStr.gsSaveAToolFirst);
 
             }
 
@@ -39,7 +38,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void cboxVeh_SelectedIndexChanged(object sender, EventArgs e)
+        private void CboxVeh_SelectedIndexChanged(object sender, EventArgs e)
         {
             mf.FileOpenTool(mf.toolsDirectory + cboxTool.SelectedItem.ToString() + ".txt");
             Close();

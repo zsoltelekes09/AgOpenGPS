@@ -28,9 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.oglSelf = new OpenTK.GLControl();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.nudDistance = new System.Windows.Forms.NumericUpDown();
             this.lblStart = new System.Windows.Forms.Label();
             this.lblEnd = new System.Windows.Forms.Label();
@@ -50,6 +48,8 @@
             this.btnMoveUp = new ProXoft.WinForms.RepeatButton();
             this.btnMoveDown = new ProXoft.WinForms.RepeatButton();
             this.btnDoneManualMove = new System.Windows.Forms.Button();
+            this.Previous_Field = new System.Windows.Forms.Button();
+            this.Next_Field = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudSetDistance)).BeginInit();
             this.SuspendLayout();
@@ -58,22 +58,16 @@
             // 
             this.oglSelf.BackColor = System.Drawing.Color.Black;
             this.oglSelf.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.oglSelf.Location = new System.Drawing.Point(5, 7);
+            this.oglSelf.Location = new System.Drawing.Point(5, 5);
             this.oglSelf.Margin = new System.Windows.Forms.Padding(0);
             this.oglSelf.Name = "oglSelf";
             this.oglSelf.Size = new System.Drawing.Size(700, 700);
             this.oglSelf.TabIndex = 183;
             this.oglSelf.VSync = false;
-            this.oglSelf.Load += new System.EventHandler(this.oglSelf_Load);
-            this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.oglSelf_Paint);
-            this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.oglSelf_MouseDown);
-            this.oglSelf.Resize += new System.EventHandler(this.oglSelf_Resize);
-            // 
-            // timer1
-            // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 500;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.oglSelf.Load += new System.EventHandler(this.OglSelf_Load);
+            this.oglSelf.Paint += new System.Windows.Forms.PaintEventHandler(this.OglSelf_Paint);
+            this.oglSelf.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OglSelf_MouseDown);
+            this.oglSelf.Resize += new System.EventHandler(this.OglSelf_Resize);
             // 
             // nudDistance
             // 
@@ -90,7 +84,7 @@
             this.nudDistance.Size = new System.Drawing.Size(148, 52);
             this.nudDistance.TabIndex = 338;
             this.nudDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudDistance.Enter += new System.EventHandler(this.nudDistance_Enter);
+            this.nudDistance.Enter += new System.EventHandler(this.NudDistance_Enter);
             // 
             // lblStart
             // 
@@ -133,7 +127,7 @@
             this.btnDeletePoints.Size = new System.Drawing.Size(73, 61);
             this.btnDeletePoints.TabIndex = 452;
             this.btnDeletePoints.UseVisualStyleBackColor = false;
-            this.btnDeletePoints.Click += new System.EventHandler(this.btnDeletePoints_Click);
+            this.btnDeletePoints.Click += new System.EventHandler(this.BtnDeletePoints_Click);
             // 
             // btnMakeFixedHeadland
             // 
@@ -150,7 +144,7 @@
             this.btnMakeFixedHeadland.Size = new System.Drawing.Size(73, 61);
             this.btnMakeFixedHeadland.TabIndex = 450;
             this.btnMakeFixedHeadland.UseVisualStyleBackColor = false;
-            this.btnMakeFixedHeadland.Click += new System.EventHandler(this.btnMakeFixedHeadland_Click);
+            this.btnMakeFixedHeadland.Click += new System.EventHandler(this.BtnMakeFixedHeadland_Click);
             // 
             // btnExit
             // 
@@ -166,7 +160,7 @@
             this.btnExit.Size = new System.Drawing.Size(123, 70);
             this.btnExit.TabIndex = 234;
             this.btnExit.UseVisualStyleBackColor = false;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
             // 
             // btnStartUp
             // 
@@ -182,7 +176,7 @@
             this.btnStartUp.Size = new System.Drawing.Size(63, 59);
             this.btnStartUp.TabIndex = 454;
             this.btnStartUp.UseVisualStyleBackColor = true;
-            this.btnStartUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnStartUp_MouseDown);
+            this.btnStartUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnStartUp_MouseDown);
             // 
             // btnStartDown
             // 
@@ -198,7 +192,7 @@
             this.btnStartDown.Size = new System.Drawing.Size(63, 59);
             this.btnStartDown.TabIndex = 453;
             this.btnStartDown.UseVisualStyleBackColor = true;
-            this.btnStartDown.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnStartDown_MouseDown);
+            this.btnStartDown.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnStartDown_MouseDown);
             // 
             // nudSetDistance
             // 
@@ -220,7 +214,7 @@
             this.nudSetDistance.Size = new System.Drawing.Size(148, 52);
             this.nudSetDistance.TabIndex = 457;
             this.nudSetDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudSetDistance.Enter += new System.EventHandler(this.nudSetDistance_Enter);
+            this.nudSetDistance.Enter += new System.EventHandler(this.NudSetDistance_Enter);
             // 
             // btnSetDistance
             // 
@@ -237,7 +231,7 @@
             this.btnSetDistance.Size = new System.Drawing.Size(73, 61);
             this.btnSetDistance.TabIndex = 458;
             this.btnSetDistance.UseVisualStyleBackColor = false;
-            this.btnSetDistance.Click += new System.EventHandler(this.btnSetDistance_Click);
+            this.btnSetDistance.Click += new System.EventHandler(this.BtnSetDistance_Click);
             // 
             // btnReset
             // 
@@ -257,7 +251,7 @@
             this.btnReset.Text = "Reset";
             this.btnReset.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnReset.UseVisualStyleBackColor = false;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            this.btnReset.Click += new System.EventHandler(this.BtnReset_Click);
             // 
             // btnTurnOffHeadland
             // 
@@ -274,7 +268,7 @@
             this.btnTurnOffHeadland.Size = new System.Drawing.Size(88, 70);
             this.btnTurnOffHeadland.TabIndex = 460;
             this.btnTurnOffHeadland.UseVisualStyleBackColor = false;
-            this.btnTurnOffHeadland.Click += new System.EventHandler(this.btnTurnOffHeadland_Click);
+            this.btnTurnOffHeadland.Click += new System.EventHandler(this.BtnTurnOffHeadland_Click);
             // 
             // btnEndUp
             // 
@@ -290,7 +284,7 @@
             this.btnEndUp.Size = new System.Drawing.Size(63, 59);
             this.btnEndUp.TabIndex = 462;
             this.btnEndUp.UseVisualStyleBackColor = true;
-            this.btnEndUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnEndUp_MouseDown);
+            this.btnEndUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnEndUp_MouseDown);
             // 
             // btnEndDown
             // 
@@ -306,7 +300,7 @@
             this.btnEndDown.Size = new System.Drawing.Size(63, 59);
             this.btnEndDown.TabIndex = 461;
             this.btnEndDown.UseVisualStyleBackColor = true;
-            this.btnEndDown.MouseDown += new System.Windows.Forms.MouseEventHandler(this.btnEndDown_MouseDown);
+            this.btnEndDown.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnEndDown_MouseDown);
             // 
             // btnMoveRight
             // 
@@ -323,7 +317,7 @@
             this.btnMoveRight.Size = new System.Drawing.Size(48, 73);
             this.btnMoveRight.TabIndex = 465;
             this.btnMoveRight.UseVisualStyleBackColor = true;
-            this.btnMoveRight.Click += new System.EventHandler(this.btnMoveRight_Click);
+            this.btnMoveRight.Click += new System.EventHandler(this.BtnMoveRight_Click);
             // 
             // btnMoveLeft
             // 
@@ -340,7 +334,7 @@
             this.btnMoveLeft.Size = new System.Drawing.Size(48, 73);
             this.btnMoveLeft.TabIndex = 466;
             this.btnMoveLeft.UseVisualStyleBackColor = true;
-            this.btnMoveLeft.Click += new System.EventHandler(this.btnMoveLeft_Click);
+            this.btnMoveLeft.Click += new System.EventHandler(this.BtnMoveLeft_Click);
             // 
             // btnMoveUp
             // 
@@ -358,7 +352,7 @@
             this.btnMoveUp.TabIndex = 464;
             this.btnMoveUp.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.btnMoveUp.UseVisualStyleBackColor = true;
-            this.btnMoveUp.Click += new System.EventHandler(this.btnMoveUp_Click_1);
+            this.btnMoveUp.Click += new System.EventHandler(this.BtnMoveUp_Click_1);
             // 
             // btnMoveDown
             // 
@@ -375,7 +369,7 @@
             this.btnMoveDown.Size = new System.Drawing.Size(48, 73);
             this.btnMoveDown.TabIndex = 463;
             this.btnMoveDown.UseVisualStyleBackColor = true;
-            this.btnMoveDown.Click += new System.EventHandler(this.btnMoveDown_Click);
+            this.btnMoveDown.Click += new System.EventHandler(this.BtnMoveDown_Click);
             // 
             // btnDoneManualMove
             // 
@@ -392,7 +386,27 @@
             this.btnDoneManualMove.Size = new System.Drawing.Size(73, 61);
             this.btnDoneManualMove.TabIndex = 467;
             this.btnDoneManualMove.UseVisualStyleBackColor = false;
-            this.btnDoneManualMove.Click += new System.EventHandler(this.btnDoneManualMove_Click);
+            this.btnDoneManualMove.Click += new System.EventHandler(this.BtnDoneManualMove_Click);
+            // 
+            // Previous_Field
+            // 
+            this.Previous_Field.Location = new System.Drawing.Point(5, 5);
+            this.Previous_Field.Name = "Previous_Field";
+            this.Previous_Field.Size = new System.Drawing.Size(200, 50);
+            this.Previous_Field.TabIndex = 469;
+            this.Previous_Field.Text = "Previous_Field";
+            this.Previous_Field.UseVisualStyleBackColor = true;
+            this.Previous_Field.Click += new System.EventHandler(this.Previous_Field_Click);
+            // 
+            // Next_Field
+            // 
+            this.Next_Field.Location = new System.Drawing.Point(505, 5);
+            this.Next_Field.Name = "Next_Field";
+            this.Next_Field.Size = new System.Drawing.Size(200, 50);
+            this.Next_Field.TabIndex = 468;
+            this.Next_Field.Text = "Next_Field";
+            this.Next_Field.UseVisualStyleBackColor = true;
+            this.Next_Field.Click += new System.EventHandler(this.Next_Field_Click);
             // 
             // FormHeadland
             // 
@@ -401,6 +415,8 @@
             this.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.ClientSize = new System.Drawing.Size(1004, 709);
             this.ControlBox = false;
+            this.Controls.Add(this.Previous_Field);
+            this.Controls.Add(this.Next_Field);
             this.Controls.Add(this.btnDoneManualMove);
             this.Controls.Add(this.btnMoveRight);
             this.Controls.Add(this.btnMoveLeft);
@@ -438,7 +454,6 @@
         #endregion
 
         private OpenTK.GLControl oglSelf;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.NumericUpDown nudDistance;
         private System.Windows.Forms.Label lblStart;
@@ -458,5 +473,7 @@
         private ProXoft.WinForms.RepeatButton btnMoveUp;
         private ProXoft.WinForms.RepeatButton btnMoveDown;
         private System.Windows.Forms.Button btnDoneManualMove;
+        private System.Windows.Forms.Button Previous_Field;
+        private System.Windows.Forms.Button Next_Field;
     }
 }

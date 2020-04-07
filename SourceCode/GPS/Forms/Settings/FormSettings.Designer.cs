@@ -146,7 +146,7 @@
             this.rbtnHarvester.TabIndex = 253;
             this.rbtnHarvester.TabStop = true;
             this.rbtnHarvester.UseVisualStyleBackColor = true;
-            this.rbtnHarvester.CheckedChanged += new System.EventHandler(this.rbtn4WD_CheckedChanged);
+            this.rbtnHarvester.CheckedChanged += new System.EventHandler(this.Rbtn4WD_CheckedChanged);
             // 
             // rbtn4WD
             // 
@@ -163,7 +163,7 @@
             this.rbtn4WD.TabIndex = 252;
             this.rbtn4WD.TabStop = true;
             this.rbtn4WD.UseVisualStyleBackColor = true;
-            this.rbtn4WD.CheckedChanged += new System.EventHandler(this.rbtn4WD_CheckedChanged);
+            this.rbtn4WD.CheckedChanged += new System.EventHandler(this.Rbtn4WD_CheckedChanged);
             // 
             // btnChangeAttachment
             // 
@@ -176,7 +176,7 @@
             this.btnChangeAttachment.Size = new System.Drawing.Size(170, 106);
             this.btnChangeAttachment.TabIndex = 251;
             this.btnChangeAttachment.UseVisualStyleBackColor = false;
-            this.btnChangeAttachment.Click += new System.EventHandler(this.btnChangeAttachment_Click);
+            this.btnChangeAttachment.Click += new System.EventHandler(this.BtnChangeAttachment_Click);
             // 
             // rbtnTractor
             // 
@@ -193,7 +193,7 @@
             this.rbtnTractor.TabIndex = 112;
             this.rbtnTractor.TabStop = true;
             this.rbtnTractor.UseVisualStyleBackColor = true;
-            this.rbtnTractor.CheckedChanged += new System.EventHandler(this.rbtn4WD_CheckedChanged);
+            this.rbtnTractor.CheckedChanged += new System.EventHandler(this.Rbtn4WD_CheckedChanged);
             // 
             // tabSettings
             // 
@@ -262,7 +262,7 @@
             0,
             0,
             0});
-            this.nudAntennaHeight.ValueChanged += new System.EventHandler(this.nudAntennaHeight_ValueChanged);
+            this.nudAntennaHeight.ValueChanged += new System.EventHandler(this.NudAntennaHeight_ValueChanged);
             this.nudAntennaHeight.Enter += new System.EventHandler(this.NudAntennaHeight_Enter);
             // 
             // label26
@@ -326,7 +326,7 @@
             0,
             0,
             0});
-            this.nudWheelbase.ValueChanged += new System.EventHandler(this.nudWheelbase_ValueChanged);
+            this.nudWheelbase.ValueChanged += new System.EventHandler(this.NudWheelbase_ValueChanged);
             this.nudWheelbase.Enter += new System.EventHandler(this.NudWheelbase_Enter);
             // 
             // nudAntennaPivot
@@ -350,7 +350,7 @@
             0,
             0,
             0});
-            this.nudAntennaPivot.ValueChanged += new System.EventHandler(this.nudAntennaPivot_ValueChanged);
+            this.nudAntennaPivot.ValueChanged += new System.EventHandler(this.NudAntennaPivot_ValueChanged);
             this.nudAntennaPivot.Enter += new System.EventHandler(this.NudAntennaPivot_Enter);
             // 
             // label18
@@ -385,7 +385,7 @@
             this.nudAntennaOffset.Size = new System.Drawing.Size(144, 65);
             this.nudAntennaOffset.TabIndex = 26;
             this.nudAntennaOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudAntennaOffset.ValueChanged += new System.EventHandler(this.nudAntennaOffset_ValueChanged);
+            this.nudAntennaOffset.ValueChanged += new System.EventHandler(this.NudAntennaOffset_ValueChanged);
             this.nudAntennaOffset.Enter += new System.EventHandler(this.NudAntennaOffset_Enter);
             // 
             // tabVehicle
@@ -437,7 +437,7 @@
             0,
             0,
             0});
-            this.nudHydLiftSecs.Enter += new System.EventHandler(this.nudHydLiftSecs_Enter);
+            this.nudHydLiftSecs.Enter += new System.EventHandler(this.NudHydLiftSecs_Enter);
             // 
             // nudMinTurnRadius
             // 
@@ -465,7 +465,7 @@
             0,
             0,
             0});
-            this.nudMinTurnRadius.ValueChanged += new System.EventHandler(this.nudMinTurnRadius_ValueChanged);
+            this.nudMinTurnRadius.ValueChanged += new System.EventHandler(this.NudMinTurnRadius_ValueChanged);
             this.nudMinTurnRadius.Enter += new System.EventHandler(this.NudMinTurnRadius_Enter);
             // 
             // pictureBox1
@@ -540,7 +540,7 @@
             0,
             0,
             0});
-            this.nudLineWidth.Enter += new System.EventHandler(this.nudLineWidth_Enter);
+            this.nudLineWidth.Enter += new System.EventHandler(this.NudLineWidth_Enter);
             // 
             // groupBox2
             // 
@@ -680,7 +680,7 @@
             this.btnCancel.Size = new System.Drawing.Size(88, 68);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -696,7 +696,7 @@
             this.bntOK.TabIndex = 0;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = false;
-            this.bntOK.Click += new System.EventHandler(this.btnOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
             // FormSettings
             // 
