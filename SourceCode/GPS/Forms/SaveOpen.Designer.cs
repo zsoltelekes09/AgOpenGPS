@@ -809,8 +809,8 @@ namespace AgOpenGPS
                 writer.WriteLine("LookAheadOn," + Properties.Vehicle.Default.setVehicle_toolLookAheadOn.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("TurnOffDelay," + Properties.Vehicle.Default.setVehicle_toolOffDelay.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("ToolMinUnappliedPixels," + Properties.Vehicle.Default.setVehicle_minApplied.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("MappingOnDelay," + Properties.Vehicle.Default.setVehicle_toolOffDelay.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("MappingOffDelay," + Properties.Vehicle.Default.setVehicle_minApplied.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("MappingOnDelay," + Properties.Vehicle.Default.setVehicle_MappingOnDelay.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("MappingOffDelay," + Properties.Vehicle.Default.setVehicle_MappingOffDelay.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
 
@@ -935,9 +935,9 @@ namespace AgOpenGPS
                         Properties.Vehicle.Default.setVehicle_minApplied = int.Parse(words[1], CultureInfo.InvariantCulture);
 
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_MappingOnDelay = int.Parse(words[1], CultureInfo.InvariantCulture);
+                        Properties.Vehicle.Default.setVehicle_MappingOnDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_MappingOffDelay = int.Parse(words[1], CultureInfo.InvariantCulture);
+                        Properties.Vehicle.Default.setVehicle_MappingOffDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine();
                         line = reader.ReadLine();
 
@@ -1089,11 +1089,13 @@ namespace AgOpenGPS
                     WriteErrorLog("pen Tool" + e.ToString());
 
                     //vehicle is corrupt, reload with all default information
-                    Properties.Settings.Default.Reset();
+                    //Properties.Settings.Default.Reset();
                     Properties.Settings.Default.Save();
-                    MessageBox.Show(gStr.gsProgramWillResetToRecoverPleaseRestart, gStr.gsFileError, MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                    Application.Restart();
-                    Environment.Exit(0);
+
+                    TimedMessageBox(3000, gStr.gsFileError, gStr.gsVehicleFileIsCorrupt);
+
+                    //Application.Restart();
+                    //Environment.Exit(0);
                     return false;
                 }
             }    //cancelled out of open file

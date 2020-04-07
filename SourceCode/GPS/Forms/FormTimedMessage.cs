@@ -11,7 +11,7 @@ namespace AgOpenGPS
             lblMessage.Text = str;
             lblMessage2.Text = str2;
             timer1.Interval = timeInMsec;
-            Width = str2.Length * 15 + 120;
+            Width = Math.Max(str2.Length, str.Length) * 15 + 120;
 
             this.Left = callingForm.Width / 2 - this.Width/2;
             this.Top = 53;
