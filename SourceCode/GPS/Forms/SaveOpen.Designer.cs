@@ -809,9 +809,8 @@ namespace AgOpenGPS
                 writer.WriteLine("LookAheadOn," + Properties.Vehicle.Default.setVehicle_toolLookAheadOn.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("TurnOffDelay," + Properties.Vehicle.Default.setVehicle_toolOffDelay.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("ToolMinUnappliedPixels," + Properties.Vehicle.Default.setVehicle_minApplied.ToString(CultureInfo.InvariantCulture));
-
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("MappingOnDelay," + Properties.Vehicle.Default.setVehicle_toolOffDelay.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("MappingOffDelay," + Properties.Vehicle.Default.setVehicle_minApplied.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
 
@@ -935,8 +934,10 @@ namespace AgOpenGPS
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.setVehicle_minApplied = int.Parse(words[1], CultureInfo.InvariantCulture);
 
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
+                        line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Vehicle.Default.setVehicle_MappingOnDelay = int.Parse(words[1], CultureInfo.InvariantCulture);
+                        line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Vehicle.Default.setVehicle_MappingOffDelay = int.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine();
                         line = reader.ReadLine();
 
@@ -1055,6 +1056,10 @@ namespace AgOpenGPS
                         tool.LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
                         tool.LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
                         tool.TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
+
+                        tool.MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
+                        tool.MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
+
 
                         tool.toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
 

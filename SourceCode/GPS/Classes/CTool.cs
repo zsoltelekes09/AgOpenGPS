@@ -17,7 +17,7 @@ namespace AgOpenGPS
         public double toolOffset;
 
         public double LookAheadOffSetting, LookAheadOnSetting;
-        public double TurnOffDelay;
+        public double TurnOffDelay, MappingOnDelay, MappingOffDelay;
 
         public double lookAheadDistanceOnPixelsLeft, lookAheadDistanceOnPixelsRight;
         public double lookAheadDistanceOffPixelsLeft, lookAheadDistanceOffPixelsRight;
@@ -62,6 +62,9 @@ namespace AgOpenGPS
             LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
             LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
             TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
+
+            MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
+            MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
 
             numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
             numSuperSection = numOfSections + 1;

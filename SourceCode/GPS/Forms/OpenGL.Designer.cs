@@ -616,7 +616,7 @@ namespace AgOpenGPS
             GL.Flush();
 
             //determine farthest ahead lookahead - is the height of the readpixel line
-            rpHeight = (int)Math.Min(Math.Max(Math.Max((hd.isOn ? Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft) : 0), Math.Max(tool.lookAheadDistanceOnPixelsRight, tool.lookAheadDistanceOnPixelsLeft)) + 2, 8), 240);
+            rpHeight = (int)Math.Min(Math.Max(Math.Max((hd.isOn && vehicle.isHydLiftOn ? Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft) : 0), Math.Max(tool.lookAheadDistanceOnPixelsRight, tool.lookAheadDistanceOnPixelsLeft)) + 2, 8), 240);
 
 
             byte[] GreenPixels = new byte[(tool.rpWidth * rpHeight)];
@@ -758,7 +758,7 @@ namespace AgOpenGPS
 
                 for (int j = 0; j < tool.numOfSections; j++)//set the timers back
                 {
-                    section[j].MappingOffTimer = (int)(fixUpdateHz * 0.8 + 1);
+                    section[j].MappingOffTimer = (int)(fixUpdateHz * tool.MappingOffDelay + 1);
                     section[j].SectionOverlapTimer = (int)((double)fixUpdateHz * tool.TurnOffDelay + 1);
                     section[j].MappingOnTimer = 1;
                 }

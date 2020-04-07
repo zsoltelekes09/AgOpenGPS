@@ -42,6 +42,10 @@
             this.nudHitchLength = new System.Windows.Forms.NumericUpDown();
             this.nudTankHitch = new System.Windows.Forms.NumericUpDown();
             this.tabSettings = new System.Windows.Forms.TabPage();
+            this.nudMappingOffDelay = new System.Windows.Forms.NumericUpDown();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.nudMappingOnDelay = new System.Windows.Forms.NumericUpDown();
             this.label8 = new System.Windows.Forms.Label();
             this.nudLookAheadOff = new System.Windows.Forms.NumericUpDown();
             this.nudCutoffSpeed = new System.Windows.Forms.NumericUpDown();
@@ -115,6 +119,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudHitchLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudTankHitch)).BeginInit();
             this.tabSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMappingOffDelay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMappingOnDelay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLookAheadOff)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudCutoffSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).BeginInit();
@@ -377,6 +383,10 @@
             this.tabSettings.BackColor = System.Drawing.SystemColors.Window;
             this.tabSettings.BackgroundImage = global::AgOpenGPS.Properties.Resources.ImplementSettings;
             this.tabSettings.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.tabSettings.Controls.Add(this.nudMappingOffDelay);
+            this.tabSettings.Controls.Add(this.label12);
+            this.tabSettings.Controls.Add(this.label9);
+            this.tabSettings.Controls.Add(this.nudMappingOnDelay);
             this.tabSettings.Controls.Add(this.label8);
             this.tabSettings.Controls.Add(this.nudLookAheadOff);
             this.tabSettings.Controls.Add(this.nudCutoffSpeed);
@@ -394,13 +404,93 @@
             this.tabSettings.TabIndex = 9;
             this.tabSettings.Text = "Settings";
             // 
+            // MappingOffDelay
+            // 
+            this.nudMappingOffDelay.BackColor = System.Drawing.Color.AliceBlue;
+            this.nudMappingOffDelay.DecimalPlaces = 1;
+            this.nudMappingOffDelay.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nudMappingOffDelay.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.nudMappingOffDelay.InterceptArrowKeys = false;
+            this.nudMappingOffDelay.Location = new System.Drawing.Point(70, 366);
+            this.nudMappingOffDelay.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.nudMappingOffDelay.Name = "MappingOffDelay";
+            this.nudMappingOffDelay.Size = new System.Drawing.Size(150, 65);
+            this.nudMappingOffDelay.TabIndex = 119;
+            this.nudMappingOffDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.nudMappingOffDelay.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.nudMappingOffDelay.ValueChanged += new System.EventHandler(this.MappingOffDelay_ValueChanged);
+            this.nudMappingOffDelay.Enter += new System.EventHandler(this.MappingOffDelay_Enter);
+            // 
+            // label12
+            // 
+            this.label12.Font = new System.Drawing.Font("Tahoma", 14.25F);
+            this.label12.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label12.Location = new System.Drawing.Point(5, 328);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(280, 35);
+            this.label12.TabIndex = 118;
+            this.label12.Text = "Stop Mapping Delay (Secs)";
+            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label9
+            // 
+            this.label9.Font = new System.Drawing.Font("Tahoma", 14.25F);
+            this.label9.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label9.Location = new System.Drawing.Point(5, 116);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(280, 35);
+            this.label9.TabIndex = 116;
+            this.label9.Text = "Start Mapping Delay (Secs)";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // MappingOnDelay
+            // 
+            this.nudMappingOnDelay.BackColor = System.Drawing.Color.AliceBlue;
+            this.nudMappingOnDelay.DecimalPlaces = 1;
+            this.nudMappingOnDelay.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nudMappingOnDelay.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.nudMappingOnDelay.InterceptArrowKeys = false;
+            this.nudMappingOnDelay.Location = new System.Drawing.Point(70, 154);
+            this.nudMappingOnDelay.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.nudMappingOnDelay.Name = "MappingOnDelay";
+            this.nudMappingOnDelay.Size = new System.Drawing.Size(150, 65);
+            this.nudMappingOnDelay.TabIndex = 115;
+            this.nudMappingOnDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.nudMappingOnDelay.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            65536});
+            this.nudMappingOnDelay.ValueChanged += new System.EventHandler(this.MappingOnDelay_ValueChanged);
+            this.nudMappingOnDelay.Enter += new System.EventHandler(this.MappingOnDelay_Enter);
+            // 
             // label8
             // 
             this.label8.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label8.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label8.Location = new System.Drawing.Point(34, 198);
+            this.label8.Location = new System.Drawing.Point(5, 222);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(227, 53);
+            this.label8.Size = new System.Drawing.Size(280, 35);
             this.label8.TabIndex = 114;
             this.label8.Text = "Turn Off Ahead (Secs)";
             this.label8.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -416,7 +506,7 @@
             0,
             65536});
             this.nudLookAheadOff.InterceptArrowKeys = false;
-            this.nudLookAheadOff.Location = new System.Drawing.Point(70, 254);
+            this.nudLookAheadOff.Location = new System.Drawing.Point(70, 260);
             this.nudLookAheadOff.Maximum = new decimal(new int[] {
             3,
             0,
@@ -519,12 +609,12 @@
             // 
             this.label23.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label23.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label23.Location = new System.Drawing.Point(34, 399);
+            this.label23.Location = new System.Drawing.Point(5, 434);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(227, 53);
+            this.label23.Size = new System.Drawing.Size(280, 35);
             this.label23.TabIndex = 109;
             this.label23.Text = "Turn Off Delay (Secs)";
-            this.label23.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // nudTurnOffDelay
             // 
@@ -537,7 +627,7 @@
             0,
             65536});
             this.nudTurnOffDelay.InterceptArrowKeys = false;
-            this.nudTurnOffDelay.Location = new System.Drawing.Point(70, 455);
+            this.nudTurnOffDelay.Location = new System.Drawing.Point(70, 472);
             this.nudTurnOffDelay.Maximum = new decimal(new int[] {
             5,
             0,
@@ -554,12 +644,12 @@
             // 
             this.label3.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(34, 9);
+            this.label3.Location = new System.Drawing.Point(5, 10);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(227, 53);
+            this.label3.Size = new System.Drawing.Size(280, 35);
             this.label3.TabIndex = 107;
             this.label3.Text = "Turn On Ahead (Secs)";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // nudLookAhead
             // 
@@ -572,7 +662,7 @@
             0,
             65536});
             this.nudLookAhead.InterceptArrowKeys = false;
-            this.nudLookAhead.Location = new System.Drawing.Point(70, 65);
+            this.nudLookAhead.Location = new System.Drawing.Point(70, 48);
             this.nudLookAhead.Maximum = new decimal(new int[] {
             5,
             0,
@@ -1547,6 +1637,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudTankHitch)).EndInit();
             this.tabSettings.ResumeLayout(false);
             this.tabSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMappingOffDelay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMappingOnDelay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLookAheadOff)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudCutoffSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).EndInit();
@@ -1662,5 +1754,9 @@
         private System.Windows.Forms.Label lblTurnOffBelowUnits;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.NumericUpDown nudLookAheadOff;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown nudMappingOnDelay;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.NumericUpDown nudMappingOffDelay;
     }
 }

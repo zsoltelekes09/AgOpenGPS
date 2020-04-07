@@ -1537,9 +1537,9 @@ namespace AgOpenGPS
                 if (section[j].SectionOnRequest)
                 {
                     section[j].IsSectionOn = true;
-                    section[j].SectionOverlapTimer = (int)((double)fixUpdateHz * tool.TurnOffDelay + 1);
+                    section[j].SectionOverlapTimer = (int)(fixUpdateHz * tool.TurnOffDelay + 1);
 
-                    if (section[j].MappingOnTimer == 0) section[j].MappingOnTimer = fixUpdateHz * 1;
+                    if (section[j].MappingOnTimer == 0) section[j].MappingOnTimer = (int)(fixUpdateHz * tool.MappingOnDelay + 1);
                 }
                 else
                 {
@@ -1562,7 +1562,7 @@ namespace AgOpenGPS
 
                 if (section[j].IsSectionOn)
                 {
-                    section[j].MappingOffTimer = (int)(0.8 * fixUpdateHz + 1);
+                    section[j].MappingOffTimer = (int)(tool.MappingOffDelay * fixUpdateHz + 1);
                 }
                 else
                 {

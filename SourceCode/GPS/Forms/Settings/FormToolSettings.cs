@@ -10,7 +10,7 @@ namespace AgOpenGPS
         //class variables
         private readonly FormGPS mf;
 
-        private double toolOverlap, toolTrailingHitchLength, tankTrailingHitchLength, toolOffset, toolTurnOffDelay, toolLookAheadOn, toolLookAheadOff;
+        private double toolOverlap, toolTrailingHitchLength, tankTrailingHitchLength, toolOffset, toolTurnOffDelay, toolLookAheadOn, toolLookAheadOff, MappingOnDelay, MappingOffDelay;
         private double hitchLength;
 
         private bool isToolTrailing, isToolBehindPivot, isToolTBT;
@@ -73,6 +73,10 @@ namespace AgOpenGPS
             nudLookAhead.Controls[0].Enabled = false;
             nudLookAheadOff.Controls[0].Enabled = false;
             nudTurnOffDelay.Controls[0].Enabled = false;
+
+
+            nudMappingOnDelay.Controls[0].Enabled = false;
+            nudMappingOffDelay.Controls[0].Enabled = false;
 
             nudMinApplied.Controls[0].Enabled = false;
             nudDefaultSectionWidth.Controls[0].Enabled = false;
@@ -156,11 +160,23 @@ namespace AgOpenGPS
             temp = (decimal)toolTurnOffDelay;
             if (nudTurnOffDelay.CheckValue(ref temp)) nudTurnOffDelay.BackColor = System.Drawing.Color.OrangeRed;
             toolTurnOffDelay = (double)temp;
-            
+
             toolLookAheadOff = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
             temp = (decimal)toolLookAheadOff;
             if (nudLookAheadOff.CheckValue(ref temp)) nudLookAheadOff.BackColor = System.Drawing.Color.OrangeRed;
             toolLookAheadOff = (double)temp;
+
+            MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
+            temp = (decimal)MappingOnDelay;
+            if (nudMappingOnDelay.CheckValue(ref temp)) nudMappingOnDelay.BackColor = System.Drawing.Color.OrangeRed;
+            MappingOnDelay = (double)temp;
+
+            MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
+            temp = (decimal)MappingOffDelay;
+            if (nudMappingOffDelay.CheckValue(ref temp)) nudMappingOffDelay.BackColor = System.Drawing.Color.OrangeRed;
+            MappingOffDelay = (double)temp;
+
+
 
             toolLookAheadOn = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
             temp = (decimal)toolLookAheadOn;
@@ -316,6 +332,18 @@ namespace AgOpenGPS
             nudLookAheadOff.Value = (decimal)(toolLookAheadOff);
             nudLookAheadOff.ValueChanged += NudLookAheadOff_ValueChanged;
 
+            nudMappingOnDelay.ValueChanged -= MappingOnDelay_ValueChanged;
+            nudMappingOnDelay.Value = (decimal)(MappingOnDelay);
+            nudMappingOnDelay.ValueChanged += MappingOnDelay_ValueChanged;
+
+            nudMappingOffDelay.ValueChanged -= MappingOffDelay_ValueChanged;
+            nudMappingOffDelay.Value = (decimal)(MappingOffDelay);
+            nudMappingOffDelay.ValueChanged += MappingOffDelay_ValueChanged;
+
+
+
+
+
             cboxNumSections.Text = numberOfSections.ToString();
 
             //calc the 8 section widths based on settings.settings also meters to inches
@@ -397,6 +425,11 @@ namespace AgOpenGPS
             mf.tool.TurnOffDelay = toolTurnOffDelay;
             Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.tool.TurnOffDelay;
 
+            mf.tool.MappingOnDelay = MappingOnDelay;
+            Properties.Vehicle.Default.setVehicle_MappingOnDelay = mf.tool.MappingOnDelay;
+
+            mf.tool.MappingOffDelay = MappingOffDelay;
+            Properties.Vehicle.Default.setVehicle_MappingOffDelay = mf.tool.MappingOffDelay;
 
             mf.tool.toolOffset = toolOffset;
             Properties.Vehicle.Default.setVehicle_toolOffset = mf.tool.toolOffset;
@@ -614,6 +647,18 @@ namespace AgOpenGPS
         }
 
         private void NudLookAheadOff_Enter(object sender, EventArgs e)
+        {
+            mf.KeypadToNUD((NumericUpDown)sender);
+            btnCancel.Focus();
+        }
+
+        private void MappingOnDelay_Enter(object sender, EventArgs e)
+        {
+            mf.KeypadToNUD((NumericUpDown)sender);
+            btnCancel.Focus();
+        }
+
+        private void MappingOffDelay_Enter(object sender, EventArgs e)
         {
             mf.KeypadToNUD((NumericUpDown)sender);
             btnCancel.Focus();
@@ -897,6 +942,16 @@ namespace AgOpenGPS
                 toolTurnOffDelay = 0;
                 nudTurnOffDelay.Value = 0;
             }
+        }
+
+        private void MappingOnDelay_ValueChanged(object sender, EventArgs e)
+        {
+            MappingOnDelay = (double)nudMappingOnDelay.Value;
+        }
+
+        private void MappingOffDelay_ValueChanged(object sender, EventArgs e)
+        {
+            MappingOffDelay = (double)nudMappingOffDelay.Value;
         }
 
         private void NudTurnOffDelay_ValueChanged(object sender, EventArgs e)
