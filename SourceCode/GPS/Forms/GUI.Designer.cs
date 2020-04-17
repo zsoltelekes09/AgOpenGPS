@@ -27,6 +27,7 @@ namespace AgOpenGPS
         public bool isUTurnAlwaysOn, isAutoLoadFields, isCompassOn, isSpeedoOn, isAutoDayNight, isSideGuideLines = true;
         public bool isPureDisplayOn = true, isSkyOn = true, isRollMeterOn = false;
         public bool isDay = true, isDayTime = true;
+        public bool isKeyboardOn = true;
 
         //master Manual and Auto, 3 states possible
         public enum btnStates { Off, Auto, On }
@@ -56,7 +57,32 @@ namespace AgOpenGPS
         {
             //set the language to last used
             SetLanguage(Settings.Default.setF_culture);
-            
+
+            currentVersionStr = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
+
+            string[] fullVers = currentVersionStr.Split('.');
+            int inoV = int.Parse(fullVers[0], CultureInfo.InvariantCulture);
+            inoV += int.Parse(fullVers[1], CultureInfo.InvariantCulture);
+            inoV += int.Parse(fullVers[2], CultureInfo.InvariantCulture);
+            inoVersionInt = inoV;
+            inoVersionStr = inoV.ToString();
+
+            simulatorOnToolStripMenuItem.Checked = Settings.Default.setMenu_isSimulatorOn;
+            if (simulatorOnToolStripMenuItem.Checked)
+            {
+                panelSim.Visible = true;
+                timerSim.Enabled = true;
+            }
+            else
+            {
+                panelSim.Visible = false;
+                timerSim.Enabled = false;
+            }
+
+            fixUpdateHz = Properties.Settings.Default.setPort_NMEAHz;
+            if (timerSim.Enabled) fixUpdateHz = 10;
+            fixUpdateTime = 1 / (double)fixUpdateHz;
+
             //set the flag mark button to red dot
             btnFlag.Image = Properties.Resources.FlagRed;
 
@@ -135,6 +161,10 @@ namespace AgOpenGPS
             isAutoLoadFields = Settings.Default.AutoLoadFields;
             AutoLoadFieldsToolStripMenuItem.Checked = isAutoLoadFields;
 
+            isKeyboardOn = Settings.Default.setDisplay_isKeyboardOn;
+            keyboardToolStripMenuItem1.Checked = isKeyboardOn;
+
+
             if (Settings.Default.setMenu_isOGLZoomOn == 1)
                 topFieldViewToolStripMenuItem.Checked = true;
             else topFieldViewToolStripMenuItem.Checked = false;
@@ -147,17 +177,6 @@ namespace AgOpenGPS
 
             oglZoom.SendToBack();
 
-            simulatorOnToolStripMenuItem.Checked = Settings.Default.setMenu_isSimulatorOn;
-            if (simulatorOnToolStripMenuItem.Checked)
-            {
-                panelSim.Visible = true;
-                timerSim.Enabled = true;
-            }
-            else
-            {
-                panelSim.Visible = false;
-                timerSim.Enabled = false;
-            }
 
             LineUpManualBtns();
 
@@ -198,7 +217,6 @@ namespace AgOpenGPS
 
             if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
             else btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
-
 
             stripSectionColor.BackColor = sectionColorDay;
 
@@ -246,7 +264,7 @@ namespace AgOpenGPS
                 {
                     double northingOffset = 0;
                     double eastingOffset = 0;
-
+                    double convergenceAngle = 0;
                     string fieldDirectory = Path.GetFileName(dir);
                     string filename = dir + "\\Field.txt";
                     string line;
@@ -272,6 +290,12 @@ namespace AgOpenGPS
 
                                     eastingOffset = (double.Parse(offs[0], CultureInfo.InvariantCulture));
                                     northingOffset = (double.Parse(offs[1], CultureInfo.InvariantCulture));
+                                    line = reader.ReadLine();
+                                    if (!reader.EndOfStream)
+                                    {
+                                        line = reader.ReadLine();
+                                        convergenceAngle = double.Parse(line, CultureInfo.InvariantCulture);
+                                    }
                                 }
                             }
                             catch (Exception)
@@ -315,9 +339,9 @@ namespace AgOpenGPS
                                             {
                                                 line = reader.ReadLine();
                                                 string[] words2 = line.Split(',');
-                                                vec2 vecPt = new vec2(
-                                                double.Parse(words2[0], CultureInfo.InvariantCulture) + eastingOffset,
-                                                double.Parse(words2[1], CultureInfo.InvariantCulture) + northingOffset);
+                                                double easting = double.Parse(words2[0], CultureInfo.InvariantCulture);
+                                                double northing = double.Parse(words2[1], CultureInfo.InvariantCulture);
+                                                vec2 vecPt = new vec2((Math.Cos(convergenceAngle) * easting) - (Math.Sin(convergenceAngle) * northing) + eastingOffset, (Math.Sin(convergenceAngle) * easting) + (Math.Cos(convergenceAngle) * northing) + northingOffset);
                                                 Fields[Fields.Count-1].Boundary.Add(vecPt);
                                             }
                                         }
@@ -664,14 +688,10 @@ namespace AgOpenGPS
         {
             HalfSecondUpdate.Enabled = false;
 
-            if (guidanceLineDistanceOff == 32020 | guidanceLineDistanceOff == 32000)
-            {
-                AutoSteerToolBtn.Text = "Off \r\n" + ActualSteerAngle;
-            }
-            else
-            {
-                AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
-            }
+            AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
+
+            lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
+            lblHz2.Text = (int)(FrameTime) + "\r\n";
 
             //the main formgps window
             if (isMetric)  //metric or imperial
@@ -688,9 +708,12 @@ namespace AgOpenGPS
 
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
 
-            lblHz.Text = NMEAHz + ".0 Hz\r\n" + FixQuality + HzTime.ToString("N1") + " Hz";
-            lblHz2.Text = (int)(FrameTime) + "\r\n";
-
+            if (panelBatman.Visible)
+            {
+                lblRoll.Text = RollInDegrees;
+                lblYawHeading.Text = GyroInDegrees;
+                lblGPSHeading.Text = GPSHeading;
+            }
             HalfSecondUpdate.Enabled = true;
         }
 
@@ -726,22 +749,17 @@ namespace AgOpenGPS
                 lblLatitude.Text = Latitude;
                 lblLongitude.Text = Longitude;
 
-
-                lblRoll.Text = RollInDegrees;
-                lblYawHeading.Text = GyroInDegrees;
-                lblGPSHeading.Text = GPSHeading;
-
-                //up in the menu a few pieces of info
-                if (isJobStarted)
-                {
-                    lblEasting.Text = "E:" + (pn.fix.easting).ToString("N1");
-                    lblNorthing.Text = "N:" + (pn.fix.northing).ToString("N1");
-                }
-                else
-                {
-                    lblEasting.Text = "E:" + (pn.actualEasting).ToString("N1");
-                    lblNorthing.Text = "N:" + (pn.actualNorthing).ToString("N1");
-                }
+                        //up in the menu a few pieces of info
+                        if (isJobStarted)
+                        {
+                            lblEasting.Text = "E:" + (pn.fix.easting).ToString("N1");
+                            lblNorthing.Text = "N:" + (pn.fix.northing).ToString("N1");
+                        }
+                        else
+                        {
+                            lblEasting.Text = "E:" + (pn.actualEasting).ToString("N1");
+                            lblNorthing.Text = "N:" + (pn.actualNorthing).ToString("N1");
+                        }
 
                 lblUturnByte.Text = Convert.ToString(mc.machineData[mc.mdUTurn], 2).PadLeft(6, '0');
             }

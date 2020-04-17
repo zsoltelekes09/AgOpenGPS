@@ -1468,8 +1468,8 @@ namespace AgOpenGPS
                     pn.utmEast = (int)pn.actualEasting;
                     pn.utmNorth = (int)pn.actualNorthing;
 
-                    pn.fix.easting = (int)pn.actualEasting - pn.utmEast;
-                    pn.fix.northing = (int)pn.actualNorthing - pn.utmNorth;
+                    pn.fix.easting = pn.actualEasting - pn.utmEast;
+                    pn.fix.northing = pn.actualNorthing - pn.utmNorth;
 
                     worldGrid.CreateWorldGrid(0, 0);
 

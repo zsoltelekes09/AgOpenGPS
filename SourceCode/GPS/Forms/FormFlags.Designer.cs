@@ -207,6 +207,7 @@
             this.tboxFlagNotes.TextChanged += new System.EventHandler(this.TboxFlagNotes_TextChanged);
             this.tboxFlagNotes.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TboxFlagNotes_KeyPress);
             this.tboxFlagNotes.Leave += new System.EventHandler(this.TboxFlagNotes_Leave);
+            this.tboxFlagNotes.Click += new System.EventHandler(this.tboxFlagNotes_Click);
             // 
             // btnExit
             // 

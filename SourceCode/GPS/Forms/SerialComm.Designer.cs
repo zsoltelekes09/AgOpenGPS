@@ -88,6 +88,9 @@ namespace AgOpenGPS
             }
         }
 
+        public byte checksumSent = 0;
+        public byte checksumRecd = 0;
+
         public void SendSteerSettingsOutAutoSteerPort()
         {
             //send out to udp network
@@ -97,7 +100,7 @@ namespace AgOpenGPS
             }
 
             //Tell Arduino autoSteer settings
-            if (spAutoSteer.IsOpen && !isJRK)
+            else if (spAutoSteer.IsOpen && !isJRK)
             {
                 try { spAutoSteer.Write(mc.autoSteerSettings, 0, CModuleComm.pgnSentenceLength); }
                 catch (Exception e)
@@ -105,6 +108,12 @@ namespace AgOpenGPS
                     WriteErrorLog("Out Settings to Steer Port " + e.ToString());
                     SerialPortAutoSteerClose();
                 }
+            }
+
+            checksumSent = 0;
+            for (int i = 2; i < 10; i++)
+            {
+                checksumSent += mc.autoSteerSettings[i];
             }
         }
 
@@ -117,7 +126,7 @@ namespace AgOpenGPS
             }
 
             //Tell Arduino autoSteer settings
-            if (spAutoSteer.IsOpen &&!isJRK)
+            else if (spAutoSteer.IsOpen &&!isJRK)
             {
                 try { spAutoSteer.Write(mc.ardSteerConfig, 0, CModuleComm.pgnSentenceLength); }
                 catch (Exception e)
@@ -126,6 +135,13 @@ namespace AgOpenGPS
                     SerialPortAutoSteerClose();
                 }
             }
+
+            checksumSent = 0;
+            for (int i = 2; i < 10; i++)
+            {
+                checksumSent += mc.ardSteerConfig[i];
+            }
+
         }
 
         //called by the AutoSteer module delegate every time a chunk is rec'd
@@ -158,7 +174,8 @@ namespace AgOpenGPS
 
                 switch (incomingInt)
                 {
-                    // 127,253, 2 - actual steer angle*100, 3 - setpoint steer angle*100, 4 - heading in degrees * 16, 5 - roll in degrees * 16, 6 - steerSwitch position,,,;
+                    // 127,253, 2 - actual steer angle*100, 3 - setpoint steer angle*100, 4 - heading in degrees * 16, 
+                    //5 - roll in degrees * 16, 6 - steerSwitch position,pwmDisplay,,;
                     case 253:  //PGN 127 253: AutoSteer main sentence 
 
                         double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out actualSteerAngleDisp);
@@ -172,54 +189,51 @@ namespace AgOpenGPS
 
                         if (ahrs.isRollFromAutoSteer) int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.rollX16);
 
-                        byte.TryParse(words[6], out byte steerSwitchValue);
+                        int.TryParse(words[6], out mc.steerSwitchValue);
+                        mc.workSwitchValue = mc.steerSwitchValue & 1;
+                        mc.steerSwitchValue = mc.steerSwitchValue & 2;
 
+                        int.TryParse(words[7], out mc.pwmDisplay);
 
-                        if (isJobStarted && mc.isWorkSwitchEnabled)
+                        break;
+
+                    // 127,230, 2=checksum, 8 = ino version
+                    case 230: 
+
+                        byte.TryParse(words[2], out checksumRecd);
+
+                        if (checksumRecd != checksumSent)
                         {
-                            if ((!mc.isWorkSwitchActiveLow && (steerSwitchValue & 1) == 1) || (mc.isWorkSwitchActiveLow && (steerSwitchValue & 1) == 0))
-                            {
-                                if (mc.isWorkSwitchManual)
-                                {
-                                    if (autoBtnState != FormGPS.btnStates.On)
-                                    {
-                                        autoBtnState = FormGPS.btnStates.On;
-                                        btnSection_Update();
-                                    }
-                                }
-                                else
-                                {
-                                    if (autoBtnState != FormGPS.btnStates.Auto)
-                                    {
-                                        autoBtnState = FormGPS.btnStates.Auto;
-                                        btnSection_Update();
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (autoBtnState != FormGPS.btnStates.Off)
-                                {
-                                    autoBtnState = FormGPS.btnStates.Off;
-                                    btnSection_Update();
-                                }
-                            }
+                            MessageBox.Show(
+                                "Sent: " + checksumSent + "\r\n Recieved: " + checksumRecd,
+                                    "Checksum Error",
+                                            MessageBoxButtons.OK, MessageBoxIcon.Question);
                         }
 
-                        //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
-                        if (ahrs.isAutoSteerAuto)
+                        if (words[3] != inoVersionStr)
                         {
-                            if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLine.isBtnABLineOn || ct.isContourBtnOn || curve.isBtnCurveOn) && (steerSwitchValue & 2) == 0)
+                            Form af = Application.OpenForms["FormSteer"];
+
+                            if (af != null)
                             {
-                                if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
+                                af.Focus();
+                                af.Close();
                             }
-                            else
+
+                            af = Application.OpenForms["FormArduinoSettings"];
+
+                            if (af != null)
                             {
-                                if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
+                                af.Focus();
+                                af.Close();
                             }
+
+                            //spAutoSteer.Close();
+                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_USB_4201.INO ", gStr.gsFileError,
+                                                MessageBoxButtons.OK, MessageBoxIcon.Question);
+                            Close();
                         }
+
                         break;
                 }
             }

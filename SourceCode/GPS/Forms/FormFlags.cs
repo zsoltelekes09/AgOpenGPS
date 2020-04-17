@@ -106,7 +106,7 @@ namespace AgOpenGPS
                 mf.flagPts[mf.flagNumberPicked - 1].easting, mf.flagPts[mf.flagNumberPicked - 1].northing) * glm.m2ft).ToString("N2") + " m";
         
         }
-        /*
+
         private void MakeDubinsLineFromPivotToFlag()
         {
             //if (mf.ABLine.isBtnABLineOn)
@@ -143,6 +143,15 @@ namespace AgOpenGPS
             mf.flagDubinsList = dubPath.GenerateDubins(pt2, goal, mf.gf);
 
         }
-        */
+
+        private void tboxFlagNotes_Click(object sender, EventArgs e)
+        {
+            if (mf.isKeyboardOn)
+            {
+                mf.KeyboardToText((TextBox)sender);
+                btnExit.Focus();
+            }
+
+        }
     }
 }

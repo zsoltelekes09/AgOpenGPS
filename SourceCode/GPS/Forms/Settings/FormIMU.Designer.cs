@@ -37,9 +37,7 @@
             this.rbtnHeadingFix = new System.Windows.Forms.RadioButton();
             this.btnRollZero = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnRemoveZeroOffsetPitch = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnZeroPitch = new System.Windows.Forms.Button();
             this.btnRemoveZeroOffset = new System.Windows.Forms.Button();
             this.lblRollZeroOffset = new System.Windows.Forms.Label();
             this.btnZeroRoll = new System.Windows.Forms.Button();
@@ -184,9 +182,7 @@
             // btnRollZero
             // 
             this.btnRollZero.Controls.Add(this.label2);
-            this.btnRollZero.Controls.Add(this.btnRemoveZeroOffsetPitch);
             this.btnRollZero.Controls.Add(this.label1);
-            this.btnRollZero.Controls.Add(this.btnZeroPitch);
             this.btnRollZero.Controls.Add(this.btnRemoveZeroOffset);
             this.btnRollZero.Controls.Add(this.lblRollZeroOffset);
             this.btnRollZero.Controls.Add(this.btnZeroRoll);
@@ -433,6 +429,7 @@
             this.tboxTinkerUID.Name = "tboxTinkerUID";
             this.tboxTinkerUID.Size = new System.Drawing.Size(169, 33);
             this.tboxTinkerUID.TabIndex = 78;
+            this.tboxTinkerUID.Click += new System.EventHandler(this.tboxTinkerUID_Click);
             // 
             // groupBox1
             // 
@@ -748,9 +745,7 @@
         private System.Windows.Forms.GroupBox headingGroupBox;
         private System.Windows.Forms.GroupBox btnRollZero;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnRemoveZeroOffsetPitch;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btnZeroPitch;
         private System.Windows.Forms.Button btnRemoveZeroOffset;
         private System.Windows.Forms.Label lblRollZeroOffset;
         private System.Windows.Forms.Button btnZeroRoll;

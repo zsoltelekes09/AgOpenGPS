@@ -78,7 +78,6 @@
             this.resetALLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetEverythingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extraGuidesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,6 +91,7 @@
             this.polygonsOnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logNMEAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startFullScreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.colorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dayModeToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.nightModeToolStrip = new System.Windows.Forms.ToolStripMenuItem();
@@ -99,10 +99,13 @@
             this.dayModeToolField = new System.Windows.Forms.ToolStripMenuItem();
             this.nightModeToolField = new System.Windows.Forms.ToolStripMenuItem();
             this.sectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator22 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripUnitsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.metricToolStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.imperialToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator23 = new System.Windows.Forms.ToolStripSeparator();
             this.topFieldViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator24 = new System.Windows.Forms.ToolStripSeparator();
             this.lightbarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.simulatorOnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -111,6 +114,7 @@
             this.OneSecondUpdate = new System.Windows.Forms.Timer(this.components);
             this.ThreeSecondUpdate = new System.Windows.Forms.Timer(this.components);
             this.NMEAWatchdog = new System.Windows.Forms.Timer(this.components);
+            this.keyboardToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.lblNorthing = new System.Windows.Forms.Label();
             this.lblEasting = new System.Windows.Forms.Label();
             this.lblSpeed = new System.Windows.Forms.Label();
@@ -674,26 +678,25 @@
             // 
             this.settingsToolStripMenuItem.AutoSize = false;
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripSeparator1,
             this.toolStripSeparator2,
             this.optionsToolStripMenuItem,
+            this.toolStripSeparator1,
             this.colorsToolStripMenuItem,
+            this.toolStripSeparator22,
             this.toolStripUnitsMenu,
+            this.toolStripSeparator23,
             this.topFieldViewToolStripMenuItem,
+            this.toolStripSeparator24,
             this.lightbarToolStripMenuItem,
             this.toolStripSeparator6,
             this.simulatorOnToolStripMenuItem,
-            this.toolStripSeparator7});
+            this.toolStripSeparator7,
+            this.keyboardToolStripMenuItem1});
             this.settingsToolStripMenuItem.Image = global::AgOpenGPS.Properties.Resources.displayMenu;
             this.settingsToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Padding = new System.Windows.Forms.Padding(0);
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(100, 53);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(282, 6);
             // 
             // toolStripSeparator2
             // 
@@ -798,6 +801,11 @@
             this.startFullScreenToolStripMenuItem.Text = "Start Full Screen";
             this.startFullScreenToolStripMenuItem.Click += new System.EventHandler(this.startFullScreenToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(282, 6);
+            // 
             // colorsToolStripMenuItem
             // 
             this.colorsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -864,6 +872,11 @@
             this.sectionToolStripMenuItem.Text = "Section";
             this.sectionToolStripMenuItem.Click += new System.EventHandler(this.dayModeToolSection_Click);
             // 
+            // toolStripSeparator22
+            // 
+            this.toolStripSeparator22.Name = "toolStripSeparator22";
+            this.toolStripSeparator22.Size = new System.Drawing.Size(282, 6);
+            // 
             // toolStripUnitsMenu
             // 
             this.toolStripUnitsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -889,6 +902,11 @@
             this.imperialToolStrip.Text = "Imperial";
             this.imperialToolStrip.Click += new System.EventHandler(this.imperialToolStrip_Click);
             // 
+            // toolStripSeparator23
+            // 
+            this.toolStripSeparator23.Name = "toolStripSeparator23";
+            this.toolStripSeparator23.Size = new System.Drawing.Size(282, 6);
+            // 
             // topFieldViewToolStripMenuItem
             // 
             this.topFieldViewToolStripMenuItem.CheckOnClick = true;
@@ -896,6 +914,11 @@
             this.topFieldViewToolStripMenuItem.Size = new System.Drawing.Size(285, 40);
             this.topFieldViewToolStripMenuItem.Text = "Top Field View";
             this.topFieldViewToolStripMenuItem.Click += new System.EventHandler(this.topFieldViewToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator24
+            // 
+            this.toolStripSeparator24.Name = "toolStripSeparator24";
+            this.toolStripSeparator24.Size = new System.Drawing.Size(282, 6);
             // 
             // lightbarToolStripMenuItem
             // 
@@ -921,6 +944,13 @@
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(282, 6);
+            // 
+            // keyboardToolStripMenuItem1
+            // 
+            this.keyboardToolStripMenuItem1.Name = "keyboardToolStripMenuItem1";
+            this.keyboardToolStripMenuItem1.Size = new System.Drawing.Size(285, 40);
+            this.keyboardToolStripMenuItem1.Text = "Keyboard";
+            this.keyboardToolStripMenuItem1.Click += new System.EventHandler(this.keyboardToolStripMenuItem1_Click);
             // 
             // HalfSecondUpdate
             // 
@@ -1625,7 +1655,7 @@
             this.btnResetSim.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnResetSim.Location = new System.Drawing.Point(629, 4);
             this.btnResetSim.Name = "btnResetSim";
-            this.btnResetSim.Size = new System.Drawing.Size(84, 31);
+            this.btnResetSim.Size = new System.Drawing.Size(52, 31);
             this.btnResetSim.TabIndex = 164;
             this.btnResetSim.Text = "Reset";
             this.btnResetSim.UseVisualStyleBackColor = false;
@@ -1641,7 +1671,7 @@
             this.btnResetSteerAngle.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnResetSteerAngle.Location = new System.Drawing.Point(565, 4);
             this.btnResetSteerAngle.Name = "btnResetSteerAngle";
-            this.btnResetSteerAngle.Size = new System.Drawing.Size(57, 31);
+            this.btnResetSteerAngle.Size = new System.Drawing.Size(58, 31);
             this.btnResetSteerAngle.TabIndex = 162;
             this.btnResetSteerAngle.Text = ">0<";
             this.btnResetSteerAngle.UseVisualStyleBackColor = false;
@@ -2256,14 +2286,14 @@
             // stripSectionColor
             // 
             this.stripSectionColor.AutoSize = false;
-            this.stripSectionColor.BackColor = System.Drawing.Color.Aqua;
+            this.stripSectionColor.BackColor = System.Drawing.Color.LightBlue;
             this.stripSectionColor.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.stripSectionColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.stripSectionColor.Font = new System.Drawing.Font("Tahoma", 18F);
+            this.stripSectionColor.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.stripSectionColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.stripSectionColor.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.stripSectionColor.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.stripSectionColor.Margin = new System.Windows.Forms.Padding(2);
             this.stripSectionColor.Name = "stripSectionColor";
+            this.stripSectionColor.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.stripSectionColor.ShowDropDownArrow = false;
             this.stripSectionColor.Size = new System.Drawing.Size(48, 64);
             this.stripSectionColor.Click += new System.EventHandler(this.stripSectionColor_Click);
@@ -3404,7 +3434,6 @@
         private System.Windows.Forms.ContextMenuStrip contextManualColor;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
-        private System.Windows.Forms.ToolStripDropDownButton stripSectionColor;
         public System.Windows.Forms.Button btnHydLift;
         private System.Windows.Forms.ContextMenuStrip contextAutoSteer;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
@@ -3438,6 +3467,11 @@
         private System.Windows.Forms.Label lblNorth;
         private System.Windows.Forms.Label lblEast;
         private System.Windows.Forms.ToolStripMenuItem AutoLoadFieldsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem keyboardToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator22;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator23;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator24;
+        private System.Windows.Forms.ToolStripDropDownButton stripSectionColor;
     }
 }
 

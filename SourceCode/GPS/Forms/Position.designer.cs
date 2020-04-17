@@ -507,8 +507,12 @@ namespace AgOpenGPS
 
         private void CheckInsideOtherBoundary()
         {
+
             if (isAutoLoadFields && NotLoadedField)
             {
+                double x = pn.actualEasting;
+                double y = pn.actualNorthing;
+
                 for (int i = 0; i < Fields.Count; i++)
                 {
                     string test = currentFieldDirectory;
@@ -517,20 +521,15 @@ namespace AgOpenGPS
                         int j = Fields[i].Boundary.Count - 1;
 
                         bool oddNodes = false;
-                        //double x = pn.actualEasting;
-                        // double y = pn.actualNorthing;
-                        double x = pn.fix.easting;
-                        double y = pn.fix.northing;
-
 
                         for (int k = 0; k < Fields[i].Boundary.Count; k++)
                         {
-                            if (((Fields[i].Boundary[k].northing - pn.utmNorth) < y && (Fields[i].Boundary[j].northing - pn.utmNorth) >= y
-                            || (Fields[i].Boundary[j].northing - pn.utmNorth) < y && (Fields[i].Boundary[k].northing - pn.utmNorth) >= y)
-                            && ((Fields[i].Boundary[k].easting - pn.utmEast) <= x || (Fields[i].Boundary[j].easting - pn.utmEast) <= x))
+                            if ((Fields[i].Boundary[k].northing < y && Fields[i].Boundary[j].northing >= y
+                            || Fields[i].Boundary[j].northing < y && Fields[i].Boundary[k].northing >= y)
+                            && (Fields[i].Boundary[k].easting <= x || Fields[i].Boundary[j].easting <= x))
                             {
-                                oddNodes ^= ((Fields[i].Boundary[k].easting - pn.utmEast) + (y - (Fields[i].Boundary[k].northing - pn.utmNorth)) /
-                                ((Fields[i].Boundary[j].northing - pn.utmNorth) - (Fields[i].Boundary[k].northing - pn.utmNorth)) * ((Fields[i].Boundary[j].easting - pn.utmEast) - (Fields[i].Boundary[k].easting - pn.utmEast)) < x);
+                                oddNodes ^= (Fields[i].Boundary[k].easting + (y - Fields[i].Boundary[k].northing) /
+                                (Fields[i].Boundary[j].northing - Fields[i].Boundary[k].northing) * (Fields[i].Boundary[j].easting - Fields[i].Boundary[k].easting) < x);
                             }
                             j = k;
                         }
@@ -545,7 +544,6 @@ namespace AgOpenGPS
                 }
             }
         }
-
 
         public bool isBoundAlarming;
 
@@ -988,8 +986,8 @@ namespace AgOpenGPS
             //set up the modules
             mc.ResetAllModuleCommValues();
 
-            SendSteerSettingsOutAutoSteerPort();
-            //SendArduinoSettingsOutToAutoSteerPort();
+                    //SendSteerSettingsOutAutoSteerPort();
+                    //SendArduinoSettingsOutToAutoSteerPort();
 
             IsBetweenSunriseSunset(pn.latitude, pn.longitude);
 

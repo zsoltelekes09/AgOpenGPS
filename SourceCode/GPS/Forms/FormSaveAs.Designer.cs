@@ -67,6 +67,7 @@
             this.tboxFieldName.Size = new System.Drawing.Size(486, 36);
             this.tboxFieldName.TabIndex = 0;
             this.tboxFieldName.TextChanged += new System.EventHandler(this.TboxFieldName_TextChanged);
+            this.tboxFieldName.Click += new System.EventHandler(this.tboxFieldName_Click);
             // 
             // label2
             // 
@@ -140,6 +141,7 @@
             this.tboxTask.Size = new System.Drawing.Size(339, 36);
             this.tboxTask.TabIndex = 1;
             this.tboxTask.TextChanged += new System.EventHandler(this.TboxTask_TextChanged);
+            this.tboxTask.Click += new System.EventHandler(this.tboxTask_Click);
             // 
             // label4
             // 
@@ -175,6 +177,7 @@
             this.tboxVehicle.Size = new System.Drawing.Size(339, 36);
             this.tboxVehicle.TabIndex = 2;
             this.tboxVehicle.TextChanged += new System.EventHandler(this.TboxVehicle_TextChanged);
+            this.tboxVehicle.Click += new System.EventHandler(this.tboxVehicle_Click);
             // 
             // lblFilename
             // 

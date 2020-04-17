@@ -191,7 +191,7 @@ namespace AgOpenGPS
 
                     if (isDay) GL.ClearColor(0.27f, 0.4f, 0.7f, 1.0f);
                     else GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-                    
+
                     GL.LoadIdentity();
 
                     //position the camera
@@ -373,7 +373,11 @@ namespace AgOpenGPS
                             GL.Begin(PrimitiveType.LineLoop);
                             for (int h = 0; h < Fields[i].Boundary.Count; h++)
                             {
-                                GL.Vertex3(Fields[i].Boundary[h].easting - pn.utmEast, Fields[i].Boundary[h].northing - pn.utmNorth, 0);
+                                double east = Fields[i].Boundary[h].easting - pn.utmEast;
+                                double north = Fields[i].Boundary[h].northing - pn.utmNorth;
+                                double east2 = (Math.Cos(-pn.convergenceAngle) * east) - (Math.Sin(-pn.convergenceAngle) * north);
+                                double north2 = (Math.Sin(-pn.convergenceAngle) * east) + (Math.Cos(-pn.convergenceAngle) * north);
+                                GL.Vertex3(east2, north2, 0);
                             }
                             GL.End();
                             GL.Color3(0.295f, 0.972f, 0.290f);
@@ -449,7 +453,7 @@ namespace AgOpenGPS
                     //LightBar if AB Line is set and turned on or contour
                     if (isLightbarOn)
                     {
-                        DrawRollBar();
+                        //DrawRollBar();
                         DrawLightBarText();
                     }
 
@@ -458,7 +462,7 @@ namespace AgOpenGPS
                     if (isAutoSteerBtnOn && !ct.isContourBtnOn) DrawManUTurnBtn();
 
                     if (isCompassOn) DrawCompass();
-                    DrawCompassText();
+                    //DrawCompassText();
 
                     if (isSpeedoOn) DrawSpeedo();
 
@@ -785,6 +789,8 @@ namespace AgOpenGPS
             {
                 NMEAWatchdog.Enabled = false;
 
+                //save nmea log file
+                if (isLogNMEA) FileSaveNMEA();
 
                 //don't save if no gps
                 if (isJobStarted)
@@ -794,7 +800,6 @@ namespace AgOpenGPS
                     FileSaveContour();
 
                     //NMEA log file
-                    if (isLogNMEA) FileSaveNMEA();
                     if (isLogElevation) FileSaveElevation();
                     //FileSaveFieldKML();
                 }
@@ -913,7 +918,7 @@ namespace AgOpenGPS
 
                             //else 
                             //{
-                                for (int i = 1; i < count2; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0); 
+                            for (int i = 1; i < count2; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0);
                             //}
                             GL.End();
 
@@ -1087,15 +1092,15 @@ namespace AgOpenGPS
         {
             GL.Enable(EnableCap.Texture2D);
 
-                GL.BindTexture(TextureTarget.Texture2D, texture[5]);        // Select Our Texture
-                GL.Color3(0.90f, 0.90f, 0.293f);
+            GL.BindTexture(TextureTarget.Texture2D, texture[5]);        // Select Our Texture
+            GL.Color3(0.90f, 0.90f, 0.293f);
 
             int two3 = oglMain.Width / 4;
             GL.Begin(PrimitiveType.Quads);              // Build Quad From A Triangle Strip
             {
                 GL.TexCoord2(0, 0); GL.Vertex2(-82 - two3, 45); // 
-                GL.TexCoord2(1, 0); GL.Vertex2( 82 - two3, 45.0); // 
-                GL.TexCoord2(1, 1); GL.Vertex2( 82 - two3, 120); // 
+                GL.TexCoord2(1, 0); GL.Vertex2(82 - two3, 45.0); // 
+                GL.TexCoord2(1, 1); GL.Vertex2(82 - two3, 120); // 
                 GL.TexCoord2(0, 1); GL.Vertex2(-82 - two3, 120); //
             }
             GL.End();
@@ -1124,15 +1129,15 @@ namespace AgOpenGPS
             if (!yt.isYouTurnRight)
             {
                 GL.TexCoord2(0, 0); GL.Vertex2(-62 + two3, 50); // 
-                GL.TexCoord2(1, 0); GL.Vertex2(62 + two3,  50.0); // 
-                GL.TexCoord2(1, 1); GL.Vertex2(62 + two3,  120); // 
+                GL.TexCoord2(1, 0); GL.Vertex2(62 + two3, 50.0); // 
+                GL.TexCoord2(1, 1); GL.Vertex2(62 + two3, 120); // 
                 GL.TexCoord2(0, 1); GL.Vertex2(-62 + two3, 120); //
             }
             else
             {
                 GL.TexCoord2(1, 0); GL.Vertex2(-62 + two3, 50); // 
-                GL.TexCoord2(0, 0); GL.Vertex2(62 + two3,  50.0); // 
-                GL.TexCoord2(0, 1); GL.Vertex2(62 + two3,  120); // 
+                GL.TexCoord2(0, 0); GL.Vertex2(62 + two3, 50.0); // 
+                GL.TexCoord2(0, 1); GL.Vertex2(62 + two3, 120); // 
                 GL.TexCoord2(1, 1); GL.Vertex2(-62 + two3, 120); //
             }
             //
@@ -1162,6 +1167,49 @@ namespace AgOpenGPS
                     font.DrawText(-40 + two3, 85, yt.onA.ToString());
                 }
             }
+        }
+
+        private void DrawSteerCircle()
+        {
+            int center = oglMain.Width / -2 + 45;
+
+            GL.PushMatrix();
+            GL.Enable(EnableCap.Texture2D);
+
+            GL.BindTexture(TextureTarget.Texture2D, texture[11]);        // Select Our Texture
+            if (mc.steerSwitchValue == 0)
+                GL.Color4(0.052f, 0.970f, 0.03f, 0.4);
+            else
+                GL.Color4(0.9752f, 0.0f, 0.03f, 0.4);
+
+
+            GL.Translate(center, 88, 0);
+
+            GL.Begin(PrimitiveType.Quads);              // Build Quad From A Triangle Strip
+            {
+                GL.TexCoord2(0, 0); GL.Vertex2(-48, -48); // 
+                GL.TexCoord2(1, 0); GL.Vertex2(48, -48.0); // 
+                GL.TexCoord2(1, 1); GL.Vertex2(48, 48); // 
+                GL.TexCoord2(0, 1); GL.Vertex2(-48, 48); //
+            }
+            GL.End();
+            GL.Disable(EnableCap.Texture2D);
+            GL.PopMatrix();
+
+            //string pwm;
+            //if (guidanceLineDistanceOff == 32020 | guidanceLineDistanceOff == 32000)
+            //{
+            //    pwm = "Off";
+            //}
+            //else
+            //{
+            //    pwm = mc.pwmDisplay.ToString();
+            //}
+            
+            //center = oglMain.Width / -2 + 38 - (int)(((double)(pwm.Length) * 0.5) * 16);
+            //GL.Color3(0.7f, 0.7f, 0.53f);
+
+            //font.DrawText(center, 65, pwm, 0.8);
         }
 
         private void MakeFlagMark()
@@ -1248,7 +1296,7 @@ namespace AgOpenGPS
             double down = 20;
             GL.LineWidth(1);
             //GL.Translate(0, 0, 0.01);
-            offlineDistance *= -1;
+            //offlineDistance *= -1;
             //  Dot distance is representation of how far from AB Line
             int dotDistance = (int)(offlineDistance);
             int limit = (int)lightbarCmPerPixel * 8;
@@ -1374,12 +1422,12 @@ namespace AgOpenGPS
                 {
                     if (dist > 0.0)
                     {
-                        GL.Color3(0.50f, 0.952f, 0.3f);
+                        GL.Color3(0.9752f, 0.50f, 0.3f);
                         hede = "< " + (Math.Abs(dist)).ToString("N0");
                     }
                     else
                     {
-                        GL.Color3(0.9752f, 0.50f, 0.3f);
+                        GL.Color3(0.50f, 0.952f, 0.3f);
                         hede = (Math.Abs(dist)).ToString("N0") + " >";
                     }
                     int center = -(int)(((double)(hede.Length) * 0.5) * 16 * size);
@@ -1470,7 +1518,7 @@ namespace AgOpenGPS
             GL.Translate(0, 100, 0);
 
             //If roll is used rotate graphic based on roll angle
-            if ((ahrs.isRollFromAutoSteer || ahrs.isRollFromGPS || ahrs.isRollFromOGI) && ahrs.rollX16 != 9999)
+            if ((ahrs.isRollFromAutoSteer || ahrs.isRollFromGPS || ahrs.isRollFromOGI))
                 GL.Rotate(((ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625f), 0.0f, 0.0f, 1.0f);
 
             GL.LineWidth(1);
@@ -1599,13 +1647,20 @@ namespace AgOpenGPS
 
         private void DrawCompassText()
         {
-            string hede = camHeading.ToString("N1");
-            int center = oglMain.Width / 2 - 45 - (int)(((double)(hede.Length) * 0.5) * 16);
+            //int center = oglMain.Width / 2 - 45 - (int)(((double)(hede.Length) * 0.5) * 16);
+            int center = oglMain.Width / 2 - 80;
             GL.Color3(0.9752f, 0.952f, 0.83f);
 
-            if (isCompassOn)
-            font.DrawText(center, 65, hede, 0.8);
-            else font.DrawText(center, 65, hede, 1.2);
+            //if (isCompassOn)
+            font.DrawText(center, 65, glm.toDegrees(fixHeading).ToString("N1"), 1.0);
+            font.DrawText(center, 95, glm.toDegrees(gpsHeading).ToString("N1"), 0.8);
+
+            font.DrawText(center, 125, Math.Round(ahrs.correctionHeadingX16 * 0.0625, 1).ToString(), 0.8);
+            font.DrawText(center, 165, Math.Round((ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625, 1).ToString(), 0.8);
+            
+            font.DrawText(center-360, 110, "Beta v4.2.01", 1.5);
+
+
         }
 
         private void DrawLostRTK()

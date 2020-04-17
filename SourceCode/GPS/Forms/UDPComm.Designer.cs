@@ -370,10 +370,7 @@ namespace AgOpenGPS
                     case 0xFD:
                         {
                             //Steer angle actual
-                            double actualSteerAngle = (Int16)((data[2] << 8) + data[3]);
-
-                            //build string for display
-                            double setSteerAngle = guidanceLineSteerAngle;
+                            actualSteerAngleDisp = (Int16)((data[2] << 8) + data[3]);
 
                             if (ahrs.isHeadingCorrectionFromAutoSteer)
                             {
@@ -416,6 +413,7 @@ namespace AgOpenGPS
                                 }
                             }
 
+
                             //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
                             if (ahrs.isAutoSteerAuto)
                             {
@@ -438,8 +436,11 @@ namespace AgOpenGPS
                                     btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
                                 }
                             }
-                            byte pwm = data[9];
-                            actualSteerAngleDisp = actualSteerAngle;
+
+
+                            mc.pwmDisplay = data[9];
+
+
                             break;
                         }
 
@@ -449,6 +450,44 @@ namespace AgOpenGPS
                             mc.recvUDPSentence = DateTime.Now.ToString() + "," + data[2].ToString();
                             break;
                         }
+
+                    case 230:
+
+                        checksumRecd = data[2];
+
+                        if (checksumRecd != checksumSent)
+                        {
+                            MessageBox.Show(
+                                "Sent: " + checksumSent + "\r\n Recieved: " + checksumRecd,
+                                    "Checksum Error",
+                                            MessageBoxButtons.OK, MessageBoxIcon.Question);
+                        }
+
+                        if (data[3] != inoVersionInt)
+                        {
+                            Form af = Application.OpenForms["FormSteer"];
+
+                            if (af != null)
+                            {
+                                af.Focus();
+                                af.Close();
+                            }
+
+                            af = Application.OpenForms["FormArduinoSettings"];
+
+                            if (af != null)
+                            {
+                                af.Focus();
+                                af.Close();
+                            }
+
+                            //spAutoSteer.Close();
+                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_USB_4201.INO ", gStr.gsFileError,
+                                                MessageBoxButtons.OK, MessageBoxIcon.Question);
+                            Close();
+                        }
+
+                        break;
 
                     //lidar
                     case 0xF1:

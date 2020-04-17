@@ -12,7 +12,7 @@ namespace AgOpenGPS.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -303,7 +303,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public byte setAS_Ko {
             get {
                 return ((byte)(this["setAS_Ko"]));
@@ -315,7 +315,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public byte setAS_Kp {
             get {
                 return ((byte)(this["setAS_Kp"]));
@@ -328,12 +328,12 @@ namespace AgOpenGPS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public byte setAS_Ki {
+        public byte setAS_DeadZone {
             get {
-                return ((byte)(this["setAS_Ki"]));
+                return ((byte)(this["setAS_DeadZone"]));
             }
             set {
-                this["setAS_Ki"] = value;
+                this["setAS_DeadZone"] = value;
             }
         }
         
@@ -387,7 +387,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public byte setAS_minSteerPWM {
             get {
                 return ((byte)(this["setAS_minSteerPWM"]));
@@ -411,13 +411,13 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("20")]
-        public byte setAS_maxIntegral {
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public byte setAS_maxSteerPWM {
             get {
-                return ((byte)(this["setAS_maxIntegral"]));
+                return ((byte)(this["setAS_maxSteerPWM"]));
             }
             set {
-                this["setAS_maxIntegral"] = value;
+                this["setAS_maxSteerPWM"] = value;
             }
         }
         
@@ -435,7 +435,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public byte setAS_countsPerDegree {
             get {
                 return ((byte)(this["setAS_countsPerDegree"]));
@@ -843,7 +843,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool setNTRIP_isGGAManual {
             get {
                 return ((bool)(this["setNTRIP_isGGAManual"]));
@@ -1271,6 +1271,30 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setUDP_isInterAppOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool setDisplay_isKeyboardOn {
+            get {
+                return ((bool)(this["setDisplay_isKeyboardOn"]));
+            }
+            set {
+                this["setDisplay_isKeyboardOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool setNTRIP_isHTTP10 {
+            get {
+                return ((bool)(this["setNTRIP_isHTTP10"]));
+            }
+            set {
+                this["setNTRIP_isHTTP10"] = value;
             }
         }
     }
