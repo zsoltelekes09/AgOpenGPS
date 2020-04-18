@@ -227,9 +227,6 @@
     <Setting Name="setAS_isAutoSteerAutoOn" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="setDisplay_isBatmanOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="setAS_isJRK" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>

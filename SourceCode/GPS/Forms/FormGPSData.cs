@@ -53,7 +53,7 @@ namespace AgOpenGPS
                 lblWorkRemaining.Text = mf.fd.WorkedAreaRemainHectares;
                 lblPercentRemaining.Text = mf.fd.WorkedAreaRemainPercentage;
                 lblTimeRemaining.Text = mf.fd.TimeTillFinished;
-                lblEqSpec.Text = (Math.Round(mf.tool.toolWidth, 2)).ToString() + " m  " + mf.vehicleFileName + mf.toolFileName;
+                lblEqSpec.Text = (Math.Round(mf.tool.ToolWidth, 2)).ToString() + " m  " + mf.vehicleFileName + mf.toolFileName;
             }
             else //imperial
             {
@@ -63,7 +63,7 @@ namespace AgOpenGPS
                 lblWorkRemaining.Text = mf.fd.WorkedAreaRemainAcres;
                 lblPercentRemaining.Text = mf.fd.WorkedAreaRemainPercentage;
                 lblTimeRemaining.Text = mf.fd.TimeTillFinished;
-                lblEqSpec.Text =  (Math.Round(mf.tool.toolWidth * glm.m2ft, 2)).ToString() + " ft  " + mf.vehicleFileName + mf.toolFileName;
+                lblEqSpec.Text =  (Math.Round(mf.tool.ToolWidth * glm.m2ft, 2)).ToString() + " ft  " + mf.vehicleFileName + mf.toolFileName;
             }
 
             txtBoxRecvAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;

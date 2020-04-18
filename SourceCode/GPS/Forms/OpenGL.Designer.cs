@@ -498,7 +498,7 @@ namespace AgOpenGPS
                     //draw the zoom window
                     if (isJobStarted && oglZoom.Width != 400)
                     {
-                        if (zoomUpdateCounter == true && panelBatman.Visible)
+                        if (zoomUpdateCounter == true)
                         {
                             zoomUpdateCounter = false;
                             oglZoom.Refresh();

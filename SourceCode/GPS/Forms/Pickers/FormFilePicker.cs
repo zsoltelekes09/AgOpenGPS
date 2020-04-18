@@ -69,16 +69,16 @@ namespace AgOpenGPS
                                 distance = Math.Sqrt(distance);
                                 distance *= 100;
 
-                                fileList.Add(fieldDirectory);
-                                fileList.Add(distance.ToString("#####.##").PadLeft(10));
+                                FileList.Add(fieldDirectory);
+                                FileList.Add(distance.ToString("#####.##").PadLeft(10));
                             }
                             else
                             {
                                 MessageBox.Show(fieldDirectory + " is Damaged, Please Delete This Field", gStr.gsFileError,
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                                fileList.Add(fieldDirectory);
-                                fileList.Add("Error");
+                                FileList.Add(fieldDirectory);
+                                FileList.Add("Error");
                             }
                         }
                         catch (Exception)
@@ -86,8 +86,8 @@ namespace AgOpenGPS
                             MessageBox.Show(fieldDirectory + " is Damaged, Please Delete, Field.txt is Broken", gStr.gsFileError,
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                            fileList.Add(fieldDirectory);
-                            fileList.Add("Error");
+                            FileList.Add(fieldDirectory);
+                            FileList.Add("Error");
                         }
                     }
                 }
@@ -167,13 +167,13 @@ namespace AgOpenGPS
                             area = 0;
                         }
                     }
-                    if (area ==0) fileList.Add("No Bndry");
-                    else fileList.Add(area.ToString("####.##").PadLeft(10));
+                    if (area ==0) FileList.Add("No Bndry");
+                    else FileList.Add(area.ToString("####.##").PadLeft(10));
                 }
 
                 else
                 {
-                    fileList.Add("Error");
+                    FileList.Add("Error");
                     MessageBox.Show(fieldDirectory + " is Damaged, Missing Boundary.Txt " +
                         "               \r\n Delete Field or Fix ", gStr.gsFileError,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);

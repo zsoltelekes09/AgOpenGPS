@@ -119,8 +119,6 @@ namespace AgOpenGPS
             else if (recvCounter++ > 133)
             {
                 ShowNoGPSWarning();
-                lblEasting.Text = "-";
-                lblNorthing.Text = gStr.gsNoGPS;
             }
             NMEAWatchdog.Enabled = true;
         }

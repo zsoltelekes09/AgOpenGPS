@@ -1113,7 +1113,7 @@ namespace AgOpenGPS
 
                 writer.WriteLine("Culture," + Properties.Settings.Default.setF_culture.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("CamPitch," + Properties.Settings.Default.setDisplay_camPitch.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("IsBatmanOn," + Properties.Settings.Default.setDisplay_isBatmanOn.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("Empty,10");
                 writer.WriteLine("LightBarCMPerPixel," + Properties.Settings.Default.setDisplay_lightbarCmPerPixel.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("LineWidth," + Properties.Settings.Default.setDisplay_lineWidth.ToString(CultureInfo.InvariantCulture));
 
@@ -1228,7 +1228,6 @@ namespace AgOpenGPS
                         Properties.Settings.Default.setDisplay_camPitch = double.Parse(words[1], CultureInfo.InvariantCulture);
 
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Settings.Default.setDisplay_isBatmanOn = bool.Parse(words[1]);
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Settings.Default.setDisplay_lightbarCmPerPixel = int.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine(); words = line.Split(',');

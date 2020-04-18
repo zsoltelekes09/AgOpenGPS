@@ -665,7 +665,7 @@
             this.cboxNMEAHz.Name = "cboxNMEAHz";
             this.cboxNMEAHz.Size = new System.Drawing.Size(96, 37);
             this.cboxNMEAHz.TabIndex = 88;
-            this.cboxNMEAHz.SelectedIndexChanged += new System.EventHandler(this.cboxNMEAHz_SelectedIndexChanged);
+            this.cboxNMEAHz.SelectedIndexChanged += new System.EventHandler(this.CboxNMEAHz_SelectedIndexChanged);
             // 
             // cboxIsRTK
             // 

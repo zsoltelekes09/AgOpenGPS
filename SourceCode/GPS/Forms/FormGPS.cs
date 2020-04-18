@@ -560,11 +560,11 @@ namespace AgOpenGPS
             //start NTRIP if required
             if (Settings.Default.setNTRIP_isOn)
             {
-                isNTRIP_RequiredOn = true;
+                isNTRIP_TurnedOn = true;
             }
             else
             {
-                isNTRIP_RequiredOn = false;
+                isNTRIP_TurnedOn = false;
             }
 
             //remembered window position

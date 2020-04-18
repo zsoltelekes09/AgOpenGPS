@@ -19,15 +19,12 @@ namespace AgOpenGPS
             if (!isNTRIP_TurnedOn)
             {
                 ShutDownNTRIP();
-                lblNTRIPSeconds.Text = gStr.gsOffline;
-                btnStartStopNtrip.Text = gStr.gsStart;
                 lblWatch.Text = gStr.gsStopped;
                 NTRIPBytesMenu.Visible = false;
                 pbarNtripMenu.Visible = false;
             }
             else
             {
-                btnStartStopNtrip.Text = gStr.gsStop;
                 lblWatch.Text = gStr.gsWaiting;
                 NTRIPBytesMenu.Visible = true;
                 pbarNtripMenu.Visible = true;
@@ -1378,22 +1375,11 @@ namespace AgOpenGPS
             }
         }
         
-        private void batmanToolStrip_Click(object sender, EventArgs e)
-        {
-            //if (secondRowCounter < 8) return;
-            Properties.Settings.Default.setDisplay_isBatmanOn = !Properties.Settings.Default.setDisplay_isBatmanOn;
-            Properties.Settings.Default.Save();
-            SwapBatmanPanels();
-            FixPanelsAndMenus();
-
-        }
-
         private void simplifyToolStrip_Click(object sender, EventArgs e)
         {
             Settings.Default.setDisplay_isSimple = !Settings.Default.setDisplay_isSimple;
             Settings.Default.Save();
 
-            SwapBatmanPanels();
             FixPanelsAndMenus();
         }
 
@@ -1481,8 +1467,6 @@ namespace AgOpenGPS
                     //Azimuth Error - utm declination
                     pn.convergenceAngle = Math.Atan(Math.Sin(glm.toRadians(pn.latitude))
                                                 * Math.Tan(glm.toRadians(pn.longitude - pn.centralMeridian)));
-                    lblConvergenceAngle.Text = Math.Round(glm.toDegrees(pn.convergenceAngle), 3).ToString();
-
 
                     //reset so it doesnt jump for program?
 
