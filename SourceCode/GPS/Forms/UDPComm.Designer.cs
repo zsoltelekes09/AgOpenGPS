@@ -350,6 +350,12 @@ namespace AgOpenGPS
             else if (data[0] == 0x24)//if it starts with a $, its an nmea sentence
             {
                 pn.rawBuffer += Encoding.ASCII.GetString(data);
+
+                if (isLogNMEA)
+                {
+                    pn.logNMEASentence.Append(Encoding.ASCII.GetString(data));
+                }
+
                 return;
             }
 

@@ -970,9 +970,8 @@ namespace AgOpenGPS
             //calculate the central meridian of current zone
             pn.centralMeridian = -177 + ((pn.zone - 1) * 6);
 
-            //Azimuth Error - utm declination
-            pn.convergenceAngle = Math.Atan(Math.Sin(glm.toRadians(pn.latitude)) * Math.Tan(glm.toRadians(pn.longitude - pn.centralMeridian)));
-            lblConvergenceAngle.Text = Math.Round(glm.toDegrees(pn.convergenceAngle), 2).ToString();
+                //Azimuth Error - utm declination
+                pn.convergenceAngle = Math.Atan(Math.Sin(glm.toRadians(pn.latitude)) * Math.Tan(glm.toRadians(pn.longitude - pn.centralMeridian)));
 
             //Draw a grid once we know where in the world we are.
             worldGrid.CreateWorldGrid(0, 0);
@@ -993,9 +992,6 @@ namespace AgOpenGPS
 
             //set display accordingly
             isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
-
-                lblSunrise.Text = sunrise.ToString("HH:mm");
-                lblSunset.Text = sunset.ToString("HH:mm");
 
                 if (isAutoDayNight)
                 {

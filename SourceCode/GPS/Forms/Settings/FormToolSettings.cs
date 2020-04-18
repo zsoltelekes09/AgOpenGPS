@@ -246,6 +246,9 @@ namespace AgOpenGPS
                 nudCutoffSpeed.Maximum /= 1.60934M;
                 nudCutoffSpeed.Minimum /= 1.60934M;
 
+                nudDefaultSectionWidth.Maximum /= 2.54M;
+                nudDefaultSectionWidth.Minimum /= 2.54M;
+
                 nudSection1.Maximum /= 2.54M;
                 nudSection1.Minimum /= 2.54M;
                 nudSection2.Maximum /= 2.54M;
@@ -504,7 +507,7 @@ namespace AgOpenGPS
 
             mf.tram.abOffset = (Math.Round((mf.tool.ToolWidth - mf.tool.toolOverlap) / 2.0, 3));
 
-            Properties.Vehicle.Default.setTool_defaultSectionWidth = (double)nudDefaultSectionWidth.Value * 0.01;
+            Properties.Vehicle.Default.setTool_defaultSectionWidth = defaultSectionWidth;
 
             Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
@@ -970,6 +973,10 @@ namespace AgOpenGPS
             toolOverlap = (double)nudOverlap.Value * metImp2m;
         }
 
+        private void nudDefaultSectionWidth_ValueChanged(object sender, EventArgs e)
+        {
+            defaultSectionWidth = (double)nudDefaultSectionWidth.Value * metImp2m;
+        }
 
         #region Sections //---------------------------------------------------------------
 

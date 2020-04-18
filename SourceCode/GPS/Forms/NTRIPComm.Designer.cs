@@ -177,7 +177,7 @@ namespace AgOpenGPS
                 isNTRIP_Connected = true;
                 isNTRIP_Connecting = false;
 
-                btnStartStopNtrip.Text = gStr.gsStop;
+                //btnStartStopNtrip.Text = gStr.gsStop;
 
             }
             catch (Exception)

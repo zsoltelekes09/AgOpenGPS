@@ -198,21 +198,21 @@ namespace AgOpenGPS
             //boundaryToolStripBtn.Enabled = false;
             toolStripBtnDropDownBoundaryTools.Enabled = false;
 
-            if (!isNTRIP_TurnedOn)
+            if (isNTRIP_TurnedOn)
             {
-                NTRIPBytesMenu.Visible = false;
-                pbarNtripMenu.Visible = false;
-            }
-
-            if (Properties.Settings.Default.setUDP_isOn)
-            {
-                pbarUDPComm.Visible = true;
-                toolStripStatusLabel2.Visible = true;
+                //btnStartStopNtrip.Visible = true;
+                NTRIPStartStopStrip.Visible = true;
+                lblWatch.Visible = true;
+                NTRIPBytesMenu.Visible = true;
+                pbarNtripMenu.Visible = true;
             }
             else
             {
-                pbarUDPComm.Visible = false;
-                toolStripStatusLabel2.Visible = false;
+                //btnStartStopNtrip.Visible = false;
+                NTRIPStartStopStrip.Visible = false;
+                lblWatch.Visible = false;
+                NTRIPBytesMenu.Visible = false;
+                pbarNtripMenu.Visible = false;
             }
 
             if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
@@ -477,31 +477,6 @@ namespace AgOpenGPS
         //hide the left panel
         public void SwapBatmanPanels()
         {
-            //Properties.Settings.Default.Save();
-            if (Properties.Settings.Default.setDisplay_isBatmanOn)
-            {
-                oglMain.Left = statusStripLeft.Width + panelBatman.Width;
-
-                if (Settings.Default.setDisplay_isSimple)
-                {
-                    oglMain.Width = Width - 17 - statusStripLeft.Width - panelBatman.Width - layoutPanelRight.Width / 2;
-                }
-                else
-                {
-                    oglMain.Width = Width - 16 - statusStripLeft.Width - panelBatman.Width - layoutPanelRight.Width;
-                }
-
-                if (isFullScreen) oglMain.Width += 16;
-
-                panelBatman.Left = statusStripLeft.Width;
-                panelBatman.Visible = true;
-
-
-                if (panelDrag.Visible) panelDrag.Left = statusStripLeft.Width + panelBatman.Width + 5;
-
-                LineUpManualBtns();
-            }
-            else
             {
                 //no side panel
                 oglMain.Left = statusStripLeft.Width;
@@ -520,16 +495,13 @@ namespace AgOpenGPS
                 
 
 
-                if (panelDrag.Visible) panelDrag.Left = statusStripLeft.Width + 10;
-
-                LineUpManualBtns();
-            }
+            if (panelDrag.Visible) panelDrag.Left = statusStripLeft.Width + 10;
         }
 
         //line up section On Off Auto buttons based on how many there are
         public void LineUpManualBtns()
         {
-            int oglCenter = (panelBatman.Visible ? panelBatman.Width : 0) + statusStripLeft.Width + oglMain.Width / 2;
+            int oglCenter = statusStripLeft.Width + oglMain.Width / 2;
 
             int top = 180;
             if (panelSim.Visible == true) top = 230;
@@ -708,12 +680,6 @@ namespace AgOpenGPS
 
             lblTrigger.Text = sectionTriggerStepDistance.ToString("N2");
 
-            if (panelBatman.Visible)
-            {
-                lblRoll.Text = RollInDegrees;
-                lblYawHeading.Text = GyroInDegrees;
-                lblGPSHeading.Text = GPSHeading;
-            }
             HalfSecondUpdate.Enabled = true;
         }
 

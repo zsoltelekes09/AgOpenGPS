@@ -24,7 +24,7 @@ namespace AgOpenGPS
         //used to decide to autoconnect section arduino this run
         public bool wasRateMachineConnectedLastRun = false;
         public string[] recvSentenceSettings = new string[4];
-
+        public string lastRecvd = "";
         //used to decide to autoconnect autosteer arduino this run
         public bool wasAutoSteerConnectedLastRun = false;
 

@@ -386,7 +386,7 @@ namespace AgOpenGPS
                 writer.WriteLine("IMUPitchZero," + Properties.Settings.Default.setIMU_pitchZeroX16.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("IMURollZero," + Properties.Settings.Default.setIMU_rollZeroX16.ToString(CultureInfo.InvariantCulture));
 
-                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("IMUFusion," + Properties.Settings.Default.setIMU_fusionWeight.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
@@ -592,7 +592,9 @@ namespace AgOpenGPS
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Settings.Default.setIMU_rollZeroX16 = int.Parse(words[1], CultureInfo.InvariantCulture);
 
-                        line = reader.ReadLine();
+                        line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Settings.Default.setIMU_fusionWeight = double.Parse(words[1], CultureInfo.InvariantCulture);
+
                         line = reader.ReadLine();
                         line = reader.ReadLine();
                         line = reader.ReadLine();
@@ -714,6 +716,8 @@ namespace AgOpenGPS
 
                         ahrs.pitchZeroX16 = Properties.Settings.Default.setIMU_pitchZeroX16;
                         ahrs.rollZeroX16 = Properties.Settings.Default.setIMU_rollZeroX16;
+
+                        ahrs.fusionWeight = Properties.Settings.Default.setIMU_fusionWeight;
 
                         mc.ardSteerConfig[mc.arHeaderHi] = 127; //PGN - 32750
                         mc.ardSteerConfig[mc.arHeaderLo] = 238;
@@ -1463,7 +1467,6 @@ namespace AgOpenGPS
                         line = reader.ReadLine();
                         line = reader.ReadLine();
                         pn.convergenceAngle = double.Parse(line, CultureInfo.InvariantCulture);
-                        lblConvergenceAngle.Text = Math.Round(glm.toDegrees(pn.convergenceAngle), 3).ToString();
                     }
 
                     //start positions
@@ -2403,7 +2406,7 @@ namespace AgOpenGPS
         //save nmea sentences
         public void FileSaveNMEA()
         {
-            using (StreamWriter writer = new StreamWriter((fieldsDirectory + currentFieldDirectory + "\\NMEA_log.txt"), true))
+            using (StreamWriter writer = new StreamWriter((fieldsDirectory + "\\NMEA_log.txt"), true))
             {
                 writer.Write(pn.logNMEASentence.ToString());
             }

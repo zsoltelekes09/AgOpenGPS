@@ -88,6 +88,11 @@ namespace AgOpenGPS
 
             mf.pn.rawBuffer += sbSendText.ToString();
 
+            if (mf.isLogNMEA)
+            {
+                mf.pn.logNMEASentence.Append(sbSendText.ToString());
+            }
+
             sbSendText.Clear();
         }
 
