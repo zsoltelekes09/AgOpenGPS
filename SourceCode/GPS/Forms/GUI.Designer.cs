@@ -816,15 +816,15 @@ namespace AgOpenGPS
                 //if (timerSim.Enabled)
                 //    return "Sim: ";
 
-                if (pn.fixQuality == 0) return "Invalid ";
-                else if (pn.fixQuality == 1) return "GPS Single ";
-                else if (pn.fixQuality == 2) return "DGPS ";
-                else if (pn.fixQuality == 3) return "PPS ";
-                else if (pn.fixQuality == 4) return "RTK Fix ";
-                else if (pn.fixQuality == 5) return "Float ";
-                else if (pn.fixQuality == 6) return "Estimate ";
-                else if (pn.fixQuality == 7) return "Man IP ";
-                else if (pn.fixQuality == 8) return "Sim ";
+                if (pn.FixQuality == 0) return "Invalid ";
+                else if (pn.FixQuality == 1) return "GPS Single ";
+                else if (pn.FixQuality == 2) return "DGPS ";
+                else if (pn.FixQuality == 3) return "PPS ";
+                else if (pn.FixQuality == 4) return "RTK Fix ";
+                else if (pn.FixQuality == 5) return "Float ";
+                else if (pn.FixQuality == 6) return "Estimate ";
+                else if (pn.FixQuality == 7) return "Man IP ";
+                else if (pn.FixQuality == 8) return "Sim ";
                 else return "Unknown: ";
             }
         }

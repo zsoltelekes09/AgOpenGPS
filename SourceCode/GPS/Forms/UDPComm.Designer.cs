@@ -233,59 +233,59 @@ namespace AgOpenGPS
             }
         }
 
-        private void UpdateRecvMessage(int port, byte[] data)
+        private void UpdateRecvMessage(int port, byte[] Data)
         {
             //update progress bar for autosteer
             if (pbarUDP++ > 99) pbarUDP = 0;
 
-            if (data[0] == 0xB5 && data[1] == 0x62 && data[2] == 0x01)//Daniel P
+            if (Data[0] == 0xB5 && Data[1] == 0x62 && Data[2] == 0x01)//Daniel P
             {
-                if (data[3] == 0x07)//UBX-NAV-PVT
+                if (Data[3] == 0x07)//UBX-NAV-PVT
                 {
-                    if (data.Length == 100)
+                    if (Data.Length == 100)
                     {
                         int CK_A = 0;
                         int CK_B = 0;
 
                         for (int j = 2; j < 98; j += 1)// start with Class and end by Checksum
                         {
-                            CK_A = (CK_A + data[j]) & 0xFF;
+                            CK_A = (CK_A + Data[j]) & 0xFF;
                             CK_B = (CK_B + CK_A) & 0xFF;
                         }
 
-                        if (data[98] == CK_A && data[99] == CK_B)
+                        if (Data[98] == CK_A && Data[99] == CK_B)
                         {
-                            long itow = data[6] | (data[7] << 8) | (data[8] << 16) | (data[9] << 24);
+                            long itow = Data[6] | (Data[7] << 8) | (Data[8] << 16) | (Data[9] << 24);
 
-                            if (data[84] == 0x00)
+                            if (Data[84] == 0x00)
                             {
-                                if ((data[27] & 0x81) == 0x81)
+                                if ((Data[27] & 0x81) == 0x81)
                                 {
-                                    pn.fixQuality = 4;
+                                    pn.FixQuality = 4;
                                     pn.EnableHeadRoll = true;
                                 }
-                                else if ((data[27] & 0x41) == 0x41)
+                                else if ((Data[27] & 0x41) == 0x41)
                                 {
-                                    pn.fixQuality = 5;
+                                    pn.FixQuality = 5;
                                     pn.EnableHeadRoll = true;
                                 }
                                 else
                                 {
-                                    pn.fixQuality = 1;
+                                    pn.FixQuality = 1;
                                     pn.EnableHeadRoll = false;
                                 }
 
-                                pn.satellitesTracked = data[29];
+                                pn.satellitesTracked = Data[29];
 
-                                pn.longitude = (data[30] | (data[31] << 8) | (data[32] << 16) | (data[33] << 24)) * 0.0000001;//to deg
-                                pn.latitude = (data[34] | (data[35] << 8) | (data[36] << 16) | (data[37] << 24)) * 0.0000001;//to deg
-                                pn.altitude = (data[42] | (data[43] << 8) | (data[44] << 16) | (data[45] << 24)) * 0.001;//to meters
+                                pn.longitude = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.0000001;//to deg
+                                pn.latitude = (Data[34] | (Data[35] << 8) | (Data[36] << 16) | (Data[37] << 24)) * 0.0000001;//to deg
+                                pn.altitude = (Data[42] | (Data[43] << 8) | (Data[44] << 16) | (Data[45] << 24)) * 0.001;//to meters
 
-                                pn.hdop = (data[46] | (data[47] << 8) | (data[48] << 16) | (data[49] << 24)) * 0.01;
+                                pn.hdop = (Data[46] | (Data[47] << 8) | (Data[48] << 16) | (Data[49] << 24)) * 0.01;
 
                                 pn.UpdateNorthingEasting();
 
-                                pn.speed = (data[66] | (data[67] << 8) | (data[68] << 16) | (data[69] << 24)) * 0.0036;//to km/h
+                                pn.speed = (Data[66] | (Data[67] << 8) | (Data[68] << 16) | (Data[69] << 24)) * 0.0036;//to km/h
 
                                 //average the speed
                                 pn.AverageTheSpeed();
@@ -295,7 +295,7 @@ namespace AgOpenGPS
                             }
                             else
                             {
-                                pn.fixQuality = 0;
+                                pn.FixQuality = 0;
                                 recvSentenceSettings[2] = recvSentenceSettings[0];
                                 recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
                             }
@@ -303,42 +303,42 @@ namespace AgOpenGPS
                     }
                     return;
                 }
-                else if (data[3] == 0x3C)//UBX-NAV-RELPOSNED
+                else if (Data[3] == 0x3C)//UBX-NAV-RELPOSNED
                 {
-                    if (data.Length == 72)
+                    if (Data.Length == 72)
                     {
                         int CK_A = 0;
                         int CK_B = 0;
 
                         for (int j = 2; j < 70; j += 1)// start with Class and end by Checksum
                         {
-                            CK_A = (CK_A + data[j]) & 0xFF;
+                            CK_A = (CK_A + Data[j]) & 0xFF;
                             CK_B = (CK_B + CK_A) & 0xFF;
                         }
 
-                        if (data[70] == CK_A && data[71] == CK_B)
+                        if (Data[70] == CK_A && Data[71] == CK_B)
                         {
-                            long itow = data[10] | (data[11] << 8) | (data[12] << 16) | (data[13] << 24);
+                            long itow = Data[10] | (Data[11] << 8) | (Data[12] << 16) | (Data[13] << 24);
 
-                            if (pn.EnableHeadRoll && ((data[67] & 0x01) == 0x01) && (((data[66] & 0x2D) == 0x2D) || ((data[66] & 0x35) == 0x35)))
+                            if (pn.EnableHeadRoll && ((Data[67] & 0x01) == 0x01) && (((Data[66] & 0x2D) == 0x2D) || ((Data[66] & 0x35) == 0x35)))
                             {
-                                int relposlength = data[26] | (data[27] << 8) | (data[28] << 16) | (data[29] << 24);//in cm!
+                                int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
 
                                 if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
                                 {
                                     //save dist?
                                 }
 
-                                pn.headingHDT = (data[30] | (data[31] << 8) | (data[32] << 16) | (data[33] << 24)) * 0.00001;
-                                ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2((data[22] | (data[23] << 8) | (data[24] << 16) | (data[25] << 24)) + data[40] * 0.1, pn.DualAntennaDistance)) * 16);
+                                pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
+                                ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.1, pn.DualAntennaDistance)) * 16);
 
                                 recvSentenceSettings[3] = recvSentenceSettings[1];
-                                recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.headingHDT.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + ahrs.rollX16.ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                                recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + ahrs.rollX16.ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
                             }
                             else //Bad Quality
                             {
                                 ahrs.rollX16 = 9999;
-                                pn.headingHDT = 9999;
+                                pn.HeadingForced = 9999;
                                 recvSentenceSettings[3] = recvSentenceSettings[1];
                                 recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
                             }
@@ -347,50 +347,50 @@ namespace AgOpenGPS
                     return;
                 }
             }
-            else if (data[0] == 0x24)//if it starts with a $, its an nmea sentence
+            else if (Data[0] == 0x24)//if it starts with a $, its an nmea sentence
             {
-                pn.rawBuffer += Encoding.ASCII.GetString(data);
+                pn.rawBuffer += Encoding.ASCII.GetString(Data);
 
                 if (isLogNMEA)
                 {
-                    pn.logNMEASentence.Append(Encoding.ASCII.GetString(data));
+                    pn.logNMEASentence.Append(Encoding.ASCII.GetString(Data));
                 }
 
                 return;
             }
 
-            if (data[0] == 0x23 && data[1] == 0x23)
+            if (Data[0] == 0x23 && Data[1] == 0x23)
             {
-                string buff = Encoding.ASCII.GetString(data);
+                string buff = Encoding.ASCII.GetString(Data);
                 return;
             }
 
             //quick check
-            if (data.Length != 10) return;
+            if (Data.Length != 10) return;
 
-            if (data[0] == 0x7F)
+            if (Data[0] == 0x7F)
             {
-                switch (data[1])
+                switch (Data[1])
                 {
                     //autosteer FD - 253
                     case 0xFD:
                         {
                             //Steer angle actual
-                            actualSteerAngleDisp = (Int16)((data[2] << 8) + data[3]);
+                            actualSteerAngleDisp = (Int16)((Data[2] << 8) + Data[3]);
 
                             if (ahrs.isHeadingCorrectionFromAutoSteer)
                             {
-                                ahrs.correctionHeadingX16 = (Int16)((data[4] << 8) + data[5]);
+                                ahrs.correctionHeadingX16 = (Int16)((Data[4] << 8) + Data[5]);
                             }
 
                             if (ahrs.isRollFromAutoSteer)
                             {
-                                ahrs.rollX16 = (Int16)((data[6] << 8) + data[7]);
+                                ahrs.rollX16 = (Int16)((Data[6] << 8) + Data[7]);
                             }
 
                             if (isJobStarted && mc.isWorkSwitchEnabled)
                             {
-                                if ((!mc.isWorkSwitchActiveLow && (data[8] & 1) == 1) || (mc.isWorkSwitchActiveLow && (data[8] & 1) == 0))
+                                if ((!mc.isWorkSwitchActiveLow && (Data[8] & 1) == 1) || (mc.isWorkSwitchActiveLow && (Data[8] & 1) == 0))
                                 {
                                     if (mc.isWorkSwitchManual)
                                     {
@@ -425,7 +425,7 @@ namespace AgOpenGPS
                             {
                                 if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLine.isBtnABLineOn || ct.isContourBtnOn || curve.isBtnCurveOn))
                                 {
-                                    if ((data[8] & 2) == 0)
+                                    if ((Data[8] & 2) == 0)
                                     {
                                         if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
                                         btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
@@ -444,7 +444,7 @@ namespace AgOpenGPS
                             }
 
 
-                            mc.pwmDisplay = data[9];
+                            mc.pwmDisplay = Data[9];
 
 
                             break;
@@ -453,13 +453,13 @@ namespace AgOpenGPS
                     //From Machine Data
                     case 0xE0:
                         {
-                            mc.recvUDPSentence = DateTime.Now.ToString() + "," + data[2].ToString();
+                            mc.recvUDPSentence = DateTime.Now.ToString() + "," + Data[2].ToString();
                             break;
                         }
 
                     case 230:
 
-                        checksumRecd = data[2];
+                        checksumRecd = Data[2];
 
                         if (checksumRecd != checksumSent)
                         {
@@ -469,7 +469,7 @@ namespace AgOpenGPS
                                             MessageBoxButtons.OK, MessageBoxIcon.Question);
                         }
 
-                        if (data[3] != inoVersionInt)
+                        if (Data[3] != inoVersionInt)
                         {
                             Form af = Application.OpenForms["FormSteer"];
 
@@ -498,7 +498,7 @@ namespace AgOpenGPS
                     //lidar
                     case 0xF1:
                         {
-                            mc.lidarDistance = (Int16)((data[2] << 8) + data[3]);
+                            mc.lidarDistance = (Int16)((Data[2] << 8) + Data[3]);
                             //mc.recvUDPSentence = DateTime.Now.ToString() + "," + mc.lidarDistance.ToString();
                             break;
                         }
@@ -509,12 +509,12 @@ namespace AgOpenGPS
                             //by Matthias Hammer Jan 2019
                             if (ahrs.isHeadingCorrectionFromExtUDP)
                             {
-                                ahrs.correctionHeadingX16 = (Int16)((data[4] << 8) + data[5]);
+                                ahrs.correctionHeadingX16 = (Int16)((Data[4] << 8) + Data[5]);
                             }
 
                             if (ahrs.isRollFromOGI)
                             {
-                                ahrs.rollX16 = (Int16)((data[6] << 8) + data[7]);
+                                ahrs.rollX16 = (Int16)((Data[6] << 8) + Data[7]);
                             }
 
                             break;
@@ -534,15 +534,13 @@ namespace AgOpenGPS
 
                             rate stuff  */
 
-
-
                             //header
                             mc.ss[mc.swHeaderLo] = 0xF9;
-                            mc.ss[mc.swONHi] = data[5];  //Section On status
-                            mc.ss[mc.swONLo] = data[6];  //Section On status
-                            mc.ss[mc.swOFFHi] = data[7];//Section Auto status(only when Section On)
-                            mc.ss[mc.swOFFLo] = data[8];//Section Auto status(only when Section On)
-                            mc.ss[mc.swMain] = data[9];  //read MainSW+RateSW
+                            mc.ss[mc.swONHi] = Data[5];  //Section On status
+                            mc.ss[mc.swONLo] = Data[6];  //Section On status
+                            mc.ss[mc.swOFFHi] = Data[7];//Section Auto status(only when Section On)
+                            mc.ss[mc.swOFFLo] = Data[8];//Section Auto status(only when Section On)
+                            mc.ss[mc.swMain] = Data[9];  //read MainSW+RateSW
                             break;
                         }
                 }

@@ -471,7 +471,7 @@ namespace AgOpenGPS
 
                     if (isRTK)
                     {
-                        if (pn.fixQuality == 4 || pn.fixQuality == 5) { }
+                        if (pn.FixQuality == 4 || pn.FixQuality == 5) { }
                         else DrawLostRTK();
                     }
 

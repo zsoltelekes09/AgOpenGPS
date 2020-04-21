@@ -421,7 +421,6 @@ namespace AgOpenGPS
                     SerialPortAutoSteerClose();
                 }
             }
-
         }
 
         private void SerialLineReceivedMachine(string sentence)

@@ -548,56 +548,35 @@ namespace AgOpenGPS
         //all the hitch, pivot, section, trailing hitch, headings and fixes
         private void CalculatePositionHeading()
         {
-            if (!timerSim.Enabled) //use heading true if using simulator
+            if ((pn.HeadingForced != 9999 && (headingFromSource == "GPS" || headingFromSource == "Dual")) || timerSim.Enabled)
             {
-                switch (headingFromSource)
-                {
-                    case "Fix":
-                        fixStepDist = 0;
-                        for (currentStepFix = 0; currentStepFix < totalFixSteps - 1; currentStepFix++)
-                        {
-                            fixStepDist += stepFixPts[currentStepFix].heading;
-                            if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
-                            {
-                                gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
-                                if (gpsHeading < 0) gpsHeading += glm.twoPI;
-                                fixHeading = gpsHeading;
-
-                                //determine fix positions and heading in degrees for glRotate opengl methods.
-                                int camStep = (currentStepFix + 1) * 2;
-                                if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
-                                camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
-                                if (camHeading < 0) camHeading += glm.twoPI;
-
-
-
-                                camHeading = glm.toDegrees(gpsHeading);
-                                break;
-                            }
-                        }
-                        break;
-                    case "GPS":
-                        //use NMEA headings for camera and tractor graphic
-                        fixHeading = glm.toRadians(pn.headingTrue);
-                        camHeading = pn.headingTrue;
-                        gpsHeading = glm.toRadians(pn.headingTrue);
-                        break;
-                    case "Dual":
-                        if (pn.headingHDT != 9999)
-                        {
-                            //use Dual Antenna heading for camera and tractor graphic
-                            fixHeading = glm.toRadians(pn.headingHDT);
-                            camHeading = pn.headingHDT;
-                            gpsHeading = glm.toRadians(pn.headingHDT);
-                        }
-                        break;
-                }
+                fixHeading = glm.toRadians(pn.HeadingForced);
+                camHeading = pn.HeadingForced;
+                gpsHeading = glm.toRadians(pn.HeadingForced);
             }
             else
             {
-                fixHeading = glm.toRadians(pn.headingTrue);
-                camHeading = pn.headingTrue;
-                gpsHeading = glm.toRadians(pn.headingTrue);
+                fixStepDist = 0;
+                for (currentStepFix = 0; currentStepFix < totalFixSteps - 1; currentStepFix++)
+                {
+                    fixStepDist += stepFixPts[currentStepFix].heading;
+                    if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
+                    {
+                        gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
+                        if (gpsHeading < 0) gpsHeading += glm.twoPI;
+                        fixHeading = gpsHeading;
+
+                        //determine fix positions and heading in degrees for glRotate opengl methods.
+                        int camStep = (currentStepFix + 1) * 2;
+                        if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
+                        camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
+                        if (camHeading < 0) camHeading += glm.twoPI;
+
+
+                        camHeading = glm.toDegrees(gpsHeading);
+                        break;
+                    }
+                }
             }
 
             //an IMU with heading correction, add the correction
@@ -645,7 +624,6 @@ namespace AgOpenGPS
 
             if (pn.speed > -0.1)
             {
-
                 steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * vehicle.wheelbase);
                 steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * vehicle.wheelbase);
                 steerAxlePos.heading = fixHeading;

@@ -152,7 +152,7 @@ Field	Meaning
         //other GIS Info
         public double altitude, speed;
 
-        public double headingTrue, headingHDT, hdop, ageDiff;
+        public double HeadingForced = 9999, hdop, ageDiff;
 
         //BaselineData
         public double upProjection, baselineLength, baselineCourse;
@@ -161,7 +161,7 @@ Field	Meaning
         public double nRoll, nYaw, nAngularVelocity;
 
         public bool isValidIMU;
-        public int fixQuality;
+        public int FixQuality;
         public int satellitesTracked;
         public string status = "q";
         public DateTime utcDateTime;
@@ -453,8 +453,8 @@ Field	Meaning
                     AverageTheSpeed();
                 }
 
-                //fixQuality
-                int.TryParse(words[6], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
+                //FixQuality
+                int.TryParse(words[6], NumberStyles.Float, CultureInfo.InvariantCulture, out FixQuality);
 
                 //satellites tracked
                 int.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
@@ -481,7 +481,7 @@ Field	Meaning
                 speed = Math.Round(speed * 1.852, 1);
 
                 //True heading
-                double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrue);
+                double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
             }
             else
             {
@@ -522,8 +522,8 @@ Field	Meaning
 
                 }
 
-                //fixQuality
-                int.TryParse(words[6], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
+                //FixQuality
+                int.TryParse(words[6], NumberStyles.Float, CultureInfo.InvariantCulture, out FixQuality);
 
                 //satellites tracked
                 int.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
@@ -542,7 +542,7 @@ Field	Meaning
                 speed = Math.Round(speed * 1.852, 1);
 
                 //Dual antenna derived heading
-                double.TryParse(words[12], NumberStyles.Float, CultureInfo.InvariantCulture, out headingHDT);
+                double.TryParse(words[12], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
 
                 //roll
                 double.TryParse(words[13], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
@@ -623,7 +623,7 @@ Field	Meaning
             if (!String.IsNullOrEmpty(words[1]))
             {
                 //True heading
-                double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out headingHDT);
+                double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
             }
         }
 
@@ -633,7 +633,7 @@ Field	Meaning
             {
                 //baselineCourse: angle between baseline vector (from kinematic base to rover) and north direction, degrees
                 double.TryParse(words[10], NumberStyles.Float, CultureInfo.InvariantCulture, out baselineCourse);
-                headingHDT = (baselineCourse < 270) ? (double)(baselineCourse + 90) : (double)(baselineCourse - 270); //Rover Antenna on the left, kinematic base on the right!!!
+                HeadingForced = (baselineCourse < 270) ? (double)(baselineCourse + 90) : (double)(baselineCourse - 270); //Rover Antenna on the left, kinematic base on the right!!!
             }
 
             if (!String.IsNullOrEmpty(words[8]) && !String.IsNullOrEmpty(words[9]))
@@ -686,8 +686,8 @@ Field	Meaning
             if (!String.IsNullOrEmpty(words[1]))
             {
 
-                double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out headingHDT);
-                //  Console.WriteLine(headingHDT);
+                double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
+                //  Console.WriteLine(HeadingForced);
                 double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
                 // Console.WriteLine(nRoll);
 
@@ -735,7 +735,7 @@ Field	Meaning
                 speed = Math.Round(speed * 1.852, 1);
 
                 //True heading
-                double.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrue);
+                double.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
 
                 //Status
                 if (String.IsNullOrEmpty(words[2]))
