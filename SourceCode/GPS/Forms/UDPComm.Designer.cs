@@ -488,7 +488,7 @@ namespace AgOpenGPS
                             }
 
                             //spAutoSteer.Close();
-                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_USB_4201.INO ", gStr.gsFileError,
+                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_UDP_4202.INO ", gStr.gsFileError,
                                                 MessageBoxButtons.OK, MessageBoxIcon.Question);
                             Close();
                         }
@@ -507,10 +507,12 @@ namespace AgOpenGPS
                     case 0xEE:
                         {
                             //by Matthias Hammer Jan 2019
-                            if (ahrs.isHeadingCorrectionFromExtUDP)
-                            {
-                                ahrs.correctionHeadingX16 = (Int16)((Data[4] << 8) + Data[5]);
-                            }
+                            //if ((data[0] == 127) & (data[1] == 238))
+
+                            //if (ahrs.isHeadingCorrectionFromExtUDP)
+                            //{
+                            //    ahrs.correctionHeadingX16 = (Int16)((data[4] << 8) + data[5]);
+                            //}
 
                             if (ahrs.isRollFromOGI)
                             {
@@ -646,7 +648,7 @@ namespace AgOpenGPS
 
             if (keyData == (Keys.C)) //open the steer chart
             {
-                toolStripAutoSteerChart.PerformClick();
+                steerChartStripMenu.PerformClick();
                 return true;    // indicate that you handled this keystroke
             }
 

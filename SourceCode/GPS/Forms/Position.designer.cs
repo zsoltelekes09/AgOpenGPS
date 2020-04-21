@@ -580,7 +580,7 @@ namespace AgOpenGPS
             }
 
             //an IMU with heading correction, add the correction
-            if (ahrs.isHeadingCorrectionFromBrick | ahrs.isHeadingCorrectionFromAutoSteer | ahrs.isHeadingCorrectionFromExtUDP)
+            if (ahrs.isHeadingCorrectionFromBrick | ahrs.isHeadingCorrectionFromAutoSteer) //| ahrs.isHeadingCorrectionFromExtUDP
             {
                 //current gyro angle in radians
                 double correctionHeading = glm.toRadians((double)ahrs.correctionHeadingX16 * 0.0625);

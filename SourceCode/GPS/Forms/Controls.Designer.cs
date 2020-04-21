@@ -1363,8 +1363,7 @@ namespace AgOpenGPS
                 }
             }
         }
-
-        private void arduinoSetupToolStripMenuItem_Click(object sender, EventArgs e)
+        private void moduleConfigToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var form = new FormArduinoSettings(this))
             {
