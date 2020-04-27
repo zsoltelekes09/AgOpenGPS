@@ -20,8 +20,6 @@ namespace AgOpenGPS
         public int fixUpdateHz = 5;
         public double fixUpdateTime = 0.2;
 
-        //public StringBuilder sbNMEAFromGPS = new StringBuilder();
-
         //for heading or Atan2 as camera
         public string headingFromSource, headingFromSourceBak;
 
@@ -137,14 +135,13 @@ namespace AgOpenGPS
                 return;            
             }
 
-            #region Step Fix
+        #region Step Fix
 
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = glm.Distance(pn.fix, stepFixPts[0]);
 
-
-
-            if (distanceCurrentStepFix > minFixStepDist/totalFixSteps)
+            
+            if (distanceCurrentStepFix > minFixStepDist / totalFixSteps)
             {
                 for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
 
@@ -156,7 +153,6 @@ namespace AgOpenGPS
                 if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser -= 3000; ;//userDistance can be reset
 
                 CalculatePositionHeading();
-
             }
 
             //test if travelled far enough for new boundary point
@@ -173,20 +169,119 @@ namespace AgOpenGPS
             if (isJobStarted && glm.Distance(pn.fix, prevSectionPos) > sectionTriggerStepDistance)
             {
                 AddSectionOrContourPathPoints();
-
-
                 //grab fix and elevation
                 if (isLogElevation) sbFix.Append(pn.fix.easting.ToString("N2") + "," + pn.fix.northing.ToString("N2") + ","
                                                     + pn.altitude.ToString("N2") + ","
                                                     + pn.latitude + "," + pn.longitude + "\r\n");
             }
 
-            //grab sentences for logging
-            if (isLogNMEA) pn.logNMEASentence.Append(recvSentenceSettings[0]);// not sure :O
+        #endregion fix
 
-            #endregion fix
+        #region Heading
+            if ((pn.HeadingForced != 9999 && (headingFromSource == "GPS" || headingFromSource == "Dual")) || timerSim.Enabled)
+            {
+                fixHeading = glm.toRadians(pn.HeadingForced);
+                camHeading = pn.HeadingForced;
+                gpsHeading = glm.toRadians(pn.HeadingForced);
+            }
+            else
+            {
+                fixStepDist = 0;
+                for (currentStepFix = 0; currentStepFix < totalFixSteps - 1; currentStepFix++)
+                {
+                    fixStepDist += stepFixPts[currentStepFix].heading;
+                    if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
+                    {
+                        gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
+                        if (gpsHeading < 0) gpsHeading += glm.twoPI;
+                        fixHeading = gpsHeading;
 
-            #region AutoSteer
+                        //determine fix positions and heading in degrees for glRotate opengl methods.
+                        int camStep = (currentStepFix + 1) * 2;
+                        if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
+                        camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
+                        if (camHeading < 0) camHeading += glm.twoPI;
+
+
+                        camHeading = glm.toDegrees(gpsHeading);
+                        break;
+                    }
+                }
+            }
+        #endregion Heading
+
+        #region Heading Correction
+
+            //an IMU with heading correction, add the correction
+            if (ahrs.isHeadingCorrectionFromBrick | ahrs.isHeadingCorrectionFromAutoSteer) //| ahrs.isHeadingCorrectionFromExtUDP
+            {
+                //current gyro angle in radians
+                double correctionHeading = glm.toRadians((double)ahrs.correctionHeadingX16 * 0.0625);
+
+                //Difference between the IMU heading and the GPS heading
+                double gyroDelta = (correctionHeading + gyroCorrection) - gpsHeading;
+                if (gyroDelta < 0) gyroDelta += glm.twoPI;
+
+                //calculate delta based on circular data problem 0 to 360 to 0, clamp to +- 2 Pi
+                if (gyroDelta >= -glm.PIBy2 && gyroDelta <= glm.PIBy2) gyroDelta *= -1.0;
+                else
+                {
+                    if (gyroDelta > glm.PIBy2) { gyroDelta = glm.twoPI - gyroDelta; }
+                    else { gyroDelta = (glm.twoPI + gyroDelta) * -1.0; }
+                }
+                gyroDelta %= glm.twoPI;
+
+                //if the gyro and last corrected fix is < 10 degrees, super low pass for gps
+                if (Math.Abs(gyroDelta) < 0.18)
+                {
+                    //a bit of delta and add to correction to current gyro
+                    gyroCorrection += (gyroDelta * (0.25 / fixUpdateHz)) % glm.twoPI;
+                }
+                else
+                {
+                    //a bit of delta and add to correction to current gyro
+                    gyroCorrection += (gyroDelta * (2.0 / fixUpdateHz)) % glm.twoPI;
+                }
+
+                //determine the Corrected heading based on gyro and GPS
+                gyroCorrected = (correctionHeading + gyroCorrection) % glm.twoPI;
+                if (gyroCorrected < 0) gyroCorrected += glm.twoPI;
+
+                fixHeading = gyroCorrected;
+            }
+
+        #endregion Heading Correction
+
+        #region Antenna Offset
+            if (vehicle.antennaOffset != 0)
+            {
+                pn.fix.easting = (Math.Cos(-fixHeading) * vehicle.antennaOffset) + pn.fix.easting;
+                pn.fix.northing = (Math.Sin(-fixHeading) * vehicle.antennaOffset) + pn.fix.northing;
+            }
+       #endregion
+
+        #region Roll
+
+            rollUsed = 0;
+
+            //used only for draft compensation in OGI Sentence
+            if (ahrs.isRollFromOGI) rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
+            else if ((ahrs.isRollFromAutoSteer || ahrs.isRollFromAVR) && !ahrs.isRollFromOGI)
+            {
+                rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
+
+                //change for roll to the right is positive times -1
+                rollCorrectionDistance = Math.Sin(glm.toRadians((rollUsed))) * -vehicle.antennaHeight;
+
+                // roll to left is positive  **** important!!
+                // not any more - April 30, 2019 - roll to right is positive Now! Still Important
+                pn.fix.easting = (Math.Cos(-fixHeading) * rollCorrectionDistance) + pn.fix.easting;
+                pn.fix.northing = (Math.Sin(-fixHeading) * rollCorrectionDistance) + pn.fix.northing;
+            }
+
+        #endregion Roll
+
+        #region AutoSteer
 
             //preset the values
             guidanceLineDistanceOff = 32000;
@@ -293,9 +388,9 @@ namespace AgOpenGPS
                 crossTrackError = 0;
             }
 
-            #endregion
+        #endregion
 
-            #region Youturn
+        #region Youturn
 
             //reset the fault distance to an appropriate weird number
             //-2222 means it fell out of the loop completely
@@ -390,8 +485,9 @@ namespace AgOpenGPS
 
 
 
-            #endregion
-            #region Remote Switches
+        #endregion
+
+        #region Remote Switches
 
             //MTZ8302 Feb 2020
             if (mc.ss[mc.swHeaderLo] == 0xF9)
@@ -491,7 +587,7 @@ namespace AgOpenGPS
             }
 
             // end adds by MTZ8302 ------------------------------------------------------------------------------------
-            #endregion
+        #endregion
 
             //update Back then Main window
             oglBack.Refresh();
@@ -548,99 +644,29 @@ namespace AgOpenGPS
         //all the hitch, pivot, section, trailing hitch, headings and fixes
         private void CalculatePositionHeading()
         {
-            if ((pn.HeadingForced != 9999 && (headingFromSource == "GPS" || headingFromSource == "Dual")) || timerSim.Enabled)
-            {
-                fixHeading = glm.toRadians(pn.HeadingForced);
-                camHeading = pn.HeadingForced;
-                gpsHeading = glm.toRadians(pn.HeadingForced);
-            }
-            else
-            {
-                fixStepDist = 0;
-                for (currentStepFix = 0; currentStepFix < totalFixSteps - 1; currentStepFix++)
-                {
-                    fixStepDist += stepFixPts[currentStepFix].heading;
-                    if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
-                    {
-                        gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
-                        if (gpsHeading < 0) gpsHeading += glm.twoPI;
-                        fixHeading = gpsHeading;
-
-                        //determine fix positions and heading in degrees for glRotate opengl methods.
-                        int camStep = (currentStepFix + 1) * 2;
-                        if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
-                        camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
-                        if (camHeading < 0) camHeading += glm.twoPI;
-
-
-                        camHeading = glm.toDegrees(gpsHeading);
-                        break;
-                    }
-                }
-            }
-
-            //an IMU with heading correction, add the correction
-            if (ahrs.isHeadingCorrectionFromBrick | ahrs.isHeadingCorrectionFromAutoSteer) //| ahrs.isHeadingCorrectionFromExtUDP
-            {
-                //current gyro angle in radians
-                double correctionHeading = glm.toRadians((double)ahrs.correctionHeadingX16 * 0.0625);
-
-                //Difference between the IMU heading and the GPS heading
-                double gyroDelta = (correctionHeading + gyroCorrection) - gpsHeading;
-                if (gyroDelta < 0) gyroDelta += glm.twoPI;
-
-                //calculate delta based on circular data problem 0 to 360 to 0, clamp to +- 2 Pi
-                if (gyroDelta >= -glm.PIBy2 && gyroDelta <= glm.PIBy2) gyroDelta *= -1.0;
-                else
-                {
-                    if (gyroDelta > glm.PIBy2) { gyroDelta = glm.twoPI - gyroDelta; }
-                    else { gyroDelta = (glm.twoPI + gyroDelta) * -1.0; }
-                }
-                gyroDelta %= glm.twoPI;
-
-                //if the gyro and last corrected fix is < 10 degrees, super low pass for gps
-                if (Math.Abs(gyroDelta) < 0.18)
-                {
-                    //a bit of delta and add to correction to current gyro
-                    gyroCorrection += (gyroDelta * (0.25 / fixUpdateHz)) % glm.twoPI;
-                }
-                else
-                {
-                    //a bit of delta and add to correction to current gyro
-                    gyroCorrection += (gyroDelta * (2.0 / fixUpdateHz)) % glm.twoPI;
-                }
-
-                //determine the Corrected heading based on gyro and GPS
-                gyroCorrected = (correctionHeading + gyroCorrection) % glm.twoPI;
-                if (gyroCorrected < 0) gyroCorrected += glm.twoPI;
-
-                fixHeading = gyroCorrected;
-            }
-
             #region pivot hitch trail
 
-
-            //translate from pivot position to steer axle position
-
+            //translate from pivot position to steer axle and pivot axle position
             if (pn.speed > -0.1)
             {
-                steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * vehicle.wheelbase);
-                steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * vehicle.wheelbase);
-                steerAxlePos.heading = fixHeading;
+
                 //translate world to the pivot axle
                 pivotAxlePos.easting = pn.fix.easting - (Math.Sin(fixHeading) * vehicle.antennaPivot);
                 pivotAxlePos.northing = pn.fix.northing - (Math.Cos(fixHeading) * vehicle.antennaPivot);
                 pivotAxlePos.heading = fixHeading;
+                steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * vehicle.wheelbase);
+                steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * vehicle.wheelbase);
+                steerAxlePos.heading = fixHeading;
             }
             else
             {
-                steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * -vehicle.wheelbase);
-                steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * -vehicle.wheelbase);
-                steerAxlePos.heading = fixHeading;
                 //translate world to the pivot axle
                 pivotAxlePos.easting = pn.fix.easting - (Math.Sin(fixHeading) * -vehicle.antennaPivot);
                 pivotAxlePos.northing = pn.fix.northing - (Math.Cos(fixHeading) * -vehicle.antennaPivot);
                 pivotAxlePos.heading = fixHeading;
+                steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * -vehicle.wheelbase);
+                steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * -vehicle.wheelbase);
+                steerAxlePos.heading = fixHeading;
             }
 
             //determine where the rigid vehicle hitch ends

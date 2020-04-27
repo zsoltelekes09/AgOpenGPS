@@ -264,7 +264,7 @@ void setup()
         MMA1C.setRange(MMA_RANGE_2G);
         MMA1C.setHighPassFilter(false); 
       }
-      //else Serial.println("MMA init fails!!");
+      else Serial.println("MMA init fails!!");
   }
   else if (aogSettings.InclinometerInstalled == 3 )
   { 
@@ -277,7 +277,7 @@ void setup()
         MMA1D.setRange(MMA_RANGE_2G);
         MMA1D.setHighPassFilter(false); 
       }
-      //else Serial.println("MMA init fails!!");
+      else Serial.println("MMA init fails!!");
   }  
  
    if (ether.begin(sizeof Ethernet::buffer, mymac, CS_Pin) == 0)
@@ -295,6 +295,8 @@ void setup()
     
     //register udpSerialPrint() to port 8888
     ether.udpServerListenOnPort(&udpSteerRecv, 8888);
+
+    Serial.println("Setup complete, waiting for AgOpenGPS");
     
 }// End of Setup
 
@@ -477,7 +479,7 @@ void loop()
       
       if (WAS_Alarm)
       {
-        if (steeringPosition > 23300 || steeringPosition < 3300) WAS_OutRange = true;
+        if (steeringPosition > 25000 || steeringPosition < 2000) WAS_OutRange = true;
         else WAS_OutRange = false;
       }
      
@@ -489,7 +491,7 @@ void loop()
       
       if (WAS_Alarm)
       {
-        if (steeringPosition > 23300 || steeringPosition < 3300) WAS_OutRange = true;
+        if (steeringPosition > 25000 || steeringPosition < 2000) WAS_OutRange = true;
         else WAS_OutRange = false;
       }
       

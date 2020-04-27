@@ -183,71 +183,47 @@ Field	Meaning
         }
 
         //ParseNMEA
-        public void UpdateNorthingEasting()
+        private double rollK, Pc, G, Xp, Zp, XeRoll;
+        private double P = 1.0;
+        private readonly double varRoll = 0.1; // variance, smaller, more faster filtering
+        private readonly double varProcess = 0.0003;
+        // Returns a valid NMEA sentence from the pile from portData
+        public string Parse()
         {
-            #region Convergence
-
-            double[] xy = DecDeg2UTM(latitude, longitude);
-            //keep a copy of actual easting and northings
-            actualEasting = xy[0];
-            actualNorthing = xy[1];
-
-            //if a field is open, the real one is subtracted from the integer
-            fix.easting = xy[0] - utmEast + fixOffset.easting;
-            fix.northing = xy[1] - utmNorth + fixOffset.northing;
-
-            double east = fix.easting;
-            double nort = fix.northing;
-
-            //compensate for the fact the zones lines are a grid and the world is round
-            fix.easting = (Math.Cos(-convergenceAngle) * east) - (Math.Sin(-convergenceAngle) * nort);
-            fix.northing = (Math.Sin(-convergenceAngle) * east) + (Math.Cos(-convergenceAngle) * nort);
-
-            UpdatedLatLon = true;
-            
-            //east = fix.easting;
-            //nort = fix.northing;
-
-            //go back again - programming reference only
-            //fix.easting = (Math.Cos(convergenceAngle) * east) - (Math.Sin(convergenceAngle) * nort);
-            //fix.northing = (Math.Sin(convergenceAngle) * east) + (Math.Cos(convergenceAngle) * nort);
-
-            #endregion
-
-            #region Antenna Offset
-
-            if (mf.vehicle.antennaOffset != 0)
+            string sentence;
+            do
             {
-                fix.easting = (Math.Cos(-mf.fixHeading) * mf.vehicle.antennaOffset) + fix.easting;
-                fix.northing = (Math.Sin(-mf.fixHeading) * mf.vehicle.antennaOffset) + fix.northing;
-            }
-            #endregion
+                //double check for valid sentence
+                // Find start of next sentence
+                int start = rawBuffer.IndexOf("$", StringComparison.Ordinal);
+                if (start == -1) return null;
+                rawBuffer = rawBuffer.Substring(start);
 
-            #region Roll
+                // Find end of sentence
+                int end = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
+                if (end == -1) return null;
 
-            mf.rollUsed = 0;
-            
-            if ((mf.ahrs.isRollFromAutoSteer || mf.ahrs.isRollFromGPS) && !mf.ahrs.isRollFromOGI)
-            {
-                mf.rollUsed = ((double)(mf.ahrs.rollX16 - mf.ahrs.rollZeroX16)) * 0.0625;
+                //the NMEA sentence to be parsed
+                sentence = rawBuffer.Substring(0, end + 1);
 
-                //change for roll to the right is positive times -1
-                mf.rollCorrectionDistance = Math.Sin(glm.toRadians((mf.rollUsed))) * -mf.vehicle.antennaHeight;
-
-                // roll to left is positive  **** important!!
-                // not any more - April 30, 2019 - roll to right is positive Now! Still Important
-                fix.easting = (Math.Cos(-mf.fixHeading) * mf.rollCorrectionDistance) + fix.easting;
-                fix.northing = (Math.Sin(-mf.fixHeading) * mf.rollCorrectionDistance) + fix.northing;
+                //remove the processed sentence from the rawBuffer
+                rawBuffer = rawBuffer.Substring(end + 1);
             }
 
-            //used only for draft compensation in OGI Sentence
-            else if (mf.ahrs.isRollFromOGI) mf.rollUsed = ((double)(mf.ahrs.rollX16 - mf.ahrs.rollZeroX16)) * 0.0625;
+            //if sentence has valid checksum, its all good
+            while (!ValidateChecksum(sentence));
 
-            //pitchDistance = (pitch * vehicle.antennaHeight);
-            //pn.fix.easting = (Math.Sin(fixHeading) * pitchDistance) + pn.fix.easting;
-            //pn.fix.northing = (Math.Cos(fixHeading) * pitchDistance) + pn.fix.northing;
+            //do we want to log? Grab before pieces are missing
+            //if (mf.isLogNMEA )
+            //{
+            //    logNMEASentence.Append(sentence);
+            //    nmeaCntr = 0;
+            //}
 
-            #endregion Roll
+            // Remove trailing checksum and \r\n and return
+            sentence = sentence.Substring(0, sentence.IndexOf("*", StringComparison.Ordinal));
+
+            return sentence;
         }
 
         public void ParseNMEA()
@@ -307,17 +283,6 @@ Field	Meaning
             }// while still data
         }
 
-        private double rollK, Pc, G, Xp, Zp, XeRoll;
-        private double P = 1.0;
-        private readonly double varRoll = 0.1; // variance, smaller, more faster filtering
-        private readonly double varProcess = 0.0003;
-
-        public void AverageTheSpeed()
-        {
-            //average the speed
-            mf.avgSpeed = (mf.avgSpeed * 0.8) + (speed * 0.2);
-        }
-
         private void ParseAVR()
         {
             if (!String.IsNullOrEmpty(words[1]))
@@ -328,7 +293,7 @@ Field	Meaning
                     double.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
 
                 //input to the kalman filter
-                if (mf.ahrs.isRollFromGPS)
+                if (mf.ahrs.isRollFromAVR)
                 {
                     //added by Andreas Ortner
                     rollK = nRoll;
@@ -371,45 +336,6 @@ Field	Meaning
 
         }
 
-        // Returns a valid NMEA sentence from the pile from portData
-        public string Parse()
-        {
-            string sentence;
-            do
-            {
-                //double check for valid sentence
-                // Find start of next sentence
-                int start = rawBuffer.IndexOf("$", StringComparison.Ordinal);
-                if (start == -1) return null;
-                rawBuffer = rawBuffer.Substring(start);
-
-                // Find end of sentence
-                int end = rawBuffer.IndexOf("\n", StringComparison.Ordinal);
-                if (end == -1) return null;
-
-                //the NMEA sentence to be parsed
-                sentence = rawBuffer.Substring(0, end + 1);
-
-                //remove the processed sentence from the rawBuffer
-                rawBuffer = rawBuffer.Substring(end + 1);
-            }
-
-            //if sentence has valid checksum, its all good
-            while (!ValidateChecksum(sentence));
-
-            //do we want to log? Grab before pieces are missing
-            //if (mf.isLogNMEA )
-            //{
-            //    logNMEASentence.Append(sentence);
-            //    nmeaCntr = 0;
-            //}
-
-            // Remove trailing checksum and \r\n and return
-            sentence = sentence.Substring(0, sentence.IndexOf("*", StringComparison.Ordinal));
-
-            return sentence;
-        }
-
         //The indivdual sentence parsing
         private void ParseGGA()
         {
@@ -446,8 +372,8 @@ Field	Meaning
 
                     { if (words[5] == "W") longitude *= -1; }
 
-                    //calculate zone and UTM coords, roll calcs
-                    UpdateNorthingEasting();
+                    //calculate zone and UTM coords
+                    ToUTM_FixConvergenceAngle();
 
                     //average the speed
                     AverageTheSpeed();
@@ -470,6 +396,7 @@ Field	Meaning
 
             }
         }
+
         private void ParseVTG()
         {
             //$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48
@@ -518,7 +445,7 @@ Field	Meaning
                     { if (words[5] == "W") longitude *= -1; }
 
                     //calculate zone and UTM coords, roll calcs
-                    UpdateNorthingEasting();
+                    ToUTM_FixConvergenceAngle();
 
                 }
 
@@ -568,8 +495,6 @@ Field	Meaning
 
                 //Angular velocity
                 double.TryParse(words[15], NumberStyles.Float, CultureInfo.InvariantCulture, out nAngularVelocity);
-
-
 
                 AverageTheSpeed();
 
@@ -642,7 +567,7 @@ Field	Meaning
                 double.TryParse(words[9], NumberStyles.Float, CultureInfo.InvariantCulture, out baselineLength); //distance between kinematic base and rover
                 nRoll = Math.Atan(upProjection / baselineLength) * 180 / Math.PI; //roll to the right is positiv (rover left, kinematic base right!)
 
-                if (mf.ahrs.isRollFromGPS)
+                if (mf.ahrs.isRollFromAVR)
                 //input to the kalman filter
                 {
                     rollK = nRoll;
@@ -694,7 +619,7 @@ Field	Meaning
                 int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out int trasolution);
                 if (trasolution != 4) nRoll = 0;
 
-                mf.ahrs.rollX16 = mf.ahrs.isRollFromGPS ? (int)(nRoll * 16) : 0;
+                mf.ahrs.rollX16 = mf.ahrs.isRollFromAVR ? (int)(nRoll * 16) : 0;
             }
         }
 
@@ -726,8 +651,8 @@ Field	Meaning
 
                     if (words[6] == "W") longitude *= -1;
 
-                    //calculate zone and UTM coords, roll calcs
-                    UpdateNorthingEasting();
+                    //calculate zone and UTM coords
+                    ToUTM_FixConvergenceAngle();
                 }
 
                 //Convert from knots to kph for speed
@@ -758,6 +683,43 @@ Field	Meaning
         }
 
         //checks the checksum against the string
+        public void AverageTheSpeed()
+        {
+            //average the speed
+            mf.avgSpeed = (mf.avgSpeed * 0.65) + (speed * 0.35);
+        }
+
+        public void ToUTM_FixConvergenceAngle()
+        {
+            #region Convergence
+
+            double[] xy = DecDeg2UTM(latitude, longitude);
+            //keep a copy of actual easting and northings
+            actualEasting = xy[0];
+            actualNorthing = xy[1];
+
+            //if a field is open, the real one is subtracted from the integer
+            fix.easting = xy[0] - utmEast + fixOffset.easting;
+            fix.northing = xy[1] - utmNorth + fixOffset.northing;
+
+            double east = fix.easting;
+            double nort = fix.northing;
+            //compensate for the fact the zones lines are a grid and the world is spheroid
+            fix.easting = (Math.Cos(-convergenceAngle) * east) - (Math.Sin(-convergenceAngle) * nort);
+            fix.northing = (Math.Sin(-convergenceAngle) * east) + (Math.Cos(-convergenceAngle) * nort);
+
+            UpdatedLatLon = true;
+
+            //east = fix.easting;
+            //nort = fix.northing;
+
+            //go back again - programming reference only
+            //fix.easting = (Math.Cos(convergenceAngle) * east) - (Math.Sin(convergenceAngle) * nort);
+            //fix.northing = (Math.Sin(convergenceAngle) * east) + (Math.Cos(convergenceAngle) * nort);
+
+            #endregion Convergence
+        }
+
         public bool ValidateChecksum(string Sentence)
         {
             int sum = 0;

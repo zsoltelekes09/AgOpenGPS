@@ -283,7 +283,7 @@ namespace AgOpenGPS
 
                                 pn.hdop = (Data[46] | (Data[47] << 8) | (Data[48] << 16) | (Data[49] << 24)) * 0.01;
 
-                                pn.UpdateNorthingEasting();
+                                pn.ToUTM_FixConvergenceAngle();
 
                                 pn.speed = (Data[66] | (Data[67] << 8) | (Data[68] << 16) | (Data[69] << 24)) * 0.0036;//to km/h
 
@@ -295,6 +295,7 @@ namespace AgOpenGPS
                             }
                             else
                             {
+                                pn.EnableHeadRoll = false;
                                 pn.FixQuality = 0;
                                 recvSentenceSettings[2] = recvSentenceSettings[0];
                                 recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();

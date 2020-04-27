@@ -216,7 +216,7 @@
             this.hsbarDeadZone.Size = new System.Drawing.Size(260, 30);
             this.hsbarDeadZone.TabIndex = 269;
             this.hsbarDeadZone.Value = 1;
-            this.hsbarDeadZone.ValueChanged += new System.EventHandler(this.hsbarDeadZone_ValueChanged);
+            this.hsbarDeadZone.ValueChanged += new System.EventHandler(this.HsbarDeadZone_ValueChanged);
             // 
             // label7
             // 

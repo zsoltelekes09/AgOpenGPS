@@ -64,11 +64,19 @@ namespace AgOpenGPS
             hsbarSidehillDraftGain.Value = Properties.Settings.Default.setAS_Kd;
             lblSidehillDraftGain.Text = hsbarSidehillDraftGain.Value.ToString();
 
+
+            hsbarDeadZone.ValueChanged -= HsbarDeadZone_ValueChanged;
+            hsbarPWMMax.ValueChanged -= HsbarMinPWM_ValueChanged;
+
             hsbarDeadZone.Value = Properties.Settings.Default.setAS_DeadZone;
             lblDeadZone.Text = (mf.mc.autoSteerSettings[mf.mc.ssDeadZone]).ToString();
 
             hsbarPWMMax.Value = Properties.Settings.Default.setAS_maxSteerPWM;
             lblMaxPWM.Text = hsbarPWMMax.Value.ToString();
+
+            hsbarDeadZone.ValueChanged += HsbarDeadZone_ValueChanged;
+            hsbarPWMMax.ValueChanged += HsbarMinPWM_ValueChanged;
+
 
             mf.vehicle.maxSteerAngle = Properties.Vehicle.Default.setVehicle_maxSteerAngle;
             hsbarMaxSteerAngle.Value = (Int16)mf.vehicle.maxSteerAngle;
@@ -218,7 +226,7 @@ namespace AgOpenGPS
             toSend = true;
         }
 
-        private void hsbarDeadZone_ValueChanged(object sender, EventArgs e)
+        private void HsbarDeadZone_ValueChanged(object sender, EventArgs e)
         {
             if (hsbarDeadZone.Value > hsbarPWMMax.Value) hsbarPWMMax.Value = hsbarDeadZone.Value;
             mf.mc.autoSteerSettings[mf.mc.ssDeadZone] = unchecked((byte)hsbarDeadZone.Value);
