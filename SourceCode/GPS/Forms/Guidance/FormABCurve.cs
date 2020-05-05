@@ -35,12 +35,12 @@ namespace AgOpenGPS
             mf.curve.isOkToAddPoints = false;
 
             formLoading = true;
-            if (mf.curve.spiralmode)
+            if (mf.curve.SpiralMode)
             {
                 //comboBox1.Text = "Spiral Mode";
                 //button2.Enabled = true;
             }
-            else if (mf.curve.circlemode)
+            else if (mf.curve.CircleMode)
             {
                 //comboBox1.Text = "Circle Mode";
                 //button2.Enabled = true;
@@ -53,7 +53,7 @@ namespace AgOpenGPS
             formLoading = false;
 
 
-            if ((mf.curve.spiralmode || mf.curve.circlemode) && (mf.curve.refList.Count == 1))
+            if ((mf.curve.SpiralMode || mf.curve.CircleMode) && (mf.curve.refList.Count == 1))
             {
                 lblCurveExists.Text = gStr.gsCurveSet;
             }
@@ -145,8 +145,8 @@ namespace AgOpenGPS
 
                     mf.curve.curveArr[cnt].Name = textBox1.Text.Trim();
 
-                    mf.curve.curveArr[cnt].spiralmode = mf.curve.spiralmode;
-                    mf.curve.curveArr[cnt].circlemode = mf.curve.circlemode;
+                    mf.curve.curveArr[cnt].spiralmode = mf.curve.SpiralMode;
+                    mf.curve.curveArr[cnt].circlemode = mf.curve.CircleMode;
 
                     mf.curve.curveArr[cnt].aveHeading = mf.curve.aveLineHeading;
 
@@ -197,8 +197,8 @@ namespace AgOpenGPS
                     mf.curve.curveArr[idx].Name = textBox1.Text.Trim();
                     mf.curve.curveArr[idx].aveHeading = mf.curve.aveLineHeading;
 
-                    mf.curve.curveArr[idx].spiralmode = mf.curve.spiralmode;
-                    mf.curve.curveArr[idx].circlemode = mf.curve.circlemode;
+                    mf.curve.curveArr[idx].spiralmode = mf.curve.SpiralMode;
+                    mf.curve.curveArr[idx].circlemode = mf.curve.CircleMode;
 
                     //write out the Curve Points
                     foreach (var item in mf.curve.refList)
@@ -255,7 +255,7 @@ namespace AgOpenGPS
 
             int cnt = mf.curve.refList.Count;
 
-            if (mf.curve.spiralmode || mf.curve.circlemode)
+            if (mf.curve.SpiralMode || mf.curve.CircleMode)
             {
                 if (mf.curve.refList.Count > 1)
                 {
@@ -283,7 +283,7 @@ namespace AgOpenGPS
                 }
 
 
-                mf.curve.oldhowManyPathsAway = -1;//reset
+                mf.curve.OldhowManyPathsAway = -1;//reset
                 mf.curve.isCurveSet = true;
                 mf.EnableYouTurnButtons();
                 //mf.FileSaveCurveLine();
@@ -300,9 +300,9 @@ namespace AgOpenGPS
                 textBox1.BackColor = Color.LightGreen;
                 textBox1.Enabled = true;
 
-                if (mf.curve.spiralmode) textBox1.Text = "spiral " + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
+                if (mf.curve.SpiralMode) textBox1.Text = "spiral " + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
 
-                if (mf.curve.circlemode) textBox1.Text = "circle " + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
+                if (mf.curve.CircleMode) textBox1.Text = "circle " + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
             }
             else if (cnt > 3)
             {
@@ -382,7 +382,7 @@ namespace AgOpenGPS
 
         private void BtnCancel_Click(object sender, System.EventArgs e)
         {
-            mf.curve.oldhowManyPathsAway = -99999;
+            mf.curve.OldhowManyPathsAway = -99999;
             mf.curve.moveDistance = 0;
             mf.curve.isOkToAddPoints = false;
             mf.curve.isCurveSet = false;
@@ -428,7 +428,7 @@ namespace AgOpenGPS
 
         private void BtnListUse_Click(object sender, EventArgs e)
         {
-            mf.curve.oldhowManyPathsAway = -99999;
+            mf.curve.OldhowManyPathsAway = -99999;
             mf.curve.moveDistance = 0;
 
             int count = lvLines.SelectedItems.Count;
@@ -438,14 +438,14 @@ namespace AgOpenGPS
                 int idx = lvLines.SelectedIndices[0];
                 mf.curve.numCurveLineSelected = idx + 1;
 
-                mf.curve.spiralmode = mf.curve.curveArr[idx].spiralmode;
-                mf.curve.circlemode = mf.curve.curveArr[idx].circlemode;
+                mf.curve.SpiralMode = mf.curve.curveArr[idx].spiralmode;
+                mf.curve.CircleMode = mf.curve.curveArr[idx].circlemode;
 
 
 
                 if (mf.curve.curveArr[idx].spiralmode || mf.curve.curveArr[idx].circlemode)
                 {
-                    //if (mf.curve.curveArr[idx].spiralmode) comboBox1.Text = "Spiral Mode";
+                    //if (mf.curve.curveArr[idx].SpiralMode) comboBox1.Text = "Spiral Mode";
                     //else comboBox1.Text = "Circle Mode";
                     if (mf.curve.curveArr[idx].curvePts.Count == 1)
                     {
@@ -471,7 +471,7 @@ namespace AgOpenGPS
                         mf.curve.refList.Clear();
                         mf.curve.refList.Add(new vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
                     }
-                    mf.curve.oldhowManyPathsAway = -1;//reset
+                    mf.curve.OldhowManyPathsAway = -1;//reset
                     mf.curve.isCurveSet = true;
                     mf.EnableYouTurnButtons();
                 }
@@ -600,13 +600,13 @@ namespace AgOpenGPS
                 int idx = lvLines.SelectedIndices[0];
                 mf.curve.numCurveLineSelected = idx + 1;
 
-                mf.curve.spiralmode = mf.curve.curveArr[idx].spiralmode;
-                mf.curve.circlemode = mf.curve.curveArr[idx].circlemode;
+                mf.curve.SpiralMode = mf.curve.curveArr[idx].spiralmode;
+                mf.curve.CircleMode = mf.curve.curveArr[idx].circlemode;
 
 
                 if (mf.curve.curveArr[idx].spiralmode || mf.curve.curveArr[idx].circlemode)
                 {
-                    //if (mf.curve.curveArr[idx].spiralmode) comboBox1.Text = "Spiral Mode";
+                    //if (mf.curve.curveArr[idx].SpiralMode) comboBox1.Text = "Spiral Mode";
                     //else comboBox1.Text = "Circle Mode";
 
                     if (mf.curve.curveArr[idx].curvePts.Count == 1)
@@ -633,7 +633,7 @@ namespace AgOpenGPS
                         mf.curve.refList.Clear();
                         mf.curve.refList.Add(new vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
                     }
-                    mf.curve.oldhowManyPathsAway = -1;//reset
+                    mf.curve.OldhowManyPathsAway = -1;//reset
                     mf.curve.isCurveSet = true;
                     //mf.EnableYouTurnButtons();
                 }

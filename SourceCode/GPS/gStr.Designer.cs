@@ -340,6 +340,15 @@ namespace AgOpenGPS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto Load Fields.
+        /// </summary>
+        public static string gsAutoLoadFields {
+            get {
+                return ResourceManager.GetString("gsAutoLoadFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remote / Manual Autosteer Btn.
         /// </summary>
         public static string gsAutoManualAutosteerBtn {
@@ -419,7 +428,7 @@ namespace AgOpenGPS {
                 return ResourceManager.GetString("gsBaud", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Begin.
         /// </summary>
@@ -3038,25 +3047,16 @@ namespace AgOpenGPS {
                 return ResourceManager.GetString("gsPolygonsOn", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Port.
         /// </summary>
-        public static string gsPort
-        {
-            get
-            {
+        public static string gsPort {
+            get {
                 return ResourceManager.GetString("gsPort", resourceCulture);
             }
         }
-        public static string gsPort2
-        {
-            get
-            {
-                return ResourceManager.GetString("gsPort2", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Ports.
         /// </summary>

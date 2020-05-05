@@ -50,8 +50,8 @@ namespace AgOpenGPS
                             writer.WriteLine(curve.curveArr[i].Name);
 
                             //write out the aveheading
-                            //writer.WriteLine(curve.curveArr[i].spiralmode.ToString(CultureInfo.InvariantCulture));
-                            //writer.WriteLine(curve.curveArr[i].circlemode.ToString(CultureInfo.InvariantCulture));
+                            //writer.WriteLine(curve.curveArr[i].SpiralMode.ToString(CultureInfo.InvariantCulture));
+                            //writer.WriteLine(curve.curveArr[i].CircleMode.ToString(CultureInfo.InvariantCulture));
                             writer.WriteLine(curve.curveArr[i].aveHeading.ToString(CultureInfo.InvariantCulture));
 
                             //write out the points of ref line

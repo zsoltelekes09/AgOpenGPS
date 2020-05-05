@@ -210,6 +210,9 @@
   <data name="gsAutoDayNightMode" xml:space="preserve">
     <value>Auto Day Night Mode</value>
   </data>
+  <data name="gsAutoLoadFields" xml:space="preserve">
+    <value>Auto Load Fields</value>
+  </data>
   <data name="gsAutoManualAutosteerBtn" xml:space="preserve">
     <value>Remote / Manual Autosteer Btn</value>
   </data>

@@ -339,8 +339,8 @@ namespace AgOpenGPS
         {
             btnCancelTouch.Enabled = false;
 
-            mf.curve.spiralmode = false;
-            mf.curve.circlemode = false;
+            mf.curve.SpiralMode = false;
+            mf.curve.CircleMode = false;
 
             mf.curve.refList?.Clear();
             vec2 chk = new vec2(arr[start].easting, arr[start].northing);

@@ -34,7 +34,7 @@ namespace AgOpenGPS
             chkSpeedo.Text = gStr.gsSpeedoOn;
             chkStartFullScreen.Text = gStr.gsStartFullScreen;
             chkDayNight.Text = gStr.gsAutoDayNightMode;
-
+            chkAutoLoadFields.Text = gStr.gsAutoLoadFields;
             rbtnMetric.Text = gStr.gsMetric;
             rbtnImperial.Text = gStr.gsImperial;
             unitsGroupBox.Text = gStr.gsUnits;
@@ -53,6 +53,7 @@ namespace AgOpenGPS
             chkPolygons.Checked = mf.isDrawPolygons;
             chkPursuitLines.Checked = mf.isPureDisplayOn;
             chkUTurnOn.Checked = mf.isUTurnAlwaysOn;
+            chkAutoLoadFields.Checked = mf.isAutoLoadFields;
 
             if (mf.isMetric) rbtnMetric.Checked = true;
             else rbtnImperial.Checked = true;
@@ -69,6 +70,7 @@ namespace AgOpenGPS
             mf.isDrawPolygons = chkPolygons.Checked;
             mf.isPureDisplayOn = chkPursuitLines.Checked;
             mf.isUTurnAlwaysOn = chkUTurnOn.Checked;
+            mf.isAutoLoadFields = chkAutoLoadFields.Checked;
 
             Settings.Default.setMenu_isSkyOn = mf.isSkyOn;
             Settings.Default.setMenu_isGridOn = mf.isGridOn;
@@ -81,6 +83,8 @@ namespace AgOpenGPS
             mf.isDrawPolygons = chkPolygons.Checked ;
             Settings.Default.setMenu_isPureOn = mf.isPureDisplayOn;
             Settings.Default.setMenu_isUTurnAlwaysOn = mf.isUTurnAlwaysOn;
+            Settings.Default.AutoLoadFields = mf.isAutoLoadFields;
+            
 
             if (rbtnMetric.Checked) { Settings.Default.setMenu_isMetric = true; mf.isMetric = true; }
             else { Settings.Default.setMenu_isMetric = false; mf.isMetric = false; }

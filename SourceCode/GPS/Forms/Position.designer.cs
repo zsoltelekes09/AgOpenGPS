@@ -129,9 +129,9 @@ namespace AgOpenGPS
             startCounter++;
             totalFixSteps = fixUpdateHz * 6;
 
-            if (!isGPSPositionInitialized)             
+            if (!isGPSPositionInitialized)
             { 
-                InitializeFirstFewGPSPositions(); 
+                InitializeFirstFewGPSPositions();
                 return;            
             }
 
@@ -140,7 +140,6 @@ namespace AgOpenGPS
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = glm.Distance(pn.fix, stepFixPts[0]);
 
-            
             if (distanceCurrentStepFix > minFixStepDist / totalFixSteps)
             {
                 for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];

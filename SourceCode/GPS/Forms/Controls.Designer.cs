@@ -227,7 +227,7 @@ namespace AgOpenGPS
             else if (curve.isBtnCurveOn && curve.numCurveLines > 0)
             {
                 curve.moveDistance = 0;
-                curve.oldhowManyPathsAway = -99999;
+                curve.OldhowManyPathsAway = -99999;
                 curve.numCurveLineSelected++;
                 if (curve.numCurveLineSelected > curve.numCurveLines) curve.numCurveLineSelected = 1;
 
@@ -902,9 +902,6 @@ namespace AgOpenGPS
 
         }
 
-        private void startFullScreenToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-        }
         private void btnFullScreen_Click(object sender, EventArgs e)
         {
             isFullScreen = !isFullScreen;
@@ -935,6 +932,7 @@ namespace AgOpenGPS
 
         private void btnReverseDirection_Click(object sender, EventArgs e)
         {
+            curve.isSameWay = !curve.isSameWay;
             sim.headingTrue += Math.PI;
             if (sim.headingTrue > (2.0 * Math.PI)) sim.headingTrue -= (2.0 * Math.PI);
             if (sim.headingTrue < 0) sim.headingTrue += (2.0 * Math.PI);

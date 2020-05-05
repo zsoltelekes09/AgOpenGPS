@@ -46,6 +46,7 @@
             this.unitsGroupBox = new System.Windows.Forms.GroupBox();
             this.rbtnImperial = new System.Windows.Forms.RadioButton();
             this.rbtnMetric = new System.Windows.Forms.RadioButton();
+            this.chkAutoLoadFields = new System.Windows.Forms.CheckBox();
             this.unitsGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -288,6 +289,21 @@
             this.rbtnMetric.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.rbtnMetric.UseVisualStyleBackColor = true;
             // 
+            // chkAutoLoadFields
+            // 
+            this.chkAutoLoadFields.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkAutoLoadFields.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
+            this.chkAutoLoadFields.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chkAutoLoadFields.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkAutoLoadFields.Location = new System.Drawing.Point(265, 385);
+            this.chkAutoLoadFields.Name = "chkAutoLoadFields";
+            this.chkAutoLoadFields.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.chkAutoLoadFields.Size = new System.Drawing.Size(192, 65);
+            this.chkAutoLoadFields.TabIndex = 330;
+            this.chkAutoLoadFields.Text = "Auto Load Field";
+            this.chkAutoLoadFields.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkAutoLoadFields.UseVisualStyleBackColor = true;
+            // 
             // FormDisplayOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -295,6 +311,7 @@
             this.AutoScroll = true;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(784, 461);
+            this.Controls.Add(this.chkAutoLoadFields);
             this.Controls.Add(this.unitsGroupBox);
             this.Controls.Add(this.chkUTurnOn);
             this.Controls.Add(this.chkPolygons);
@@ -342,5 +359,6 @@
         private System.Windows.Forms.GroupBox unitsGroupBox;
         private System.Windows.Forms.RadioButton rbtnImperial;
         private System.Windows.Forms.RadioButton rbtnMetric;
+        private System.Windows.Forms.CheckBox chkAutoLoadFields;
     }
 }

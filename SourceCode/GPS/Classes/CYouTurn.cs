@@ -886,7 +886,7 @@ namespace AgOpenGPS
                     if (FindCurveTurnPoints()) youTurnPhase = 1;
                     else
                     {
-                        if (mf.curve.spiralmode == true || mf.curve.circlemode == true)
+                        if (mf.curve.SpiralMode == true || mf.curve.CircleMode == true)
                         {
                             isTurnCreationNotCrossingError = false;
                             mf.mc.isOutOfBounds = false;
@@ -1133,6 +1133,33 @@ namespace AgOpenGPS
             //just do the opposite of last turn
             isYouTurnRight = !isLastYouTurnRight;
             isLastYouTurnRight = !isLastYouTurnRight;
+
+            if (mf.curve.isSameWay)
+            {
+                if (isYouTurnRight)
+                {
+                    mf.curve.curveNumber -= rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+                else
+                {
+                    mf.curve.curveNumber += rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+            }
+            else
+            {
+                if (isYouTurnRight)
+                {
+                    mf.curve.curveNumber += rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+                else
+                {
+                    mf.curve.curveNumber -= rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+            }
         }
 
         //Normal copmpletion of youturn
@@ -1143,6 +1170,7 @@ namespace AgOpenGPS
             mf.seq.ResetSequenceEventTriggers();
             mf.seq.isSequenceTriggered = false;
             mf.isBoundAlarming = false;
+            mf.curve.isSameWay = !mf.curve.isSameWay;
         }
 
         //something went seriously wrong so reset everything
@@ -1218,7 +1246,35 @@ namespace AgOpenGPS
         {
             isYouTurnTriggered = true;
 
-            double delta, head;
+            if (mf.curve.isSameWay)
+            {
+                if (isTurnRight)
+                {
+                    mf.curve.curveNumber = mf.curve.curveNumber - rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+                else
+                {
+                    mf.curve.curveNumber = mf.curve.curveNumber + rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+            }
+            else
+            {
+                if (isTurnRight)
+                {
+                    mf.curve.curveNumber = mf.curve.curveNumber + rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+                else
+                {
+                    mf.curve.curveNumber = mf.curve.curveNumber - rowSkipsWidth;
+                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                }
+            }
+
+
+            double head;
             //point on AB line closest to pivot axle point from ABLine PurePursuit
             if (mf.ABLine.isABLineSet)
             {
@@ -1226,21 +1282,13 @@ namespace AgOpenGPS
                 rNorthYT = mf.ABLine.rNorthAB;
                 isABSameAsFixHeading = mf.ABLine.isABSameAsVehicleHeading;
                 head = mf.ABLine.abHeading;
-                delta = 1;
             }
             else
             {
                 rEastYT = mf.curve.rEastCu;
                 rNorthYT = mf.curve.rNorthCu;
                 isABSameAsFixHeading = mf.curve.isSameWay;
-                head = mf.curve.refHeading;
-                if (mf.curve.spiralmode == true || mf.curve.circlemode == true)
-                {
-                    head = mf.curve.curList[mf.curve.currentLocationIndex].heading;//set to curent line heading ;)
-
-                    isABSameAsFixHeading = mf.curve.isABSameAsVehicleHeading;
-                }
-                delta = mf.curve.deltaOfRefAndAveHeadings;
+                head = mf.curve.curList[mf.curve.currentLocationIndex].heading;//set to curent line heading ;)
             }
 
             //grab the vehicle widths and offsets
@@ -1249,73 +1297,65 @@ namespace AgOpenGPS
             double turnOffset;
 
             //turning right
-            if (isTurnRight) turnOffset = (widthMinusOverlap + toolOffset);
-            else turnOffset = (widthMinusOverlap - toolOffset);
+            if (isTurnRight) turnOffset = (widthMinusOverlap * rowSkipsWidth + toolOffset);
+            else turnOffset = (widthMinusOverlap * rowSkipsWidth - toolOffset);
 
-            //to compensate for AB Curve overlap
-            turnOffset *= delta;
+            CDubins dubYouTurnPath = new CDubins();
+            CDubins.turningRadius = mf.vehicle.minTurningRadius;
 
-            //if using dubins to calculate youturn
-            //if (isUsingDubinsTurn)
+            //if its straight across it makes 2 loops instead so goal is a little lower then start
+            if (!isABSameAsFixHeading) head += 3.14;
+            else head -= 0.01;
+
+            //move the start forward 2 meters, this point is critical to formation of uturn
+            rEastYT += (Math.Sin(head) * 2);
+            rNorthYT += (Math.Cos(head) * 2);
+
+            //now we have our start point
+            var start = new vec3(rEastYT, rNorthYT, head);
+            var goal = new vec3();
+
+
+            //now we go the other way to turn round
+            head -= Math.PI;
+            if (head < 0) head += glm.twoPI;
+
+            //set up the goal point for Dubins
+            goal.heading = head;
+            if (isTurnButtonTriggered)
             {
-                CDubins dubYouTurnPath = new CDubins();
-                CDubins.turningRadius = mf.vehicle.minTurningRadius;
-
-                //if its straight across it makes 2 loops instead so goal is a little lower then start
-                if (!isABSameAsFixHeading) head += 3.14;
-                else head -= 0.01;
-
-                //move the start forward 2 meters, this point is critical to formation of uturn
-                rEastYT += (Math.Sin(head) * 2);
-                rNorthYT += (Math.Cos(head) * 2);
-
-                //now we have our start point
-                var start = new vec3(rEastYT, rNorthYT, head);
-                var goal = new vec3();
-
-                turnOffset *= rowSkipsWidth;
-
-                //now we go the other way to turn round
-                head -= Math.PI;
-                if (head < 0) head += glm.twoPI;
-
-                //set up the goal point for Dubins
-                goal.heading = head;
-                if (isTurnButtonTriggered)
+                if (isTurnRight)
                 {
-                    if (isTurnRight)
-                    {
-                        goal.easting = rEastYT - (Math.Cos(-head) * turnOffset);
-                        goal.northing = rNorthYT - (Math.Sin(-head) * turnOffset);
-                    }
-                    else
-                    {
-                        goal.easting = rEastYT + (Math.Cos(-head) * turnOffset);
-                        goal.northing = rNorthYT + (Math.Sin(-head) * turnOffset);
-                    }
+                    goal.easting = rEastYT - (Math.Cos(-head) * turnOffset);
+                    goal.northing = rNorthYT - (Math.Sin(-head) * turnOffset);
                 }
-
-                //generate the turn points
-                ytList = dubYouTurnPath.GenerateDubins(start, goal);
-
-                vec3 pt;
-                for (int a = 0; a < 3; a++)
+                else
                 {
-                    pt.easting = ytList[0].easting + (Math.Sin(head));
-                    pt.northing = ytList[0].northing + (Math.Cos(head));
-                    pt.heading = ytList[0].heading;
-                    ytList.Insert(0, pt);
+                    goal.easting = rEastYT + (Math.Cos(-head) * turnOffset);
+                    goal.northing = rNorthYT + (Math.Sin(-head) * turnOffset);
                 }
+            }
 
-                int count = ytList.Count;
+            //generate the turn points
+            ytList = dubYouTurnPath.GenerateDubins(start, goal);
 
-                for (int i = 1; i <= 7; i++)
-                {
-                    pt.easting = ytList[count - 1].easting + (Math.Sin(head) * i);
-                    pt.northing = ytList[count - 1].northing + (Math.Cos(head) * i);
-                    pt.heading = head;
-                    ytList.Add(pt);
-                }
+            vec3 pt;
+            for (int a = 0; a < 3; a++)
+            {
+                pt.easting = ytList[0].easting + (Math.Sin(head));
+                pt.northing = ytList[0].northing + (Math.Cos(head));
+                pt.heading = ytList[0].heading;
+                ytList.Insert(0, pt);
+            }
+
+            int count = ytList.Count;
+
+            for (int i = 1; i <= 7; i++)
+            {
+                pt.easting = ytList[count - 1].easting + (Math.Sin(head) * i);
+                pt.northing = ytList[count - 1].northing + (Math.Cos(head) * i);
+                pt.heading = head;
+                ytList.Add(pt);
             }
         }
 
