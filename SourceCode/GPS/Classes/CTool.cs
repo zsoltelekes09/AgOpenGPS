@@ -96,7 +96,7 @@ namespace AgOpenGPS
             if (isToolTBT && isToolTrailing)
             {
                 //rotate to tank heading
-                GL.Rotate(glm.toDegrees(-mf.tankPos.heading), 0.0, 0.0, 1.0);
+                GL.Rotate(Glm.ToDegrees(-mf.tankPos.heading), 0.0, 0.0, 1.0);
 
                 //draw the tank hitch
                 GL.LineWidth(2f);
@@ -115,14 +115,14 @@ namespace AgOpenGPS
 
                 //move down the tank hitch, unwind, rotate to section heading
                 GL.Translate(0.0, trailingTank, 0.0);
-                GL.Rotate(glm.toDegrees(mf.tankPos.heading), 0.0, 0.0, 1.0);
-                GL.Rotate(glm.toDegrees(-mf.toolPos.heading), 0.0, 0.0, 1.0);
+                GL.Rotate(Glm.ToDegrees(mf.tankPos.heading), 0.0, 0.0, 1.0);
+                GL.Rotate(Glm.ToDegrees(-mf.toolPos.heading), 0.0, 0.0, 1.0);
             }
 
             //no tow between hitch
             else
             {
-                GL.Rotate(glm.toDegrees(-mf.toolPos.heading), 0.0, 0.0, 1.0);
+                GL.Rotate(Glm.ToDegrees(-mf.toolPos.heading), 0.0, 0.0, 1.0);
             }
 
             //draw the hitch if trailing

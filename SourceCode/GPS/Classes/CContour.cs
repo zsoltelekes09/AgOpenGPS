@@ -172,8 +172,8 @@ namespace AgOpenGPS
                 for (int i = ptCount - 1; i >= 0; i--)
                 {
                     //calculate the point inside the boundary
-                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting - (signPass * Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
-                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing - (signPass * Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
+                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting - (signPass * Math.Sin(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
+                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing - (signPass * Math.Cos(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading - Math.PI;
 
                     //only add if inside actual field boundary
@@ -203,20 +203,20 @@ namespace AgOpenGPS
             if (mf.tool.toolOffset < 0)
             {
                 //sticks out more left
-                sin2HL = Math.Sin(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
-                cos2HL = Math.Cos(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
+                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
+                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
 
-                sin2HR = Math.Sin(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
-                cos2HR = Math.Cos(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
+                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
+                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
             }
             else
             {
                 //sticks out more right
-                sin2HL = Math.Sin(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
-                cos2HL = Math.Cos(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
+                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
+                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
 
-                sin2HR = Math.Sin(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
-                cos2HR = Math.Cos(pivot.heading + glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
+                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
+                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
             }
 
             //narrow equipment needs bigger bounding box.
@@ -226,8 +226,8 @@ namespace AgOpenGPS
                 cosH = Math.Cos(pivot.heading) * 4 * toolWid;
             }
 
-            double sin3H = Math.Sin(pivot.heading + glm.PIBy2) * 0.5;
-            double cos3H = Math.Cos(pivot.heading + glm.PIBy2) * 0.5;
+            double sin3H = Math.Sin(pivot.heading + Glm.PIBy2) * 0.5;
+            double cos3H = Math.Cos(pivot.heading + Glm.PIBy2) * 0.5;
 
             //build a frustum box ahead of fix to find adjacent paths and points
 
@@ -470,8 +470,8 @@ namespace AgOpenGPS
             double piSide;
 
             //sign of distance determines which side of line we are on
-            if (distanceFromRefLine > 0) piSide = glm.PIBy2;
-            else piSide = -glm.PIBy2;
+            if (distanceFromRefLine > 0) piSide = Glm.PIBy2;
+            else piSide = -Glm.PIBy2;
 
             //offset calcs
             double toolOffset = mf.tool.toolOffset;
@@ -518,7 +518,7 @@ namespace AgOpenGPS
                 //make sure its not closer then 1 eq width
                 for (int j = start; j < stop; j++)
                 {
-                    double check = glm.DistanceSquared(point.northing, point.easting, stripList[strip][j].northing, stripList[strip][j].easting);
+                    double check = Glm.DistanceSquared(point.northing, point.easting, stripList[strip][j].northing, stripList[strip][j].easting);
                     if (check < distSq)
                     {
                         fail = true;
@@ -537,7 +537,7 @@ namespace AgOpenGPS
             double distance;
             for (int i = 0; i < ctCount - 1; i++)
             {
-                distance = glm.Distance(ctList[i], ctList[i + 1]);
+                distance = Glm.Distance(ctList[i], ctList[i + 1]);
                 if (distance < spacing)
                 {
                     ctList.RemoveAt(i + 1);
@@ -610,7 +610,7 @@ namespace AgOpenGPS
             {
                 vec3 pt3 = arr[i];
                 pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                if (pt3.heading < 0) pt3.heading += glm.twoPI;
+                if (pt3.heading < 0) pt3.heading += Glm.twoPI;
                 ctList.Add(pt3);
             }
         }
@@ -657,7 +657,7 @@ namespace AgOpenGPS
                     if (Math.Abs(dx) < Double.Epsilon && Math.Abs(dy) < Double.Epsilon) return;
 
                     abHeading = Math.Atan2(dx, dy);
-                    if (abHeading < 0) abHeading += glm.twoPI;
+                    if (abHeading < 0) abHeading += Glm.twoPI;
                     //if (abHeading > Math.PI) abHeading -= glm.twoPI;
 
                     //abHeading = ctList[A].heading;
@@ -675,9 +675,9 @@ namespace AgOpenGPS
 
                     //Subtract the two headings, if > 1.57 its going the opposite heading as refAB
                     abFixHeadingDelta = (Math.Abs(mf.fixHeading - abHeading));
-                    if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - glm.twoPI);
+                    if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - Glm.twoPI);
 
-                    isABSameAsVehicleHeading = abFixHeadingDelta < glm.PIBy2;
+                    isABSameAsVehicleHeading = abFixHeadingDelta < Glm.PIBy2;
 
                     // calc point on ABLine closest to current position
                     double U = (((steer.easting - ctList[A].easting) * dx) + ((steer.northing - ctList[A].northing) * dy))
@@ -724,8 +724,8 @@ namespace AgOpenGPS
                     if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
                     else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
 
-                    if (abFixHeadingDelta > glm.PIBy2) abFixHeadingDelta -= Math.PI;
-                    else if (abFixHeadingDelta < -glm.PIBy2) abFixHeadingDelta += Math.PI;
+                    if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
+                    else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
 
                     abFixHeadingDelta *= mf.vehicle.stanleyHeadingErrorGain;
                     if (abFixHeadingDelta > 0.74) abFixHeadingDelta = 0.74;
@@ -738,9 +738,9 @@ namespace AgOpenGPS
                     if (steerAngleCT < -0.74) steerAngleCT = -0.74;
 
                     if (mf.pn.speed > -0.1)
-                        steerAngleCT = glm.toDegrees((steerAngleCT + abFixHeadingDelta) * -1.0);
+                        steerAngleCT = Glm.ToDegrees((steerAngleCT + abFixHeadingDelta) * -1.0);
                     else
-                        steerAngleCT = glm.toDegrees((steerAngleCT - abFixHeadingDelta) * -1.0);
+                        steerAngleCT = Glm.ToDegrees((steerAngleCT - abFixHeadingDelta) * -1.0);
 
 
                     if (steerAngleCT < -mf.vehicle.maxSteerAngle) steerAngleCT = -mf.vehicle.maxSteerAngle;
@@ -822,7 +822,7 @@ namespace AgOpenGPS
 
                     //Subtract the two headings, if > 1.57 its going the opposite heading as refAB
                     abFixHeadingDelta = (Math.Abs(mf.fixHeading - abHeading));
-                    if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - glm.twoPI);
+                    if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - Glm.twoPI);
 
                     //used for accumulating distance to find goal point
                     double distSoFar;
@@ -834,11 +834,11 @@ namespace AgOpenGPS
                     // used for calculating the length squared of next segment.
                     double tempDist = 0.0;
 
-                    if (abFixHeadingDelta >= glm.PIBy2)
+                    if (abFixHeadingDelta >= Glm.PIBy2)
                     {
                         //counting down
                         isABSameAsVehicleHeading = false;
-                        distSoFar = glm.Distance(ctList[A], rEastCT, rNorthCT);
+                        distSoFar = Glm.Distance(ctList[A], rEastCT, rNorthCT);
                         //Is this segment long enough to contain the full lookahead distance?
                         if (distSoFar > goalPointDistance)
                         {
@@ -854,7 +854,7 @@ namespace AgOpenGPS
                             while (A > 0)
                             {
                                 B--; A--;
-                                tempDist = glm.Distance(ctList[B], ctList[A]);
+                                tempDist = Glm.Distance(ctList[B], ctList[A]);
 
                                 //will we go too far?
                                 if ((tempDist + distSoFar) > goalPointDistance)
@@ -879,7 +879,7 @@ namespace AgOpenGPS
                     {
                         //counting up
                         isABSameAsVehicleHeading = true;
-                        distSoFar = glm.Distance(ctList[B], rEastCT, rNorthCT);
+                        distSoFar = Glm.Distance(ctList[B], rEastCT, rNorthCT);
 
                         //Is this segment long enough to contain the full lookahead distance?
                         if (distSoFar > goalPointDistance)
@@ -897,7 +897,7 @@ namespace AgOpenGPS
                             while (B < ptCount - 1)
                             {
                                 B++; A++;
-                                tempDist = glm.Distance(ctList[B], ctList[A]);
+                                tempDist = Glm.Distance(ctList[B], ctList[A]);
 
                                 //will we go too far?
                                 if ((tempDist + distSoFar) > goalPointDistance)
@@ -921,13 +921,13 @@ namespace AgOpenGPS
                     }
 
                     //calc "D" the distance from pivot axle to lookahead point
-                    double goalPointDistanceSquared = glm.DistanceSquared(goalPointCT.northing, goalPointCT.easting, pivot.northing, pivot.easting);
+                    double goalPointDistanceSquared = Glm.DistanceSquared(goalPointCT.northing, goalPointCT.easting, pivot.northing, pivot.easting);
 
                     //calculate the the delta x in local coordinates and steering angle degrees based on wheelbase
-                    double localHeading = glm.twoPI - mf.fixHeading;
+                    double localHeading = Glm.twoPI - mf.fixHeading;
                     ppRadiusCT = goalPointDistanceSquared / (2 * (((goalPointCT.easting - pivot.easting) * Math.Cos(localHeading)) + ((goalPointCT.northing - pivot.northing) * Math.Sin(localHeading))));
 
-                    steerAngleCT = glm.toDegrees(Math.Atan(2 * (((goalPointCT.easting - pivot.easting) * Math.Cos(localHeading))
+                    steerAngleCT = Glm.ToDegrees(Math.Atan(2 * (((goalPointCT.easting - pivot.easting) * Math.Cos(localHeading))
                         + ((goalPointCT.northing - pivot.northing) * Math.Sin(localHeading))) * mf.vehicle.wheelbase / goalPointDistanceSquared));
 
                     if (steerAngleCT < -mf.vehicle.maxSteerAngle) steerAngleCT = -mf.vehicle.maxSteerAngle;
@@ -940,14 +940,14 @@ namespace AgOpenGPS
                     radiusPointCT.northing = pivot.northing + (ppRadiusCT * Math.Sin(localHeading));
 
                     //angular velocity in rads/sec  = 2PI * m/sec * radians/meters
-                    double angVel = glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(glm.toRadians(steerAngleCT))) / mf.vehicle.wheelbase;
+                    double angVel = Glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(Glm.ToRadians(steerAngleCT))) / mf.vehicle.wheelbase;
 
                     //clamp the steering angle to not exceed safe angular velocity
                     if (Math.Abs(angVel) > mf.vehicle.maxAngularVelocity)
                     {
-                        steerAngleCT = glm.toDegrees(steerAngleCT > 0 ?
-                                (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity) / (glm.twoPI * mf.pn.speed * 0.277777)))
-                            : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (glm.twoPI * mf.pn.speed * 0.277777))));
+                        steerAngleCT = Glm.ToDegrees(steerAngleCT > 0 ?
+                                (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777)))
+                            : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777))));
                     }
                     //Convert to centimeters
                     distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);

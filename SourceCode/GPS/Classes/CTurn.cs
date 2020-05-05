@@ -95,11 +95,11 @@ namespace AgOpenGPS
             }
 
             //isYouTurnRight actuall means turning left - Painful, but it switches later
-            boxA.easting = fromPt.easting + (Math.Sin(headAB + glm.PIBy2) * scanWidthL);
-            boxA.northing = fromPt.northing + (Math.Cos(headAB + glm.PIBy2) * scanWidthL);
+            boxA.easting = fromPt.easting + (Math.Sin(headAB + Glm.PIBy2) * scanWidthL);
+            boxA.northing = fromPt.northing + (Math.Cos(headAB + Glm.PIBy2) * scanWidthL);
 
-            boxB.easting = fromPt.easting + (Math.Sin(headAB + glm.PIBy2) * scanWidthR);
-            boxB.northing = fromPt.northing + (Math.Cos(headAB + glm.PIBy2) * scanWidthR);
+            boxB.easting = fromPt.easting + (Math.Sin(headAB + Glm.PIBy2) * scanWidthR);
+            boxB.northing = fromPt.northing + (Math.Cos(headAB + Glm.PIBy2) * scanWidthR);
 
             boxC.easting = boxB.easting + (Math.Sin(headAB) * boxLength);
             boxC.northing = boxB.northing + (Math.Cos(headAB) * boxLength);
@@ -152,11 +152,11 @@ namespace AgOpenGPS
                 }
 
                 //isYouTurnRight actuall means turning left - Painful, but it switches later
-                boxA.easting = fromPt.easting + (Math.Sin(headAB + glm.PIBy2) * scanWidthL);
-                boxA.northing = fromPt.northing + (Math.Cos(headAB + glm.PIBy2) * scanWidthL);
+                boxA.easting = fromPt.easting + (Math.Sin(headAB + Glm.PIBy2) * scanWidthL);
+                boxA.northing = fromPt.northing + (Math.Cos(headAB + Glm.PIBy2) * scanWidthL);
 
-                boxB.easting = fromPt.easting + (Math.Sin(headAB + glm.PIBy2) * scanWidthR);
-                boxB.northing = fromPt.northing + (Math.Cos(headAB + glm.PIBy2) * scanWidthR);
+                boxB.easting = fromPt.easting + (Math.Sin(headAB + Glm.PIBy2) * scanWidthR);
+                boxB.northing = fromPt.northing + (Math.Cos(headAB + Glm.PIBy2) * scanWidthR);
 
                 boxC.easting = boxB.easting + (Math.Sin(headAB) * boxLength);
                 boxC.northing = boxB.northing + (Math.Cos(headAB) * boxLength);
@@ -220,7 +220,7 @@ namespace AgOpenGPS
                         closestTurnPt.heading = turnClosestList[i].heading;
                     }
                 }
-                if (closestTurnPt.heading < 0) closestTurnPt.heading += glm.twoPI;
+                if (closestTurnPt.heading < 0) closestTurnPt.heading += Glm.twoPI;
             }
         }
 
@@ -245,8 +245,8 @@ namespace AgOpenGPS
                 for (int i = ptCount - 1; i >= 0; i--)
                 {
                     //calculate the point outside the boundary
-                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
-                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
+                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
+                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * totalHeadWidth * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
 
                     //only add if outside actual field boundary

@@ -403,9 +403,9 @@ namespace AgOpenGPS
 
         public string FindDirection(double heading)
         {
-            if (heading < 0) heading += glm.twoPI;
+            if (heading < 0) heading += Glm.twoPI;
 
-            heading = glm.toDegrees(heading);
+            heading = Glm.ToDegrees(heading);
 
             if (heading > 337.5 || heading < 22.5)
             {
@@ -767,8 +767,8 @@ namespace AgOpenGPS
         public string NMEAHz { get { return Convert.ToString(fixUpdateHz); } }
         public string PassNumber { get { return Convert.ToString(ABLine.passNumber); } }
         public string CurveNumber { get { return Convert.ToString(curve.curveNumber); } }
-        public string Heading { get { return Convert.ToString(Math.Round(glm.toDegrees(fixHeading), 1)) + "\u00B0"; } }
-        public string GPSHeading { get { return (Math.Round(glm.toDegrees(gpsHeading), 1)) + "\u00B0"; } }
+        public string Heading { get { return Convert.ToString(Math.Round(Glm.ToDegrees(fixHeading), 1)) + "\u00B0"; } }
+        public string GPSHeading { get { return (Math.Round(Glm.ToDegrees(gpsHeading), 1)) + "\u00B0"; } }
         public string Status { get { if (pn.status == "A") return "Active"; else return "Void"; } }
         public string FixQuality
         {
@@ -803,13 +803,13 @@ namespace AgOpenGPS
         {
             get
             {
-                if (ahrs.rollX16 != 9999)
+                if (ahrs.isRollFromAutoSteer || ahrs.isRollFromAVR)
                     return Math.Round((ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625, 1) + "\u00B0";
                 else return "-";
             }
         }
-        public string SetSteerAngle { get { return ((double)(guidanceLineSteerAngle) * 0.01).ToString("N1") + "\u00B0"; } }
-        public string ActualSteerAngle { get { return ((double)(actualSteerAngleDisp) * 0.01).ToString("N1") + "\u00B0"; } }
+        public string SetSteerAngle { get { return ((double)(guidanceLineSteerAngle) * 0.01).ToString("N2") + "\u00B0"; } }
+        public string ActualSteerAngle { get { return ((double)(actualSteerAngleDisp) * 0.01).ToString("N2") + "\u00B0"; } }
 
         public string FixHeading { get { return Math.Round(fixHeading, 4).ToString(); } }
         
@@ -860,7 +860,7 @@ namespace AgOpenGPS
         }
 
         public string FixOffset { get { return (pn.fixOffset.easting.ToString("N2") + ", " + pn.fixOffset.northing.ToString("N2")); } }
-        public string FixOffsetInch { get { return ((pn.fixOffset.easting*glm.m2in).ToString("N0")+ ", " + (pn.fixOffset.northing*glm.m2in).ToString("N0")); } }
+        public string FixOffsetInch { get { return ((pn.fixOffset.easting*Glm.m2in).ToString("N0")+ ", " + (pn.fixOffset.northing*Glm.m2in).ToString("N0")); } }
 
         public string Altitude { get { return Convert.ToString(Math.Round(pn.altitude,1)); } }
         public string AltitudeFeet { get { return Convert.ToString((Math.Round((pn.altitude * 3.28084),1))); } }
@@ -877,7 +877,7 @@ namespace AgOpenGPS
         {
             get
             {
-                if (distancePivotToTurnLine > 0 ) return (((int)(glm.m2ft * (distancePivotToTurnLine))) + " ft");
+                if (distancePivotToTurnLine > 0 ) return (((int)(Glm.m2ft * (distancePivotToTurnLine))) + " ft");
                 else return "--";
             }
         }

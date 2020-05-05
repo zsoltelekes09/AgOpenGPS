@@ -26,7 +26,7 @@ namespace AgOpenGPS
             //first point needs last, first, second points
             vec3 pt3 = arr[0];
             pt3.heading = Math.Atan2(arr[1].easting - arr[cnt].easting, arr[1].northing - arr[cnt].northing);
-            if (pt3.heading < 0) pt3.heading += glm.twoPI;
+            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
             turnLine.Add(pt3);
 
             //middle points
@@ -34,14 +34,14 @@ namespace AgOpenGPS
             {
                 pt3 = arr[i];
                 pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                if (pt3.heading < 0) pt3.heading += glm.twoPI;
+                if (pt3.heading < 0) pt3.heading += Glm.twoPI;
                 turnLine.Add(pt3);
             }
 
             //last and first point
             pt3 = arr[cnt];
             pt3.heading = Math.Atan2(arr[0].easting - arr[cnt - 1].easting, arr[0].northing - arr[cnt - 1].northing);
-            if (pt3.heading < 0) pt3.heading += glm.twoPI;
+            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
             turnLine.Add(pt3);
         }
 
@@ -60,7 +60,7 @@ namespace AgOpenGPS
                 for (int j = 0; j < lineCount; j++)
                 {
                     //make sure distance between headland and boundary is not less then width
-                    distance = glm.Distance(curBnd[i], turnLine[j]);
+                    distance = Glm.Distance(curBnd[i], turnLine[j]);
                     if (distance < (totalHeadWidth * 0.96))
                     {
                         turnLine.RemoveAt(j);
@@ -76,7 +76,7 @@ namespace AgOpenGPS
             //double spacing = mf.tool.toolWidth * 0.25;
             for (int i = 0; i < bndCount - 1; i++)
             {
-                distance = glm.Distance(turnLine[i], turnLine[i + 1]);
+                distance = Glm.Distance(turnLine[i], turnLine[i + 1]);
                 if (distance < spacing)
                 {
                     turnLine.RemoveAt(i + 1);
@@ -91,7 +91,7 @@ namespace AgOpenGPS
             {
                 int j = i + 1;
                 if (j == bndCount) j = 0;
-                distance = glm.Distance(turnLine[i], turnLine[j]);
+                distance = Glm.Distance(turnLine[i], turnLine[j]);
                 if (distance > (spacing * 1.25))
                 {
                     vec3 pointB = new vec3((turnLine[i].easting + turnLine[j].easting) / 2.0, (turnLine[i].northing + turnLine[j].northing) / 2.0, turnLine[i].heading);

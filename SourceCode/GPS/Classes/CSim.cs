@@ -51,6 +51,7 @@ namespace AgOpenGPS
 
         public void DoSimTick(double _st)
         {
+            mf.actualSteerAngleDisp = _st*100.0;
             steerAngle = _st;
             double temp = (stepDistance / mf.fixUpdateHz * Math.Tan(steerAngle * 0.0165329252) / 3.3);
             headingTrue += temp;
@@ -59,7 +60,7 @@ namespace AgOpenGPS
 
 
             //Calculate the next Lat Long based on heading and distance
-            degrees = glm.toDegrees(headingTrue);
+            degrees = Glm.ToDegrees(headingTrue);
             CalculateNewPostionFromBearingDistance(latitude, longitude, degrees, (stepDistance / mf.fixUpdateHz) / 1000.0);
 
             //calc the speed

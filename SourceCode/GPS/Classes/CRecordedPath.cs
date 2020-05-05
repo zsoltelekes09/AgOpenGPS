@@ -122,7 +122,7 @@ namespace AgOpenGPS
                 pathCount = cnt - B;
                 if (pathCount < 8)
                 {
-                    double distSqr = glm.DistanceSquared(steerAxlePosRP.northing, steerAxlePosRP.easting, recList[0].Northing, recList[0].Easting);
+                    double distSqr = Glm.DistanceSquared(steerAxlePosRP.northing, steerAxlePosRP.easting, recList[0].Northing, recList[0].Easting);
                     if (distSqr < 2)
                     {
                         isFollowingRecPath = true;
@@ -364,8 +364,8 @@ namespace AgOpenGPS
             //Fix the circular error - get it from -Pi/2 to Pi/2
             if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
             else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
-            if (abFixHeadingDelta > glm.PIBy2) abFixHeadingDelta -= Math.PI;
-            else if (abFixHeadingDelta < -glm.PIBy2) abFixHeadingDelta += Math.PI;
+            if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
+            else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
 
             //normally set to 1, less then unity gives less heading error.
             abFixHeadingDelta *= mf.vehicle.stanleyHeadingErrorGain;
@@ -380,7 +380,7 @@ namespace AgOpenGPS
             if (steerAngleRP < -0.74) steerAngleRP = -0.74;
 
             //add them up and clamp to max in vehicle settings
-            steerAngleRP = glm.toDegrees((steerAngleRP + abFixHeadingDelta) * -1.0);
+            steerAngleRP = Glm.ToDegrees((steerAngleRP + abFixHeadingDelta) * -1.0);
             if (steerAngleRP < -mf.vehicle.maxSteerAngle) steerAngleRP = -mf.vehicle.maxSteerAngle;
             if (steerAngleRP > mf.vehicle.maxSteerAngle) steerAngleRP = mf.vehicle.maxSteerAngle;
 
@@ -448,8 +448,8 @@ namespace AgOpenGPS
             //Fix the circular error - get it from -Pi/2 to Pi/2
             if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
             else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
-            if (abFixHeadingDelta > glm.PIBy2) abFixHeadingDelta -= Math.PI;
-            else if (abFixHeadingDelta < -glm.PIBy2) abFixHeadingDelta += Math.PI;
+            if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
+            else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
 
             //normally set to 1, less then unity gives less heading error.
             abFixHeadingDelta *= mf.vehicle.stanleyHeadingErrorGain;
@@ -464,7 +464,7 @@ namespace AgOpenGPS
             if (steerAngleRP < -0.74) steerAngleRP = -0.74;
 
             //add them up and clamp to max in vehicle settings
-            steerAngleRP = glm.toDegrees((steerAngleRP + abFixHeadingDelta) * -1.0);
+            steerAngleRP = Glm.ToDegrees((steerAngleRP + abFixHeadingDelta) * -1.0);
             if (steerAngleRP < -mf.vehicle.maxSteerAngle) steerAngleRP = -mf.vehicle.maxSteerAngle;
             if (steerAngleRP > mf.vehicle.maxSteerAngle) steerAngleRP = mf.vehicle.maxSteerAngle;
 

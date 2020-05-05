@@ -23,7 +23,7 @@ namespace AgOpenGPS
 
                 lblEastingField.Text = Math.Round(mf.pn.fix.easting, 1).ToString();
                 lblNorthingField.Text = Math.Round(mf.pn.fix.northing, 1).ToString();
-
+                                                                                                                                                                      
                 lblEasting.Text = ((int)mf.pn.actualEasting).ToString();
                 lblNorthing.Text = ((int)mf.pn.actualNorthing).ToString();
 
@@ -63,16 +63,28 @@ namespace AgOpenGPS
                 lblWorkRemaining.Text = mf.fd.WorkedAreaRemainAcres;
                 lblPercentRemaining.Text = mf.fd.WorkedAreaRemainPercentage;
                 lblTimeRemaining.Text = mf.fd.TimeTillFinished;
-                lblEqSpec.Text =  (Math.Round(mf.tool.ToolWidth * glm.m2ft, 2)).ToString() + " ft  " + mf.vehicleFileName + mf.toolFileName;
+                lblEqSpec.Text =  (Math.Round(mf.tool.ToolWidth * Glm.m2ft, 2)).ToString() + " ft  " + mf.vehicleFileName + mf.toolFileName;
             }
 
+            if (mf.isUDPSendConnected)
+            {
+                tboxUDPSteer.Text = mf.autoSteerUDPActivity.ToString();
+                tboxUDPMachine.Text = mf.machineUDPActivity.ToString();
+                tboxUDPSwitch.Text = mf.switchUDPActivity.ToString();
+            }
+            else
+            {
+                tboxUDPSteer.Text = "NC";
+                tboxUDPMachine.Text = "NC";
+                tboxUDPSwitch.Text = "NC";
+            }
             txtBoxRecvAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;
-            txtBoxRecvMachine.Text = mf.mc.serialRecvMachineStr;
+                txtBoxRecvMachine.Text = mf.mc.serialRecvMachineStr;
         }
 
         private void FormGPSData_Load(object sender, EventArgs e)
         {
-            lblConvergenceAngle.Text = Math.Round(glm.toDegrees(mf.pn.convergenceAngle), 3).ToString();
+            lblConvergenceAngle.Text = Math.Round(Glm.ToDegrees(mf.pn.convergenceAngle), 3).ToString();
             lblSunrise.Text = mf.sunrise.ToString("HH:mm");
             lblSunset.Text = mf.sunset.ToString("HH:mm");
 

@@ -36,7 +36,7 @@ namespace AgOpenGPS
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
-            textboxSender.Text = Regex.Replace(textboxSender.Text, glm.fileReg, "");
+            textboxSender.Text = Regex.Replace(textboxSender.Text, Glm.fileRegex, "");
             textboxSender.SelectionStart = cursorPosition;
 
             if (String.IsNullOrEmpty(tboxFieldName.Text.Trim()))
@@ -56,7 +56,7 @@ namespace AgOpenGPS
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
-            textboxSender.Text = Regex.Replace(textboxSender.Text, glm.fileReg, "");
+            textboxSender.Text = Regex.Replace(textboxSender.Text, Glm.fileRegex, "");
             textboxSender.SelectionStart = cursorPosition;
 
             lblFilename.Text = tboxFieldName.Text.Trim() + " " + tboxTask.Text.Trim()
@@ -67,7 +67,7 @@ namespace AgOpenGPS
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
-            textboxSender.Text = Regex.Replace(textboxSender.Text, glm.fileReg, "");
+            textboxSender.Text = Regex.Replace(textboxSender.Text, Glm.fileRegex, "");
             textboxSender.SelectionStart = cursorPosition;
 
             lblFilename.Text = tboxFieldName.Text.Trim() + " " + tboxTask.Text.Trim()
@@ -131,8 +131,8 @@ namespace AgOpenGPS
                         mf.pn.centralMeridian = -177 + ((mf.pn.zone - 1) * 6);
 
                         //Azimuth Error - utm declination
-                        mf.pn.convergenceAngle = Math.Atan(Math.Sin(glm.toRadians(mf.pn.latitude))
-                                                    * Math.Tan(glm.toRadians(mf.pn.longitude - mf.pn.centralMeridian)));
+                        mf.pn.convergenceAngle = Math.Atan(Math.Sin(Glm.ToRadians(mf.pn.latitude))
+                                                    * Math.Tan(Glm.ToRadians(mf.pn.longitude - mf.pn.centralMeridian)));
 
                         //make sure directory exists, or create it
                         if ((!string.IsNullOrEmpty(directoryName)) && (!Directory.Exists(directoryName)))
@@ -162,7 +162,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void tboxFieldName_Click(object sender, EventArgs e)
+        private void TboxFieldName_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {
@@ -171,7 +171,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void tboxTask_Click(object sender, EventArgs e)
+        private void TboxTask_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {
@@ -180,7 +180,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void tboxVehicle_Click(object sender, EventArgs e)
+        private void TboxVehicle_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {

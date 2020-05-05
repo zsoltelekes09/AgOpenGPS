@@ -41,7 +41,7 @@ namespace AgOpenGPS
             //first point needs last, first, second points
             vec3 pt3 = arr[0];
             pt3.heading = Math.Atan2(arr[1].easting - arr[cnt].easting, arr[1].northing - arr[cnt].northing);
-            if (pt3.heading < 0) pt3.heading += glm.twoPI;
+            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
             bndLine.Add(pt3);
 
             //middle points
@@ -49,14 +49,14 @@ namespace AgOpenGPS
             {
                 pt3 = arr[i];
                 pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                if (pt3.heading < 0) pt3.heading += glm.twoPI;
+                if (pt3.heading < 0) pt3.heading += Glm.twoPI;
                 bndLine.Add(pt3);
             }
 
             //last and first point
             pt3 = arr[cnt];
             pt3.heading = Math.Atan2(arr[0].easting - arr[cnt - 1].easting, arr[0].northing - arr[cnt - 1].northing);
-            if (pt3.heading < 0) pt3.heading += glm.twoPI;
+            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
             bndLine.Add(pt3);
         }
 
@@ -77,7 +77,7 @@ namespace AgOpenGPS
 
             for (int i = 0; i < bndCount - 1; i++)
             {
-                distance = glm.Distance(bndLine[i], bndLine[i + 1]);
+                distance = Glm.Distance(bndLine[i], bndLine[i + 1]);
                 if (distance < spacing)
                 {
                     bndLine.RemoveAt(i + 1);
@@ -95,7 +95,7 @@ namespace AgOpenGPS
                 int j = i + 1;
 
                 if (j == bndCount) j = 0;
-                distance = glm.Distance(bndLine[i], bndLine[j]);
+                distance = Glm.Distance(bndLine[i], bndLine[j]);
                 if (distance > spacing)
                 {
                     vec3 pointB = new vec3((bndLine[i].easting + bndLine[j].easting) / 2.0,
@@ -116,7 +116,7 @@ namespace AgOpenGPS
                 int j = i + 1;
 
                 if (j == bndCount) j = 0;
-                distance = glm.Distance(bndLine[i], bndLine[j]);
+                distance = Glm.Distance(bndLine[i], bndLine[j]);
                 if (distance > spacing)
                 {
                     vec3 pointB = new vec3((bndLine[i].easting + bndLine[j].easting) / 2.0,
@@ -143,7 +143,7 @@ namespace AgOpenGPS
             for (int i = cnt; i >= 0; i--)
             {
                 arr[i].heading -= Math.PI;
-                if (arr[i].heading < 0) arr[i].heading += glm.twoPI;
+                if (arr[i].heading < 0) arr[i].heading += Glm.twoPI;
                 bndLine.Add(arr[i]);
             }
         }
@@ -259,11 +259,11 @@ namespace AgOpenGPS
             if (ptCount < 3) return;
 
             double area2 = 0;         // Accumulates area in the loop
-            vec3 lastpoint = new vec3(bndLine[ptCount - 1].easting + (-Math.Sin(glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), bndLine[ptCount - 1].northing + (-Math.Cos(glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), 0);
+            vec3 lastpoint = new vec3(bndLine[ptCount - 1].easting + (-Math.Sin(Glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), bndLine[ptCount - 1].northing + (-Math.Cos(Glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), 0);
 
             for (int i = 0; i < ptCount; i++)
             {
-                vec3 point = new vec3(bndLine[i].easting + (-Math.Sin(glm.PIBy2 + bndLine[i].heading) * 5f), bndLine[i].northing + (-Math.Cos(glm.PIBy2 + bndLine[i].heading) * 5f), 0);
+                vec3 point = new vec3(bndLine[i].easting + (-Math.Sin(Glm.PIBy2 + bndLine[i].heading) * 5f), bndLine[i].northing + (-Math.Cos(Glm.PIBy2 + bndLine[i].heading) * 5f), 0);
                 area2 += (lastpoint.easting + point.easting) * (lastpoint.northing - point.northing);
                 lastpoint = point;
             }

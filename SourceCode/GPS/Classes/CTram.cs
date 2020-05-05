@@ -84,14 +84,14 @@ namespace AgOpenGPS
             {
                 //calculate the point inside the boundary
                 pt3.easting = mf.bnd.bndArr[0].bndLine[i].easting -
-                    (Math.Sin(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack));
+                    (Math.Sin(Glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack));
 
                 pt3.northing = mf.bnd.bndArr[0].bndLine[i].northing -
-                    (Math.Cos(glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack));
+                    (Math.Cos(Glm.PIBy2 + mf.bnd.bndArr[0].bndLine[i].heading) * (tramWidth * 0.5 - halfWheelTrack));
 
                 for (int j = 0; j < ptCount; j++)
                 {
-                    double check = glm.DistanceSquared(pt3.northing, pt3.easting,
+                    double check = Glm.DistanceSquared(pt3.northing, pt3.easting,
                                         mf.bnd.bndArr[0].bndLine[j].northing, mf.bnd.bndArr[0].bndLine[j].easting);
                     if (check < distSq)
                     {
@@ -115,7 +115,7 @@ namespace AgOpenGPS
             double distance;
             for (int i = 0; i < cnt - 1; i++)
             {
-                distance = glm.Distance(outArr[i], outArr[i + 1]);
+                distance = Glm.Distance(outArr[i], outArr[i + 1]);
                 if (distance < spacing)
                 {
                     outArr.RemoveAt(i + 1);
@@ -144,10 +144,10 @@ namespace AgOpenGPS
                     tramBndArr.Add(pt);
 
                     pt2.easting = mf.tram.outArr[i].easting -
-                        (Math.Sin(glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack);
+                        (Math.Sin(Glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack);
 
                     pt2.northing = mf.tram.outArr[i].northing -
-                        (Math.Cos(glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack);
+                        (Math.Cos(Glm.PIBy2 + mf.tram.outArr[i].heading) * mf.tram.wheelTrack);
                     tramBndArr.Add(pt2);
                 }
             }

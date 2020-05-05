@@ -197,8 +197,8 @@ namespace AgOpenGPS
                 for (int i = ptCount - 1; i >= 0; i--)
                 {
                     //calculate the point outside the boundary
-                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
-                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
+                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
+                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
                     point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
 
                     //only add if outside actual field boundary

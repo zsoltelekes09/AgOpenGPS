@@ -311,7 +311,7 @@ namespace AgOpenGPS
                 {
                     int j = i + 1;
                     //if (j == cnt) j = 0;
-                    double distance = glm.Distance(mf.curve.refList[i], mf.curve.refList[j]);
+                    double distance = Glm.Distance(mf.curve.refList[i], mf.curve.refList[j]);
                     if (distance > 1.2)
                     {
                         vec3 pointB = new vec3((mf.curve.refList[i].easting + mf.curve.refList[j].easting) / 2.0,
@@ -335,7 +335,7 @@ namespace AgOpenGPS
                 x /= mf.curve.refList.Count;
                 y /= mf.curve.refList.Count;
                 mf.curve.aveLineHeading = Math.Atan2(y, x);
-                if (mf.curve.aveLineHeading < 0) mf.curve.aveLineHeading += glm.twoPI;
+                if (mf.curve.aveLineHeading < 0) mf.curve.aveLineHeading += Glm.twoPI;
 
                 //build the tail extensions
                 mf.curve.AddFirstLastPoints();
@@ -357,7 +357,7 @@ namespace AgOpenGPS
 
                 textBox1.BackColor = Color.LightGreen;
                 textBox1.Enabled = true;
-                textBox1.Text = (Math.Round(glm.toDegrees(mf.curve.aveLineHeading), 1)).ToString(CultureInfo.InvariantCulture)
+                textBox1.Text = (Math.Round(Glm.ToDegrees(mf.curve.aveLineHeading), 1)).ToString(CultureInfo.InvariantCulture)
                     + "\u00B0" + mf.FindDirection(mf.curve.aveLineHeading)
                     + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
             }

@@ -478,8 +478,8 @@ namespace AgOpenGPS
             vec2 rightCirclePos = new vec2(0, 0)
             {
                 //The circle is 90 degrees (pi/2 radians) to the right of the car's heading
-                easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading + glm.PIBy2)),
-                northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading + glm.PIBy2))
+                easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading + Glm.PIBy2)),
+                northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading + Glm.PIBy2))
             };
             return rightCirclePos;
         }
@@ -490,8 +490,8 @@ namespace AgOpenGPS
             vec2 rightCirclePos = new vec2(0, 0)
             {
                 //The circle is 90 degrees (pi/2 radians) to the left of the car's heading
-                easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading - glm.PIBy2)),
-                northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading - glm.PIBy2))
+                easting = circlePos.easting + (CDubins.turningRadius * Math.Sin(heading - Glm.PIBy2)),
+                northing = circlePos.northing + (CDubins.turningRadius * Math.Cos(heading - Glm.PIBy2))
             };
             return rightCirclePos;
         }
@@ -504,7 +504,7 @@ namespace AgOpenGPS
         public static void LSLorRSR(vec2 startCircle, vec2 goalCircle, bool isBottom, out vec2 startTangent, out vec2 goalTangent)
         {
             //The angle to the first tangent coordinate is always 90 degrees if the both circles have the same radius
-            double theta = glm.PIBy2;
+            double theta = Glm.PIBy2;
 
             //Need to modify theta if the circles are not on the same height (z)
             theta += Math.Atan2(goalCircle.northing - startCircle.northing, goalCircle.easting - startCircle.easting);

@@ -198,7 +198,7 @@ namespace AgOpenGPS
 
         private void BtnSwapAB_Click(object sender, EventArgs e)
         {
-            mf.ABLine.abHeading = (mf.ABLine.abHeading + Math.PI) % glm.twoPI;
+            mf.ABLine.abHeading = (mf.ABLine.abHeading + Math.PI) % Glm.twoPI;
 
             mf.ABLine.refABLineP1.easting = mf.ABLine.refPoint1.easting - (Math.Sin(mf.ABLine.abHeading) *   1600.0);
             mf.ABLine.refABLineP1.northing = mf.ABLine.refPoint1.northing - (Math.Cos(mf.ABLine.abHeading) * 1600.0);

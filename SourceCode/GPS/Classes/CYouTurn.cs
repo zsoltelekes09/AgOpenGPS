@@ -220,7 +220,7 @@ namespace AgOpenGPS
             curTurnLineCount = turnLineCloseList.Count;
             for (int i = 0; i < curTurnLineCount; i++)
             {
-                dist1 = glm.Distance(mf.turn.turnArr[turnNum].turnLine[turnLineCloseList[i]].easting,
+                dist1 = Glm.Distance(mf.turn.turnArr[turnNum].turnLine[turnLineCloseList[i]].easting,
                                         mf.turn.turnArr[turnNum].turnLine[turnLineCloseList[i]].northing,
                                             crossingCurvePoint.easting, crossingCurvePoint.northing);
                 if (dist1 < dist2)
@@ -263,7 +263,7 @@ namespace AgOpenGPS
             count = ytList.Count;
             for (int i = 0; i < count; i += 2)
             {
-                distancePivotToTurnLine = glm.Distance(ytList[i], mf.pivotAxlePos);
+                distancePivotToTurnLine = Glm.Distance(ytList[i], mf.pivotAxlePos);
                 if (distancePivotToTurnLine > 3)
                 {
                     isTurnCreationTooClose = false;
@@ -398,7 +398,7 @@ namespace AgOpenGPS
                 //or did we lose the turnLine - we are on the highway cuz we left the outer/inner turn boundary
                 if ((int)mf.turn.closestTurnPt.easting != -20000)
                 {
-                    mf.distancePivotToTurnLine = glm.Distance(mf.pivotAxlePos, mf.turn.closestTurnPt);
+                    mf.distancePivotToTurnLine = Glm.Distance(mf.pivotAxlePos, mf.turn.closestTurnPt);
                 }
                 else
                 {
@@ -407,10 +407,10 @@ namespace AgOpenGPS
                 }
 
 
-                boundaryAngleOffPerpendicular = glm.PIBy2 + (mf.turn.closestTurnPt.heading - head);
+                boundaryAngleOffPerpendicular = Glm.PIBy2 + (mf.turn.closestTurnPt.heading - head);
 
-                if (boundaryAngleOffPerpendicular > Math.PI) boundaryAngleOffPerpendicular -= glm.twoPI;
-                if (boundaryAngleOffPerpendicular < -Math.PI) boundaryAngleOffPerpendicular += glm.twoPI;
+                if (boundaryAngleOffPerpendicular > Math.PI) boundaryAngleOffPerpendicular -= Glm.twoPI;
+                if (boundaryAngleOffPerpendicular < -Math.PI) boundaryAngleOffPerpendicular += Glm.twoPI;
 
                 CDubins dubYouTurnPath = new CDubins();
                 CDubins.turningRadius = mf.vehicle.minTurningRadius;
@@ -436,20 +436,20 @@ namespace AgOpenGPS
 
                 if (!isTurnRight)//this is actualy right
                 {
-                    goal.northing = (rNorthYT - (Math.Cos(head - glm.PIBy2) * turnOffset)) - Math.Cos(head) * turnRadius;
-                    goal.easting = (rEastYT - (Math.Sin(head - glm.PIBy2) * turnOffset)) - Math.Sin(head) * turnRadius;
+                    goal.northing = (rNorthYT - (Math.Cos(head - Glm.PIBy2) * turnOffset)) - Math.Cos(head) * turnRadius;
+                    goal.easting = (rEastYT - (Math.Sin(head - Glm.PIBy2) * turnOffset)) - Math.Sin(head) * turnRadius;
                     goal.heading = head - Math.PI;
                 }
                 else
                 {
-                    goal.northing = (rNorthYT - (Math.Cos(head + glm.PIBy2) * turnOffset)) + Math.Cos(head) * turnRadius;
-                    goal.easting = (rEastYT - (Math.Sin(head + glm.PIBy2) * turnOffset)) + Math.Sin(head) * turnRadius;
+                    goal.northing = (rNorthYT - (Math.Cos(head + Glm.PIBy2) * turnOffset)) + Math.Cos(head) * turnRadius;
+                    goal.easting = (rEastYT - (Math.Sin(head + Glm.PIBy2) * turnOffset)) + Math.Sin(head) * turnRadius;
                     goal.heading = head + Math.PI;
                 }
 
                 //now we go the other way to turn round
                 head -= Math.PI;
-                if (head < 0) head += glm.twoPI;
+                if (head < 0) head += Glm.twoPI;
 
                 //generate the turn points
                 ytList = dubYouTurnPath.GenerateDubins(start, goal);
@@ -475,7 +475,7 @@ namespace AgOpenGPS
             {
                 case 1:
                     //the temp array
-                    mf.distancePivotToTurnLine = glm.Distance(ytList[0], mf.pivotAxlePos);
+                    mf.distancePivotToTurnLine = Glm.Distance(ytList[0], mf.pivotAxlePos);
                     double cosHead = Math.Cos(head);
                     double sinHead = Math.Sin(head);
 
@@ -548,7 +548,7 @@ namespace AgOpenGPS
             //or did we lose the turnLine - we are on the highway cuz we left the outer/inner turn boundary
             if ((int)mf.turn.closestTurnPt.easting != -20000)
             {
-                mf.distancePivotToTurnLine = glm.Distance(mf.pivotAxlePos, mf.turn.closestTurnPt);
+                mf.distancePivotToTurnLine = Glm.Distance(mf.pivotAxlePos, mf.turn.closestTurnPt);
             }
             else
             {
@@ -632,7 +632,7 @@ namespace AgOpenGPS
                 pt[i].easting = xr;
                 pt[i].northing = yr;
                 pt[i].heading = Math.Atan2(xr2 - xr, yr2 - yr);
-                if (pt[i].heading < 0) pt[i].heading += glm.twoPI;
+                if (pt[i].heading < 0) pt[i].heading += Glm.twoPI;
                 ytList.Add(pt[i]);
             }
             xr = (Math.Cos(-head) * pt[pt.Length - 1].easting) - (Math.Sin(-head) * pt[pt.Length - 1].northing) + rEastYT;
@@ -674,7 +674,7 @@ namespace AgOpenGPS
             count = ytList.Count;
             for (int i = 0; i < count; i += 2)
             {
-                distancePivotToTurnLine = glm.Distance(ytList[i], mf.pivotAxlePos);
+                distancePivotToTurnLine = Glm.Distance(ytList[i], mf.pivotAxlePos);
                 if (distancePivotToTurnLine > 3)
                 {
                     isTurnCreationTooClose = false;
@@ -828,7 +828,7 @@ namespace AgOpenGPS
                     pt[i].northing = yr;
 
                     pt[i].heading = Math.Atan2(xr2 - xr, yr2 - yr);
-                    if (pt[i].heading < 0) pt[i].heading += glm.twoPI;
+                    if (pt[i].heading < 0) pt[i].heading += Glm.twoPI;
                     ytList.Add(pt[i]);
                 }
                 xr = (Math.Cos(-head) * pt[pt.Length - 1].easting) - (Math.Sin(-head) * pt[pt.Length - 1].northing) + crossingCurvePoint.easting;
@@ -865,7 +865,7 @@ namespace AgOpenGPS
                 count = ytList.Count;
                 for (int i = 0; i < count; i += 2)
                 {
-                    distancePivotToTurnLine = glm.Distance(ytList[i], mf.pivotAxlePos);
+                    distancePivotToTurnLine = Glm.Distance(ytList[i], mf.pivotAxlePos);
                     if (distancePivotToTurnLine > 3)
                     {
                         isTurnCreationTooClose = false;
@@ -963,7 +963,7 @@ namespace AgOpenGPS
                     crossingCurvePoint.northing = mf.curve.curList[crossingCurvePoint.index].northing;
                     crossingCurvePoint.heading = mf.curve.curList[crossingCurvePoint.index].heading;
 
-                    double tooClose = glm.Distance(ytList[0], pivotPos);
+                    double tooClose = Glm.Distance(ytList[0], pivotPos);
                     isTurnCreationTooClose = tooClose < 3;
 
                     //set the flag to Critical stop machine
@@ -987,9 +987,9 @@ namespace AgOpenGPS
                 if (!isABSameAsFixHeading) head += Math.PI;
                 double delta = mf.curve.deltaOfRefAndAveHeadings;
 
-                boundaryAngleOffPerpendicular = glm.PIBy2 + (crossingTurnLinePoint.heading - head);
-                if (boundaryAngleOffPerpendicular > Math.PI) boundaryAngleOffPerpendicular -= glm.twoPI;
-                if (boundaryAngleOffPerpendicular < -Math.PI) boundaryAngleOffPerpendicular += glm.twoPI;
+                boundaryAngleOffPerpendicular = Glm.PIBy2 + (crossingTurnLinePoint.heading - head);
+                if (boundaryAngleOffPerpendicular > Math.PI) boundaryAngleOffPerpendicular -= Glm.twoPI;
+                if (boundaryAngleOffPerpendicular < -Math.PI) boundaryAngleOffPerpendicular += Glm.twoPI;
 
                 CDubins dubYouTurnPath = new CDubins();
                 CDubins.turningRadius = mf.vehicle.minTurningRadius;
@@ -1013,20 +1013,20 @@ namespace AgOpenGPS
 
 
 
-                    goal.northing = (crossingCurvePoint.northing - (Math.Cos(head - glm.PIBy2) * turnOffset)) - Math.Cos(head) * turnRadius;
-                    goal.easting = (crossingCurvePoint.easting - (Math.Sin(head - glm.PIBy2) * turnOffset)) - Math.Sin(head) * turnRadius;
+                    goal.northing = (crossingCurvePoint.northing - (Math.Cos(head - Glm.PIBy2) * turnOffset)) - Math.Cos(head) * turnRadius;
+                    goal.easting = (crossingCurvePoint.easting - (Math.Sin(head - Glm.PIBy2) * turnOffset)) - Math.Sin(head) * turnRadius;
                     goal.heading = head - Math.PI;
                 }
                 else
                 {
-                    goal.northing = (crossingCurvePoint.northing - (Math.Cos(head + glm.PIBy2) * turnOffset)) + Math.Cos(head) * turnRadius;
-                    goal.easting = (crossingCurvePoint.easting - (Math.Sin(head + glm.PIBy2) * turnOffset)) + Math.Sin(head) * turnRadius;
+                    goal.northing = (crossingCurvePoint.northing - (Math.Cos(head + Glm.PIBy2) * turnOffset)) + Math.Cos(head) * turnRadius;
+                    goal.easting = (crossingCurvePoint.easting - (Math.Sin(head + Glm.PIBy2) * turnOffset)) + Math.Sin(head) * turnRadius;
                     goal.heading = head + Math.PI;
                 }
 
                 //now we go the other way to turn round
                 head -= Math.PI;
-                if (head < 0) head += glm.twoPI;
+                if (head < 0) head += Glm.twoPI;
 
                 //generate the turn points
                 ytList = dubYouTurnPath.GenerateDubins(start, goal);
@@ -1109,7 +1109,7 @@ namespace AgOpenGPS
                     crossingCurvePoint.northing = mf.curve.curList[crossingCurvePoint.index].northing;
                     crossingCurvePoint.heading = mf.curve.curList[crossingCurvePoint.index].heading;
 
-                    double tooClose = glm.Distance(ytList[0], pivotPos);
+                    double tooClose = Glm.Distance(ytList[0], pivotPos);
                     isTurnCreationTooClose = tooClose < 3;
 
                     //set the flag to Critical stop machine
@@ -1318,7 +1318,7 @@ namespace AgOpenGPS
 
             //now we go the other way to turn round
             head -= Math.PI;
-            if (head < 0) head += glm.twoPI;
+            if (head < 0) head += Glm.twoPI;
 
             //set up the goal point for Dubins
             goal.heading = head;
@@ -1400,7 +1400,7 @@ namespace AgOpenGPS
                     int closestPt = 0;
                     for (int i = 0; i < ptCount; i++)
                     {
-                        double distancePiv = glm.Distance(ytList[i], pivot);
+                        double distancePiv = Glm.Distance(ytList[i], pivot);
                         if (distancePiv < minDistA)
                         {
                             minDistA = distancePiv;
@@ -1454,8 +1454,8 @@ namespace AgOpenGPS
                     //Fix the circular error - get it from -Pi/2 to Pi/2
                     if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
                     else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
-                    if (abFixHeadingDelta > glm.PIBy2) abFixHeadingDelta -= Math.PI;
-                    else if (abFixHeadingDelta < -glm.PIBy2) abFixHeadingDelta += Math.PI;
+                    if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
+                    else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
 
                     //normally set to 1, less then unity gives less heading error.
                     abFixHeadingDelta *= mf.vehicle.stanleyHeadingErrorGain;
@@ -1470,7 +1470,7 @@ namespace AgOpenGPS
                     if (steerAngleYT < -0.74) steerAngleYT = -0.74;
 
                     //add them up and clamp to max in vehicle settings
-                    steerAngleYT = glm.toDegrees((steerAngleYT + abFixHeadingDelta) * -1.0);
+                    steerAngleYT = Glm.ToDegrees((steerAngleYT + abFixHeadingDelta) * -1.0);
                     if (steerAngleYT < -mf.vehicle.maxSteerAngle) steerAngleYT = -mf.vehicle.maxSteerAngle;
                     if (steerAngleYT > mf.vehicle.maxSteerAngle) steerAngleYT = mf.vehicle.maxSteerAngle;
 
@@ -1511,7 +1511,7 @@ namespace AgOpenGPS
                     int closestPt = 0;
                     for (int i = 0; i < ptCount; i++)
                     {
-                        double distancePiv = glm.Distance(ytList[i], mf.pivotAxlePos);
+                        double distancePiv = Glm.Distance(ytList[i], mf.pivotAxlePos);
                         if (distancePiv < minDistA)
                         {
                             minDistA = distancePiv;
@@ -1571,7 +1571,7 @@ namespace AgOpenGPS
                     double distSoFar;
 
                     isABSameAsFixHeading = true;
-                    distSoFar = glm.Distance(ytList[B], rEastYT, rNorthYT);
+                    distSoFar = Glm.Distance(ytList[B], rEastYT, rNorthYT);
 
                     // used for calculating the length squared of next segment.
                     double tempDist = 0.0;
@@ -1591,7 +1591,7 @@ namespace AgOpenGPS
                         while (B < ptCount - 1)
                         {
                             B++; A++;
-                            tempDist = glm.Distance(ytList[B], ytList[A]);
+                            tempDist = Glm.Distance(ytList[B], ytList[A]);
                             if ((tempDist + distSoFar) > goalPointDistance) break; //will we go too far?
                             distSoFar += tempDist;
                         }
@@ -1603,13 +1603,13 @@ namespace AgOpenGPS
                     }
 
                     //calc "D" the distance from pivot axle to lookahead point
-                    double goalPointDistanceSquared = glm.DistanceSquared(goalPointYT.northing, goalPointYT.easting, pivot.northing, pivot.easting);
+                    double goalPointDistanceSquared = Glm.DistanceSquared(goalPointYT.northing, goalPointYT.easting, pivot.northing, pivot.easting);
 
                     //calculate the the delta x in local coordinates and steering angle degrees based on wheelbase
-                    double localHeading = glm.twoPI - mf.fixHeading;
+                    double localHeading = Glm.twoPI - mf.fixHeading;
                     ppRadiusYT = goalPointDistanceSquared / (2 * (((goalPointYT.easting - pivot.easting) * Math.Cos(localHeading)) + ((goalPointYT.northing - pivot.northing) * Math.Sin(localHeading))));
 
-                    steerAngleYT = glm.toDegrees(Math.Atan(2 * (((goalPointYT.easting - pivot.easting) * Math.Cos(localHeading))
+                    steerAngleYT = Glm.ToDegrees(Math.Atan(2 * (((goalPointYT.easting - pivot.easting) * Math.Cos(localHeading))
                         + ((goalPointYT.northing - pivot.northing) * Math.Sin(localHeading))) * mf.vehicle.wheelbase / goalPointDistanceSquared));
 
                     if (steerAngleYT < -mf.vehicle.maxSteerAngle) steerAngleYT = -mf.vehicle.maxSteerAngle;
@@ -1622,14 +1622,14 @@ namespace AgOpenGPS
                     radiusPointYT.northing = pivot.northing + (ppRadiusYT * Math.Sin(localHeading));
 
                     //angular velocity in rads/sec  = 2PI * m/sec * radians/meters
-                    double angVel = glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(glm.toRadians(steerAngleYT))) / mf.vehicle.wheelbase;
+                    double angVel = Glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(Glm.ToRadians(steerAngleYT))) / mf.vehicle.wheelbase;
 
                     //clamp the steering angle to not exceed safe angular velocity
                     if (Math.Abs(angVel) > mf.vehicle.maxAngularVelocity)
                     {
-                        steerAngleYT = glm.toDegrees(steerAngleYT > 0 ?
-                                (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity) / (glm.twoPI * mf.pn.speed * 0.277777)))
-                            : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (glm.twoPI * mf.pn.speed * 0.277777))));
+                        steerAngleYT = Glm.ToDegrees(steerAngleYT > 0 ?
+                                (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777)))
+                            : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777))));
                     }
                     //Convert to centimeters
                     distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);

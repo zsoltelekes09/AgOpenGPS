@@ -70,8 +70,8 @@ namespace AgOpenGPS
             }
             else
             {
-                metImp2m = glm.in2m;
-                m2MetImp = glm.m2in;
+                metImp2m = Glm.in2m;
+                m2MetImp = Glm.m2in;
                 lblInchesCm.Text = gStr.gsInches;
             }
             //select the page as per calling menu or button from mainGPS form

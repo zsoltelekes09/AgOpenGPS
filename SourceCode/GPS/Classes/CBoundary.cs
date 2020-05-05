@@ -70,16 +70,16 @@ namespace AgOpenGPS
                 {
                     GL.Vertex3(bndBeingMadePts[0].easting, bndBeingMadePts[0].northing, 0);
 
-                    GL.Vertex3(pivot.easting + (Math.Sin(pivot.heading - glm.PIBy2) * -mf.bnd.createBndOffset),
-                            pivot.northing + (Math.Cos(pivot.heading - glm.PIBy2) * -mf.bnd.createBndOffset), 0);
+                    GL.Vertex3(pivot.easting + (Math.Sin(pivot.heading - Glm.PIBy2) * -mf.bnd.createBndOffset),
+                            pivot.northing + (Math.Cos(pivot.heading - Glm.PIBy2) * -mf.bnd.createBndOffset), 0);
                     GL.Vertex3(bndBeingMadePts[bndBeingMadePts.Count - 1].easting, bndBeingMadePts[bndBeingMadePts.Count - 1].northing, 0);
                 }
                 else
                 {
                     GL.Vertex3(bndBeingMadePts[0].easting, bndBeingMadePts[0].northing, 0);
 
-                    GL.Vertex3(pivot.easting + (Math.Sin(pivot.heading - glm.PIBy2) * mf.bnd.createBndOffset),
-                            pivot.northing + (Math.Cos(pivot.heading - glm.PIBy2) * mf.bnd.createBndOffset), 0);
+                    GL.Vertex3(pivot.easting + (Math.Sin(pivot.heading - Glm.PIBy2) * mf.bnd.createBndOffset),
+                            pivot.northing + (Math.Cos(pivot.heading - Glm.PIBy2) * mf.bnd.createBndOffset), 0);
                     GL.Vertex3(bndBeingMadePts[bndBeingMadePts.Count - 1].easting, bndBeingMadePts[bndBeingMadePts.Count - 1].northing, 0);
                 }
                 GL.End();

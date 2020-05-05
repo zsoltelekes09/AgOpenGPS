@@ -605,9 +605,6 @@ namespace AgOpenGPS
             //Stanley guidance
             isStanleyUsed = Properties.Vehicle.Default.setVehicle_isStanleyUsed;
 
-            //motor controller
-            isJRK = Properties.Settings.Default.setAS_isJRK;
-
             isRTK = Properties.Settings.Default.setGPS_isRTK;
         }
 
@@ -1113,7 +1110,7 @@ namespace AgOpenGPS
             btnHeadlandOnOff.Image = (hd.isOn = hd.headArr.Count > 0) ? Resources.HeadlandOn : Resources.HeadlandOff;
         }
 
-        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OptionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var form = new FormDisplayOptions(this))
             {
@@ -1125,7 +1122,7 @@ namespace AgOpenGPS
 
         }
 
-        private void colorsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ColorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var form = new FormColor(this))
             {
@@ -1137,28 +1134,16 @@ namespace AgOpenGPS
 
         }
 
-        private void stripSectionColor_Click(object sender, EventArgs e)
+        private void StripSectionColor_Click(object sender, EventArgs e)
         {
-            ColorDialog colorDlg = new ColorDialog
+            using (var form = new FormColorPicker(this, sectionColorDay))
             {
-                FullOpen = true,
-                AnyColor = true,
-                SolidColorOnly = false,
-                Color = Settings.Default.setDisplay_colorSectionsDay
-            };
-
-            colorDlg.CustomColors = customColorsList;
-
-            if (colorDlg.ShowDialog() != DialogResult.OK) return;
-
-            sectionColorDay = colorDlg.Color;
-
-            //save the custom colors
-            customColorsList = colorDlg.CustomColors;
-            Properties.Settings.Default.setDisplay_customColors = "";
-            for (int i = 0; i < 15; i++)
-                Properties.Settings.Default.setDisplay_customColors += customColorsList[i].ToString() + ",";
-            Properties.Settings.Default.setDisplay_customColors += customColorsList[15].ToString();
+                var result = form.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    sectionColorDay = form.UseThisColor;
+                }
+            }
 
             Settings.Default.setDisplay_colorSectionsDay = sectionColorDay;
             Settings.Default.Save();
@@ -1166,7 +1151,7 @@ namespace AgOpenGPS
             stripSectionColor.BackColor = sectionColorDay;
         }
 
-        private void keyboardToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void KeyboardToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             isKeyboardOn = !isKeyboardOn;
             keyboardToolStripMenuItem1.Checked = isKeyboardOn;

@@ -49,7 +49,7 @@ namespace AgOpenGPS
             if (mf.ABLine.isABLineSet)
             {
                 //AB line is on screen and set
-                upDnHeading = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 6);
+                upDnHeading = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 6);
                 this.tboxHeading.TextChanged -= new System.EventHandler(this.TboxHeading_TextChanged);
                 tboxHeading.Text = upDnHeading.ToString(CultureInfo.InvariantCulture);
                 this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
@@ -59,7 +59,7 @@ namespace AgOpenGPS
                 //no AB line
                 btnAPoint.Enabled = false;
                 btnBPoint.Enabled = false;
-                upDnHeading = Math.Round(glm.toDegrees(mf.fixHeading), 6);
+                upDnHeading = Math.Round(Glm.ToDegrees(mf.fixHeading), 6);
                 //mf.ABLine.tramPassEvery = 0;
                 //mf.ABLine.tramBasedOn = 0;
             }
@@ -98,7 +98,7 @@ namespace AgOpenGPS
             mf.ABLine.SetABLineByHeading();
 
             btnAPoint.Enabled = false;
-            upDnHeading = Math.Round(glm.toDegrees(mf.fixHeading), 1);
+            upDnHeading = Math.Round(Glm.ToDegrees(mf.fixHeading), 1);
             this.tboxHeading.TextChanged -= new System.EventHandler(this.TboxHeading_TextChanged);
             tboxHeading.Text = upDnHeading.ToString();
             this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
@@ -109,13 +109,13 @@ namespace AgOpenGPS
         private void BtnBPoint_Click(object sender, EventArgs e)
         {
             mf.ABLine.SetABLineByBPoint();
-            upDnHeading = Math.Round(glm.toDegrees(mf.fixHeading), 3);
+            upDnHeading = Math.Round(Glm.ToDegrees(mf.fixHeading), 3);
 
             //update the default
             //if (mf.ABLine.tramPassEvery == 0) mf.mc.machineData[mf.mc.rdTramLine] = 0;
 
             this.tboxHeading.TextChanged -= new System.EventHandler(this.TboxHeading_TextChanged);
-            tboxHeading.Text = glm.toDegrees(mf.ABLine.abHeading).ToString("N4");
+            tboxHeading.Text = Glm.ToDegrees(mf.ABLine.abHeading).ToString("N4");
             this.tboxHeading.TextChanged += new System.EventHandler(this.TboxHeading_TextChanged);
             //mf.ABLine.SetABLineByHeading();
 
@@ -161,7 +161,7 @@ namespace AgOpenGPS
 
                 lvLines.Enabled = false;
                 btnAddToFile.Focus();
-                tboxABLineName.Text = (Math.Round(glm.toDegrees(mf.ABLine.abHeading), 1)).ToString(CultureInfo.InvariantCulture)
+                tboxABLineName.Text = (Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 1)).ToString(CultureInfo.InvariantCulture)
                     + "\u00B0" +
                     mf.FindDirection(mf.ABLine.abHeading) + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
             }
@@ -200,7 +200,7 @@ namespace AgOpenGPS
             {
                 upDnHeading += 360;
             }
-            mf.ABLine.abHeading = glm.toRadians(upDnHeading);
+            mf.ABLine.abHeading = Glm.ToRadians(upDnHeading);
             tboxHeading.Text = Convert.ToString(upDnHeading, CultureInfo.InvariantCulture);
         }
 
@@ -215,7 +215,7 @@ namespace AgOpenGPS
                 upDnHeading -= 360;
             }
             //upDnHeading = (int)upDnHeading;
-            mf.ABLine.abHeading = glm.toRadians(upDnHeading);
+            mf.ABLine.abHeading = Glm.ToRadians(upDnHeading);
             tboxHeading.Text = Convert.ToString(upDnHeading, CultureInfo.InvariantCulture);
         }
 
@@ -249,7 +249,7 @@ namespace AgOpenGPS
             if (line?.Length == 0) line = "0";
             if (line == ".") line = "0";
             upDnHeading = double.Parse(line, CultureInfo.InvariantCulture);
-            mf.ABLine.abHeading = glm.toRadians(Math.Round(upDnHeading, 6));
+            mf.ABLine.abHeading = Glm.ToRadians(Math.Round(upDnHeading, 6));
             mf.ABLine.SetABLineByHeading();
             //ShowSavedPanel(true);
             tboxABLineName.BackColor = Color.LightGreen;
@@ -444,7 +444,7 @@ namespace AgOpenGPS
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            lblFixHeading.Text = Convert.ToString(Math.Round(glm.toDegrees(mf.fixHeading), 1)) + "°";
+            lblFixHeading.Text = Convert.ToString(Math.Round(Glm.ToDegrees(mf.fixHeading), 1)) + "°";
             lblKeepGoing.Text = "";
 
             if (!isFullPanel)

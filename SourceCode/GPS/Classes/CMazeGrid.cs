@@ -154,7 +154,7 @@ namespace AgOpenGPS
                 int j = i + 1;
                 if (j == cnt)
                     j = i;
-                double distance = glm.Distance(mazeList[i], mazeList[j]);
+                double distance = Glm.Distance(mazeList[i], mazeList[j]);
                 if (distance > 2)
                 {
                     vec3 pointB = new vec3((mazeList[i].easting + mazeList[j].easting) / 2.0,
@@ -209,7 +209,7 @@ namespace AgOpenGPS
             {
                 vec3 pt3 = arr[i];
                 pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i].easting, arr[i + 1].northing - arr[i].northing);
-                if (pt3.heading < 0) pt3.heading += glm.twoPI;
+                if (pt3.heading < 0) pt3.heading += Glm.twoPI;
                 mazeList.Add(pt3);
             }
 

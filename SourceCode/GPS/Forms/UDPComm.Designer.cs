@@ -15,7 +15,8 @@ namespace AgOpenGPS
         // Send and Recv socket
         private Socket sendSocket;
         private Socket recvSocket;
-        private bool isUDPSendConnected;
+        public bool isUDPSendConnected;
+        public int autoSteerUDPActivity, machineUDPActivity, switchUDPActivity;
 
         //IP address and port of Auto Steer server
         IPAddress epIP = IPAddress.Parse(Properties.Settings.Default.setIP_autoSteerIP);
@@ -41,202 +42,10 @@ namespace AgOpenGPS
         private delegate void UpdateStatusDelegate(string status);
         private UpdateStatusDelegate updateStatusDelegate = null;
 
-        public void SendAppData(IAsyncResult asyncResult)
-        {
-            try
-            {
-                sendToAppSocket.EndSend(asyncResult);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("SendData Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void ReceiveAppData(IAsyncResult asyncResult)
-        {
-            try
-            {
-                // Initialise the IPEndPoint for the clients
-                EndPoint epSender = new IPEndPoint(IPAddress.Any, 0);
-
-                // Receive all data
-                int msgLen = recvFromAppSocket.EndReceiveFrom(asyncResult, ref epSender);
-
-                byte[] localMsg = new byte[msgLen];
-                Array.Copy(appBuffer, localMsg, msgLen);
-
-                // Listen for more connections again...
-                recvFromAppSocket.BeginReceiveFrom(appBuffer, 0, appBuffer.Length, SocketFlags.None, ref epSender, new AsyncCallback(ReceiveAppData), epSender);
-
-                string text = Encoding.ASCII.GetString(localMsg);
-
-                // Update status through a delegate
-                Invoke(updateStatusDelegate, new object[] { text + " IP: " + epSender.ToString() + "\r\n" });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("ReceiveData Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void SendToApp()
-        {
-            try
-            {
-                // Get packet as byte array
-                byte[] byteData = Encoding.ASCII.GetBytes("98,43,26");
-
-                if (byteData.Length != 0)
-                    sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length, 
-                        SocketFlags.None, epAppOne, new AsyncCallback(SendAppData), null);
-
-                    //sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length, 
-                        //SocketFlags.None, epAppTwo, new AsyncCallback(SendAppData), null);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Send Error: " + ex.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        public void SendPgnToApp(byte[] byteData)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    if (byteData.Length != 0)
-                        sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length,
-                            SocketFlags.None, epAppOne, new AsyncCallback(SendAppData), null);
-                }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void UpdateAppStatus(string status)
-        {
-            //rtxtStatus.Text = (status);
-        }
-
-        // ------------------------------------------------------------------
-
-
-        //sends ascii text message
-
-        public void SendUDPMessage(string message)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
-
-                    // Get packet as byte array to send
-                    byte[] byteData = Encoding.ASCII.GetBytes(message);
-                    if (byteData.Length != 0)
-                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
-                }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        //sends byte array
-        public void SendUDPMessage(byte[] byteData)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
-
-                    // Send packet to the zero
-                    if (byteData.Length != 0)
-                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
-                }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        //sends byte array
-        public void SendUDPMessageNTRIP(byte[] byteData, int port)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, port);
-
-                    // Send packet to the zero
-                    if (byteData.Length != 0)
-                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
-                }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void SendData(IAsyncResult asyncResult)
-        {
-            try
-            {
-                sendSocket.EndSend(asyncResult);
-            }
-            catch (Exception)
-            {
-                //WriteErrorLog(" UDP Send Data" + e.ToString());
-                //MessageBox.Show("SendData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void ReceiveData(IAsyncResult asyncResult)
-        {
-            try
-            {
-                // Initialise the IPEndPoint for the client
-                EndPoint epSender = new IPEndPoint(IPAddress.Any, 0);
-
-                // Receive all data
-                int msgLen = recvSocket.EndReceiveFrom(asyncResult, ref epSender);
-
-                byte[] localMsg = new byte[msgLen];
-                Array.Copy(buffer, localMsg, msgLen);
-
-                // Listen for more connections again...
-                recvSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref epSender, new AsyncCallback(ReceiveData), epSender);
-
-                //string text =  Encoding.ASCII.GetString(localMsg);
-                
-                int port = ((IPEndPoint)epSender).Port;
-                // Update status through a delegate
-                Invoke(updateRecvMessageDelegate, new object[] { port, localMsg });
-            }
-            catch (Exception)
-            {
-                //WriteErrorLog("UDP Recv data " + e.ToString());
-                //MessageBox.Show("ReceiveData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void UpdateRecvMessage(int port, byte[] Data)
         {
             //update progress bar for autosteer
-            if (pbarUDP++ > 99) pbarUDP = 0;
+            pbarUDP++;
 
             if (Data[0] == 0xB5 && Data[1] == 0x62 && Data[2] == 0x01)//Daniel P
             {
@@ -331,7 +140,7 @@ namespace AgOpenGPS
                                 }
 
                                 pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
-                                ahrs.rollX16 = (int)(glm.toRadians(Math.Atan2((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.1, pn.DualAntennaDistance)) * 16);
+                                ahrs.rollX16 = (int)(Glm.ToRadians(Math.Atan2((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.1, pn.DualAntennaDistance)) * 16);
 
                                 recvSentenceSettings[3] = recvSentenceSettings[1];
                                 recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + ahrs.rollX16.ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
@@ -447,6 +256,7 @@ namespace AgOpenGPS
 
                             mc.pwmDisplay = Data[9];
 
+                            autoSteerUDPActivity++;
 
                             break;
                         }
@@ -454,7 +264,8 @@ namespace AgOpenGPS
                     //From Machine Data
                     case 0xE0:
                         {
-                            mc.recvUDPSentence = DateTime.Now.ToString() + "," + Data[2].ToString();
+                            //mc.recvUDPSentence = DateTime.Now.ToString() + "," + data[2].ToString();
+                            machineUDPActivity++;
                             break;
                         }
 
@@ -489,7 +300,7 @@ namespace AgOpenGPS
                             }
 
                             //spAutoSteer.Close();
-                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_UDP_4202.INO ", gStr.gsFileError,
+                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_UDP_" + currentVersionStr + ".ino", gStr.gsFileError,
                                                 MessageBoxButtons.OK, MessageBoxIcon.Question);
                             Close();
                         }
@@ -544,11 +355,206 @@ namespace AgOpenGPS
                             mc.ss[mc.swOFFHi] = Data[7];//Section Auto status(only when Section On)
                             mc.ss[mc.swOFFLo] = Data[8];//Section Auto status(only when Section On)
                             mc.ss[mc.swMain] = Data[9];  //read MainSW+RateSW
+                            mc.ss[mc.swHeaderLo] = 249;
+
+
+
+                            switchUDPActivity++;
                             break;
                         }
                 }
             }
         }
+
+        private void ReceiveData(IAsyncResult asyncResult)
+        {
+            try
+            {
+                // Initialise the IPEndPoint for the client
+                EndPoint epSender = new IPEndPoint(IPAddress.Any, 0);
+
+                // Receive all data
+                int msgLen = recvSocket.EndReceiveFrom(asyncResult, ref epSender);
+
+                byte[] localMsg = new byte[msgLen];
+                Array.Copy(buffer, localMsg, msgLen);
+
+                // Listen for more connections again...
+                recvSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref epSender, new AsyncCallback(ReceiveData), epSender);
+
+                //string text =  Encoding.ASCII.GetString(localMsg);
+                
+                int port = ((IPEndPoint)epSender).Port;
+                // Update status through a delegate
+                Invoke(updateRecvMessageDelegate, new object[] { port, localMsg });
+            }
+            catch (Exception)
+            {
+                //WriteErrorLog("UDP Recv data " + e.ToString());
+                //MessageBox.Show("ReceiveData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void SendUDPMessage(string message)
+        {
+            if (isUDPSendConnected)
+            {
+                try
+                {
+                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
+
+                    // Get packet as byte array to send
+                    byte[] byteData = Encoding.ASCII.GetBytes(message);
+                    if (byteData.Length != 0)
+                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
+                }
+                catch (Exception)
+                {
+                    //WriteErrorLog("Sending UDP Message" + e.ToString());
+                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        //sends byte array
+        public void SendUDPMessage(byte[] byteData)
+        {
+            if (isUDPSendConnected)
+            {
+                try
+                {
+                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
+
+                    // Send packet to the zero
+                    if (byteData.Length != 0)
+                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
+                }
+                catch (Exception)
+                {
+                    //WriteErrorLog("Sending UDP Message" + e.ToString());
+                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void SendData(IAsyncResult asyncResult)
+        {
+            try
+            {
+                sendSocket.EndSend(asyncResult);
+            }
+            catch (Exception)
+            {
+                //WriteErrorLog(" UDP Send Data" + e.ToString());
+                //MessageBox.Show("SendData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //sends byte array
+        public void SendUDPMessageNTRIP(byte[] byteData, int port)
+        {
+            if (isUDPSendConnected)
+            {
+                try
+                {
+                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, port);
+
+                    // Send packet to the zero
+                    if (byteData.Length != 0)
+                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
+                }
+                catch (Exception)
+                {
+                    //WriteErrorLog("Sending UDP Message" + e.ToString());
+                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------
+
+        public void SendAppData(IAsyncResult asyncResult)
+        {
+            try
+            {
+                sendToAppSocket.EndSend(asyncResult);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("SendData Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ReceiveAppData(IAsyncResult asyncResult)
+        {
+            try
+            {
+                // Initialise the IPEndPoint for the clients
+                EndPoint epSender = new IPEndPoint(IPAddress.Any, 0);
+
+                // Receive all data
+                int msgLen = recvFromAppSocket.EndReceiveFrom(asyncResult, ref epSender);
+
+                byte[] localMsg = new byte[msgLen];
+                Array.Copy(appBuffer, localMsg, msgLen);
+
+                // Listen for more connections again...
+                recvFromAppSocket.BeginReceiveFrom(appBuffer, 0, appBuffer.Length, SocketFlags.None, ref epSender, new AsyncCallback(ReceiveAppData), epSender);
+
+                string text = Encoding.ASCII.GetString(localMsg);
+
+                // Update status through a delegate
+                Invoke(updateStatusDelegate, new object[] { text + " IP: " + epSender.ToString() + "\r\n" });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ReceiveData Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SendToApp()
+        {
+            try
+            {
+                // Get packet as byte array
+                byte[] byteData = Encoding.ASCII.GetBytes("98,43,26");
+
+                if (byteData.Length != 0)
+                    sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length, 
+                        SocketFlags.None, epAppOne, new AsyncCallback(SendAppData), null);
+
+                    //sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length, 
+                        //SocketFlags.None, epAppTwo, new AsyncCallback(SendAppData), null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Send Error: " + ex.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void SendPgnToApp(byte[] byteData)
+        {
+            if (isUDPSendConnected)
+            {
+                try
+                {
+                    if (byteData.Length != 0)
+                        sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length,
+                            SocketFlags.None, epAppOne, new AsyncCallback(SendAppData), null);
+                }
+                catch (Exception)
+                {
+                    //WriteErrorLog("Sending UDP Message" + e.ToString());
+                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void UpdateAppStatus(string status)
+        {
+            //rtxtStatus.Text = (status);
+        }
+
 
         #region keystrokes
         //keystrokes for easy and quick startup

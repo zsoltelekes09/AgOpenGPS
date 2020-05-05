@@ -116,7 +116,7 @@ namespace AgOpenGPS
 
                 font.DrawText(edge, line, "NMEA: " + recvSentenceSettings, 1);
                 line += 30;
-                if (sp.IsOpen)
+                if (spGPS.IsOpen)
                 {
                     font.DrawText(edge, line, "GPS Port: Connected", 1);
                 }
@@ -548,7 +548,7 @@ namespace AgOpenGPS
             GL.Translate(0, 0, -500);
 
             //rotate camera so heading matched fix heading in the world
-            GL.Rotate(glm.toDegrees(toolPos.heading), 0, 0, 1);
+            GL.Rotate(Glm.ToDegrees(toolPos.heading), 0, 0, 1);
 
             //translate to that spot in the world 
             GL.Translate(-toolPos.easting, -toolPos.northing, 0);
@@ -1637,7 +1637,7 @@ namespace AgOpenGPS
 
                 GL.Enable(EnableCap.Texture2D);
 
-                double u = (fixHeading)/glm.twoPI;
+                double u = (fixHeading)/Glm.twoPI;
                 GL.Begin(PrimitiveType.TriangleStrip);              // Build Quad From A Triangle Strip
                 GL.TexCoord2(u+0.25,      0); GL.Vertex2(winRightPos, 0.0); // Top Right
                 GL.TexCoord2(u, 0); GL.Vertex2(winLeftPos, 0.0); // Top Left
@@ -1674,6 +1674,8 @@ namespace AgOpenGPS
 
                 font.DrawText(center, 80, "I:" + Math.Round(ahrs.correctionHeadingX16 * 0.0625, 1).ToString(), 0.8);
             }
+
+            //if (isFixHolding) font.DrawText(center, 110, "Holding", 0.8);
 
             GL.Color3(0.9752f, 0.952f, 0.0f);
             //font.DrawText(center, 130, "Beta v4.2.02", 1.0);
@@ -1745,11 +1747,9 @@ namespace AgOpenGPS
             GL.Enable(EnableCap.Texture2D);
 
             GL.BindTexture(TextureTarget.Texture2D, texture[7]);        // Select Our Texture
-            GL.Color4(0.952f, 0.870f, 0.823f, 0.8);
+            GL.Color4(0.952f, 0.980f, 0.98f, 0.99);
 
-            int bottomSide = oglMain.Height - 170;
-
-            GL.Translate(oglMain.Width / 2 - 60, bottomSide, 0);
+            GL.Translate(oglMain.Width / 2 - 65, 65, 0);
 
             GL.Begin(PrimitiveType.Quads);              // Build Quad From A Triangle Strip
             {
@@ -1963,15 +1963,15 @@ namespace AgOpenGPS
                 if (bnd.bndArr.Count > 0)
                 {
                     sb.Clear();
-                    sb.Append(((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ha).ToString("N3"));
+                    sb.Append(((fd.workedAreaTotal - fd.actualAreaCovered) * Glm.m2ha).ToString("N3"));
                     sb.Append("Ha ");
                     sb.Append(fd.overlapPercent.ToString("N2"));
                     sb.Append("%  ");
-                    sb.Append((fd.areaBoundaryOuterLessInner * glm.m2ha).ToString("N2"));
+                    sb.Append((fd.areaBoundaryOuterLessInner * Glm.m2ha).ToString("N2"));
                     sb.Append("-");
-                    sb.Append((fd.actualAreaCovered * glm.m2ha).ToString("N2"));
+                    sb.Append((fd.actualAreaCovered * Glm.m2ha).ToString("N2"));
                     sb.Append(" = ");
-                    sb.Append(((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ha).ToString("N2"));
+                    sb.Append(((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * Glm.m2ha).ToString("N2"));
                     sb.Append("Ha  ");
                     sb.Append(fd.TimeTillFinished);
                     GL.Color3(0.95, 0.95, 0.95);
@@ -1983,7 +1983,7 @@ namespace AgOpenGPS
                     //sb.Append("Overlap ");
                     sb.Append(fd.overlapPercent.ToString("N3"));
                     sb.Append("%   ");
-                    sb.Append((fd.actualAreaCovered * glm.m2ha).ToString("N3"));
+                    sb.Append((fd.actualAreaCovered * Glm.m2ha).ToString("N3"));
                     sb.Append("Ha");
                     GL.Color3(0.95, 0.95, 0.95);
                     font.DrawText(0, oglMain.Height - 32, sb.ToString());
@@ -1994,15 +1994,15 @@ namespace AgOpenGPS
                 if (bnd.bndArr.Count > 0)
                 {
                     sb.Clear();
-                    sb.Append(((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ac).ToString("N3"));
+                    sb.Append(((fd.workedAreaTotal - fd.actualAreaCovered) * Glm.m2ac).ToString("N3"));
                     sb.Append("Ac ");
                     sb.Append(fd.overlapPercent.ToString("N2"));
                     sb.Append("%  ");
-                    sb.Append((fd.areaBoundaryOuterLessInner * glm.m2ac).ToString("N2"));
+                    sb.Append((fd.areaBoundaryOuterLessInner * Glm.m2ac).ToString("N2"));
                     sb.Append("-");
-                    sb.Append((fd.actualAreaCovered * glm.m2ac).ToString("N2"));
+                    sb.Append((fd.actualAreaCovered * Glm.m2ac).ToString("N2"));
                     sb.Append(" = ");
-                    sb.Append(((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * glm.m2ac).ToString("N2"));
+                    sb.Append(((fd.areaBoundaryOuterLessInner - fd.actualAreaCovered) * Glm.m2ac).ToString("N2"));
                     sb.Append("Ac  ");
                     sb.Append(fd.TimeTillFinished);
                     GL.Color3(0.95, 0.95, 0.95);
@@ -2014,7 +2014,7 @@ namespace AgOpenGPS
                     //sb.Append("Overlap ");
                     sb.Append(fd.overlapPercent.ToString("N3"));
                     sb.Append("%   ");
-                    sb.Append((fd.actualAreaCovered * glm.m2ac).ToString("N3"));
+                    sb.Append((fd.actualAreaCovered * Glm.m2ac).ToString("N3"));
                     sb.Append("Ac");
                     GL.Color3(0.95, 0.95, 0.95);
                     font.DrawText(0, oglMain.Height - 32, sb.ToString());

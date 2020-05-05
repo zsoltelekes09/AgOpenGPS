@@ -270,7 +270,7 @@ namespace AgOpenGPS
             }
 
             //create list of list of points of triangle strip of AB Highlight
-            double headingCalc = abHeading + glm.PIBy2;
+            double headingCalc = abHeading + Glm.PIBy2;
             hsin = Math.Sin(headingCalc);
             hcos = Math.Cos(headingCalc);
 
@@ -388,9 +388,9 @@ namespace AgOpenGPS
 
                 //Subtract the two headings, if > 1.57 its going the opposite heading as refAB
                 abFixHeadingDelta = (Math.Abs(mf.fixHeading - abHeading));
-                if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - glm.twoPI);
+                if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - Glm.twoPI);
 
-                isABSameAsVehicleHeading = abFixHeadingDelta < glm.PIBy2;
+                isABSameAsVehicleHeading = abFixHeadingDelta < Glm.PIBy2;
 
                 // **Stanley Point ** - calc point on ABLine closest to current steer position
                 double U = (((steer.easting - currentABLineP1.easting) * dx)
@@ -425,8 +425,8 @@ namespace AgOpenGPS
                 if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
                 else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
 
-                if (abFixHeadingDelta > glm.PIBy2) abFixHeadingDelta -= Math.PI;
-                else if (abFixHeadingDelta < -glm.PIBy2) abFixHeadingDelta += Math.PI;
+                if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
+                else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
 
                 abFixHeadingDelta *= mf.vehicle.stanleyHeadingErrorGain;
                 if (abFixHeadingDelta > 0.4) abFixHeadingDelta = 0.4;
@@ -439,9 +439,9 @@ namespace AgOpenGPS
                 if (steerAngleAB < -0.4) steerAngleAB = -0.4;
 
                 if (mf.pn.speed > -0.1)
-                    steerAngleAB = glm.toDegrees((steerAngleAB + abFixHeadingDelta) * -1.0);
+                    steerAngleAB = Glm.ToDegrees((steerAngleAB + abFixHeadingDelta) * -1.0);
                 else
-                    steerAngleAB = glm.toDegrees((steerAngleAB - abFixHeadingDelta) * -1.0);
+                    steerAngleAB = Glm.ToDegrees((steerAngleAB - abFixHeadingDelta) * -1.0);
 
                 if (steerAngleAB < -mf.vehicle.maxSteerAngle) steerAngleAB = -mf.vehicle.maxSteerAngle;
                 if (steerAngleAB > mf.vehicle.maxSteerAngle) steerAngleAB = mf.vehicle.maxSteerAngle;
@@ -526,7 +526,7 @@ namespace AgOpenGPS
 
                 //Subtract the two headings, if > 1.57 its going the opposite heading as refAB
                 abFixHeadingDelta = (Math.Abs(mf.fixHeading - abHeading));
-                if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - glm.twoPI);
+                if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - Glm.twoPI);
 
                 // ** Pure pursuit ** - calc point on ABLine closest to current position
                 double U = (((pivot.easting - currentABLineP1.easting) * dx)
@@ -537,7 +537,7 @@ namespace AgOpenGPS
                 rEastAB = currentABLineP1.easting + (U * dx);
                 rNorthAB = currentABLineP1.northing + (U * dy);
 
-                if (abFixHeadingDelta >= glm.PIBy2)
+                if (abFixHeadingDelta >= Glm.PIBy2)
                 {
                     isABSameAsVehicleHeading = false;
                     goalPointAB.easting = rEastAB - (Math.Sin(abHeading) * goalPointDistance);
@@ -552,14 +552,14 @@ namespace AgOpenGPS
 
                 //calc "D" the distance from pivot axle to lookahead point
                 double goalPointDistanceDSquared
-                    = glm.DistanceSquared(goalPointAB.northing, goalPointAB.easting, pivot.northing, pivot.easting);
+                    = Glm.DistanceSquared(goalPointAB.northing, goalPointAB.easting, pivot.northing, pivot.easting);
 
                 //calculate the the new x in local coordinates and steering angle degrees based on wheelbase
-                double localHeading = glm.twoPI - mf.fixHeading;
+                double localHeading = Glm.twoPI - mf.fixHeading;
                 ppRadiusAB = goalPointDistanceDSquared / (2 * (((goalPointAB.easting - pivot.easting) * Math.Cos(localHeading))
                     + ((goalPointAB.northing - pivot.northing) * Math.Sin(localHeading))));
 
-                steerAngleAB = glm.toDegrees(Math.Atan(2 * (((goalPointAB.easting - pivot.easting) * Math.Cos(localHeading))
+                steerAngleAB = Glm.ToDegrees(Math.Atan(2 * (((goalPointAB.easting - pivot.easting) * Math.Cos(localHeading))
                     + ((goalPointAB.northing - pivot.northing) * Math.Sin(localHeading))) * mf.vehicle.wheelbase
                     / goalPointDistanceDSquared));
                 if (steerAngleAB < -mf.vehicle.maxSteerAngle) steerAngleAB = -mf.vehicle.maxSteerAngle;
@@ -576,14 +576,14 @@ namespace AgOpenGPS
                 distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
 
                 //angular velocity in rads/sec  = 2PI * m/sec * radians/meters
-                angVel = glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(glm.toRadians(steerAngleAB))) / mf.vehicle.wheelbase;
+                angVel = Glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(Glm.ToRadians(steerAngleAB))) / mf.vehicle.wheelbase;
 
                 //clamp the steering angle to not exceed safe angular velocity
                 if (Math.Abs(angVel) > mf.vehicle.maxAngularVelocity)
                 {
-                    steerAngleAB = glm.toDegrees(steerAngleAB > 0 ? (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity)
-                        / (glm.twoPI * mf.pn.speed * 0.277777)))
-                        : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (glm.twoPI * mf.pn.speed * 0.277777))));
+                    steerAngleAB = Glm.ToDegrees(steerAngleAB > 0 ? (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity)
+                        / (Glm.twoPI * mf.pn.speed * 0.277777)))
+                        : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777))));
                 }
 
                 //distance is negative if on left, positive if on right
@@ -626,12 +626,12 @@ namespace AgOpenGPS
             //calculate the heading 90 degrees to ref ABLine heading
             if (isABSameAsVehicleHeading)
             {
-                headingCalc = abHeading + glm.PIBy2;
+                headingCalc = abHeading + Glm.PIBy2;
                 moveDistance += dist;
             }
             else
             {
-                headingCalc = abHeading - glm.PIBy2;
+                headingCalc = abHeading - Glm.PIBy2;
                 moveDistance -= dist;
             }
 
@@ -674,7 +674,7 @@ namespace AgOpenGPS
 
             //calculate the AB Heading
             abHeading = Math.Atan2(refPoint2.easting - refPoint1.easting, refPoint2.northing - refPoint1.northing);
-            if (abHeading < 0) abHeading += glm.twoPI;
+            if (abHeading < 0) abHeading += Glm.twoPI;
 
             //sin x cos z for endpoints, opposite for additional lines
             refABLineP1.easting = refPoint1.easting - (Math.Sin(abHeading) *   1600.0);
@@ -710,11 +710,11 @@ namespace AgOpenGPS
             //calculate the heading 90 degrees to ref ABLine heading
             if (isOnRightSideCurrentLine)
             {
-                headingCalc = abHeading + glm.PIBy2;
+                headingCalc = abHeading + Glm.PIBy2;
             }
             else
             {
-                headingCalc = abHeading - glm.PIBy2;
+                headingCalc = abHeading - Glm.PIBy2;
             }
 
             if (isABSameAsVehicleHeading)

@@ -85,7 +85,7 @@ namespace AgOpenGPS
                 for (int j = 0; j < lineCount; j++)
                 {
                     //make sure distance between headland and boundary is not less then width
-                    distance = glm.Distance(curBnd[i], geoFenceLine[j]);
+                    distance = Glm.Distance(curBnd[i], geoFenceLine[j]);
                     if (distance < (totalHeadWidth * 0.96))
                     {
                         geoFenceLine.RemoveAt(j);
@@ -101,7 +101,7 @@ namespace AgOpenGPS
             //double spacing = mf.tool.toolWidth * 0.25;
             for (int i = 0; i < bndCount - 1; i++)
             {
-                distance = glm.Distance(geoFenceLine[i], geoFenceLine[i + 1]);
+                distance = Glm.Distance(geoFenceLine[i], geoFenceLine[i + 1]);
                 if (distance < spacing)
                 {
                     geoFenceLine.RemoveAt(i + 1);
@@ -116,7 +116,7 @@ namespace AgOpenGPS
             {
                 int j = i + 1;
                 if (j == bndCount) j = 0;
-                distance = glm.Distance(geoFenceLine[i], geoFenceLine[j]);
+                distance = Glm.Distance(geoFenceLine[i], geoFenceLine[j]);
                 if (distance > (spacing * 1.25))
                 {
                     vec2 pointB = new vec2((geoFenceLine[i].easting + geoFenceLine[j].easting) / 2.0, (geoFenceLine[i].northing + geoFenceLine[j].northing) / 2.0);

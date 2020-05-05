@@ -26,7 +26,7 @@ namespace AgOpenGPS
             snapAdj = Properties.Settings.Default.setAS_snapDistance * 0.01;
             nudMinTurnRadius.Value = Properties.Settings.Default.setAS_snapDistance;
 
-            tboxHeading.Text = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 3).ToString("N3");
+            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
             btnCancel.Focus();
             mf.ABLine.isEditing = true;
             mf.layoutPanelRight.Enabled = true;
@@ -103,7 +103,7 @@ namespace AgOpenGPS
 
         private void BtnSwapAB_Click(object sender, EventArgs e)
         {
-            mf.ABLine.abHeading = (mf.ABLine.abHeading + Math.PI) % glm.twoPI;
+            mf.ABLine.abHeading = (mf.ABLine.abHeading + Math.PI) % Glm.twoPI;
 
             mf.ABLine.refABLineP1.easting = mf.ABLine.refPoint1.easting - (Math.Sin(mf.ABLine.abHeading) *   1600.0);
             mf.ABLine.refABLineP1.northing = mf.ABLine.refPoint1.northing - (Math.Cos(mf.ABLine.abHeading) * 1600.0);
@@ -115,31 +115,31 @@ namespace AgOpenGPS
 
             if (mf.tram.displayMode > 0) mf.ABLine.BuildTram();
 
-            tboxHeading.Text = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 3).ToString("N3");
+            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
         }
 
         private void BtnBPoint_Click(object sender, EventArgs e)
         {
             mf.ABLine.SetABLineByBPoint();
-            tboxHeading.Text = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 3).ToString("N3");
+            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
 
             //update the default
             //if (mf.ABLine.tramPassEvery == 0) mf.mc.machineData[mf.mc.rdTramLine] = 0;
 
-            tboxHeading.Text = Math.Round(glm.toDegrees(mf.ABLine.abHeading), 3).ToString("N3");
+            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
         }
 
         private void TboxHeading_Enter(object sender, EventArgs e)
         {
             tboxHeading.Text = "";
 
-            using (var form = new FormNumeric(0, 360, Math.Round(glm.toDegrees(mf.ABLine.abHeading), 5)))
+            using (var form = new FormNumeric(0, 360, Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 5)))
             {
                 var result = form.ShowDialog();
                 if (result == DialogResult.OK)
                 {
                     tboxHeading.Text = ((double)form.ReturnValue).ToString("N3");
-                    mf.ABLine.abHeading = glm.toRadians((double)form.ReturnValue);
+                    mf.ABLine.abHeading = Glm.ToRadians((double)form.ReturnValue);
                     mf.ABLine.SetABLineByHeading();
                 }
             }

@@ -39,15 +39,24 @@ namespace AgOpenGPS
 
         private void CboxVeh_SelectedIndexChanged(object sender, EventArgs e)
         {
-            mf.FileSaveVehicle(mf.vehiclesDirectory + cboxVeh.SelectedItem.ToString() + ".txt");
-            Close();
+            DialogResult result3 = MessageBox.Show(
+                "Overwrite: " + cboxVeh.SelectedItem.ToString() + ".txt",
+                gStr.gsSaveAndReturn,
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button2);
+            if (result3 == DialogResult.Yes)
+            {
+                mf.FileSaveVehicle(mf.vehiclesDirectory + cboxVeh.SelectedItem.ToString() + ".txt");
+                Close();
+            }
         }
 
         private void TboxName_TextChanged(object sender, EventArgs e)
         {
             var textboxSender = (TextBox)sender;
             var cursorPosition = textboxSender.SelectionStart;
-            textboxSender.Text = Regex.Replace(textboxSender.Text, glm.fileReg, "");
+            textboxSender.Text = Regex.Replace(textboxSender.Text, Glm.fileRegex, "");
 
             textboxSender.SelectionStart = cursorPosition;
         }
@@ -61,7 +70,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void tboxName_Click(object sender, EventArgs e)
+        private void TboxName_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {

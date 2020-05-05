@@ -358,7 +358,7 @@ namespace AgOpenGPS
                 {
                     int j = i + 1;
                     //if (j == cnt) j = 0;
-                    double distance = glm.Distance(mf.curve.refList[i], mf.curve.refList[j]);
+                    double distance = Glm.Distance(mf.curve.refList[i], mf.curve.refList[j]);
                     if (distance > 1.2)
                     {
                         vec3 pointB = new vec3((mf.curve.refList[i].easting + mf.curve.refList[j].easting) / 2.0,
@@ -385,7 +385,7 @@ namespace AgOpenGPS
                 x /= mf.curve.refList.Count;
                 y /= mf.curve.refList.Count;
                 mf.curve.aveLineHeading = Math.Atan2(y, x);
-                if (mf.curve.aveLineHeading < 0) mf.curve.aveLineHeading += glm.twoPI;
+                if (mf.curve.aveLineHeading < 0) mf.curve.aveLineHeading += Glm.twoPI;
 
                 //build the tail extensions
                 mf.curve.AddFirstLastPoints();
@@ -397,14 +397,14 @@ namespace AgOpenGPS
                 double offset = ((double)nudDistance.Value) / 200.0;
 
                 //calculate the heading 90 degrees to ref ABLine heading
-                double headingAt90 = mf.curve.aveLineHeading + glm.PIBy2;
+                double headingAt90 = mf.curve.aveLineHeading + Glm.PIBy2;
 
                 chk.easting = (Math.Sin(headingAt90) * Math.Abs(offset)) + chk.easting;
                 chk.northing = (Math.Cos(headingAt90) * Math.Abs(offset)) + chk.northing;
 
                 if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
                 {
-                    if (!mf.bnd.bndArr[Boundary].IsPointInsideBoundary(chk)) headingAt90 = mf.curve.aveLineHeading - glm.PIBy2;
+                    if (!mf.bnd.bndArr[Boundary].IsPointInsideBoundary(chk)) headingAt90 = mf.curve.aveLineHeading - Glm.PIBy2;
                 }
                 cnt = mf.curve.refList.Count;
 
@@ -427,7 +427,7 @@ namespace AgOpenGPS
                 int idx = mf.curve.curveArr.Count - 1;
 
                 //create a name
-                mf.curve.curveArr[idx].Name = (Math.Round(glm.toDegrees(mf.curve.aveLineHeading), 1)).ToString(CultureInfo.InvariantCulture)
+                mf.curve.curveArr[idx].Name = (Math.Round(Glm.ToDegrees(mf.curve.aveLineHeading), 1)).ToString(CultureInfo.InvariantCulture)
                      + "\u00B0" + mf.FindDirection(mf.curve.aveLineHeading) + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
 
                 mf.curve.curveArr[idx].aveHeading = mf.curve.aveLineHeading;
@@ -463,11 +463,11 @@ namespace AgOpenGPS
             //calculate the AB Heading
             double abHead = Math.Atan2(arr[C].easting - arr[A].easting,
                 arr[C].northing - arr[A].northing);
-            if (abHead < 0) abHead += glm.twoPI;
+            if (abHead < 0) abHead += Glm.twoPI;
 
             double offset = ((double)nudDistance.Value) / 200.0;
 
-            double headingCalc = abHead + glm.PIBy2;
+            double headingCalc = abHead + Glm.PIBy2;
 
             mf.ABLine.lineArr.Add(new CABLines());
             mf.ABLine.numABLines = mf.ABLine.lineArr.Count;
@@ -484,7 +484,7 @@ namespace AgOpenGPS
             {
                 if (!mf.bnd.bndArr[Boundary].IsPointInsideBoundary(mf.ABLine.lineArr[idx].origin))
                 {
-                    headingCalc = abHead - glm.PIBy2;
+                    headingCalc = abHead - Glm.PIBy2;
                     mf.ABLine.lineArr[idx].origin.easting = (Math.Sin(headingCalc) * Math.Abs(offset)) + arr[A].easting;
                     mf.ABLine.lineArr[idx].origin.northing = (Math.Cos(headingCalc) * Math.Abs(offset)) + arr[A].northing;
                 }
@@ -497,7 +497,7 @@ namespace AgOpenGPS
             mf.ABLine.lineArr[idx].ref2.northing = mf.ABLine.lineArr[idx].origin.northing + (Math.Cos(mf.ABLine.lineArr[idx].heading) * 1600.0);
 
             //create a name
-            mf.ABLine.lineArr[idx].Name = (Math.Round(glm.toDegrees(mf.ABLine.lineArr[idx].heading), 1)).ToString(CultureInfo.InvariantCulture)
+            mf.ABLine.lineArr[idx].Name = (Math.Round(Glm.ToDegrees(mf.ABLine.lineArr[idx].heading), 1)).ToString(CultureInfo.InvariantCulture)
                  + "\u00B0" + mf.FindDirection(mf.ABLine.lineArr[idx].heading) + DateTime.Now.ToString("hh:mm:ss", CultureInfo.InvariantCulture);
 
             //clean up gui

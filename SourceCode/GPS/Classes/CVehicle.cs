@@ -94,7 +94,7 @@ namespace AgOpenGPS
         {
 
             //draw vehicle
-            GL.Rotate(glm.toDegrees(-mf.fixHeading), 0.0, 0.0, 1.0);
+            GL.Rotate(Glm.ToDegrees(-mf.fixHeading), 0.0, 0.0, 1.0);
             //mf.font.DrawText3D(0, 0, "&TGF");
 
             //if (mf.camera.camFollowing)
@@ -236,14 +236,18 @@ namespace AgOpenGPS
             if (mf.curve.isBtnCurveOn && !mf.ct.isContourBtnOn)
             {
                 GL.Color4(0.969, 0.95, 0.9510, 0.87);
-                mf.font.DrawTextVehicle(0, wheelbase, mf.curve.curveNumber.ToString(), 1.5);
+                if (mf.curve.curveNumber < 0)
+                mf.font.DrawTextVehicle(0, wheelbase, (-mf.curve.curveNumber) + "L", 1.5);
+                else mf.font.DrawTextVehicle(0, wheelbase, mf.curve.curveNumber.ToString() + "R", 1.5);
             }
             else if (mf.ABLine.isBtnABLineOn && !mf.ct.isContourBtnOn)
             {
                 GL.Color4(0.96, 0.95, 0.9510, 0.87);
-                mf.font.DrawTextVehicle(0, wheelbase, mf.ABLine.passNumber.ToString(), 1.5);
-            }
 
+                if (mf.ABLine.passNumber < 0)
+                mf.font.DrawTextVehicle(0, wheelbase, -mf.ABLine.passNumber + "L", 1.5);
+                else mf.font.DrawTextVehicle(0, wheelbase, mf.ABLine.passNumber.ToString() + "R", 1.5);
+            }
 
             //draw the rigid hitch
             GL.Color3(0.37f, 0.37f, 0.97f);
@@ -257,7 +261,7 @@ namespace AgOpenGPS
             if (mf.camera.camSetDistance < -1000)
             {
                 GL.Color4(0.5f, 0.5f, 0.9f, 0.20);
-                double theta = glm.twoPI / 20;
+                double theta = Glm.twoPI / 20;
                 double c = Math.Cos(theta);//precalculate the sine and cosine
                 double s = Math.Sin(theta);
 

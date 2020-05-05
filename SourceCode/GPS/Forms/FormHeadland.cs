@@ -176,7 +176,7 @@ namespace AgOpenGPS
                 for (int j = 0; j < lineCount; j++)
                 {
                     //make sure distance between headland and boundary is not less then width
-                    distance = glm.Distance(curBnd[i], foos[j]);
+                    distance = Glm.Distance(curBnd[i], foos[j]);
                     if (distance < (totalHeadWidth * 0.96))
                     {
                         foos.RemoveAt(j);
@@ -192,7 +192,7 @@ namespace AgOpenGPS
             //double spacing = mf.tool.toolWidth * 0.25;
             for (int i = 0; i < bndCount - 1; i++)
             {
-                distance = glm.Distance(foos[i], foos[i + 1]);
+                distance = Glm.Distance(foos[i], foos[i + 1]);
                 if (distance < spacing)
                 {
                     foos.RemoveAt(i + 1);
@@ -237,9 +237,9 @@ namespace AgOpenGPS
                     for (int i = start; i < hdArr.Length; i++)
                     {
                         hdArr[i].easting = headLineTemplate[i].easting
-                            + (-Math.Sin(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
+                            + (-Math.Sin(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
                         hdArr[i].northing = headLineTemplate[i].northing
-                            + (-Math.Cos(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
+                            + (-Math.Cos(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
                         hdArr[i].heading = headLineTemplate[i].heading;
                     }
 
@@ -247,9 +247,9 @@ namespace AgOpenGPS
                     for (int i = 0; i < end; i++)
                     {
                         hdArr[i].easting = headLineTemplate[i].easting
-                            + (-Math.Sin(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
+                            + (-Math.Sin(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
                         hdArr[i].northing = headLineTemplate[i].northing
-                            + (-Math.Cos(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
+                            + (-Math.Cos(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
                         hdArr[i].heading = headLineTemplate[i].heading;
                     }
                 }
@@ -259,9 +259,9 @@ namespace AgOpenGPS
                     {
                         //calculate the point inside the boundary
                         hdArr[i].easting = headLineTemplate[i].easting
-                            + (-Math.Sin(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
+                            + (-Math.Sin(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
                         hdArr[i].northing = headLineTemplate[i].northing
-                            + (-Math.Cos(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
+                            + (-Math.Cos(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudSetDistance.Value) * ChangeDirection;
                         hdArr[i].heading = headLineTemplate[i].heading;
                     }
                 }
@@ -281,8 +281,8 @@ namespace AgOpenGPS
                 for (int i = 0; i < headLineTemplate.Count; i++)
                 {
                     //calculate the point inside the boundary
-                    hdArr[i].easting = headLineTemplate[i].easting + (-Math.Sin(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudDistance.Value) * ChangeDirection;
-                    hdArr[i].northing = headLineTemplate[i].northing + (-Math.Cos(glm.PIBy2 + headLineTemplate[i].heading) * (double)nudDistance.Value) * ChangeDirection;
+                    hdArr[i].easting = headLineTemplate[i].easting + (-Math.Sin(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudDistance.Value) * ChangeDirection;
+                    hdArr[i].northing = headLineTemplate[i].northing + (-Math.Cos(Glm.PIBy2 + headLineTemplate[i].heading) * (double)nudDistance.Value) * ChangeDirection;
                     hdArr[i].heading = headLineTemplate[i].heading;
                 }
 
@@ -764,7 +764,7 @@ namespace AgOpenGPS
             {
                 int j = i + 1;
                 if (j == bndCount) j = 0;
-                double distanceSq = glm.DistanceSquared(headLineTemplate[i].easting, headLineTemplate[i].northing, 
+                double distanceSq = Glm.DistanceSquared(headLineTemplate[i].easting, headLineTemplate[i].northing, 
                                                 headLineTemplate[j].easting, headLineTemplate[j].northing);
                 if (distanceSq > 2.3)
                 {
