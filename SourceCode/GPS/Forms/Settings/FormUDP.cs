@@ -124,7 +124,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void tboxAutoSteerIP_Click(object sender, EventArgs e)
+        private void TboxAutoSteerIP_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {

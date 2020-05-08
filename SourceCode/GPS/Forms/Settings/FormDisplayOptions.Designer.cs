@@ -97,7 +97,7 @@
             this.bntOK.TabIndex = 0;
             this.bntOK.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.bntOK.UseVisualStyleBackColor = true;
-            this.bntOK.Click += new System.EventHandler(this.bntOK_Click);
+            this.bntOK.Click += new System.EventHandler(this.BntOK_Click);
             // 
             // chkCompass
             // 

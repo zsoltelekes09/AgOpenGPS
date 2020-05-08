@@ -211,102 +211,104 @@ namespace AgOpenGPS
 
             if (isAutoLoadFields)
             {
+                LoadFields();
+            }
+        }
 
+        public void LoadFields()
+        {
+            Fields.Clear();
 
-                Fields.Clear();
+            string[] dirs = Directory.GetDirectories(fieldsDirectory);
+            foreach (string dir in dirs)
+            {
+                double northingOffset = 0;
+                double eastingOffset = 0;
+                double convergenceAngle = 0;
+                string fieldDirectory = Path.GetFileName(dir);
+                string filename = dir + "\\Field.txt";
+                string line;
 
-
-                string[] dirs = Directory.GetDirectories(fieldsDirectory);
-                foreach (string dir in dirs)
+                //make sure directory has a field.txt in it
+                if (File.Exists(filename))
                 {
-                    double northingOffset = 0;
-                    double eastingOffset = 0;
-                    double convergenceAngle = 0;
-                    string fieldDirectory = Path.GetFileName(dir);
-                    string filename = dir + "\\Field.txt";
-                    string line;
+                    using (StreamReader reader = new StreamReader(filename))
+                    {
+                        try
+                        {
+                            //Date time line
+                            for (int i = 0; i < 4; i++)
+                            {
+                                line = reader.ReadLine();
+                            }
 
-                    //make sure directory has a field.txt in it
+                            //start positions
+                            if (!reader.EndOfStream)
+                            {
+                                line = reader.ReadLine();
+                                string[] offs = line.Split(',');
+
+                                eastingOffset = (double.Parse(offs[0], CultureInfo.InvariantCulture));
+                                northingOffset = (double.Parse(offs[1], CultureInfo.InvariantCulture));
+                                line = reader.ReadLine();
+                                if (!reader.EndOfStream)
+                                {
+                                    line = reader.ReadLine();
+                                    convergenceAngle = double.Parse(line, CultureInfo.InvariantCulture);
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+
+                    //grab the boundary
+                    filename = dir + "\\Boundary.txt";
+
                     if (File.Exists(filename))
                     {
                         using (StreamReader reader = new StreamReader(filename))
                         {
                             try
                             {
-                                //Date time line
-                                for (int i = 0; i < 4; i++)
-                                {
-                                    line = reader.ReadLine();
-                                }
+                                //read header
+                                line = reader.ReadLine();//Boundary
 
-                                //start positions
-                                if (!reader.EndOfStream)
+                                if (!reader.EndOfStream) //empty boundary field
                                 {
+                                    //True or False OR points from older boundary files
                                     line = reader.ReadLine();
-                                    string[] offs = line.Split(',');
 
-                                    eastingOffset = (double.Parse(offs[0], CultureInfo.InvariantCulture));
-                                    northingOffset = (double.Parse(offs[1], CultureInfo.InvariantCulture));
-                                    line = reader.ReadLine();
-                                    if (!reader.EndOfStream)
+
+                                    //Check for older boundary files, then above line string is num of points
+                                    if (line == "True" || line == "False")
                                     {
-                                        line = reader.ReadLine();
-                                        convergenceAngle = double.Parse(line, CultureInfo.InvariantCulture);
+                                        line = reader.ReadLine(); //number of points
+                                        line = reader.ReadLine(); //number of points
+                                    }
+
+                                    int numPoints = int.Parse(line);
+                                    if (numPoints > 0)
+                                    {
+                                        Fields.Add(new CAutoLoadField());
+                                        Fields[Fields.Count - 1].Dir = Path.GetFileName(dir);
+
+                                        //load the line
+                                        for (int i = 0; i < numPoints; i++)
+                                        {
+                                            line = reader.ReadLine();
+                                            string[] words2 = line.Split(',');
+                                            double easting = double.Parse(words2[0], CultureInfo.InvariantCulture);
+                                            double northing = double.Parse(words2[1], CultureInfo.InvariantCulture);
+                                            vec2 vecPt = new vec2((Math.Cos(convergenceAngle) * easting) - (Math.Sin(convergenceAngle) * northing) + eastingOffset, (Math.Sin(convergenceAngle) * easting) + (Math.Cos(convergenceAngle) * northing) + northingOffset);
+                                            Fields[Fields.Count - 1].Boundary.Add(vecPt);
+                                        }
                                     }
                                 }
                             }
                             catch (Exception)
                             {
-                            }
-                        }
-
-                        //grab the boundary
-                        filename = dir + "\\Boundary.txt";
-
-                        if (File.Exists(filename))
-                        {
-                            using (StreamReader reader = new StreamReader(filename))
-                            {
-                                try
-                                {
-                                    //read header
-                                    line = reader.ReadLine();//Boundary
-
-                                    if (!reader.EndOfStream) //empty boundary field
-                                    {
-                                        //True or False OR points from older boundary files
-                                        line = reader.ReadLine();
-
-
-                                        //Check for older boundary files, then above line string is num of points
-                                        if (line == "True" || line == "False")
-                                        {
-                                            line = reader.ReadLine(); //number of points
-                                            line = reader.ReadLine(); //number of points
-                                        }
-
-                                        int numPoints = int.Parse(line);
-                                        if (numPoints > 0)
-                                        {
-                                            Fields.Add(new CAutoLoadField());
-                                            Fields[Fields.Count - 1].Dir = Path.GetFileName(dir);
-
-                                            //load the line
-                                            for (int i = 0; i < numPoints; i++)
-                                            {
-                                                line = reader.ReadLine();
-                                                string[] words2 = line.Split(',');
-                                                double easting = double.Parse(words2[0], CultureInfo.InvariantCulture);
-                                                double northing = double.Parse(words2[1], CultureInfo.InvariantCulture);
-                                                vec2 vecPt = new vec2((Math.Cos(convergenceAngle) * easting) - (Math.Sin(convergenceAngle) * northing) + eastingOffset, (Math.Sin(convergenceAngle) * easting) + (Math.Cos(convergenceAngle) * northing) + northingOffset);
-                                                Fields[Fields.Count-1].Boundary.Add(vecPt);
-                                            }
-                                        }
-                                    }
-                                }
-                                catch (Exception)
-                                {
-                                }
                             }
                         }
                     }

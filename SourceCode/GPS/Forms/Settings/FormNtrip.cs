@@ -342,14 +342,14 @@ namespace AgOpenGPS
             }
         }
 
-        private void btnPassUsername_Click(object sender, EventArgs e)
+        private void BtnPassUsername_Click(object sender, EventArgs e)
         {
             if (tboxUserName.PasswordChar == '*') tboxUserName.PasswordChar = '\0';
             else tboxUserName.PasswordChar = '*';
             tboxUserName.Invalidate();
         }
 
-        private void btnPassPassword_Click(object sender, EventArgs e)
+        private void BtnPassPassword_Click(object sender, EventArgs e)
         {
             if (tboxUserPassword.PasswordChar == '*') tboxUserPassword.PasswordChar = '\0';
             else tboxUserPassword.PasswordChar = '*';

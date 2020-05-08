@@ -278,7 +278,11 @@ namespace AgOpenGPS
                  + "," + mf.mc.machineData[5] + "," + mf.mc.machineData[6] + "," + mf.mc.machineData[7]; //setpoint hi lo
             //autoSteer phrases
             txtBoxRecvAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;
-            txtBoxSendAutoSteer.Text = "32766, " + mf.mc.autoSteerData[mf.mc.sdSpeed]
+
+
+
+
+            txtBoxSendAutoSteer.Text = "32766, " + (mf.mc.autoSteerData[mf.mc.sdSpeedHi] << 8 | mf.mc.autoSteerData[mf.mc.sdSpeedLo])
                                     + ", " + mf.guidanceLineDistanceOff + ", " + mf.guidanceLineSteerAngle + ", " + mf.mc.machineData[mf.mc.mdUTurn];
         }
 

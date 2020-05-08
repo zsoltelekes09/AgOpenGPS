@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.oglSelf = new OpenTK.GLControl();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnMakeABLine = new System.Windows.Forms.Button();
@@ -53,8 +52,8 @@
             this.label5 = new System.Windows.Forms.Label();
             this.btnDrawSections = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.Next = new System.Windows.Forms.Button();
+            this.Previous = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudDistance)).BeginInit();
             this.SuspendLayout();
             // 
@@ -62,7 +61,7 @@
             // 
             this.oglSelf.BackColor = System.Drawing.Color.Black;
             this.oglSelf.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.oglSelf.Location = new System.Drawing.Point(5, 5);
+            this.oglSelf.Location = new System.Drawing.Point(5, 55);
             this.oglSelf.Margin = new System.Windows.Forms.Padding(0);
             this.oglSelf.Name = "oglSelf";
             this.oglSelf.Size = new System.Drawing.Size(700, 700);
@@ -80,7 +79,7 @@
             this.btnExit.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnExit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.btnExit.Image = global::AgOpenGPS.Properties.Resources.OK64;
-            this.btnExit.Location = new System.Drawing.Point(875, 637);
+            this.btnExit.Location = new System.Drawing.Point(875, 688);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(123, 70);
             this.btnExit.TabIndex = 234;
@@ -401,35 +400,37 @@
             this.label6.Text = "2";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // button1
+            // Next
             // 
-            this.button1.Location = new System.Drawing.Point(505, 5);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(200, 50);
-            this.button1.TabIndex = 342;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.Next.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Next.Location = new System.Drawing.Point(506, 4);
+            this.Next.Name = "Next";
+            this.Next.Size = new System.Drawing.Size(200, 50);
+            this.Next.TabIndex = 342;
+            this.Next.Text = "Next";
+            this.Next.UseVisualStyleBackColor = true;
+            this.Next.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // button2
+            // Previous
             // 
-            this.button2.Location = new System.Drawing.Point(5, 5);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(200, 50);
-            this.button2.TabIndex = 343;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.Button2_Click);
+            this.Previous.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Previous.Location = new System.Drawing.Point(4, 4);
+            this.Previous.Name = "Previous";
+            this.Previous.Size = new System.Drawing.Size(200, 50);
+            this.Previous.TabIndex = 343;
+            this.Previous.Text = "Previous";
+            this.Previous.UseVisualStyleBackColor = true;
+            this.Previous.Click += new System.EventHandler(this.Button2_Click);
             // 
             // FormABDraw
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.ClientSize = new System.Drawing.Size(1004, 709);
+            this.ClientSize = new System.Drawing.Size(1004, 760);
             this.ControlBox = false;
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.Previous);
+            this.Controls.Add(this.Next);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.btnDrawSections);
             this.Controls.Add(this.label5);
@@ -494,7 +495,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnDrawSections;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button Next;
+        private System.Windows.Forms.Button Previous;
     }
 }

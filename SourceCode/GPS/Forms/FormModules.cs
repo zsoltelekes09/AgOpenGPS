@@ -20,7 +20,7 @@ namespace AgOpenGPS
             InitializeComponent();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             string[] words = mf.mc.serialRecvAutoSteerStr.Split(',');
             if (words.Length == 10)
@@ -74,7 +74,8 @@ namespace AgOpenGPS
             //lblSectionLoSd.Text = Convert.ToString
             //    (mf.mc.autoSteerData[mf.mc.sdMachineLo], 2).PadLeft(8, '0');
 
-            lblSpdSd.Text = Convert.ToString(mf.mc.autoSteerData[mf.mc.sdSpeed]);
+            lblSpeedHi.Text = Convert.ToString(mf.mc.autoSteerData[mf.mc.sdSpeedHi]);
+            lblSpeedLo.Text = Convert.ToString(mf.mc.autoSteerData[mf.mc.sdSpeedLo]);
 
             lblDistHi.Text = Convert.ToString(mf.mc.autoSteerData[mf.mc.sdDistanceHi]);
             lblDistLo.Text = Convert.ToString(mf.mc.autoSteerData[mf.mc.sdDistanceLo]);

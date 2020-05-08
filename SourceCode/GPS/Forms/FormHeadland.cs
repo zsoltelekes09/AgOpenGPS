@@ -320,8 +320,12 @@ namespace AgOpenGPS
                  lblEnd.Text = "--";
             else lblEnd.Text = end.ToString();
 
-            //draw all the boundaries
-            mf.bnd.DrawBoundaryLines();
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+            {
+                if (Boundary == i) GL.Color3(1.0f, 0.0f, 0.0f);
+                else GL.Color3(0.95f, 0.5f, 0.250f);
+                mf.bnd.bndArr[i].DrawBoundaryLine();
+            }
 
             int ptCount = hdArr.Length;
             if (ptCount > 1)

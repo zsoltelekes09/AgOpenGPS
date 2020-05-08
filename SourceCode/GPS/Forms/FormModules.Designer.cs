@@ -53,7 +53,7 @@
             this.label33 = new System.Windows.Forms.Label();
             this.label34 = new System.Windows.Forms.Label();
             this.lblUTurnSd = new System.Windows.Forms.Label();
-            this.label36 = new System.Windows.Forms.Label();
+            this.lblSpeedLo = new System.Windows.Forms.Label();
             this.lblAngleHi = new System.Windows.Forms.Label();
             this.lblAngleLo = new System.Windows.Forms.Label();
             this.label39 = new System.Windows.Forms.Label();
@@ -64,7 +64,7 @@
             this.lblPgnLoSd = new System.Windows.Forms.Label();
             this.label45 = new System.Windows.Forms.Label();
             this.label46 = new System.Windows.Forms.Label();
-            this.lblSpdSd = new System.Windows.Forms.Label();
+            this.lblSpeedHi = new System.Windows.Forms.Label();
             this.label49 = new System.Windows.Forms.Label();
             this.lblSectionLoSd = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -107,13 +107,14 @@
             this.label73 = new System.Windows.Forms.Label();
             this.label74 = new System.Windows.Forms.Label();
             this.label75 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // timer1
             // 
             this.timer1.Enabled = true;
             this.timer1.Interval = 333;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // lblSectionLoByte
             // 
@@ -391,17 +392,17 @@
             this.lblUTurnSd.Text = "-";
             this.lblUTurnSd.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label36
+            // lblSpeedLo
             // 
-            this.label36.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.label36.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label36.Location = new System.Drawing.Point(109, 47);
-            this.label36.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(72, 23);
-            this.label36.TabIndex = 244;
-            this.label36.Text = "-";
-            this.label36.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblSpeedLo.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.lblSpeedLo.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSpeedLo.Location = new System.Drawing.Point(183, 47);
+            this.lblSpeedLo.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblSpeedLo.Name = "lblSpeedLo";
+            this.lblSpeedLo.Size = new System.Drawing.Size(72, 23);
+            this.lblSpeedLo.TabIndex = 244;
+            this.lblSpeedLo.Text = "122";
+            this.lblSpeedLo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblAngleHi
             // 
@@ -520,20 +521,20 @@
             this.label46.Name = "label46";
             this.label46.Size = new System.Drawing.Size(73, 16);
             this.label46.TabIndex = 233;
-            this.label46.Text = "Spd*4";
+            this.label46.Text = "Speed Lo";
             this.label46.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // lblSpdSd
+            // lblSpeedHi
             // 
-            this.lblSpdSd.BackColor = System.Drawing.Color.LightSkyBlue;
-            this.lblSpdSd.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSpdSd.Location = new System.Drawing.Point(184, 47);
-            this.lblSpdSd.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
-            this.lblSpdSd.Name = "lblSpdSd";
-            this.lblSpdSd.Size = new System.Drawing.Size(72, 23);
-            this.lblSpdSd.TabIndex = 231;
-            this.lblSpdSd.Text = "122";
-            this.lblSpdSd.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblSpeedHi.BackColor = System.Drawing.Color.LightSkyBlue;
+            this.lblSpeedHi.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSpeedHi.Location = new System.Drawing.Point(108, 47);
+            this.lblSpeedHi.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblSpeedHi.Name = "lblSpeedHi";
+            this.lblSpeedHi.Size = new System.Drawing.Size(72, 23);
+            this.lblSpeedHi.TabIndex = 231;
+            this.lblSpeedHi.Text = "122";
+            this.lblSpeedHi.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label49
             // 
@@ -1039,11 +1040,24 @@
             this.label75.Text = "Machine Control Module";
             this.label75.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // label4
+            // 
+            this.label4.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label4.Location = new System.Drawing.Point(109, 29);
+            this.label4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(73, 16);
+            this.label4.TabIndex = 310;
+            this.label4.Text = "Speed Hi";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // FormModules
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ClientSize = new System.Drawing.Size(732, 260);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label75);
             this.Controls.Add(this.label74);
             this.Controls.Add(this.label1);
@@ -1088,7 +1102,7 @@
             this.Controls.Add(this.label33);
             this.Controls.Add(this.label34);
             this.Controls.Add(this.lblUTurnSd);
-            this.Controls.Add(this.label36);
+            this.Controls.Add(this.lblSpeedLo);
             this.Controls.Add(this.lblAngleHi);
             this.Controls.Add(this.lblAngleLo);
             this.Controls.Add(this.label39);
@@ -1100,7 +1114,7 @@
             this.Controls.Add(this.label45);
             this.Controls.Add(this.label46);
             this.Controls.Add(this.lblSectionLoSd);
-            this.Controls.Add(this.lblSpdSd);
+            this.Controls.Add(this.lblSpeedHi);
             this.Controls.Add(this.label49);
             this.Controls.Add(this.label29);
             this.Controls.Add(this.label30);
@@ -1160,7 +1174,7 @@
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Label lblUTurnSd;
-        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.Label lblSpeedLo;
         private System.Windows.Forms.Label lblAngleHi;
         private System.Windows.Forms.Label lblAngleLo;
         private System.Windows.Forms.Label label39;
@@ -1171,7 +1185,7 @@
         private System.Windows.Forms.Label lblPgnLoSd;
         private System.Windows.Forms.Label label45;
         private System.Windows.Forms.Label label46;
-        private System.Windows.Forms.Label lblSpdSd;
+        private System.Windows.Forms.Label lblSpeedHi;
         private System.Windows.Forms.Label label49;
         private System.Windows.Forms.Label lblSectionLoSd;
         private System.Windows.Forms.Label label10;
@@ -1214,5 +1228,6 @@
         private System.Windows.Forms.Label label73;
         private System.Windows.Forms.Label label74;
         private System.Windows.Forms.Label label75;
+        private System.Windows.Forms.Label label4;
     }
 }

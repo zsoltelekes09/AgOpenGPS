@@ -626,7 +626,7 @@
             this.btnPassUsername.TabIndex = 133;
             this.btnPassUsername.Text = "(o)";
             this.btnPassUsername.UseVisualStyleBackColor = true;
-            this.btnPassUsername.Click += new System.EventHandler(this.btnPassUsername_Click);
+            this.btnPassUsername.Click += new System.EventHandler(this.BtnPassUsername_Click);
             // 
             // btnPassPassword
             // 
@@ -637,7 +637,7 @@
             this.btnPassPassword.TabIndex = 134;
             this.btnPassPassword.Text = "(o)";
             this.btnPassPassword.UseVisualStyleBackColor = true;
-            this.btnPassPassword.Click += new System.EventHandler(this.btnPassPassword_Click);
+            this.btnPassPassword.Click += new System.EventHandler(this.BtnPassPassword_Click);
             // 
             // cboxHTTP
             // 

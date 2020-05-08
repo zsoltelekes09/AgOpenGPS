@@ -144,7 +144,7 @@ namespace AgOpenGPS
 
         }
 
-        private void tboxFlagNotes_Click(object sender, EventArgs e)
+        private void TboxFlagNotes_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {

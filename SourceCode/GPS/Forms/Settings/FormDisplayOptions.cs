@@ -58,7 +58,7 @@ namespace AgOpenGPS
             if (mf.isMetric) rbtnMetric.Checked = true;
             else rbtnImperial.Checked = true;
         }
-        private void bntOK_Click(object sender, EventArgs e)
+        private void BntOK_Click(object sender, EventArgs e)
         {
             mf.isSkyOn = chkSky.Checked;
             mf.isGridOn = chkGrid.Checked;
@@ -71,6 +71,8 @@ namespace AgOpenGPS
             mf.isPureDisplayOn = chkPursuitLines.Checked;
             mf.isUTurnAlwaysOn = chkUTurnOn.Checked;
             mf.isAutoLoadFields = chkAutoLoadFields.Checked;
+            if (mf.isAutoLoadFields) mf.LoadFields();
+            else mf.Fields.Clear();
 
             Settings.Default.setMenu_isSkyOn = mf.isSkyOn;
             Settings.Default.setMenu_isGridOn = mf.isGridOn;

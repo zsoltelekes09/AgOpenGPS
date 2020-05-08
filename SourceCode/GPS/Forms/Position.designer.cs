@@ -338,8 +338,10 @@ namespace AgOpenGPS
                 }
 
                 //fill up0 the appropriate arrays with new values
-                mc.autoSteerData[mc.sdSpeed] = (byte)(Math.Max(Math.Min(pn.speed * 4.0 + 40, 255), 0));
-                //mc.machineControlData[mc.cnSpeed] = mc.autoSteerData[mc.sdSpeed];
+                //mc.machineControlData[mc.cnSpeed] = mc.autoSteerData[mc.sdSpeedHi];
+
+                mc.autoSteerData[mc.sdSpeedHi] = unchecked((byte)((int)(pn.speed * 200 + 32768) >> 8));
+                mc.autoSteerData[mc.sdSpeedLo] = unchecked((byte)(pn.speed * 200.0 + 32768));
 
                 mc.autoSteerData[mc.sdDistanceHi] = unchecked((byte)(guidanceLineDistanceOff >> 8));
                 mc.autoSteerData[mc.sdDistanceLo] = unchecked((byte)(guidanceLineDistanceOff));
@@ -351,8 +353,10 @@ namespace AgOpenGPS
             else
             {
                 //fill up the auto steer array with free drive values
-                mc.autoSteerData[mc.sdSpeed] = unchecked((byte)(pn.speed * 4.0 + 40));
-                //mc.machineControlData[mc.cnSpeed] = mc.autoSteerData[mc.sdSpeed];
+                //mc.autoSteerData[mc.sdSpeedHi] = unchecked((byte)(pn.speed * 4.0 + 40));
+
+                mc.autoSteerData[mc.sdSpeedHi] = unchecked((byte)((int)(pn.speed * 200 + 32768) >> 8));
+                mc.autoSteerData[mc.sdSpeedLo] = unchecked((byte)(pn.speed * 200.0 + 32768));
 
                 //make steer module think everything is normal
                 guidanceLineDistanceOff = 0;

@@ -526,8 +526,12 @@ namespace AgOpenGPS
 
             GL.Color3(1, 1, 1);
 
-            //draw all the boundaries
-            mf.bnd.DrawBoundaryLines();
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+            {
+                if (Boundary == i) GL.Color3(1.0f, 0.0f, 0.0f);
+                else GL.Color3(0.95f, 0.5f, 0.250f);
+                mf.bnd.bndArr[i].DrawBoundaryLine();
+            }
 
             //the vehicle
             GL.PointSize(16.0f);
@@ -827,10 +831,10 @@ namespace AgOpenGPS
             //min max of the boundary
             if (mf.bnd.bndArr.Count > 0)
             {
-                minFieldY =  mf.bnd.bndArr[Boundary].Northingmin;
-                maxFieldY = mf.bnd.bndArr[Boundary].Northingmax;
-                minFieldX = mf.bnd.bndArr[Boundary].Eastingmin;
-                maxFieldX = mf.bnd.bndArr[Boundary].Eastingmax;
+                minFieldY =  mf.bnd.bndArr[0].Northingmin;
+                maxFieldY = mf.bnd.bndArr[0].Northingmax;
+                minFieldX = mf.bnd.bndArr[0].Eastingmin;
+                maxFieldX = mf.bnd.bndArr[0].Eastingmax;
             }
 
             if (maxFieldX == -9999999 || minFieldX == 9999999 || maxFieldY == -9999999 || minFieldY == 9999999)
