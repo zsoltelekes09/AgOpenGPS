@@ -29,14 +29,18 @@ namespace AgOpenGPS
             FileInfo[] Files = dinfo.GetFiles("*.txt");
             if (Files.Length == 0)
             {
+                DialogResult = DialogResult.Ignore;
                 Close();
 
                 mf.TimedMessageBox(2000, gStr.gsNoEnvironmentSaved, gStr.gsSaveAnEnvironmentFirst);
             }
 
-            foreach (FileInfo file in Files)
+            else
             {
-                cboxEnv.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
+                foreach (FileInfo file in Files)
+                {
+                    cboxEnv.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
+                }
             }
         }
 

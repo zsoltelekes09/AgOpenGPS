@@ -1097,8 +1097,11 @@ namespace AgOpenGPS
                     if (Properties.Settings.Default.setAS_isAutoSteerAutoOn) btnAutoSteer.Text = "R";
                     else btnAutoSteer.Text = "M";
 
-                    MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-                    Close();
+                    ////MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
+                    //Close();
+                    Application.Restart();
+                    Environment.Exit(0);
+
                 }
             }
 
@@ -1576,22 +1579,25 @@ namespace AgOpenGPS
                 var result = form.ShowDialog();
                 if (result == DialogResult.Cancel)
                 {
-                    MessageBox.Show(gStr.gsError,
+                    MessageBox.Show(gStr.gsRestartRequired,
                         gStr.gsFileError,
-                        MessageBoxButtons.YesNo,
+                        MessageBoxButtons.OK,
                         MessageBoxIcon.Question,
                         MessageBoxDefaultButton.Button2);
-                    MessageBox.Show(gStr.gsProgramWillExitPleaseRestart, gStr.gsProgramWillExitPleaseRestart);
-                    Close();
+                    Application.Restart();
+                    Environment.Exit(0);
                 }
                 else if (result == DialogResult.OK)
                 {
-                    MessageBox.Show(gStr.gsProgramWillExitPleaseRestart, gStr.gsProgramWillExitPleaseRestart);
-                    Close();
+                    Application.Restart();
+                    Environment.Exit(0);
+                }
+                else if (result == DialogResult.Ignore)
+                {
+                    //Close();
                 }
             }
         }
-
         private void topMenuSaveEnvironment_Click(object sender, EventArgs e)
         {
             using (var form = new FormEnvSaver(this))
@@ -1840,7 +1846,8 @@ namespace AgOpenGPS
             }
             SetLanguage("en");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
 
         }
         private void menuLanguageDeutsch_Click(object sender, EventArgs e)
@@ -1852,7 +1859,8 @@ namespace AgOpenGPS
             }
             SetLanguage("de");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
 
         }
         private void menuLanguageRussian_Click(object sender, EventArgs e)
@@ -1864,7 +1872,8 @@ namespace AgOpenGPS
             }
             SetLanguage("ru");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
         private void menuLanguageDutch_Click(object sender, EventArgs e)
         {
@@ -1875,7 +1884,8 @@ namespace AgOpenGPS
             }
             SetLanguage("nl");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
         private void menuLanguageSpanish_Click(object sender, EventArgs e)
         {
@@ -1886,7 +1896,8 @@ namespace AgOpenGPS
             }
             SetLanguage("es");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
         private void menuLanguageFrench_Click(object sender, EventArgs e)
         {
@@ -1897,7 +1908,8 @@ namespace AgOpenGPS
             }
             SetLanguage("fr");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
         private void menuLanguageItalian_Click(object sender, EventArgs e)
         {
@@ -1908,7 +1920,8 @@ namespace AgOpenGPS
             }
             SetLanguage("it");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
         private void menuLanguageUkranian_Click(object sender, EventArgs e)
         {
@@ -1919,7 +1932,8 @@ namespace AgOpenGPS
             }
             SetLanguage("uk");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
         private void menuLanguageSlovak_Click(object sender, EventArgs e)
         {
@@ -1930,7 +1944,8 @@ namespace AgOpenGPS
             }
             SetLanguage("sk");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
 
         }
         private void menuLanguagesPolski_Click(object sender, EventArgs e)
@@ -1942,7 +1957,8 @@ namespace AgOpenGPS
             }
             SetLanguage("pl");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
         private void menuLanguageTest_Click(object sender, EventArgs e)
         {
@@ -1953,7 +1969,8 @@ namespace AgOpenGPS
             }
             SetLanguage("af");
             MessageBox.Show(gStr.gsProgramWillExitPleaseRestart);
-            Close();
+            Application.Restart();
+            Environment.Exit(0);
         }
 
         private void SetLanguage(string lang)

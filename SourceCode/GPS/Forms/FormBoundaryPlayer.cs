@@ -81,6 +81,7 @@ namespace AgOpenGPS
         {
             //mf.bnd.isOkToAddPoints = false;
             btnPausePlay.Image = Properties.Resources.BoundaryRecord;
+            nudOffset.Value = (decimal)mf.bnd.createBndOffset;
             mf.Focus();
 
             if (mf.isMetric)
@@ -154,6 +155,13 @@ namespace AgOpenGPS
                 lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
             }
             mf.Focus();
+        }
+
+        private void nudOffset_Enter(object sender, EventArgs e)
+        {
+            mf.KeypadToNUD((NumericUpDown)sender);
+            btnPausePlay.Focus();
+            mf.bnd.createBndOffset = (double)nudOffset.Value;
         }
     }
 }

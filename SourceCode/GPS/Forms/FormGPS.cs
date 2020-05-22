@@ -1131,7 +1131,6 @@ namespace AgOpenGPS
                 {
                 }
             }
-
         }
 
         private void StripSectionColor_Click(object sender, EventArgs e)
@@ -1234,6 +1233,8 @@ namespace AgOpenGPS
                 if (result == DialogResult.OK)
                 {
                     //Clicked Save
+                    Application.Restart();
+                    Environment.Exit(0);
                 }
                 else
                 {

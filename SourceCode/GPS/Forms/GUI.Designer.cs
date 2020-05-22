@@ -207,7 +207,8 @@ namespace AgOpenGPS
             //is rtk on?
             isRTK = Properties.Settings.Default.setGPS_isRTK;
 
-
+            //update the field data areas
+            fd.UpdateFieldBoundaryGUIAreas();
 
             if (isAutoLoadFields)
             {
@@ -679,7 +680,7 @@ namespace AgOpenGPS
                 }
 
                 //update byte counter and up counter
-                if (NtripCounter > 20) NTRIPStartStopStrip.Text = string.Format("{0:00}:{1:00}", ((NtripCounter-21) / 60), (Math.Abs(NtripCounter-21)) % 60);
+                if (NtripCounter > 20) NTRIPStartStopStrip.Text = string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
                 else NTRIPStartStopStrip.Text = gStr.gsConnectingIn + " " + (Math.Abs(NtripCounter - 21));
 
                 pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
@@ -731,17 +732,17 @@ namespace AgOpenGPS
 
             if (isMetric)
             {
-
                 fieldStatusStripText.Text = fd.WorkedAreaRemainHectares + "\r\n" +
                                                fd.WorkedAreaRemainPercentage + "\r\n" +
-                                               fd.TimeTillFinished;
+                                               fd.TimeTillFinished + "\r\n" +
+                                               fd.WorkRateHectares;
             }
             else //imperial
             {
-
                 fieldStatusStripText.Text = fd.WorkedAreaRemainAcres + "\r\n" +
                        fd.WorkedAreaRemainPercentage + "\r\n" +
-                       fd.TimeTillFinished;
+                       fd.TimeTillFinished + "\r\n" +
+                       fd.WorkRateAcres;
             }
 
             //not Metric/Standard units sensitive

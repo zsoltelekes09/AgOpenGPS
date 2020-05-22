@@ -109,9 +109,9 @@ namespace AgOpenGPS
             if (isCountingUp)
             {
                 crossingTurnLinePoint.index = 99;
-                bool abc = true;
 
                 //for each point in succession keep going till a turnLine is found.
+                bool abc = true;
                 for (int j = mf.curve.currentLocationIndex; j < mf.curve.currentLocationIndex || abc; j++)
                 {
                     if (!mf.turn.turnArr[0].IsPointInTurnWorkArea(mf.curve.curList[j]))
@@ -1250,12 +1250,12 @@ namespace AgOpenGPS
             {
                 if (isTurnRight)
                 {
-                    mf.curve.curveNumber = mf.curve.curveNumber - rowSkipsWidth;
+                    mf.curve.curveNumber -= rowSkipsWidth;
                     mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
                 }
                 else
                 {
-                    mf.curve.curveNumber = mf.curve.curveNumber + rowSkipsWidth;
+                    mf.curve.curveNumber += rowSkipsWidth;
                     mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
                 }
             }
@@ -1263,12 +1263,12 @@ namespace AgOpenGPS
             {
                 if (isTurnRight)
                 {
-                    mf.curve.curveNumber = mf.curve.curveNumber + rowSkipsWidth;
+                    mf.curve.curveNumber += rowSkipsWidth;
                     mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
                 }
                 else
                 {
-                    mf.curve.curveNumber = mf.curve.curveNumber - rowSkipsWidth;
+                    mf.curve.curveNumber -= rowSkipsWidth;
                     mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
                 }
             }
