@@ -170,10 +170,6 @@ namespace AgOpenGPS
 
                 GL.Flush();
                 oglMain.SwapBuffers();
-
-                lblSpeed.Text = "???";
-                lblHz.Text = " ???? \r\n Not Connected";
-
             }
             else
             {
@@ -1529,8 +1525,10 @@ namespace AgOpenGPS
             GL.Vertex2(wiid+2, 0);
             GL.Vertex2(wiid + 30, 0);
             GL.End();
-
-            GL.Rotate(((ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625f), 0.0f, 0.0f, 1.0f);
+            if (ahrs.rollX16 != 9999)
+            {
+                GL.Rotate(((ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625f), 0.0f, 0.0f, 1.0f);
+            }
 
             GL.Color3(0.74f, 0.74f, 0.14f);
             GL.LineWidth(2);
@@ -1542,10 +1540,20 @@ namespace AgOpenGPS
             GL.Vertex2(wiid - 10, 15);
             GL.End();
 
-            string head = Math.Round((ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625, 1).ToString();
-            int center = -(int)(((head.Length) * 6));
+            if (ahrs.rollX16 != 9999)
+            {
+                string head = Math.Round((ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625, 1).ToString();
+                int center = -(int)(((head.Length) * 6));
 
-            font.DrawText(center, 0, head, 0.8);
+                font.DrawText(center, 0, head, 0.8);
+            }
+            else
+            {
+                string head = "0";
+                int center = -(int)(((head.Length) * 6));
+
+                font.DrawText(center, 0, head, 0.8);
+            }
 
             //GL.Translate(0, 10, 0);
 

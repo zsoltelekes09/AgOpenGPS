@@ -29,8 +29,6 @@ namespace AgOpenGPS
                 NTRIPBytesMenu.Visible = true;
                 pbarNtripMenu.Visible = true;
             }
-            Properties.Settings.Default.setNTRIP_isOn = isNTRIP_TurnedOn;
-            Properties.Settings.Default.Save();
         }
 
         private void btnManualAutoDrive_Click(object sender, EventArgs e)

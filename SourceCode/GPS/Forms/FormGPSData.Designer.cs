@@ -321,7 +321,7 @@
             this.tboxNMEASerial.Multiline = true;
             this.tboxNMEASerial.Name = "tboxNMEASerial";
             this.tboxNMEASerial.ReadOnly = true;
-            this.tboxNMEASerial.Size = new System.Drawing.Size(469, 57);
+            this.tboxNMEASerial.Size = new System.Drawing.Size(500, 58);
             this.tboxNMEASerial.TabIndex = 107;
             // 
             // label11
@@ -919,7 +919,7 @@
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(483, 270);
+            this.ClientSize = new System.Drawing.Size(514, 270);
             this.Controls.Add(this.tboxUDPSwitch);
             this.Controls.Add(this.tboxUDPMachine);
             this.Controls.Add(this.tboxUDPSteer);

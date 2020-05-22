@@ -657,13 +657,15 @@ namespace AgOpenGPS
                 //Thinks is connected but not receiving anything // 30sec maybe a bit much?
                 if (NTRIP_Watchdog++ > 10 && isNTRIP_Connected) ReconnectRequest();
 
+                //Once all connected set the timer GGA to NTRIP Settings
+                if (sendGGAInterval > 0 && NtripCounter == 40) tmr.Interval = sendGGAInterval * 1000;
+
                 //Have we connection
                 if (!isNTRIP_Connected && !isNTRIP_Connecting)
                 {
                     if (NtripCounter > 20) StartNTRIP();
                 }
-
-                if (isNTRIP_Connecting)
+                else if (isNTRIP_Connecting)
                 {
                     if (NtripCounter > 25)//give it 5 seconds
                     {

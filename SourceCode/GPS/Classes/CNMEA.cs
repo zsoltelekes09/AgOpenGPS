@@ -135,7 +135,7 @@ Field	Meaning
         public double actualEasting, actualNorthing, zone;
         public double centralMeridian, convergenceAngle;
 
-        public int DualAntennaDistance = 0;
+        public int DualAntennaDistance = 140;
         public bool UpdatedLatLon, EnableHeadRoll;
         public string rawBuffer = "";
         private string[] words;

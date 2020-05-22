@@ -1252,12 +1252,31 @@ namespace AgOpenGPS
                 {
                     if (isNTRIP_Connected)
                     {
-                        SettingsShutDownNTRIP();
+                        ShutDownNTRIP();
                     }
                 }
                 else
                 {
                     //Clicked X - No Save
+                }
+                
+
+                if (Properties.Settings.Default.setNTRIP_isOn)
+                {
+                    isNTRIP_TurnedOn = true;
+                    NTRIPStartStopStrip.Visible = true;
+                    lblWatch.Visible = true;
+                    NTRIPBytesMenu.Visible = true;
+                    pbarNtripMenu.Visible = true;
+
+                }
+                else
+                {
+                    isNTRIP_TurnedOn = false;
+                    NTRIPStartStopStrip.Visible = false;
+                    lblWatch.Visible = false;
+                    NTRIPBytesMenu.Visible = false;
+                    pbarNtripMenu.Visible = false;
                 }
             }
         }

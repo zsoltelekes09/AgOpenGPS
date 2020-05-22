@@ -11,7 +11,7 @@ namespace AgOpenGPS
         #region properties sim
 
         //Our two new nmea strings
-        private readonly StringBuilder sbOGI = new StringBuilder();
+        //private readonly StringBuilder sbOGI = new StringBuilder();
 
         private readonly StringBuilder sbHDT = new StringBuilder();
 
@@ -286,6 +286,7 @@ namespace AgOpenGPS
             //12 The checksum data, always begins with *
         }
 
+        /*
         private void BuildOGI()
         {
             sbOGI.Clear();
@@ -309,6 +310,7 @@ namespace AgOpenGPS
             sbOGI.Append(sumStr);
             sbOGI.Append("\r\n");
         }
+        */
 
     }
 

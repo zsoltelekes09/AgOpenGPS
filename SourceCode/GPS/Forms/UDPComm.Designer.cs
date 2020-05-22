@@ -49,137 +49,111 @@ namespace AgOpenGPS
 
             if (Data[0] == 0xB5 && Data[1] == 0x62 && Data[2] == 0x01)//Daniel P
             {
-                if (Data[3] == 0x07)//UBX-NAV-PVT
+                if (Data[3] == 0x07 && Data.Length == 100)//UBX-NAV-PVT
                 {
-                    if (Data.Length == 100)
-                    {
-                        int CK_A = 0;
-                        int CK_B = 0;
+                    int CK_A = 0;
+                    int CK_B = 0;
 
-                        for (int j = 2; j < 98; j += 1)// start with Class and end by Checksum
+                    for (int j = 2; j < 98; j += 1)// start with Class and end by Checksum
+                    {
+                        CK_A = (CK_A + Data[j]) & 0xFF;
+                        CK_B = (CK_B + CK_A) & 0xFF;
+                    }
+
+                    if (Data[98] == CK_A && Data[99] == CK_B)
+                    {
+                        long itow = Data[6] | (Data[7] << 8) | (Data[8] << 16) | (Data[9] << 24);
+
+                        if ((Data[27] & 0x81) == 0x81)
                         {
-                            CK_A = (CK_A + Data[j]) & 0xFF;
-                            CK_B = (CK_B + CK_A) & 0xFF;
+                            pn.FixQuality = 4;
+                            pn.EnableHeadRoll = true;
+                        }
+                        else if ((Data[27] & 0x41) == 0x41)
+                        {
+                            pn.FixQuality = 5;
+                            pn.EnableHeadRoll = true;
+                        }
+                        else
+                        {
+                            pn.FixQuality = 1;
+                            pn.EnableHeadRoll = false;
                         }
 
-                        if (Data[98] == CK_A && Data[99] == CK_B)
+                        pn.satellitesTracked = Data[29];
+
+                        pn.longitude = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.0000001;//to deg
+                        pn.latitude = (Data[34] | (Data[35] << 8) | (Data[36] << 16) | (Data[37] << 24)) * 0.0000001;//to deg
+                        pn.altitude = (Data[42] | (Data[43] << 8) | (Data[44] << 16) | (Data[45] << 24)) * 0.001;//to meters
+
+                        pn.hdop = (Data[46] | (Data[47] << 8) | (Data[48] << 16) | (Data[49] << 24)) * 0.01;
+
+                        if (pn.longitude != 0)
                         {
-                            long itow = Data[6] | (Data[7] << 8) | (Data[8] << 16) | (Data[9] << 24);
+                            pn.ToUTM_FixConvergenceAngle();
 
-                            if (Data[84] == 0x00)
-                            {
-                                if ((Data[27] & 0x81) == 0x81)
-                                {
-                                    pn.FixQuality = 4;
-                                    pn.EnableHeadRoll = true;
-                                }
-                                else if ((Data[27] & 0x41) == 0x41)
-                                {
-                                    pn.FixQuality = 5;
-                                    pn.EnableHeadRoll = true;
-                                }
-                                else
-                                {
-                                    pn.FixQuality = 1;
-                                    pn.EnableHeadRoll = false;
-                                }
+                            pn.speed = (Data[66] | (Data[67] << 8) | (Data[68] << 16) | (Data[69] << 24)) * 0.0036;//to km/h
 
-                                pn.satellitesTracked = Data[29];
+                            //average the speed
+                            pn.AverageTheSpeed();
 
-                                pn.longitude = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.0000001;//to deg
-                                pn.latitude = (Data[34] | (Data[35] << 8) | (Data[36] << 16) | (Data[37] << 24)) * 0.0000001;//to deg
-                                pn.altitude = (Data[42] | (Data[43] << 8) | (Data[44] << 16) | (Data[45] << 24)) * 0.001;//to meters
-
-                                pn.hdop = (Data[46] | (Data[47] << 8) | (Data[48] << 16) | (Data[49] << 24)) * 0.01;
-
-                                pn.ToUTM_FixConvergenceAngle();
-
-                                pn.speed = (Data[66] | (Data[67] << 8) | (Data[68] << 16) | (Data[69] << 24)) * 0.0036;//to km/h
-
-                                //average the speed
-                                pn.AverageTheSpeed();
-
-                                recvSentenceSettings[2] = recvSentenceSettings[0];
-                                recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
-                            }
-                            else
-                            {
-                                pn.EnableHeadRoll = false;
-                                pn.FixQuality = 0;
-                                recvSentenceSettings[2] = recvSentenceSettings[0];
-                                recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
-                            }
+                            recvSentenceSettings[2] = recvSentenceSettings[0];
+                            recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                        }
+                        else
+                        {
+                            pn.EnableHeadRoll = false;
+                            pn.FixQuality = 0;
+                            recvSentenceSettings[2] = recvSentenceSettings[0];
+                            recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
                         }
                     }
-                    return;
                 }
-                else if (Data[3] == 0x3C)//UBX-NAV-RELPOSNED
+                else if (Data[3] == 0x3C && Data.Length == 72)//Daniel P
                 {
-                    if (Data.Length == 72)
+                    int CK_A = 0;
+                    int CK_B = 0;
+                    for (int j = 2; j < 70; j += 1)// start with Class and end by Checksum
                     {
-                        int CK_A = 0;
-                        int CK_B = 0;
+                        CK_A = (CK_A + Data[j]) & 0xFF;
+                        CK_B = (CK_B + CK_A) & 0xFF;
+                    }
 
-                        for (int j = 2; j < 70; j += 1)// start with Class and end by Checksum
+                    if (Data[70] == CK_A && Data[71] == CK_B)
+                    {
+                        long itow = Data[10] | (Data[11] << 8) | (Data[12] << 16) | (Data[13] << 24);
+
+                        if (pn.EnableHeadRoll && ((Data[67] & 0x01) == 0x01) && (((Data[66] & 0x2D) == 0x2D) || ((Data[66] & 0x35) == 0x35)))
                         {
-                            CK_A = (CK_A + Data[j]) & 0xFF;
-                            CK_B = (CK_B + CK_A) & 0xFF;
+                            int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
+
+                            if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
+                            {
+                                //save dist?
+                                ahrs.rollX16 = (int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), pn.DualAntennaDistance) / 0.27925268016f);
+                            }
+
+                            pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
+
+                            recvSentenceSettings[3] = recvSentenceSettings[1];
+                            recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + (ahrs.rollX16 / 16.0).ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
                         }
-
-                        if (Data[70] == CK_A && Data[71] == CK_B)
+                        else //Bad Quality
                         {
-                            long itow = Data[10] | (Data[11] << 8) | (Data[12] << 16) | (Data[13] << 24);
-
-                            if (pn.EnableHeadRoll && ((Data[67] & 0x01) == 0x01) && (((Data[66] & 0x2D) == 0x2D) || ((Data[66] & 0x35) == 0x35)))
-                            {
-                                int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
-
-                                if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
-                                {
-                                    //save dist?
-                                }
-
-                                pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
-                                ahrs.rollX16 = (int)(Glm.ToRadians(Math.Atan2((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.1, pn.DualAntennaDistance)) * 16);
-
-                                recvSentenceSettings[3] = recvSentenceSettings[1];
-                                recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + ahrs.rollX16.ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
-                            }
-                            else //Bad Quality
-                            {
-                                ahrs.rollX16 = 9999;
-                                pn.HeadingForced = 9999;
-                                recvSentenceSettings[3] = recvSentenceSettings[1];
-                                recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
-                            }
+                            ahrs.rollX16 = 9999;
+                            pn.HeadingForced = 9999;
+                            recvSentenceSettings[3] = recvSentenceSettings[1];
+                            recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
                         }
                     }
-                    return;
                 }
-            }
-            else if (Data[0] == 0x24)//if it starts with a $, its an nmea sentence
-            {
-                pn.rawBuffer += Encoding.ASCII.GetString(Data);
-
-                if (isLogNMEA)
-                {
-                    pn.logNMEASentence.Append(Encoding.ASCII.GetString(Data));
-                }
-
                 return;
             }
-
-            if (Data[0] == 0x23 && Data[1] == 0x23)
+            else if (Data[0] == 0x7F)
             {
-                string buff = Encoding.ASCII.GetString(Data);
-                return;
-            }
+                //quick check
+                if (Data.Length != 10) return;
 
-            //quick check
-            if (Data.Length != 10) return;
-
-            if (Data[0] == 0x7F)
-            {
                 switch (Data[1])
                 {
                     //autosteer FD - 253
@@ -364,6 +338,22 @@ namespace AgOpenGPS
                         }
                 }
             }
+            else if (Data[0] == 0x24)//if it starts with a $, its an nmea sentence
+            {
+                pn.rawBuffer += Encoding.ASCII.GetString(Data);
+
+                if (isLogNMEA)
+                {
+                    pn.logNMEASentence.Append(Encoding.ASCII.GetString(Data));
+                }
+
+                return;
+            }
+            else
+            {
+                pn.logNMEASentence.Append(Encoding.ASCII.GetString(Data));
+                return;
+            }
         }
 
         private void ReceiveData(IAsyncResult asyncResult)
@@ -392,27 +382,6 @@ namespace AgOpenGPS
             {
                 //WriteErrorLog("UDP Recv data " + e.ToString());
                 //MessageBox.Show("ReceiveData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        public void SendUDPMessage(string message)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
-
-                    // Get packet as byte array to send
-                    byte[] byteData = Encoding.ASCII.GetBytes(message);
-                    if (byteData.Length != 0)
-                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
-                }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
         }
 

@@ -61,6 +61,30 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("COM GPS...")]
+        public string setPort2_portNameGPS {
+            get {
+                return ((string)(this["setPort2_portNameGPS"]));
+            }
+            set {
+                this["setPort2_portNameGPS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("38400")]
+        public int setPort2_baudRate {
+            get {
+                return ((int)(this["setPort2_baudRate"]));
+            }
+            set {
+                this["setPort2_baudRate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("30, 30")]
         public global::System.Drawing.Point setWindow_Location {
             get {

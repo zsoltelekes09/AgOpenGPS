@@ -43,7 +43,7 @@ namespace AgOpenGPS
         private void ReconnectRequest()
         {
             //TimedMessageBox(2000, "NTRIP Not Connected", " Reconnect Request");
-            NtripCounter = 16;
+            NtripCounter = 10;
             isNTRIP_Connected = false;
             isNTRIP_Connecting = false;
 
@@ -69,7 +69,7 @@ namespace AgOpenGPS
             {
                 TimedMessageBox(2500, gStr.gsNoIPLocated, gStr.gsCannotFind + Properties.Settings.Default.setNTRIP_casterURL);
             }
-                                          
+
             broadCasterPort = Properties.Settings.Default.setNTRIP_casterPort; //Select correct port (usually 80 or 2101)
             mount = Properties.Settings.Default.setNTRIP_mount; //Insert the correct mount
             username = Properties.Settings.Default.setNTRIP_userName; //Insert your username!
@@ -81,6 +81,14 @@ namespace AgOpenGPS
             if (tmr != null)
             {
                 tmr.Dispose();
+            }
+
+            //create new timer at fast rate to start
+            if (sendGGAInterval > 0)
+            {
+                tmr = new System.Windows.Forms.Timer();
+                tmr.Interval = 5000;
+                tmr.Tick += new EventHandler(SendGGA);
             }
 
             try
@@ -110,16 +118,6 @@ namespace AgOpenGPS
                 ReconnectRequest();
                 return;
             }
-
-            //Once all connected set the timer GGA to NTRIP Settings
-            if (sendGGAInterval > 0)
-            {
-                tmr = new System.Windows.Forms.Timer();
-                tmr.Interval = 5000;
-                tmr.Tick += new EventHandler(SendGGA);
-            }
-
-
 
 
             isNTRIP_Connecting = true;
@@ -311,8 +309,7 @@ namespace AgOpenGPS
             }
             catch (Exception)
             {
-
-                MessageBox.Show( "Unusual error during Recieve!" );
+                //MessageBox.Show( this, ex.Message, "Unusual error druing Recieve!" );
             }
         }
 
@@ -347,6 +344,9 @@ namespace AgOpenGPS
 
                 //TimedMessageBox(2000, gStr.gsNTRIPOff, gStr.gsClickStartToResume);
                 ReconnectRequest();
+
+                //Also stop the requests now
+                isNTRIP_TurnedOn = false;
             }
 
         }
