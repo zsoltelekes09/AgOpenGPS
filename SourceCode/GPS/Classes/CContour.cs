@@ -149,14 +149,14 @@ namespace AgOpenGPS
             {
                 signPass = -1;
                 //determine how wide a headland space
-                totalHeadWidth = ((mf.tool.ToolWidth - mf.tool.toolOverlap) * 0.5) - spacing;
+                totalHeadWidth = ((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) * 0.5) - spacing;
             }
 
             else
             {
                 signPass = 1;
-                totalHeadWidth = ((mf.tool.ToolWidth - mf.tool.toolOverlap) * pass) + spacing +
-                    ((mf.tool.ToolWidth - mf.tool.toolOverlap) * 0.5);
+                totalHeadWidth = ((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) * pass) + spacing +
+                    ((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) * 0.5);
             }
 
             for (int j = 0; j < mf.bnd.bndArr.Count; j++)
@@ -190,7 +190,7 @@ namespace AgOpenGPS
         //determine closest point on left side
         public void BuildContourGuidanceLine(vec3 pivot)
         {
-            double toolWid = mf.tool.ToolWidth;
+            double toolWid = mf.Tools[0].ToolWidth;
 
             double sinH = Math.Sin(pivot.heading) * 2.0 * toolWid;
             double cosH = Math.Cos(pivot.heading) * 2.0 * toolWid;
@@ -200,27 +200,27 @@ namespace AgOpenGPS
             double sin2HR;
             double cos2HR;
 
-            if (mf.tool.toolOffset < 0)
+            if (mf.Tools[0].ToolOffset < 0)
             {
                 //sticks out more left
-                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
-                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
+                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
+                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
 
-                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
-                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
+                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
+                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
             }
             else
             {
                 //sticks out more right
-                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
-                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset)));
+                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
+                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
 
-                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
-                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.tool.toolOffset * 2)));
+                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
+                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
             }
 
             //narrow equipment needs bigger bounding box.
-            if (mf.tool.ToolWidth < 6)
+            if (mf.Tools[0].ToolWidth < 6)
             {
                 sinH = Math.Sin(pivot.heading) * 4 * toolWid;
                 cosH = Math.Cos(pivot.heading) * 4 * toolWid;
@@ -445,9 +445,6 @@ namespace AgOpenGPS
             refZ = stripList[strip][pt].northing;
             refHeading = stripList[strip][pt].heading;
 
-            //are we going same direction as stripList was created?
-            bool isSameWay = Math.PI - Math.Abs(Math.Abs(mf.fixHeading - refHeading) - Math.PI) < 1.4;
-
             //which side of the patch are we on is next
             //calculate endpoints of reference line based on closest point
             refPoint1.easting = refX - (Math.Sin(refHeading) * 50.0);
@@ -473,21 +470,6 @@ namespace AgOpenGPS
             if (distanceFromRefLine > 0) piSide = Glm.PIBy2;
             else piSide = -Glm.PIBy2;
 
-            //offset calcs
-            double toolOffset = mf.tool.toolOffset;
-            if (isSameWay)
-            {
-                toolOffset = 0.0;
-            }
-            else
-            {
-                if (distanceFromRefLine > 0) toolOffset *= 2.0;
-                else toolOffset *= -2.0;
-            }
-
-            //move the Guidance Line over based on the overlap, width, and offset amount set in vehicle
-            double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap + toolOffset;
-
             //absolute the distance
             distanceFromRefLine = Math.Abs(distanceFromRefLine);
 
@@ -498,7 +480,7 @@ namespace AgOpenGPS
             start = pt - 35; if (start < 0) start = 0;
             stop = pt + 35; if (stop > ptCount) stop = ptCount + 1;
 
-            double distSq = widthMinusOverlap * widthMinusOverlap * 0.95;
+            double distSq = mf.Tools[0].WidthMinusOverlap * mf.Tools[0].WidthMinusOverlap * 0.95;
             bool fail = false;
 
             for (int i = start; i < stop; i++)
@@ -510,8 +492,8 @@ namespace AgOpenGPS
                 //ctList.Add(point);
 
                 var point = new vec3(
-                    stripList[strip][i].easting + (Math.Sin(piSide + stripList[strip][i].heading) * widthMinusOverlap),
-                    stripList[strip][i].northing + (Math.Cos(piSide + stripList[strip][i].heading) * widthMinusOverlap),
+                    stripList[strip][i].easting + (Math.Sin(piSide + stripList[strip][i].heading) * mf.Tools[0].WidthMinusOverlap),
+                    stripList[strip][i].northing + (Math.Cos(piSide + stripList[strip][i].heading) * mf.Tools[0].WidthMinusOverlap),
                     stripList[strip][i].heading);
                 //ctList.Add(point);
 

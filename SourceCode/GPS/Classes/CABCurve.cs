@@ -194,7 +194,6 @@ namespace AgOpenGPS
 
                 if (mf.camera.camSetDistance > -200)
                 {
-                    double toolWidth2 = mf.tool.ToolWidth - mf.tool.toolOverlap;
                     double cosHeading2 = Math.Cos(-mf.curve.aveLineHeading);
                     double sinHeading2 = Math.Sin(-mf.curve.aveLineHeading);
 
@@ -206,9 +205,8 @@ namespace AgOpenGPS
                     for (int i = 1; i <= 6; i++)
                     {
                         for (int h = 0; h < ptCount; h++)
-                            GL.Vertex3((cosHeading2 * toolWidth2) + mf.curve.refList[h].easting,
-                                          (sinHeading2 * toolWidth2) + mf.curve.refList[h].northing, 0);
-                        toolWidth2 = toolWidth2 + mf.tool.ToolWidth - mf.tool.toolOverlap;
+                            GL.Vertex3((cosHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.curve.refList[h].easting,
+                                          (sinHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.curve.refList[h].northing, 0);
                     }
 
                     GL.End();
@@ -392,11 +390,6 @@ namespace AgOpenGPS
 
             double boundaryTriggerDistance = 1;
 
-            //move the ABLine over based on the overlap amount set in vehicle
-            double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-
-
-
             if (SpiralMode == true)
             {
                 deltaOfRefAndAveHeadings = 1;
@@ -405,7 +398,7 @@ namespace AgOpenGPS
 
                 minDistance = Math.Sqrt(dist);
 
-                howManyPathsAway = Math.Round(minDistance / widthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                howManyPathsAway = Math.Round(minDistance / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
                 if (OldhowManyPathsAway != howManyPathsAway && howManyPathsAway == 0)
                 {
                     OldhowManyPathsAway = howManyPathsAway;
@@ -416,7 +409,7 @@ namespace AgOpenGPS
                     OldhowManyPathsAway = howManyPathsAway;
                     if (howManyPathsAway < 2) howManyPathsAway = 2;
 
-                    double s = widthMinusOverlap / 2;
+                    double s = mf.Tools[0].WidthMinusOverlap / 2;
 
                     curList?.Clear();
                     //double circumference = (glm.twoPI * s) / (boundaryTriggerDistance * 0.1);
@@ -449,6 +442,7 @@ namespace AgOpenGPS
                         pt3.heading = Math.Atan2(arr[1].easting - arr[cnt - 1].easting, arr[1].northing - arr[cnt - 1].northing);
                         if (pt3.heading < 0) pt3.heading += Glm.twoPI;
                         curList.Add(pt3);
+
                         //middle points
                         for (int i = 1; i < (cnt - 1); i++)
                         {
@@ -473,7 +467,7 @@ namespace AgOpenGPS
 
                 minDistance = Math.Sqrt(dist);
 
-                howManyPathsAway = Math.Round(minDistance / widthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                howManyPathsAway = Math.Round(minDistance / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
                 if (OldhowManyPathsAway != howManyPathsAway && howManyPathsAway == 0)
                 {
                     OldhowManyPathsAway = howManyPathsAway;
@@ -486,11 +480,11 @@ namespace AgOpenGPS
 
                     curList?.Clear();
 
-                    int aa = (int)((Glm.twoPI * widthMinusOverlap * howManyPathsAway) / (boundaryTriggerDistance));
+                    int aa = (int)((Glm.twoPI * mf.Tools[0].WidthMinusOverlap * howManyPathsAway) / (boundaryTriggerDistance));
 
                     for (double round = 0; round <= Glm.twoPI + 0.00001; round += (Glm.twoPI) / aa)
                     {
-                        vec3 pt = new vec3(refList[0].easting + (Math.Sin(round) * widthMinusOverlap * howManyPathsAway), refList[0].northing + (Math.Cos(round) * widthMinusOverlap * howManyPathsAway), 0);
+                        vec3 pt = new vec3(refList[0].easting + (Math.Sin(round) * mf.Tools[0].WidthMinusOverlap * howManyPathsAway), refList[0].northing + (Math.Cos(round) * mf.Tools[0].WidthMinusOverlap * howManyPathsAway), 0);
                         curList.Add(pt);
                     }
 
@@ -558,30 +552,22 @@ namespace AgOpenGPS
 
                     if (minDistA == 1000000 || minDistB == 1000000) return;
 
+                    //are we going same direction as stripList was created?
                     isSameWay = Math.PI - Math.Abs(Math.Abs(pivot.heading - refList[A].heading) - Math.PI) < Glm.PIBy2;
 
 
-                    double distanceFromRefLine = (pivot.northing - refList[A].northing) * (refList[B].easting - refList[A].easting) - (pivot.easting - refList[A].easting) * (refList[B].northing - refList[A].northing);
+                    //double distanceFromRefLine = (pivot.northing - refList[A].northing) * (refList[B].easting - refList[A].easting) - (pivot.easting - refList[A].easting) * (refList[B].northing - refList[A].northing);
 
-                    //determine closest point
-                    minDistance = Math.Sqrt(minDistA);
+                    double distanceFromRefLine = ((refList[B].easting - refList[A].easting) * pivot.northing - (refList[B].northing - refList[A].northing) * pivot.easting + refList[B].northing * refList[A].easting - refList[B].easting * refList[A].northing) /
+                            Math.Sqrt((refList[A].easting - refList[B].easting) * (refList[A].easting - refList[B].easting) + (refList[A].northing - refList[B].northing) * (refList[A].northing - refList[B].northing));
 
-                    //are we going same direction as stripList was created?
 
                     deltaOfRefAndAveHeadings = 1;
 
-                    //add or subtract pi by 2 depending on which side of ref line
-                    //move the ABLine over based on the overlap amount set in vehicle
-                    if (mf.tool.toolOffset != 0)
-                    {
-                        widthMinusOverlap = mf.tool.ToolWidth / 2 - mf.tool.toolOverlap;
-                    }
-                    else
-                    {
-                        widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-                    }
+                    if (isSameWay) distanceFromRefLine -= mf.Tools[0].ToolOffset;
+                    else distanceFromRefLine += mf.Tools[0].ToolOffset;
 
-                    howManyPathsAway = Math.Round(minDistance / widthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                    howManyPathsAway = Math.Round(Math.Abs(distanceFromRefLine) / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
 
                     curveNumber = howManyPathsAway;
                     if (distanceFromRefLine < 0) curveNumber = -curveNumber;
@@ -601,17 +587,34 @@ namespace AgOpenGPS
                     if (curveNumber > 0) piSide = -Glm.PIBy2;
                     else piSide = Glm.PIBy2;
 
+
+
+                    double Offset = mf.Tools[0].WidthMinusOverlap * howManyPathsAway;
+                    if (isSameWay)
+                    {
+                        if (curveNumber > 0) Offset += mf.Tools[0].ToolOffset;
+                        else Offset -= mf.Tools[0].ToolOffset;
+                    }
+                    else
+                    {
+                        if (curveNumber > 0) Offset -= mf.Tools[0].ToolOffset;
+                        else Offset += mf.Tools[0].ToolOffset;
+                    }
+
+
+
                     for (int i = 0; i < ptCount2 - 1; i++)
                     {
+
                         var point = new vec3(
-                        refList[i].easting + (Math.Sin(piSide + refList[i].heading) * widthMinusOverlap * howManyPathsAway),
-                        refList[i].northing + (Math.Cos(piSide + refList[i].heading) * widthMinusOverlap * howManyPathsAway),
+                        refList[i].easting + (Math.Sin(piSide + refList[i].heading) * Offset),
+                        refList[i].northing + (Math.Cos(piSide + refList[i].heading) * Offset),
                         refList[i].heading);
                         bool Add = true;
                         for (int t = 0; t < ptCount2; t++)
                         {
                             double dist = ((point.easting - refList[t].easting) * (point.easting - refList[t].easting)) + ((point.northing - refList[t].northing) * (point.northing - refList[t].northing));
-                            if (dist < (widthMinusOverlap * howManyPathsAway * widthMinusOverlap * howManyPathsAway) * 0.999999)
+                            if (dist < (Offset * Offset) * 0.999999)
                             {
                                 Add = false;
                                 break;
@@ -634,65 +637,129 @@ namespace AgOpenGPS
                     {
                         vec3[] arr = new vec3[cnt];
                         curList.CopyTo(arr);
-
-                        for (int i = 1; i < (curList.Count - 2); i++)
-                        {
-                            arr[i].easting = (curList[i - 1].easting + curList[i].easting + curList[i + 1].easting) / 3;
-                            arr[i].northing = (curList[i - 1].northing + curList[i].northing + curList[i + 1].northing) / 3;
-                        }
                         curList.Clear();
+
                         for (int i = 1; i < (arr.Length - 1); i++)
                         {
                             arr[i].heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                            if (arr[i].heading < 0) arr[i].heading += Glm.twoPI;
+                        }
+                        bool Next = false;
+                        for (int i = 0; i < arr.Length - 1; i++)
+                        {
+                            if (arr[i].heading - arr[i + 1].heading > 0.174533)
+                            {
+                                Next = true;
+                                curList.Add(new vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
+                                curList.Add(new vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                            }
+                            else if (Next)
+                            {
+                                Next = false;
+                                curList.Add(new vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
+                                curList.Add(new vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                            }
+                            else
+                            {
+                                curList.Add(new vec3(arr[i].easting * 0.5 + arr[i + 1].easting * 0.5, arr[i].northing * 0.5 + arr[i + 1].northing * 0.5, 0));
+                            }
                         }
 
-                        if (mf.tool.isToolTrailing)
+
+                        for (int i = 1; i < (curList.Count - 1); i++)
                         {
-                            vec3[] arr2 = arr;
+                            curList[i] = new vec3(curList[i].easting, curList[i].northing, Math.Atan2(curList[i + 1].easting - curList[i - 1].easting, curList[i + 1].northing - curList[i - 1].northing));
+                        }
+
+
+
+                        if (mf.Tools[0].isToolTrailing)
+                        {
                             double head = 0;
                             if (isSameWay) head = Math.PI;
 
-                            if (mf.tool.isToolTBT && mf.tool.toolTankTrailingHitchLength < 0)
+                            if (mf.Tools[0].isToolTBT && mf.Tools[0].toolTankTrailingHitchLength < 0)
                             {
+                                arr = new vec3[curList.Count];
+                                curList.CopyTo(arr);
+                                curList.Clear();
+
                                 for (int i = 0; i < arr.Length; i++)
                                 {
-                                    arr[i].easting += Math.Sin(arr[i].heading + head) * mf.tool.toolTankTrailingHitchLength;
-                                    arr[i].northing += Math.Cos(arr[i].heading + head) * mf.tool.toolTankTrailingHitchLength;
+                                    arr[i].easting += Math.Sin(arr[i].heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
+                                    arr[i].northing += Math.Cos(arr[i].heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
                                 }
 
-                                for (int i = 1; i < arr.Length - 2; i++)
-                                {
-                                    arr2[i].easting = (arr[i - 1].easting + arr[i].easting + arr[i + 1].easting) / 3;
-                                    arr2[i].northing = (arr[i - 1].northing + arr[i].northing + arr[i + 1].northing) / 3;
-                                }
                                 for (int i = 1; i < (arr.Length - 1); i++)
                                 {
-                                    arr2[i].heading = Math.Atan2(arr2[i + 1].easting - arr2[i - 1].easting, arr2[i + 1].northing - arr2[i - 1].northing);
-                                    if (arr2[i].heading < 0) arr2[i].heading += Glm.twoPI;
+                                    arr[i].heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
                                 }
-                                arr = arr2;
+
+                                Next = false;
+                                for (int i = 0; i < arr.Length - 1; i++)
+                                {
+                                    if (arr[i].heading - arr[i + 1].heading > 0.174533)
+                                    {
+                                        Next = true;
+                                        curList.Add(new vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
+                                        curList.Add(new vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                                    }
+                                    else if (Next)
+                                    {
+                                        Next = false;
+                                        curList.Add(new vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
+                                        curList.Add(new vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                                    }
+                                    else
+                                    {
+                                        curList.Add(new vec3(arr[i].easting * 0.5 + arr[i + 1].easting * 0.5, arr[i].northing * 0.5 + arr[i + 1].northing * 0.5, 0));
+                                    }
+                                }
+                                for (int i = 1; i < (curList.Count - 1); i++)
+                                {
+                                    curList[i] = new vec3(curList[i].easting, curList[i].northing, Math.Atan2(curList[i + 1].easting - curList[i - 1].easting, curList[i + 1].northing - curList[i - 1].northing));
+                                }
                             }
+
+                            arr = new vec3[curList.Count];
+                            curList.CopyTo(arr);
+                            curList.Clear();
+
 
                             for (int i = 0; i < arr.Length; i++)
                             {
-                                arr[i].easting += Math.Sin(arr[i].heading + head) * mf.tool.toolTrailingHitchLength;
-                                arr[i].northing += Math.Cos(arr[i].heading + head) * mf.tool.toolTrailingHitchLength;
-                            }
-
-                            for (int i = 1; i < arr.Length - 2; i++)
-                            {
-                                arr2[i].easting = (arr[i - 1].easting + arr[i].easting + arr[i + 1].easting) / 3;
-                                arr2[i].northing = (arr[i - 1].northing + arr[i].northing + arr[i + 1].northing) / 3;
+                                arr[i].easting += Math.Sin(arr[i].heading + head) * mf.Tools[0].toolTrailingHitchLength;
+                                arr[i].northing += Math.Cos(arr[i].heading + head) * mf.Tools[0].toolTrailingHitchLength;
                             }
                             for (int i = 1; i < (arr.Length - 1); i++)
                             {
-                                arr2[i].heading = Math.Atan2(arr2[i + 1].easting - arr2[i - 1].easting, arr2[i + 1].northing - arr2[i - 1].northing);
-                                if (arr2[i].heading < 0) arr2[i].heading += Glm.twoPI;
+                                arr[i].heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
                             }
-                            arr = arr2;
+
+                            Next = false;
+                            for (int i = 0; i < arr.Length - 1; i++)
+                            {
+                                if (arr[i].heading - arr[i + 1].heading > 0.174533)
+                                {
+                                    Next = true;
+                                    curList.Add(new vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
+                                    curList.Add(new vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                                }
+                                else if (Next)
+                                {
+                                    Next = false;
+                                    curList.Add(new vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
+                                    curList.Add(new vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                                }
+                                else
+                                {
+                                    curList.Add(new vec3(arr[i].easting * 0.5 + arr[i + 1].easting * 0.5, arr[i].northing * 0.5 + arr[i + 1].northing * 0.5, 0));
+                                }
+                            }
+                            for (int i = 1; i < (curList.Count - 1); i++)
+                            {
+                                curList[i] = new vec3(curList[i].easting, curList[i].northing, Math.Atan2(curList[i + 1].easting - curList[i - 1].easting, curList[i + 1].northing - curList[i - 1].northing));
+                            }
                         }
-                        curList.AddRange(arr);
                     }
                 }
             }
@@ -793,7 +860,7 @@ namespace AgOpenGPS
                     if (abFixHeadingDelta > 0.74) abFixHeadingDelta = 0.74;
                     if (abFixHeadingDelta < -0.74) abFixHeadingDelta = -0.74;
 
-                    steerAngleCu = Math.Atan((distanceFromCurrentLine * mf.vehicle.stanleyGain) 
+                    steerAngleCu = Math.Atan((distanceFromCurrentLine * mf.vehicle.stanleyGain)
                         / ((Math.Abs(mf.pn.speed) * 0.277777) + 1));
 
                     if (steerAngleCu > 0.74) steerAngleCu = 0.74;

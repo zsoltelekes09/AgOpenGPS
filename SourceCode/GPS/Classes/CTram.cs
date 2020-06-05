@@ -37,7 +37,7 @@ namespace AgOpenGPS
             halfWheelTrack = wheelTrack * 0.5;
 
             passes = Properties.Settings.Default.setTram_passes;
-            abOffset = (Math.Round((mf.tool.ToolWidth - mf.tool.toolOverlap) / 2.0, 3));
+            abOffset = (Math.Round((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) / 2.0, 3));
             displayMode = 0;
         }
 

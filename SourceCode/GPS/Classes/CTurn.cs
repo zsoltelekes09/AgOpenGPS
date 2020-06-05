@@ -85,13 +85,13 @@ namespace AgOpenGPS
             double scanWidthL, scanWidthR;
             if (isYouTurnRight) //its actually left
             {
-                scanWidthL = -(mf.tool.ToolWidth * 0.25) - (mf.tool.ToolWidth * 0.5);
-                scanWidthR = (mf.tool.ToolWidth * 0.25) - (mf.tool.ToolWidth * 0.5);
+                scanWidthL = -(mf.Tools[0].ToolWidth * 0.25) - (mf.Tools[0].ToolWidth * 0.5);
+                scanWidthR = (mf.Tools[0].ToolWidth * 0.25) - (mf.Tools[0].ToolWidth * 0.5);
             }
             else
             {
-                scanWidthL = -(mf.tool.ToolWidth * 0.25) + (mf.tool.ToolWidth * 0.5);
-                scanWidthR = (mf.tool.ToolWidth * 0.25) + (mf.tool.ToolWidth * 0.5);
+                scanWidthL = -(mf.Tools[0].ToolWidth * 0.25) + (mf.Tools[0].ToolWidth * 0.5);
+                scanWidthR = (mf.Tools[0].ToolWidth * 0.25) + (mf.Tools[0].ToolWidth * 0.5);
             }
 
             //isYouTurnRight actuall means turning left - Painful, but it switches later
@@ -142,13 +142,13 @@ namespace AgOpenGPS
             {
                 if (isYouTurnRight) //its actually left
                 {
-                    scanWidthL = -(mf.tool.ToolWidth * 0.5);
+                    scanWidthL = -(mf.Tools[0].ToolWidth * 0.5);
                     scanWidthR = 0;
                 }
                 else
                 {
                     scanWidthL = 0;
-                    scanWidthR = (mf.tool.ToolWidth * 0.5);
+                    scanWidthR = (mf.Tools[0].ToolWidth * 0.5);
                 }
 
                 //isYouTurnRight actuall means turning left - Painful, but it switches later
@@ -256,7 +256,7 @@ namespace AgOpenGPS
                         turnArr[j].turnLine.Add(tPnt);
                     }
                 }
-                turnArr[j].FixTurnLine(totalHeadWidth, mf.bnd.bndArr[j].bndLine, mf.tool.ToolWidth * 0.4);
+                turnArr[j].FixTurnLine(totalHeadWidth, mf.bnd.bndArr[j].bndLine, mf.Tools[0].ToolWidth * 0.4);
                 turnArr[j].PreCalcTurnLines();
 
                 if (Num > -1) break;

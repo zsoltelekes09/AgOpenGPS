@@ -115,15 +115,15 @@ namespace AgOpenGPS
                 if (mf.pn.speed > 2)
                 {
                     var timeSpan = TimeSpan.FromHours(((areaBoundaryOuterLessInner - workedAreaTotal) * Glm.m2ha
-                        / (mf.tool.ToolWidth * mf.pn.speed * 0.1)));
+                        / (mf.Tools[0].ToolWidth * mf.pn.speed * 0.1)));
                     return timeSpan.Hours.ToString("00") + ":" + timeSpan.Minutes.ToString("00");
                 }
                 else return "\u221E Hrs";
             }
         }
 
-        public string WorkRateHectares { get { return (mf.tool.ToolWidth * mf.pn.speed * 0.1).ToString("N1"); } }
-        public string WorkRateAcres { get { return (mf.tool.ToolWidth * mf.pn.speed * 0.2471).ToString("N1"); } }
+        public string WorkRateHectares { get { return (mf.Tools[0].ToolWidth * mf.pn.speed * 0.1).ToString("N1"); } }
+        public string WorkRateAcres { get { return (mf.Tools[0].ToolWidth * mf.pn.speed * 0.2471).ToString("N1"); } }
 
         //constructor
         public CFieldData(FormGPS _f)

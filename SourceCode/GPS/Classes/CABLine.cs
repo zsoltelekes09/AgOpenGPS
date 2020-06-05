@@ -108,11 +108,9 @@ namespace AgOpenGPS
 
             if (!isEditing)
             {
-                if (mf.isSideGuideLines && mf.camera.camSetDistance > mf.tool.ToolWidth * -120)
+                if (mf.isSideGuideLines && mf.camera.camSetDistance > mf.Tools[0].ToolWidth * -120)
                 {
-                    //get the tool offset and width
-                    double toolOffset = mf.tool.toolOffset * 2;
-                    double toolWidth = mf.tool.ToolWidth - mf.tool.toolOverlap;
+
                     double cosHeading = Math.Cos(-abHeading);
                     double sinHeading = Math.Sin(-abHeading);
 
@@ -121,11 +119,34 @@ namespace AgOpenGPS
                     GL.LineStipple(1, 0x0101);
 
                     GL.LineWidth(lineWidth);
+
                     GL.Begin(PrimitiveType.Lines);
+                    for (int i = -2; i < 3; i++)
+                    {
+                        if (i == 0) continue;
+
+
+                        GL.Vertex2(currentABLineP1.easting + (cosHeading * mf.Tools[0].WidthMinusOverlap * i), currentABLineP1.northing + (sinHeading * mf.Tools[0].WidthMinusOverlap * i));
+                        GL.Vertex2(currentABLineP2.easting + (cosHeading * mf.Tools[0].WidthMinusOverlap * i), currentABLineP2.northing + (sinHeading * mf.Tools[0].WidthMinusOverlap * i));
+
+                    }
+                    GL.End();
+                    GL.Disable(EnableCap.LineStipple);
+
+
+
+
+                    /*
+
+
+                    //get the tool offset and width
+                    double toolOffset = mf.Tools[0].ToolOffset * 2;
+                    double toolWidth = mf.Tools[0].WidthMinusOverlap;
+
 
                     if (isABSameAsVehicleHeading)
                     {
-                        GL.Vertex3((cosHeading * (toolWidth + toolOffset)) + currentABLineP1.easting, (sinHeading * (toolWidth + toolOffset)) + currentABLineP1.northing, 0);
+                        GL.Vertex3(currentABLineP1.easting + (cosHeading * (toolWidth + toolOffset)), currentABLineP1.northing + (sinHeading * (toolWidth + toolOffset)) , 0);
                         GL.Vertex3((cosHeading * (toolWidth + toolOffset)) + currentABLineP2.easting, (sinHeading * (toolWidth + toolOffset)) + currentABLineP2.northing, 0);
                         GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentABLineP1.easting, (sinHeading * (-toolWidth + toolOffset)) + currentABLineP1.northing, 0);
                         GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentABLineP2.easting, (sinHeading * (-toolWidth + toolOffset)) + currentABLineP2.northing, 0);
@@ -152,12 +173,11 @@ namespace AgOpenGPS
 
                     GL.End();
                     GL.Disable(EnableCap.LineStipple);
+                    */
                 }
             }
-
-            if (isEditing)
+            else if (isEditing)
             {
-                double toolWidth2 = mf.tool.ToolWidth - mf.tool.toolOverlap;
                 double cosHeading2 = Math.Cos(-mf.ABLine.abHeading);
                 double sinHeading2 = Math.Sin(-mf.ABLine.abHeading);
 
@@ -172,9 +192,8 @@ namespace AgOpenGPS
 
                     for (int i = 1; i <= 6; i++)
                     {
-                        GL.Vertex3((cosHeading2 * toolWidth2) + mf.ABLine.refABLineP1.easting, (sinHeading2 * toolWidth2) + mf.ABLine.refABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading2 * toolWidth2) + mf.ABLine.refABLineP2.easting, (sinHeading2 * toolWidth2) + mf.ABLine.refABLineP2.northing, 0);
-                        toolWidth2 = toolWidth2 + mf.tool.ToolWidth - mf.tool.toolOverlap;
+                        GL.Vertex3((cosHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP1.easting, (sinHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP1.northing, 0);
+                        GL.Vertex3((cosHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP2.easting, (sinHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP2.northing, 0);
                     }
 
                     GL.End();
@@ -314,63 +333,66 @@ namespace AgOpenGPS
 
         public void GetCurrentABLine(vec3 pivot, vec3 steer)
         {
+            isABSameAsVehicleHeading = Math.PI - Math.Abs(Math.Abs(pivot.heading - abHeading) - Math.PI) < Glm.PIBy2;
+
+            distanceFromRefLine = ((refABLineP2.easting - refABLineP1.easting) * pivot.northing - (refABLineP2.northing - refABLineP1.northing) * pivot.easting + refABLineP2.northing * refABLineP1.easting - refABLineP2.easting * refABLineP1.northing) /
+                    Math.Sqrt((refABLineP1.easting - refABLineP2.easting) * (refABLineP1.easting - refABLineP2.easting) + (refABLineP1.northing - refABLineP2.northing) * (refABLineP1.northing - refABLineP2.northing));
+
+
+            if (isABSameAsVehicleHeading) distanceFromRefLine -= mf.Tools[0].ToolOffset;
+            else distanceFromRefLine += mf.Tools[0].ToolOffset;
+
+            //Which ABLine is the vehicle on, negative is left and positive is right side
+            howManyPathsAway = Math.Round(Math.Abs(distanceFromRefLine) / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+
+
+            //generate that pass number as signed integer
+            passNumber = howManyPathsAway;
+            if (distanceFromRefLine < 0) passNumber = -passNumber;
+
+            //calculate the new point that is number of implement widths over
+            vec2 point1;
+
+
+            double piSide;
+
+            if (passNumber > 0) piSide = -Glm.PIBy2;
+            else piSide = Glm.PIBy2;
+
+            double Offset = mf.Tools[0].WidthMinusOverlap * howManyPathsAway;
+
+            if (isABSameAsVehicleHeading)
+            {
+                if (passNumber > 0) Offset += mf.Tools[0].ToolOffset;
+                else Offset -= mf.Tools[0].ToolOffset;
+            }
+            else
+            {
+                if (passNumber > 0) Offset -= mf.Tools[0].ToolOffset;
+                else Offset += mf.Tools[0].ToolOffset;
+            }
+
+            point1 = new vec2(refPoint1.easting + (Math.Sin(-abHeading + piSide) * Offset), refPoint1.northing + (Math.Cos(-abHeading + piSide) * Offset));
+
+
+            //create the new line extent points for current ABLine based on original heading of AB line
+            currentABLineP1.easting = point1.easting - (Math.Sin(abHeading) * 1600.0);
+            currentABLineP1.northing = point1.northing - (Math.Cos(abHeading) * 1600.0);
+
+            currentABLineP2.easting = point1.easting + (Math.Sin(abHeading) * 1600.0);
+            currentABLineP2.northing = point1.northing + (Math.Cos(abHeading) * 1600.0);
+
+
 
             if (mf.isStanleyUsed)
             {
-                //move the ABLine over based on the overlap amount set in vehicle
-                double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
 
-                //x2-x1
-                double dx = refABLineP2.easting - refABLineP1.easting;
-                //z2-z1
-                double dy = refABLineP2.northing - refABLineP1.northing;
-
-                //how far are we away from the reference line at 90 degrees
-                distanceFromRefLine = ((dy * pivot.easting) - (dx * pivot.northing) + (refABLineP2.easting
-                                        * refABLineP1.northing) - (refABLineP2.northing * refABLineP1.easting))
-                                            / Math.Sqrt((dy * dy) + (dx * dx));
-
-                //sign of distance determines which side of line we are on
-                if (distanceFromRefLine > 0) refLineSide = 1;
-                else refLineSide = -1;
-
-                //absolute the distance
-                distanceFromRefLine = Math.Abs(distanceFromRefLine);
-
-                //Which ABLine is the vehicle on, negative is left and positive is right side
-                howManyPathsAway = Math.Round(distanceFromRefLine / widthMinusOverlap, 0, MidpointRounding.AwayFromZero);
-
-                //generate that pass number as signed integer
-                passNumber = Convert.ToInt32(refLineSide * howManyPathsAway);
-
-                //calculate the new point that is number of implement widths over
-                double toolOffset = mf.tool.toolOffset;
-                vec2 point1;
-
-                //depending which way you are going, the offset can be either side
-                if (isABSameAsVehicleHeading)
-                {
-                    point1 = new vec2((Math.Cos(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) - toolOffset)) + refPoint1.easting,
-                    (Math.Sin(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) - toolOffset)) + refPoint1.northing);
-                }
-                else
-                {
-                    point1 = new vec2((Math.Cos(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) + toolOffset)) + refPoint1.easting,
-                        (Math.Sin(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) + toolOffset)) + refPoint1.northing);
-                }
-
-                //create the new line extent points for current ABLine based on original heading of AB line
-                currentABLineP1.easting = point1.easting - (Math.Sin(abHeading) * 1600.0);
-                currentABLineP1.northing = point1.northing - (Math.Cos(abHeading) * 1600.0);
-
-                currentABLineP2.easting = point1.easting + (Math.Sin(abHeading) * 1600.0);
-                currentABLineP2.northing = point1.northing + (Math.Cos(abHeading) * 1600.0);
 
                 //get the distance from currently active AB line
                 //x2-x1
-                dx = currentABLineP2.easting - currentABLineP1.easting;
+                double dx = currentABLineP2.easting - currentABLineP1.easting;
                 //z2-z1
-                dy = currentABLineP2.northing - currentABLineP1.northing;
+                double dy = currentABLineP2.northing - currentABLineP1.northing;
 
                 //save a copy of dx,dy in youTurn
                 mf.yt.dxAB = dx; mf.yt.dyAB = dy;
@@ -390,7 +412,6 @@ namespace AgOpenGPS
                 abFixHeadingDelta = (Math.Abs(mf.fixHeading - abHeading));
                 if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - Glm.twoPI);
 
-                isABSameAsVehicleHeading = abFixHeadingDelta < Glm.PIBy2;
 
                 // **Stanley Point ** - calc point on ABLine closest to current steer position
                 double U = (((steer.easting - currentABLineP1.easting) * dx)
@@ -451,60 +472,11 @@ namespace AgOpenGPS
             }
             else
             {
-                //move the ABLine over based on the overlap amount set in vehicle
-                double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-
-                //x2-x1
-                double dx = refABLineP2.easting - refABLineP1.easting;
-                //z2-z1
-                double dy = refABLineP2.northing - refABLineP1.northing;
-
-                //how far are we away from the reference line at 90 degrees
-                distanceFromRefLine = ((dy * pivot.easting) - (dx * pivot.northing) + (refABLineP2.easting
-                                        * refABLineP1.northing) - (refABLineP2.northing * refABLineP1.easting))
-                                            / Math.Sqrt((dy * dy) + (dx * dx));
-
-                //sign of distance determines which side of line we are on
-                if (distanceFromRefLine > 0) refLineSide = 1;
-                else refLineSide = -1;
-
-                //absolute the distance
-                distanceFromRefLine = Math.Abs(distanceFromRefLine);
-
-                //Which ABLine is the vehicle on, negative is left and positive is right side
-                howManyPathsAway = Math.Round(distanceFromRefLine / widthMinusOverlap, 0, MidpointRounding.AwayFromZero);
-
-                //generate that pass number as signed integer
-                passNumber = Convert.ToInt32(refLineSide * howManyPathsAway);
-
-                //calculate the new point that is number of implement widths over
-                double toolOffset = mf.tool.toolOffset;
-                vec2 point1;
-
-                //depending which way you are going, the offset can be either side
-                if (isABSameAsVehicleHeading)
-                {
-                    point1 = new vec2((Math.Cos(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) - toolOffset)) + refPoint1.easting,
-                    (Math.Sin(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) - toolOffset)) + refPoint1.northing);
-                }
-                else
-                {
-                    point1 = new vec2((Math.Cos(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) + toolOffset)) + refPoint1.easting,
-                        (Math.Sin(-abHeading) * ((widthMinusOverlap * howManyPathsAway * refLineSide) + toolOffset)) + refPoint1.northing);
-                }
-
-                //create the new line extent points for current ABLine based on original heading of AB line
-                currentABLineP1.easting = point1.easting - (Math.Sin(abHeading) * 1600.0);
-                currentABLineP1.northing = point1.northing - (Math.Cos(abHeading) * 1600.0);
-
-                currentABLineP2.easting = point1.easting + (Math.Sin(abHeading) * 1600.0);
-                currentABLineP2.northing = point1.northing + (Math.Cos(abHeading) * 1600.0);
-
                 //get the distance from currently active AB line
                 //x2-x1
-                dx = currentABLineP2.easting - currentABLineP1.easting;
+                double dx = currentABLineP2.easting - currentABLineP1.easting;
                 //z2-z1
-                dy = currentABLineP2.northing - currentABLineP1.northing;
+                double dy = currentABLineP2.northing - currentABLineP1.northing;
 
                 //save a copy of dx,dy in youTurn
                 mf.yt.dxAB = dx; mf.yt.dyAB = dy;
@@ -539,13 +511,11 @@ namespace AgOpenGPS
 
                 if (abFixHeadingDelta >= Glm.PIBy2)
                 {
-                    isABSameAsVehicleHeading = false;
                     goalPointAB.easting = rEastAB - (Math.Sin(abHeading) * goalPointDistance);
                     goalPointAB.northing = rNorthAB - (Math.Cos(abHeading) * goalPointDistance);
                 }
                 else
                 {
-                    isABSameAsVehicleHeading = true;
                     goalPointAB.easting = rEastAB + (Math.Sin(abHeading) * goalPointDistance);
                     goalPointAB.northing = rNorthAB + (Math.Cos(abHeading) * goalPointDistance);
                 }

@@ -314,29 +314,32 @@ namespace AgOpenGPS
 
             int machine = 0;
 
-            //check if super section is on
-            if (section[tool.numOfSections].IsSectionOn)
+            for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j < tool.numOfSections; j++)
+                //check if super section is on
+                if (Tools[i].section[Tools[i].numOfSections].IsSectionOn)
                 {
-                    //all the sections are on, so set them
-                    machine = machine | set;
-                    set = (set << 1);
+                    for (int j = 0; j < Tools[i].numOfSections; j++)
+                    {
+                        //all the sections are on, so set them
+                        machine = machine | set;
+                        set = (set << 1);
+                    }
                 }
-            }
 
-            else
-            {
-                for (int j = 0; j < MAXSECTIONS; j++)
+                else
                 {
-                    //set if on, reset bit if off
-                    if (section[j].IsSectionOn) machine = machine | set;
-                    else machine = machine & reset;
+                    for (int j = 0; j < MAXSECTIONS; j++)
+                    {
+                        //set if on, reset bit if off
+                        if (Tools[i].section[j].IsSectionOn) machine = machine | set;
+                        else machine = machine & reset;
 
-                    //move set and reset over 1 bit left
-                    set = (set << 1);
-                    reset = (reset << 1);
-                    reset = (reset + 1);
+                        //move set and reset over 1 bit left
+                        set = (set << 1);
+                        reset = (reset << 1);
+                        reset = (reset + 1);
+                    }
                 }
             }
 

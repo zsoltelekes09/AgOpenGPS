@@ -622,12 +622,12 @@
             // 
             this.hsbarHeadingErrorGain.LargeChange = 1;
             this.hsbarHeadingErrorGain.Location = new System.Drawing.Point(6, 114);
-            this.hsbarHeadingErrorGain.Maximum = 10;
+            this.hsbarHeadingErrorGain.Maximum = 100;
             this.hsbarHeadingErrorGain.Minimum = 1;
             this.hsbarHeadingErrorGain.Name = "hsbarHeadingErrorGain";
             this.hsbarHeadingErrorGain.Size = new System.Drawing.Size(260, 30);
             this.hsbarHeadingErrorGain.TabIndex = 294;
-            this.hsbarHeadingErrorGain.Value = 5;
+            this.hsbarHeadingErrorGain.Value = 50;
             this.hsbarHeadingErrorGain.ValueChanged += new System.EventHandler(this.HsbarHeadingErrorGain_ValueChanged);
             // 
             // btnChart
@@ -662,12 +662,12 @@
             // 
             this.hsbarStanleyGain.LargeChange = 1;
             this.hsbarStanleyGain.Location = new System.Drawing.Point(6, 35);
-            this.hsbarStanleyGain.Maximum = 30;
+            this.hsbarStanleyGain.Maximum = 300;
             this.hsbarStanleyGain.Minimum = 1;
             this.hsbarStanleyGain.Name = "hsbarStanleyGain";
             this.hsbarStanleyGain.Size = new System.Drawing.Size(260, 30);
             this.hsbarStanleyGain.TabIndex = 297;
-            this.hsbarStanleyGain.Value = 10;
+            this.hsbarStanleyGain.Value = 100;
             this.hsbarStanleyGain.ValueChanged += new System.EventHandler(this.HsbarStanleyGain_ValueChanged);
             // 
             // label3

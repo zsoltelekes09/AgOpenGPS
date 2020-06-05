@@ -207,7 +207,7 @@ namespace AgOpenGPS
                 }
 
                 nudDistance.Value = 0; // 
-                label6.Text = Math.Round((mf.tool.ToolWidth * 100), 1).ToString();
+                label6.Text = Math.Round((mf.Tools[0].ToolWidth * 100), 1).ToString();
                 FixLabelsABLine();
                 FixLabelsCurve();
                 CalculateMinMax();
@@ -785,40 +785,43 @@ namespace AgOpenGPS
 
             GL.Color3(0.0, 0.0, 0.352);
 
-            //draw patches j= # of sections
-            for (int j = 0; j < mf.tool.numSuperSection; j++)
+            for (int i = 0; i < mf.Tools.Count; i++)
             {
-                //every time the section turns off and on is a new patch
-                patchCount = mf.section[j].patchList.Count;
-
-                if (patchCount > 0)
+                //draw patches j= # of sections
+                for (int j = 0; j < mf.Tools[i].numSuperSection; j++)
                 {
-                    //for every new chunk of patch
-                    foreach (var triList in mf.section[j].patchList)
+                    //every time the section turns off and on is a new patch
+                    patchCount = mf.Tools[i].section[j].patchList.Count;
+
+                    if (patchCount > 0)
                     {
-                        //draw the triangle in each triangle strip
-                        GL.Begin(PrimitiveType.TriangleStrip);
-                        cnt = triList.Count;
-                        if (mf.isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
-                        else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
-
-                        //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                        if (cnt >= (mipmap + 2))
+                        //for every new chunk of patch
+                        foreach (var triList in mf.Tools[i].section[j].patchList)
                         {
-                            step = mipmap;
-                            for (int i = 1; i < cnt - 2; i += step)
-                            {
-                                GL.Vertex3(triList[i].easting, triList[i].northing, 0); i++;
-                                GL.Vertex3(triList[i].easting, triList[i].northing, 0); i++;
-                                if (cnt - i <= (mipmap + 2)) step = 0;//too small to mipmap it
-                            }
-                        }
-                        else { for (int i = 1; i < cnt; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0); }
-                        GL.End();
+                            //draw the triangle in each triangle strip
+                            GL.Begin(PrimitiveType.TriangleStrip);
+                            cnt = triList.Count;
+                            if (mf.isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
+                            else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
 
+                            //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
+                            if (cnt >= (mipmap + 2))
+                            {
+                                step = mipmap;
+                                for (int k = 1; k < cnt - 2; k += step)
+                                {
+                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                                    if (cnt - k <= (mipmap + 2)) step = 0;//too small to mipmap it
+                                }
+                            }
+                            else { for (int k = 1; k < cnt; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
+                            GL.End();
+
+                        }
                     }
-                }
-            } //end of section patches
+                } //end of section patches
+            }
 
         }
 

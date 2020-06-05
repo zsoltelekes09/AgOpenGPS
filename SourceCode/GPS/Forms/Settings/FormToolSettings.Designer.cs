@@ -936,7 +936,7 @@
             0,
             0,
             0});
-            this.nudDefaultSectionWidth.ValueChanged += new System.EventHandler(this.nudDefaultSectionWidth_ValueChanged);
+            this.nudDefaultSectionWidth.ValueChanged += new System.EventHandler(this.NudDefaultSectionWidth_ValueChanged);
             this.nudDefaultSectionWidth.Enter += new System.EventHandler(this.NudDefaultSectionWidth_Enter);
             // 
             // cboxNumSections

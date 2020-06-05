@@ -92,50 +92,29 @@ namespace AgOpenGPS
 
         public void DrawVehicle()
         {
-
             //draw vehicle
+            GL.Translate(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0);
             GL.Rotate(Glm.ToDegrees(-mf.fixHeading), 0.0, 0.0, 1.0);
-            //mf.font.DrawText3D(0, 0, "&TGF");
+            GL.PushMatrix();
 
-            //if (mf.camera.camFollowing)
-            //GL.Rotate(mf.camera.camPitch * -0.15, 1, 0, 0);
 
-            ////draw the vehicle Body
-            //GL.Color3(0.95f, 0.95f, 0.95f);
-            //GL.Enable(EnableCap.Texture2D);
-            //GL.BindTexture(TextureTarget.Texture2D, mf.texture[2]);        // Select Our Texture
-            //GL.Begin(PrimitiveType.TriangleStrip);              // Build Quad From A Triangle Strip
-            //GL.TexCoord2(0, 0); GL.Vertex2(2.8, 4); // Top Right
-            //GL.TexCoord2(1, 0); GL.Vertex2(-2.8, 4); // Top Left
-            //GL.TexCoord2(0, 1); GL.Vertex2(2.8, -antennaHeight + wheelbase); // Bottom Right
-            //GL.TexCoord2(1, 1); GL.Vertex2(-2.8, -antennaHeight + wheelbase); // Bottom Left
-            //GL.End();                       // Done Building Triangle Strip
-            ////disable, straight color
-            //GL.Disable(EnableCap.Texture2D);
-
-            //draw the area side marker
-            //GL.Color3(0.95f, 0.90f, 0.0f);
             GL.PointSize(6.0f);
-            GL.Begin(PrimitiveType.Points);
-            //if (mf.isAreaOnRight) GL.Vertex3(2.0, -antennaPivot, 0);
-            //else GL.Vertex3(-2.0, -antennaPivot, 0);
 
             //antenna
             GL.Color3(0.0f, 0.95f, 0.95f);
-            GL.Vertex3(0, antennaPivot, 0);
 
-            //hitch pin
-            GL.Color3(0.95f, 0.0f, 0.0f);
-            GL.Vertex3(0, mf.tool.hitchLength, 0);
-
-            ////rear Tires
-            //GL.PointSize(12.0f);
-            //GL.Color3(0, 0, 0);
-            //GL.Vertex3(-1.8, 0, 0);
-            //GL.Vertex3(1.8, 0, 0);
-            GL.End();
-
-            ////draw the vehicle Body
+            for (int i = 0; i < mf.Tools.Count; i++)
+            {
+                if (mf.Tools[i].isToolBehindPivot)
+                {
+                    GL.Begin(PrimitiveType.Points);
+                    //hitch pin
+                    GL.Vertex3(0, antennaPivot, 0);
+                    GL.Color3(0.95f, 0.0f, 0.0f);
+                    GL.Vertex3(0, mf.Tools[i].hitchLength, 0);
+                    GL.End();
+                }
+            }
 
             if (!mf.vehicle.isHydLiftOn)
             {
@@ -176,6 +155,7 @@ namespace AgOpenGPS
                 }
             }
 
+
             GL.LineWidth(3);
             GL.Color3(0.0, 0.0, 0.0);
             GL.Begin(PrimitiveType.LineLoop);
@@ -185,6 +165,11 @@ namespace AgOpenGPS
                 GL.Vertex3(0, wheelbase, 0);
             }
             GL.End();
+
+
+
+
+            # region Front Arrow
 
             GL.Begin(PrimitiveType.TriangleFan);
             {
@@ -209,6 +194,7 @@ namespace AgOpenGPS
             }
             GL.End();
 
+            #endregion
 
             if (mf.bnd.isBndBeingMade)
             {
@@ -260,25 +246,34 @@ namespace AgOpenGPS
             if (mf.curve.isBtnCurveOn && !mf.ct.isContourBtnOn)
             {
                 GL.Color4(0.969, 0.95, 0.9510, 0.87);
-                if (mf.curve.curveNumber < 0)
-                mf.font.DrawTextVehicle(0, wheelbase, (-mf.curve.curveNumber) + "L", 1.5);
-                else mf.font.DrawTextVehicle(0, wheelbase, mf.curve.curveNumber.ToString() + "R", 1.5);
+                if (mf.curve.curveNumber == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
+                else  if (mf.curve.curveNumber < 0) mf.font.DrawTextVehicle(0, wheelbase, (-mf.curve.curveNumber) + "R", 1.5);
+                else mf.font.DrawTextVehicle(0, wheelbase, mf.curve.curveNumber.ToString() + "L", 1.5);
             }
             else if (mf.ABLine.isBtnABLineOn && !mf.ct.isContourBtnOn)
             {
                 GL.Color4(0.96, 0.95, 0.9510, 0.87);
 
-                if (mf.ABLine.passNumber < 0)
-                mf.font.DrawTextVehicle(0, wheelbase, -mf.ABLine.passNumber + "L", 1.5);
-                else mf.font.DrawTextVehicle(0, wheelbase, mf.ABLine.passNumber.ToString() + "R", 1.5);
+                if (mf.ABLine.passNumber == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
+                else if (mf.ABLine.passNumber < 0) mf.font.DrawTextVehicle(0, wheelbase, -mf.ABLine.passNumber + "R", 1.5);
+                else mf.font.DrawTextVehicle(0, wheelbase, mf.ABLine.passNumber.ToString() + "L", 1.5);
             }
 
             //draw the rigid hitch
             GL.Color3(0.37f, 0.37f, 0.97f);
-            GL.Begin(PrimitiveType.Lines);
-            GL.Vertex3(0, mf.tool.hitchLength, 0);
-            GL.Vertex3(0, 0, 0);
-            GL.End();
+
+            for (int i = 0; i < mf.Tools.Count; i++)
+            {
+                if (mf.Tools[i].isToolBehindPivot)
+                {
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex3(0, mf.Tools[i].hitchLength, 0);
+                    GL.Vertex3(0, 0, 0);
+                    GL.End();
+                }
+            }
+
+
 
             GL.LineWidth(1);
 
@@ -323,7 +318,6 @@ namespace AgOpenGPS
                 }
                 GL.End();
             }
-
         }
     }
 }

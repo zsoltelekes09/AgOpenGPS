@@ -208,7 +208,7 @@ namespace AgOpenGPS
                         geoFenceArr[j].geoFenceLine.Add(tPnt);
                     }
                 }
-                geoFenceArr[j].FixGeoFenceLine(mf.yt.geoFenceDistance, mf.bnd.bndArr[j].bndLine, mf.tool.ToolWidth * 0.5);
+                geoFenceArr[j].FixGeoFenceLine(mf.yt.geoFenceDistance, mf.bnd.bndArr[j].bndLine, mf.Tools[0].ToolWidth * 0.5);
                 geoFenceArr[j].PreCalcTurnLines();
 
                 if (Num > -1) break;

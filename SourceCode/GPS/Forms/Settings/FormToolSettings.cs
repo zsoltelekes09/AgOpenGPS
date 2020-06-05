@@ -405,50 +405,59 @@ namespace AgOpenGPS
         private void BtnOK_Click(object sender, EventArgs e)
         {
             //Tool  ------------------------------------------------------------------------------------------
-
+            int Here = 0;
             //trailing hitch is always behind
             toolTrailingHitchLength *= -1;
-            mf.tool.toolTrailingHitchLength = toolTrailingHitchLength;
-            Properties.Vehicle.Default.setTool_toolTrailingHitchLength = mf.tool.toolTrailingHitchLength;
+            mf.Tools[Here].toolTrailingHitchLength = toolTrailingHitchLength;
+            Properties.Vehicle.Default.setTool_toolTrailingHitchLength = mf.Tools[Here].toolTrailingHitchLength;
 
             tankTrailingHitchLength *= -1;
-            mf.tool.toolTankTrailingHitchLength = tankTrailingHitchLength;
-            Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength = mf.tool.toolTankTrailingHitchLength;
+            mf.Tools[Here].toolTankTrailingHitchLength = tankTrailingHitchLength;
+            Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength = mf.Tools[Here].toolTankTrailingHitchLength;
 
-            mf.tool.toolOverlap = toolOverlap;
-            Properties.Vehicle.Default.setVehicle_toolOverlap = mf.tool.toolOverlap;
 
-            
-            mf.tool.LookAheadOnSetting = toolLookAheadOn;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOn = mf.tool.LookAheadOnSetting;
+
+
+            mf.Tools[Here].ToolOverlap = toolOverlap;
+            Properties.Vehicle.Default.setVehicle_toolOverlap = mf.Tools[Here].ToolOverlap;
+
+            mf.Tools[Here].ToolOffset = toolOffset;
+            Properties.Vehicle.Default.setVehicle_toolOffset = mf.Tools[Here].ToolOffset;
+            //update toolwidth in mainform
+            Properties.Vehicle.Default.setVehicle_toolWidth = mf.Tools[Here].ToolWidth;
+
+
+
+
+
+            mf.Tools[Here].LookAheadOnSetting = toolLookAheadOn;
+            Properties.Vehicle.Default.setVehicle_toolLookAheadOn = mf.Tools[Here].LookAheadOnSetting;
            
-            mf.tool.LookAheadOffSetting = toolLookAheadOff;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOff = mf.tool.LookAheadOffSetting;
+            mf.Tools[Here].LookAheadOffSetting = toolLookAheadOff;
+            Properties.Vehicle.Default.setVehicle_toolLookAheadOff = mf.Tools[Here].LookAheadOffSetting;
 
-            mf.tool.TurnOffDelay = toolTurnOffDelay;
-            Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.tool.TurnOffDelay;
+            mf.Tools[Here].TurnOffDelay = toolTurnOffDelay;
+            Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.Tools[Here].TurnOffDelay;
 
-            mf.tool.MappingOnDelay = MappingOnDelay;
-            Properties.Vehicle.Default.setVehicle_MappingOnDelay = mf.tool.MappingOnDelay;
+            mf.Tools[Here].MappingOnDelay = MappingOnDelay;
+            Properties.Vehicle.Default.setVehicle_MappingOnDelay = mf.Tools[Here].MappingOnDelay;
 
-            mf.tool.MappingOffDelay = MappingOffDelay;
-            Properties.Vehicle.Default.setVehicle_MappingOffDelay = mf.tool.MappingOffDelay;
+            mf.Tools[Here].MappingOffDelay = MappingOffDelay;
+            Properties.Vehicle.Default.setVehicle_MappingOffDelay = mf.Tools[Here].MappingOffDelay;
 
-            mf.tool.toolOffset = toolOffset;
-            Properties.Vehicle.Default.setVehicle_toolOffset = mf.tool.toolOffset;
 
-            mf.tool.isToolTrailing = isToolTrailing;
-            Properties.Vehicle.Default.setTool_isToolTrailing = mf.tool.isToolTrailing;
+            mf.Tools[Here].isToolTrailing = isToolTrailing;
+            Properties.Vehicle.Default.setTool_isToolTrailing = mf.Tools[Here].isToolTrailing;
 
-            mf.tool.isToolBehindPivot = isToolBehindPivot;
-            Properties.Vehicle.Default.setTool_isToolBehindPivot = mf.tool.isToolBehindPivot;
+            mf.Tools[Here].isToolBehindPivot = isToolBehindPivot;
+            Properties.Vehicle.Default.setTool_isToolBehindPivot = mf.Tools[Here].isToolBehindPivot;
 
-            mf.tool.isToolTBT = isToolTBT;
-            Properties.Vehicle.Default.setTool_isToolTBT = mf.tool.isToolTBT;
+            mf.Tools[Here].isToolTBT = isToolTBT;
+            Properties.Vehicle.Default.setTool_isToolTBT = mf.Tools[Here].isToolTBT;
 
             if (isToolBehindPivot) hitchLength *= -1;
-            mf.tool.hitchLength = hitchLength;
-            Properties.Vehicle.Default.setVehicle_hitchLength = mf.tool.hitchLength;
+            mf.Tools[Here].hitchLength = hitchLength;
+            Properties.Vehicle.Default.setVehicle_hitchLength = mf.Tools[Here].hitchLength;
 
             //Slow speed cutoff
             Properties.Vehicle.Default.setVehicle_slowSpeedCutoff = cutoffSpeed * cutoffMetricImperial;
@@ -456,14 +465,15 @@ namespace AgOpenGPS
 
             //Sections ------------------------------------------------------------------------------------------
 
-            mf.tool.numOfSections = numberOfSections;
-            mf.tool.numSuperSection = numberOfSections + 1;
-            Properties.Vehicle.Default.setVehicle_numSections = mf.tool.numOfSections;
+            mf.Tools[Here].numOfSections = numberOfSections;
+            mf.Tools[Here].numSuperSection = numberOfSections + 1;
+            Properties.Vehicle.Default.setVehicle_numSections = mf.Tools[Here].numOfSections;
 
-            mf.tool.toolMinUnappliedPixels = minApplied;
+            mf.Tools[Here].toolMinUnappliedPixels = minApplied;
             Properties.Vehicle.Default.setVehicle_minApplied = minApplied;
 
-            //take the section widths and convert to meters and positions along tool.
+            //take the section widths and convert to meters and positions along 
+
             CalculateSectionPositions();
 
             //save the values in each spinner for section position widths in settings
@@ -492,8 +502,6 @@ namespace AgOpenGPS
             //update the widths of sections and tool width in main
             mf.SectionCalcWidths();
 
-            //update toolwidth in mainform
-            Properties.Vehicle.Default.setVehicle_toolWidth = mf.tool.ToolWidth;
 
             //WorkSwitch settings
             mf.mc.isWorkSwitchActiveLow = isWorkSwActiveLow;
@@ -505,10 +513,10 @@ namespace AgOpenGPS
             mf.mc.isWorkSwitchManual = isWorkSwitchManual;
             Properties.Settings.Default.setF_IsWorkSwitchManual = isWorkSwitchManual;
 
-            mf.tram.abOffset = (Math.Round((mf.tool.ToolWidth - mf.tool.toolOverlap) / 2.0, 3));
+            mf.tram.abOffset = (Math.Round((mf.Tools[Here].ToolWidth - mf.Tools[Here].ToolOverlap) / 2.0, 3));
 
             Properties.Vehicle.Default.setTool_defaultSectionWidth = defaultSectionWidth;
-
+            mf.Tools[Here].WidthMinusOverlap = mf.Tools[Here].ToolWidth - mf.Tools[Here].ToolOverlap;
             Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
 
@@ -973,7 +981,7 @@ namespace AgOpenGPS
             toolOverlap = (double)nudOverlap.Value * metImp2m;
         }
 
-        private void nudDefaultSectionWidth_ValueChanged(object sender, EventArgs e)
+        private void NudDefaultSectionWidth_ValueChanged(object sender, EventArgs e)
         {
             defaultSectionWidth = (double)nudDefaultSectionWidth.Value * metImp2m;
         }

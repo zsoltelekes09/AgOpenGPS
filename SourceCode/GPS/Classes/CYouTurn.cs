@@ -416,13 +416,12 @@ namespace AgOpenGPS
                 CDubins.turningRadius = mf.vehicle.minTurningRadius;
 
                 //grab the vehicle widths and offsets
-                double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-                double toolOffset = mf.tool.toolOffset * 2.0;
+                double toolOffset = mf.Tools[0].ToolOffset * 2.0;
                 double turnOffset;
 
                 //calculate the true width
-                if (!isTurnRight) turnOffset = ((widthMinusOverlap * rowSkipsWidth) + toolOffset);
-                else turnOffset = ((widthMinusOverlap * rowSkipsWidth) - toolOffset);
+                if (!isTurnRight) turnOffset = ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) + toolOffset);
+                else turnOffset = ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) - toolOffset);
 
 
                 double turnRadius = turnOffset * Math.Tan(boundaryAngleOffPerpendicular);
@@ -567,13 +566,12 @@ namespace AgOpenGPS
             double head = mf.ABLine.abHeading;
 
             //grab the vehicle widths and offsets
-            double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-            double toolOffset = mf.tool.toolOffset * 2.0;
+            double toolOffset = mf.Tools[0].ToolOffset * 2.0;
             double turnOffset;
 
             //turning right
-            if (isTurnRight) turnOffset = (widthMinusOverlap - toolOffset);
-            else turnOffset = (widthMinusOverlap + toolOffset);
+            if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap - toolOffset);
+            else turnOffset = (mf.Tools[0].WidthMinusOverlap + toolOffset);
 
             //Pattern Turn
             numShapePoints = youFileList.Count;
@@ -777,14 +775,12 @@ namespace AgOpenGPS
                 //are we going same way as creation of curve
                 //bool isCountingUp = mf.curve.isABSameAsVehicleHeading;
 
-                //grab the vehicle widths and offsets
-                double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-                double toolOffset = mf.tool.toolOffset * 2.0;
+                double toolOffset = mf.Tools[0].ToolOffset * 2.0;
                 double turnOffset;
 
                 //turning right
-                if (isTurnRight) turnOffset = (widthMinusOverlap - toolOffset);
-                else turnOffset = (widthMinusOverlap + toolOffset);
+                if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap - toolOffset);
+                else turnOffset = (mf.Tools[0].WidthMinusOverlap + toolOffset);
 
                 //to compensate for AB Curve overlap
                 turnOffset *= delta;
@@ -994,14 +990,12 @@ namespace AgOpenGPS
                 CDubins dubYouTurnPath = new CDubins();
                 CDubins.turningRadius = mf.vehicle.minTurningRadius;
 
-                //grab the vehicle widths and offsets
-                double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-                double toolOffset = mf.tool.toolOffset * 2.0;
+                double toolOffset = mf.Tools[0].ToolOffset * 2.0;
                 double turnOffset;
 
                 //calculate the true width
-                if (isTurnRight) turnOffset = delta * ((widthMinusOverlap * rowSkipsWidth) - toolOffset);
-                else turnOffset = delta * ((widthMinusOverlap * rowSkipsWidth) + toolOffset);
+                if (isTurnRight) turnOffset = delta * ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) - toolOffset);
+                else turnOffset = delta * ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) + toolOffset);
 
                 //diagonally across
                 double turnRadius = turnOffset * Math.Tan(boundaryAngleOffPerpendicular);
@@ -1160,6 +1154,7 @@ namespace AgOpenGPS
                     mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
                 }
             }
+            mf.curve.isSameWay = !mf.curve.isSameWay;
         }
 
         //Normal copmpletion of youturn
@@ -1170,7 +1165,7 @@ namespace AgOpenGPS
             mf.seq.ResetSequenceEventTriggers();
             mf.seq.isSequenceTriggered = false;
             mf.isBoundAlarming = false;
-            mf.curve.isSameWay = !mf.curve.isSameWay;
+            //mf.curve.isSameWay = !mf.curve.isSameWay;
         }
 
         //something went seriously wrong so reset everything
@@ -1246,34 +1241,6 @@ namespace AgOpenGPS
         {
             isYouTurnTriggered = true;
 
-            if (mf.curve.isSameWay)
-            {
-                if (isTurnRight)
-                {
-                    mf.curve.curveNumber -= rowSkipsWidth;
-                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
-                }
-                else
-                {
-                    mf.curve.curveNumber += rowSkipsWidth;
-                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
-                }
-            }
-            else
-            {
-                if (isTurnRight)
-                {
-                    mf.curve.curveNumber += rowSkipsWidth;
-                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
-                }
-                else
-                {
-                    mf.curve.curveNumber -= rowSkipsWidth;
-                    mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
-                }
-            }
-
-
             double head;
             //point on AB line closest to pivot axle point from ABLine PurePursuit
             if (mf.ABLine.isABLineSet)
@@ -1285,20 +1252,48 @@ namespace AgOpenGPS
             }
             else
             {
+                if (mf.curve.isSameWay)
+                {
+                    if (isTurnRight)
+                    {
+                        mf.curve.curveNumber -= rowSkipsWidth;
+                        mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                    }
+                    else
+                    {
+                        mf.curve.curveNumber += rowSkipsWidth;
+                        mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                    }
+                }
+                else
+                {
+                    if (isTurnRight)
+                    {
+                        mf.curve.curveNumber += rowSkipsWidth;
+                        mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                    }
+                    else
+                    {
+                        mf.curve.curveNumber -= rowSkipsWidth;
+                        mf.curve.howManyPathsAway = Math.Abs(mf.curve.curveNumber);
+                    }
+                }
+                mf.curve.isSameWay = !mf.curve.isSameWay;
+
+
+
                 rEastYT = mf.curve.rEastCu;
                 rNorthYT = mf.curve.rNorthCu;
-                isABSameAsFixHeading = mf.curve.isSameWay;
+                isABSameAsFixHeading = !mf.curve.isSameWay;
                 head = mf.curve.curList[mf.curve.currentLocationIndex].heading;//set to curent line heading ;)
             }
 
-            //grab the vehicle widths and offsets
-            double widthMinusOverlap = mf.tool.ToolWidth - mf.tool.toolOverlap;
-            double toolOffset = mf.tool.toolOffset * 2.0;
+            double toolOffset = mf.Tools[0].ToolOffset * 2.0;
             double turnOffset;
 
             //turning right
-            if (isTurnRight) turnOffset = (widthMinusOverlap * rowSkipsWidth + toolOffset);
-            else turnOffset = (widthMinusOverlap * rowSkipsWidth - toolOffset);
+            if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth + toolOffset);
+            else turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth - toolOffset);
 
             CDubins dubYouTurnPath = new CDubins();
             CDubins.turningRadius = mf.vehicle.minTurningRadius;

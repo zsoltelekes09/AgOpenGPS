@@ -177,72 +177,75 @@ namespace AgOpenGPS
             minFieldX = 9999999; minFieldY = 9999999;
             maxFieldX = -9999999; maxFieldY = -9999999;
 
-            //draw patches j= # of sections
-            for (int j = 0; j < mf.tool.numSuperSection; j++)
+            for (int i = 0; i < mf.Tools.Count; i++)
             {
-                //every time the section turns off and on is a new patch
-                int patchCount = mf.section[j].patchList.Count;
-
-                if (patchCount > 0)
+                //draw patches j= # of sections
+                for (int j = 0; j < mf.Tools[0].numSuperSection; j++)
                 {
-                    //for every new chunk of patch
-                    foreach (var triList in mf.section[j].patchList)
-                    {
-                        int count2 = triList.Count;
-                        for (int i = 1; i < count2; i += 3)
-                        {
-                            double x = triList[i].easting;
-                            double y = triList[i].northing;
+                    //every time the section turns off and on is a new patch
+                    int patchCount = mf.Tools[i].section[j].patchList.Count;
 
-                            //also tally the max/min of field x and z
-                            if (minFieldX > x) minFieldX = x;
-                            if (maxFieldX < x) maxFieldX = x;
-                            if (minFieldY > y) minFieldY = y;
-                            if (maxFieldY < y) maxFieldY = y;
+                    if (patchCount > 0)
+                    {
+                        //for every new chunk of patch
+                        foreach (var triList in mf.Tools[i].section[j].patchList)
+                        {
+                            int count2 = triList.Count;
+                            for (int k = 1; k < count2; k += 3)
+                            {
+                                double x = triList[k].easting;
+                                double y = triList[k].northing;
+
+                                //also tally the max/min of field x and z
+                                if (minFieldX > x) minFieldX = x;
+                                if (maxFieldX < x) maxFieldX = x;
+                                if (minFieldY > y) minFieldY = y;
+                                if (maxFieldY < y) maxFieldY = y;
+                            }
                         }
                     }
+
+                    //min max of the boundary
+                    if (mf.bnd.bndArr.Count > 0)
+                    {
+                        minFieldY = mf.bnd.bndArr[0].Northingmin;
+                        maxFieldY = mf.bnd.bndArr[0].Northingmax;
+                        minFieldX = mf.bnd.bndArr[0].Eastingmin;
+                        maxFieldX = mf.bnd.bndArr[0].Eastingmax;
+                    }
+
+                    if (maxFieldX == -9999999 || minFieldX == 9999999 || maxFieldY == -9999999 || minFieldY == 9999999)
+                    {
+                        maxFieldX = 0; minFieldX = 0; maxFieldY = 0; minFieldY = 0;
+                    }
+                    else
+                    {
+                        //the largest distancew across field
+                        double dist = Math.Abs(minFieldX - maxFieldX);
+                        double dist2 = Math.Abs(minFieldY - maxFieldY);
+
+                        if (dist > dist2) maxFieldDistance = dist;
+                        else maxFieldDistance = dist2;
+
+                        if (maxFieldDistance < 100) maxFieldDistance = 100;
+                        if (maxFieldDistance > 19900) maxFieldDistance = 19900;
+                        //lblMax.Text = ((int)maxFieldDistance).ToString();
+
+                        fieldCenterX = (maxFieldX + minFieldX) / 2.0;
+                        fieldCenterY = (maxFieldY + minFieldY) / 2.0;
+                    }
+
+                    //if (isMetric)
+                    //{
+                    //    lblFieldWidthEastWest.Text = Math.Abs((maxFieldX - minFieldX)).ToString("N0") + " m";
+                    //    lblFieldWidthNorthSouth.Text = Math.Abs((maxFieldY - minFieldY)).ToString("N0") + " m";
+                    //}
+                    //else
+                    //{
+                    //    lblFieldWidthEastWest.Text = Math.Abs((maxFieldX - minFieldX) * glm.m2ft).ToString("N0") + " ft";
+                    //    lblFieldWidthNorthSouth.Text = Math.Abs((maxFieldY - minFieldY) * glm.m2ft).ToString("N0") + " ft";
+                    //}
                 }
-
-                //min max of the boundary
-                if (mf.bnd.bndArr.Count > 0)
-                {
-                    minFieldY = mf.bnd.bndArr[0].Northingmin;
-                    maxFieldY = mf.bnd.bndArr[0].Northingmax;
-                    minFieldX = mf.bnd.bndArr[0].Eastingmin;
-                    maxFieldX = mf.bnd.bndArr[0].Eastingmax;
-                }
-
-                if (maxFieldX == -9999999 || minFieldX == 9999999 || maxFieldY == -9999999 || minFieldY == 9999999)
-                {
-                    maxFieldX = 0; minFieldX = 0; maxFieldY = 0; minFieldY = 0;
-                }
-                else
-                {
-                    //the largest distancew across field
-                    double dist = Math.Abs(minFieldX - maxFieldX);
-                    double dist2 = Math.Abs(minFieldY - maxFieldY);
-
-                    if (dist > dist2) maxFieldDistance = dist;
-                    else maxFieldDistance = dist2;
-
-                    if (maxFieldDistance < 100) maxFieldDistance = 100;
-                    if (maxFieldDistance > 19900) maxFieldDistance = 19900;
-                    //lblMax.Text = ((int)maxFieldDistance).ToString();
-
-                    fieldCenterX = (maxFieldX + minFieldX) / 2.0;
-                    fieldCenterY = (maxFieldY + minFieldY) / 2.0;
-                }
-
-                //if (isMetric)
-                //{
-                //    lblFieldWidthEastWest.Text = Math.Abs((maxFieldX - minFieldX)).ToString("N0") + " m";
-                //    lblFieldWidthNorthSouth.Text = Math.Abs((maxFieldY - minFieldY)).ToString("N0") + " m";
-                //}
-                //else
-                //{
-                //    lblFieldWidthEastWest.Text = Math.Abs((maxFieldX - minFieldX) * glm.m2ft).ToString("N0") + " ft";
-                //    lblFieldWidthNorthSouth.Text = Math.Abs((maxFieldY - minFieldY) * glm.m2ft).ToString("N0") + " ft";
-                //}
             }
         }
     }

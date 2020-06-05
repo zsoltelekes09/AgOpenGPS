@@ -183,7 +183,7 @@
             0,
             0,
             131072});
-            this.nudOffset.Enter += new System.EventHandler(this.nudOffset_Enter);
+            this.nudOffset.Enter += new System.EventHandler(this.NudOffset_Enter);
             // 
             // FormBoundaryPlayer
             // 

@@ -36,6 +36,7 @@ namespace AgOpenGPS
         public double speed = 0.6, headingTrue, stepDistance = 1.3889, steerAngle;
         public double steerAngleScrollBar = 0;
         private double degrees;
+        public double LastSteerAngle = 0;
 
         //The checksum of an NMEA line
         private string sumStr = "";
@@ -47,12 +48,18 @@ namespace AgOpenGPS
             mf = _f;
             latitude = Properties.Settings.Default.setGPS_SimLatitude;
             longitude = Properties.Settings.Default.setGPS_SimLongitude;
+            LastSteerAngle = 0;
         }
 
         public void DoSimTick(double _st)
         {
-            mf.actualSteerAngleDisp = _st*100.0;
-            steerAngle = _st;
+
+            LastSteerAngle += Math.Max(Math.Min(_st - LastSteerAngle, 5), -5);
+
+
+
+            mf.actualSteerAngleDisp = LastSteerAngle * 100.0;
+            steerAngle = LastSteerAngle;
             double temp = (stepDistance / mf.fixUpdateHz * Math.Tan(steerAngle * 0.0165329252) / 3.3);
             headingTrue += temp;
             if (headingTrue > (2.0 * Math.PI)) headingTrue -= (2.0 * Math.PI);

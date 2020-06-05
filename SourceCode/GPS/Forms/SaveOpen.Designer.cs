@@ -1041,30 +1041,31 @@ namespace AgOpenGPS
                         Properties.Vehicle.Default.Save();
 
                         //get the number of sections from settings
-                        tool.numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
-                        tool.numSuperSection = tool.numOfSections + 1;
+                        Tools[0].numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
+                        Tools[0].numSuperSection = Tools[0].numOfSections + 1;
 
                         //from settings grab the vehicle specifics
-                        tool.toolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
-                        tool.toolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
+                        Tools[0].ToolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
+                        Tools[0].ToolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
+                        Tools[0].WidthMinusOverlap = Tools[0].ToolWidth - Tools[0].ToolOverlap;
 
-                        tool.LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
-                        tool.LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
-                        tool.TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
+                        Tools[0].LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
+                        Tools[0].LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
+                        Tools[0].TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
 
-                        tool.MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
-                        tool.MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
+                        Tools[0].MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
+                        Tools[0].MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
 
 
-                        tool.toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
+                        Tools[0].toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
 
-                        tool.toolTrailingHitchLength = Properties.Vehicle.Default.setTool_toolTrailingHitchLength;
-                        tool.toolTankTrailingHitchLength = Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength;
-                        tool.hitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
+                        Tools[0].toolTrailingHitchLength = Properties.Vehicle.Default.setTool_toolTrailingHitchLength;
+                        Tools[0].toolTankTrailingHitchLength = Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength;
+                        Tools[0].hitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
 
-                        tool.isToolBehindPivot = Properties.Vehicle.Default.setTool_isToolBehindPivot;
-                        tool.isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
-                        tool.isToolTBT = Properties.Vehicle.Default.setTool_isToolTBT;
+                        Tools[0].isToolBehindPivot = Properties.Vehicle.Default.setTool_isToolBehindPivot;
+                        Tools[0].isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
+                        Tools[0].isToolTBT = Properties.Vehicle.Default.setTool_isToolTBT;
 
                         mc.isWorkSwitchEnabled = Properties.Settings.Default.setF_IsWorkSwitchEnabled;
                         mc.isWorkSwitchActiveLow = Properties.Settings.Default.setF_IsWorkSwitchActiveLow;
@@ -1557,8 +1558,8 @@ namespace AgOpenGPS
                             }
                             int verts = int.Parse(line);
 
-                            section[0].triangleList = new List<vec3>();
-                            section[0].patchList.Add(section[0].triangleList);
+                            Tools[0].section[0].triangleList = new List<vec3>();
+                            Tools[0].section[0].patchList.Add(Tools[0].section[0].triangleList);
 
 
                             for (int v = 0; v < verts; v++)
@@ -1568,7 +1569,7 @@ namespace AgOpenGPS
                                 vecFix.easting = double.Parse(words[0], CultureInfo.InvariantCulture);
                                 vecFix.northing = double.Parse(words[1], CultureInfo.InvariantCulture);
                                 vecFix.heading = double.Parse(words[2], CultureInfo.InvariantCulture);
-                                section[0].triangleList.Add(vecFix);
+                                Tools[0].section[0].triangleList.Add(vecFix);
                             }
 
                             //calculate area of this patch - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
@@ -1578,9 +1579,9 @@ namespace AgOpenGPS
                                 for (int j = 1; j < verts; j++)
                                 {
                                     double temp = 0;
-                                    temp = section[0].triangleList[j].easting * (section[0].triangleList[j + 1].northing - section[0].triangleList[j + 2].northing) +
-                                              section[0].triangleList[j + 1].easting * (section[0].triangleList[j + 2].northing - section[0].triangleList[j].northing) +
-                                                  section[0].triangleList[j + 2].easting * (section[0].triangleList[j].northing - section[0].triangleList[j + 1].northing);
+                                    temp = Tools[0].section[0].triangleList[j].easting * (Tools[0].section[0].triangleList[j + 1].northing - Tools[0].section[0].triangleList[j + 2].northing) +
+                                              Tools[0].section[0].triangleList[j + 1].easting * (Tools[0].section[0].triangleList[j + 2].northing - Tools[0].section[0].triangleList[j].northing) +
+                                                  Tools[0].section[0].triangleList[j + 2].easting * (Tools[0].section[0].triangleList[j].northing - Tools[0].section[0].triangleList[j + 1].northing);
 
                                     fd.workedAreaTotal += Math.Abs((temp * 0.5));
                                 }
@@ -1786,7 +1787,7 @@ namespace AgOpenGPS
                                     bnd.bndArr[k].bndLine.Add(vecPt);
                                 }
 
-                                bnd.bndArr[k].FixBoundaryLine(k, tool.ToolWidth);
+                                bnd.bndArr[k].FixBoundaryLine(k, Tools[0].ToolWidth);
                                 bnd.bndArr[k].PreCalcBoundaryLines();
                                 bnd.bndArr[k].CalculateBoundaryArea();
                                 bnd.bndArr[k].CalculateBoundaryWinding();
@@ -2743,62 +2744,65 @@ namespace AgOpenGPS
             string secPts = "";
             int cntr = 0;
 
-            for (int j = 0; j < tool.numSuperSection; j++)
+            for (int i = 0; i < Tools.Count; i++)
             {
-                int patches = section[j].patchList.Count;
-
-                if (patches > 0)
+                for (int j = 0; j < Tools[0].numSuperSection; j++)
                 {
-                    //for every new chunk of patch
-                    foreach (var triList in section[j].patchList)
+                    int patches = Tools[i].section[j].patchList.Count;
+
+                    if (patches > 0)
                     {
-                        if (triList.Count > 0)
+                        //for every new chunk of patch
+                        foreach (var triList in Tools[i].section[j].patchList)
                         {
-                            kml.WriteStartElement("Placemark");
-                            kml.WriteElementString("name", "Sections_" + cntr.ToString());
-                            cntr++;
-
-                            string collor = "F0" + ((byte)(triList[0].heading)).ToString("X2") +
-                                ((byte)(triList[0].northing)).ToString("X2") + ((byte)(triList[0].easting)).ToString("X2");
-
-                            //lineStyle
-                            kml.WriteStartElement("Style");
-
-                            kml.WriteStartElement("LineStyle");
-                            kml.WriteElementString("color", collor);
-                            //kml.WriteElementString("width", "6");
-                            kml.WriteEndElement(); // <LineStyle>
-                            
-                            kml.WriteStartElement("PolyStyle");
-                            kml.WriteElementString("color", collor);
-                            kml.WriteEndElement(); // <PloyStyle>
-                            kml.WriteEndElement(); //Style
-
-                            kml.WriteStartElement("Polygon");
-                            kml.WriteElementString("tessellate", "1");
-                            kml.WriteStartElement("outerBoundaryIs");
-                            kml.WriteStartElement("LinearRing");
-                            
-                            //coords
-                            kml.WriteStartElement("coordinates");
-                            secPts = "";
-                            for (int i = 1; i < triList.Count; i += 2)
+                            if (triList.Count > 0)
                             {
-                                secPts += GetUTMToLatLon(triList[i].easting, triList[i].northing);
-                            }
-                            for (int i = triList.Count - 1; i > 1; i -= 2)
-                            {
-                                secPts += GetUTMToLatLon(triList[i].easting, triList[i].northing);
-                            }
-                            secPts += GetUTMToLatLon(triList[1].easting, triList[1].northing);
-                            kml.WriteRaw(secPts);
-                            kml.WriteEndElement(); // <coordinates>
+                                kml.WriteStartElement("Placemark");
+                                kml.WriteElementString("name", "Sections_" + cntr.ToString());
+                                cntr++;
 
-                            kml.WriteEndElement(); // <LinearRing>
-                            kml.WriteEndElement(); // <outerBoundaryIs>
-                            kml.WriteEndElement(); // <Polygon>
+                                string collor = "F0" + ((byte)(triList[0].heading)).ToString("X2") +
+                                    ((byte)(triList[0].northing)).ToString("X2") + ((byte)(triList[0].easting)).ToString("X2");
 
-                            kml.WriteEndElement(); // <Placemark>
+                                //lineStyle
+                                kml.WriteStartElement("Style");
+
+                                kml.WriteStartElement("LineStyle");
+                                kml.WriteElementString("color", collor);
+                                //kml.WriteElementString("width", "6");
+                                kml.WriteEndElement(); // <LineStyle>
+
+                                kml.WriteStartElement("PolyStyle");
+                                kml.WriteElementString("color", collor);
+                                kml.WriteEndElement(); // <PloyStyle>
+                                kml.WriteEndElement(); //Style
+
+                                kml.WriteStartElement("Polygon");
+                                kml.WriteElementString("tessellate", "1");
+                                kml.WriteStartElement("outerBoundaryIs");
+                                kml.WriteStartElement("LinearRing");
+
+                                //coords
+                                kml.WriteStartElement("coordinates");
+                                secPts = "";
+                                for (int k = 1; k < triList.Count; k += 2)
+                                {
+                                    secPts += GetUTMToLatLon(triList[k].easting, triList[k].northing);
+                                }
+                                for (int k = triList.Count - 1; k > 1; k -= 2)
+                                {
+                                    secPts += GetUTMToLatLon(triList[k].easting, triList[k].northing);
+                                }
+                                secPts += GetUTMToLatLon(triList[1].easting, triList[1].northing);
+                                kml.WriteRaw(secPts);
+                                kml.WriteEndElement(); // <coordinates>
+
+                                kml.WriteEndElement(); // <LinearRing>
+                                kml.WriteEndElement(); // <outerBoundaryIs>
+                                kml.WriteEndElement(); // <Polygon>
+
+                                kml.WriteEndElement(); // <Placemark>
+                            }
                         }
                     }
                 }

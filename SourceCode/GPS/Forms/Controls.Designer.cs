@@ -533,34 +533,40 @@ namespace AgOpenGPS
             btnManualSection.Image = autoBtnState == btnStates.On ? Properties.Resources.ManualOn : Properties.Resources.ManualOff;
             btnAutoSection.Image = autoBtnState == btnStates.Auto ? Properties.Resources.SectionMasterOn : Properties.Resources.SectionMasterOff;
 
-            //turn section buttons all On/OFF/Auto
-            for (int j = 0; j < tool.numOfSections; j++)
+            for (int i = 0; i < Tools.Count; i++)
             {
-                section[j].IsAllowedOn = (autoBtnState != 0);
-                section[j].BtnSectionState = autoBtnState;
-                ManualBtnUpdate(j);
+                //turn section buttons all On/OFF/Auto
+                for (int j = 0; j < Tools[i].numOfSections; j++)
+                {
+                    Tools[i].section[j].IsAllowedOn = (autoBtnState != 0);
+                    Tools[i].section[j].BtnSectionState = autoBtnState;
+                    ManualBtnUpdate(i, j);
+                }
             }
         }
 
         //individual buttons for sections
-        private void btnSectionMan_Click(object sender, EventArgs e)
+        public void btnSectionMan_Click(object sender, EventArgs e)
         {
             if (sender is Button btn)
             {
                 if (autoBtnState != btnStates.Off)
                 {
-                    int a = Convert.ToInt32(btn.Text);
+                    string[] words = btn.Name.Split(',');
+
+                    int toolNumber = Convert.ToInt32(words[0]);
+                    int sectNumber = Convert.ToInt32(words[1]);
 
                     //if auto is off just have on-off for choices of section buttons
-                    if (section[a - 1].BtnSectionState == btnStates.Off)
+                    if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.Off)
                     {
-                        if (autoBtnState != btnStates.Auto) section[a - 1].BtnSectionState = btnStates.On;
-                        else section[a - 1].BtnSectionState = btnStates.Auto;
+                        if (autoBtnState != btnStates.Auto) Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.On;
+                        else Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.Auto;
                     }
-                    else if (section[a - 1].BtnSectionState == btnStates.Auto) section[a - 1].BtnSectionState = btnStates.On;
-                    else if (section[a - 1].BtnSectionState == btnStates.On) section[a - 1].BtnSectionState = btnStates.Off;
+                    else if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.Auto) Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.On;
+                    else if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.On) Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.Off;
 
-                    ManualBtnUpdate(a - 1);
+                    ManualBtnUpdate(toolNumber, sectNumber);
                 }
             }
         }
@@ -1035,12 +1041,15 @@ namespace AgOpenGPS
                         ct.ResetContour();
                         fd.workedAreaTotal = 0;
 
-                        //clear the section lists
-                        for (int j = 0; j < MAXSECTIONS; j++)
+                        for (int i = 0; i < Tools.Count; i++)
                         {
-                            //clean out the lists
-                            section[j].patchList?.Clear();
-                            section[j].triangleList?.Clear();
+                            //clear the section lists
+                            for (int j = 0; j < MAXSECTIONS; j++)
+                            {
+                                //clean out the lists
+                                Tools[i].section[j].patchList?.Clear();
+                                Tools[i].section[j].triangleList?.Clear();
+                            }
                         }
                         patchSaveList?.Clear();
 

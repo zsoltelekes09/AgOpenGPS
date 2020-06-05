@@ -143,7 +143,7 @@ namespace AgOpenGPS
 
         private void BtnRightHalfWidth_Click(object sender, EventArgs e)
         {
-            double dist = mf.tool.ToolWidth - mf.tool.toolOverlap;
+            double dist = mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap;
 
             mf.curve.MoveABCurve(dist*0.5);
 
@@ -151,7 +151,7 @@ namespace AgOpenGPS
 
         private void BtnLeftHalfWidth_Click(object sender, EventArgs e)
         {
-            double dist = mf.tool.ToolWidth - mf.tool.toolOverlap;
+            double dist = mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap;
 
             mf.curve.MoveABCurve(-dist*0.5);
 

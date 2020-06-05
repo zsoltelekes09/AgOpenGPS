@@ -25,15 +25,10 @@ namespace AgOpenGPS
 
         public vec3 pivotAxlePos = new vec3(0, 0, 0);
         public vec3 steerAxlePos = new vec3(0, 0, 0);
-        public vec3 toolPos = new vec3(0, 0, 0);
-        public vec3 tankPos = new vec3(0, 0, 0);
-        public vec2 hitchPos = new vec2(0, 0);
 
         //headings
         public double fixHeading = 0.0, camHeading = 0.0, gpsHeading = 0.0;
 
-        //storage for the cos and sin of heading
-        public double cosSectionHeading = 1.0, sinSectionHeading = 0.0;
 
         //a distance between previous and current fix
         public double treeSpacingCounter = 0.0;
@@ -158,7 +153,7 @@ namespace AgOpenGPS
             if (Glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryPoint();
 
             //tree spacing
-            if (vehicle.treeSpacing != 0 && section[0].IsSectionOn && (treeSpacingCounter += (distanceCurrentStepFix * 100)) > vehicle.treeSpacing)
+            if (vehicle.treeSpacing != 0 && Tools[0].section[0].IsSectionOn && (treeSpacingCounter += (distanceCurrentStepFix * 100)) > vehicle.treeSpacing)
             {
                 treeTrigger = !treeTrigger;
                 treeSpacingCounter %= vehicle.treeSpacing;//keep the distance below spacing
@@ -489,7 +484,7 @@ namespace AgOpenGPS
 
 
         #endregion
-
+            /*
         #region Remote Switches
 
             //MTZ8302 Feb 2020
@@ -591,6 +586,7 @@ namespace AgOpenGPS
 
             // end adds by MTZ8302 ------------------------------------------------------------------------------------
         #endregion
+            */
 
             //update Back then Main window
             oglBack.Refresh();
@@ -672,115 +668,119 @@ namespace AgOpenGPS
                 steerAxlePos.heading = fixHeading;
             }
 
-            //determine where the rigid vehicle hitch ends
-            hitchPos.easting = pn.fix.easting + (Math.Sin(fixHeading) * (tool.hitchLength - vehicle.antennaPivot));
-            hitchPos.northing = pn.fix.northing + (Math.Cos(fixHeading) * (tool.hitchLength - vehicle.antennaPivot));
 
-            //tool attached via a trailing hitch
-            if (tool.isToolTrailing)
+            for (int i = 0; i < Tools.Count; i++)
             {
-                double over;
-                if (tool.isToolTBT)
+                //determine where the rigid vehicle hitch ends
+                Tools[i].hitchPos.easting = pn.fix.easting + (Math.Sin(fixHeading) * (Tools[i].hitchLength - vehicle.antennaPivot));
+                Tools[i].hitchPos.northing = pn.fix.northing + (Math.Cos(fixHeading) * (Tools[i].hitchLength - vehicle.antennaPivot));
+
+                //tool attached via a trailing hitch
+                if (Tools[i].isToolTrailing)
                 {
+                    double over;
+                    if (Tools[i].isToolTBT)
+                    {
+                        //Torriem rules!!!!! Oh yes, this is all his. Thank-you
+                        if (distanceCurrentStepFix != 0)
+                        {
+                            double t = (Tools[i].toolTankTrailingHitchLength) / distanceCurrentStepFix;
+                            Tools[i].tankPos.easting = Tools[i].hitchPos.easting + t * (Tools[i].hitchPos.easting - Tools[i].tankPos.easting);
+                            Tools[i].tankPos.northing = Tools[i].hitchPos.northing + t * (Tools[i].hitchPos.northing - Tools[i].tankPos.northing);
+                            Tools[i].tankPos.heading = Math.Atan2(Tools[i].hitchPos.easting - Tools[i].tankPos.easting, Tools[i].hitchPos.northing - Tools[i].tankPos.northing);
+                        }
+
+                        ////the tool is seriously jacknifed or just starting out so just spring it back.
+                        over = Math.Abs(Math.PI - Math.Abs(Math.Abs(Tools[i].tankPos.heading - fixHeading) - Math.PI));
+
+                        if (over < 2.0 && startCounter > 50)
+                        {
+                            Tools[i].tankPos.easting = Tools[i].hitchPos.easting + (Math.Sin(Tools[i].tankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
+                            Tools[i].tankPos.northing = Tools[i].hitchPos.northing + (Math.Cos(Tools[i].tankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
+                        }
+
+                        //criteria for a forced reset to put tool directly behind vehicle
+                        if (over > 2.0 | startCounter < 51)
+                        {
+                            Tools[i].tankPos.heading = fixHeading;
+                            Tools[i].tankPos.easting = Tools[i].hitchPos.easting + (Math.Sin(Tools[i].tankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
+                            Tools[i].tankPos.northing = Tools[i].hitchPos.northing + (Math.Cos(Tools[i].tankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
+                        }
+                    }
+                    else
+                    {
+                        Tools[i].tankPos.heading = fixHeading;
+                        Tools[i].tankPos.easting = Tools[i].hitchPos.easting;
+                        Tools[i].tankPos.northing = Tools[i].hitchPos.northing;
+                    }
+
                     //Torriem rules!!!!! Oh yes, this is all his. Thank-you
                     if (distanceCurrentStepFix != 0)
                     {
-                        double t = (tool.toolTankTrailingHitchLength) / distanceCurrentStepFix;
-                        tankPos.easting = hitchPos.easting + t * (hitchPos.easting - tankPos.easting);
-                        tankPos.northing = hitchPos.northing + t * (hitchPos.northing - tankPos.northing);
-                        tankPos.heading = Math.Atan2(hitchPos.easting - tankPos.easting, hitchPos.northing - tankPos.northing);
+                        double t = (Tools[i].toolTrailingHitchLength) / distanceCurrentStepFix;
+                        Tools[i].toolPos.easting = Tools[i].tankPos.easting + t * (Tools[i].tankPos.easting - Tools[i].toolPos.easting);
+                        Tools[i].toolPos.northing = Tools[i].tankPos.northing + t * (Tools[i].tankPos.northing - Tools[i].toolPos.northing);
+                        Tools[i].toolPos.heading = Math.Atan2(Tools[i].tankPos.easting - Tools[i].toolPos.easting, Tools[i].tankPos.northing - Tools[i].toolPos.northing);
                     }
 
                     ////the tool is seriously jacknifed or just starting out so just spring it back.
-                    over = Math.Abs(Math.PI - Math.Abs(Math.Abs(tankPos.heading - fixHeading) - Math.PI));
+                    over = Math.Abs(Math.PI - Math.Abs(Math.Abs(Tools[i].toolPos.heading - Tools[i].tankPos.heading) - Math.PI));
 
-                    if (over < 2.0 && startCounter > 50)
+                    if (over < 1.9 && startCounter > 50)
                     {
-                        tankPos.easting = hitchPos.easting + (Math.Sin(tankPos.heading) * (tool.toolTankTrailingHitchLength));
-                        tankPos.northing = hitchPos.northing + (Math.Cos(tankPos.heading) * (tool.toolTankTrailingHitchLength));
+                        Tools[i].toolPos.easting = Tools[i].tankPos.easting + (Math.Sin(Tools[i].toolPos.heading) * (Tools[i].toolTrailingHitchLength));
+                        Tools[i].toolPos.northing = Tools[i].tankPos.northing + (Math.Cos(Tools[i].toolPos.heading) * (Tools[i].toolTrailingHitchLength));
                     }
 
                     //criteria for a forced reset to put tool directly behind vehicle
-                    if (over > 2.0 | startCounter < 51)
+                    if (over > 1.9 | startCounter < 51)
                     {
-                        tankPos.heading = fixHeading;
-                        tankPos.easting = hitchPos.easting + (Math.Sin(tankPos.heading) * (tool.toolTankTrailingHitchLength));
-                        tankPos.northing = hitchPos.northing + (Math.Cos(tankPos.heading) * (tool.toolTankTrailingHitchLength));
+                        Tools[i].toolPos.heading = Tools[i].tankPos.heading;
+                        Tools[i].toolPos.easting = Tools[i].tankPos.easting + (Math.Sin(Tools[i].toolPos.heading) * (Tools[i].toolTrailingHitchLength));
+                        Tools[i].toolPos.northing = Tools[i].tankPos.northing + (Math.Cos(Tools[i].toolPos.heading) * (Tools[i].toolTrailingHitchLength));
                     }
+                }
+
+                //rigidly connected to vehicle
+                else
+                {
+                    Tools[i].toolPos.heading = fixHeading;
+                    Tools[i].toolPos.easting = Tools[i].hitchPos.easting;
+                    Tools[i].toolPos.northing = Tools[i].hitchPos.northing;
+                }
+
+                #endregion
+
+                //used to increase triangle count when going around corners, less on straight
+                //pick the slow moving side edge of tool
+                double distance = Tools[0].ToolWidth * 0.5;
+                if (distance > 3) distance = 3;
+
+                //whichever is less
+                if (Tools[i].ToolFarLeftSpeed < Tools[i].ToolFarRightSpeed)
+                {
+                    double twist = Tools[i].ToolFarLeftSpeed / Tools[i].ToolFarRightSpeed;
+                    //twist *= twist;
+                    if (twist < 0.2) twist = 0.2;
+                    sectionTriggerStepDistance = distance * twist * twist;
                 }
                 else
                 {
-                    tankPos.heading = fixHeading;
-                    tankPos.easting = hitchPos.easting;
-                    tankPos.northing = hitchPos.northing;
+                    double twist = Tools[0].ToolFarRightSpeed / Tools[i].ToolFarLeftSpeed;
+                    //twist *= twist;
+                    if (twist < 0.2) twist = 0.2;
+
+                    sectionTriggerStepDistance = distance * twist * twist;
                 }
 
-                //Torriem rules!!!!! Oh yes, this is all his. Thank-you
-                if (distanceCurrentStepFix != 0)
-                {
-                    double t = (tool.toolTrailingHitchLength) / distanceCurrentStepFix;
-                    toolPos.easting = tankPos.easting + t * (tankPos.easting - toolPos.easting);
-                    toolPos.northing = tankPos.northing + t * (tankPos.northing - toolPos.northing);
-                    toolPos.heading = Math.Atan2(tankPos.easting - toolPos.easting, tankPos.northing - toolPos.northing);
-                }
+                //finally fixed distance for making a curve line
+                if (!curve.isOkToAddPoints) sectionTriggerStepDistance += 0.2;
+                else sectionTriggerStepDistance = 1.0;
 
-                ////the tool is seriously jacknifed or just starting out so just spring it back.
-                over = Math.Abs(Math.PI - Math.Abs(Math.Abs(toolPos.heading - tankPos.heading) - Math.PI));
-
-                if (over < 1.9 && startCounter > 50)
-                {
-                    toolPos.easting = tankPos.easting + (Math.Sin(toolPos.heading) * (tool.toolTrailingHitchLength));
-                    toolPos.northing = tankPos.northing + (Math.Cos(toolPos.heading) * (tool.toolTrailingHitchLength));
-                }
-
-                //criteria for a forced reset to put tool directly behind vehicle
-                if (over > 1.9 | startCounter < 51)
-                {
-                    toolPos.heading = tankPos.heading;
-                    toolPos.easting = tankPos.easting + (Math.Sin(toolPos.heading) * (tool.toolTrailingHitchLength));
-                    toolPos.northing = tankPos.northing + (Math.Cos(toolPos.heading) * (tool.toolTrailingHitchLength));
-                }
+                //precalc the sin and cos of heading * -1
+                Tools[i].sinSectionHeading = Math.Sin(-Tools[i].toolPos.heading);
+                Tools[i].cosSectionHeading = Math.Cos(-Tools[i].toolPos.heading);
             }
-
-            //rigidly connected to vehicle
-            else
-            {
-                toolPos.heading = fixHeading;
-                toolPos.easting = hitchPos.easting;
-                toolPos.northing = hitchPos.northing;
-            }
-
-            #endregion
-
-            //used to increase triangle count when going around corners, less on straight
-            //pick the slow moving side edge of tool
-            double distance = tool.ToolWidth * 0.5;
-            if (distance > 3) distance = 3;
-            
-            //whichever is less
-            if (tool.ToolFarLeftSpeed < tool.ToolFarRightSpeed)
-            {
-                double twist = tool.ToolFarLeftSpeed / tool.ToolFarRightSpeed;
-                //twist *= twist;
-                if (twist < 0.2) twist = 0.2;
-                sectionTriggerStepDistance = distance * twist * twist;
-            }
-            else
-            {
-                double twist = tool.ToolFarRightSpeed / tool.ToolFarLeftSpeed;
-                //twist *= twist;
-                if (twist < 0.2) twist = 0.2;
-
-                sectionTriggerStepDistance = distance * twist * twist;
-            }
-
-            //finally fixed distance for making a curve line
-            if (!curve.isOkToAddPoints) sectionTriggerStepDistance += 0.2;
-            else sectionTriggerStepDistance = 1.0;
-
-            //precalc the sin and cos of heading * -1
-            sinSectionHeading = Math.Sin(-toolPos.heading);
-            cosSectionHeading = Math.Cos(-toolPos.heading);
         }
 
         //perimeter and boundary point generation
@@ -830,13 +830,16 @@ namespace AgOpenGPS
             // if non zero, at least one section is on.
             int sectionCounter = 0;
 
-            //send the current and previous GPS fore/aft corrected fix to each section
-            for (int j = 0; j < tool.numOfSections + 1; j++)
+            for (int i = 0; i < Tools.Count; i++)
             {
-                if (section[j].IsMappingOn)
+                //send the current and previous GPS fore/aft corrected fix to each section
+                for (int j = 0; j < Tools[0].numOfSections + 1; j++)
                 {
-                    section[j].AddMappingPoint();
-                    sectionCounter++;
+                    if (Tools[i].section[j].IsMappingOn)
+                    {
+                        Tools[i].section[j].AddMappingPoint();
+                        sectionCounter++;
+                    }
                 }
             }
 
@@ -870,97 +873,92 @@ namespace AgOpenGPS
         }
 
         //calculate the extreme tool left, right velocities, each section lookahead, and whether or not its going backwards
-        public void CalculateSectionLookAhead(double northing, double easting, double cosHeading, double sinHeading)
+        public void CalculateSectionLookAhead()
         {
             //calculate left side of section 1
             vec3 left = new vec3();
             vec3 right = left;
-            double leftSpeed = 0, rightSpeed = 0;
 
             //speed max for section kmh*0.277 to m/s * 10 cm per pixel * 1.7 max speed
             double meterPerSecPerPixel = Math.Abs(pn.speed) * 4.5;
             vec3 lastLeftPoint = new vec3();
             vec3 lastRightPoint = new vec3();
 
-            //now loop all the section rights and the one extreme left
-            for (int j = 0; j < tool.numOfSections; j++)
+            for (int i = 0; i < Tools.Count; i++)
             {
-                if (j == 0)
+                double leftSpeed = 0, rightSpeed = 0;
+                //now loop all the section rights and the one extreme left
+                for (int j = 0; j < Tools[i].numOfSections; j++)
                 {
-                    lastLeftPoint = section[j].leftPoint;
+
+                    lastLeftPoint = Tools[i].section[j].leftPoint;
 
                     //only one first left point, the rest are all rights moved over to left
-                    section[j].leftPoint = new vec3(cosHeading * (section[j].positionLeft) + easting, sinHeading * (section[j].positionLeft) + northing,0);
+                    Tools[i].section[j].leftPoint = new vec3(Tools[i].cosSectionHeading * (Tools[i].section[j].positionLeft) + Tools[i].toolPos.easting, Tools[i].sinSectionHeading * (Tools[i].section[j].positionLeft) + Tools[i].toolPos.northing, 0);
 
-                    left = section[j].leftPoint - lastLeftPoint;
+                    left = Tools[i].section[j].leftPoint - lastLeftPoint;
 
                     //get the speed for left side only once
                     leftSpeed = left.GetLength() / fixUpdateTime * 10;
                     if (leftSpeed > meterPerSecPerPixel) leftSpeed = meterPerSecPerPixel;
-                }
-                else
-                {
-                    lastLeftPoint = section[j].leftPoint;
-                    //right point from last section becomes this left one
-                    section[j].leftPoint = section[j - 1].rightPoint;
-                    left = section[j].leftPoint - lastLeftPoint;
 
-                    //Save the slower of the 2
-                    if (leftSpeed > rightSpeed) leftSpeed = rightSpeed;                    
-                }
-                lastRightPoint = section[j].rightPoint;
-                section[j].rightPoint = new vec3(cosHeading * (section[j].positionRight) + easting, sinHeading * (section[j].positionRight) + northing,0);
 
-                //now we have left and right for this section
-                right = section[j].rightPoint - lastRightPoint;
 
-                //grab vector length and convert to meters/sec/10 pixels per meter                
-                rightSpeed = right.GetLength() / fixUpdateTime * 10;
-                if (rightSpeed > meterPerSecPerPixel) rightSpeed = meterPerSecPerPixel;
+                    lastRightPoint = Tools[i].section[j].rightPoint;
 
-                //Is section outer going forward or backward
-                double head = left.HeadingXZ();
-                if (Math.PI - Math.Abs(Math.Abs(head - toolPos.heading) - Math.PI) > Glm.PIBy2)
-                {
-                    if (leftSpeed > 0) leftSpeed *= -1;
+                    Tools[i].section[j].rightPoint = new vec3(Tools[i].cosSectionHeading * (Tools[i].section[j].positionRight) + Tools[i].toolPos.easting, Tools[i].sinSectionHeading * (Tools[i].section[j].positionRight) + Tools[i].toolPos.northing, 0);
+
+                    //now we have left and right for this section
+                    right = Tools[i].section[j].rightPoint - lastRightPoint;
+
+                    //grab vector length and convert to meters/sec/10 pixels per meter                
+                    rightSpeed = right.GetLength() / fixUpdateTime * 10;
+                    if (rightSpeed > meterPerSecPerPixel) rightSpeed = meterPerSecPerPixel;
+
+                    //Is section outer going forward or backward
+                    double head = left.HeadingXZ();
+                    if (Math.PI - Math.Abs(Math.Abs(head - Tools[i].toolPos.heading) - Math.PI) > Glm.PIBy2)
+                    {
+                        if (leftSpeed > 0) leftSpeed *= -1;
+                    }
+
+                    head = right.HeadingXZ();
+                    if (Math.PI - Math.Abs(Math.Abs(head - Tools[i].toolPos.heading) - Math.PI) > Glm.PIBy2)
+                    {
+                        if (rightSpeed > 0) rightSpeed *= -1;
+                    }
+
+                    //save the far left and right speed in m/sec averaged over 20%
+                    if (true)
+                    {
+                        Tools[i].ToolFarLeftSpeed = (leftSpeed * 0.1);
+                    }
+                    if (j == Tools[i].numOfSections - 1)
+                    {
+                        Tools[i].ToolFarRightSpeed = (rightSpeed * 0.1);
+                    }
+
+                    //choose fastest speed
+                    if (leftSpeed > rightSpeed)
+                    {
+                        Tools[i].section[j].speedPixels = leftSpeed * 0.36;
+                        leftSpeed = rightSpeed;
+                    }
+                    else Tools[i].section[j].speedPixels = rightSpeed * 0.36;
                 }
 
-                head = right.HeadingXZ();
-                if (Math.PI - Math.Abs(Math.Abs(head - toolPos.heading) - Math.PI) > Glm.PIBy2)
-                {
-                    if (rightSpeed > 0) rightSpeed *= -1;
-                }
+                //fill in tool positions
+                Tools[i].section[Tools[i].numOfSections].leftPoint = Tools[i].section[0].leftPoint;
+                Tools[i].section[Tools[i].numOfSections].rightPoint = Tools[i].section[Tools[i].numOfSections - 1].rightPoint;
 
-                //save the far left and right speed in m/sec averaged over 20%
-                if (j==0)
-                {
-                    tool.ToolFarLeftSpeed = (leftSpeed * 0.1);
-                }
-                if (j == tool.numOfSections - 1)
-                {
-                    tool.ToolFarRightSpeed = (rightSpeed * 0.1);
-                }
-
-                //choose fastest speed
-                if (leftSpeed > rightSpeed)
-                {
-                    section[j].speedPixels = leftSpeed * 0.36;
-                    leftSpeed = rightSpeed;
-                }
-                else section[j].speedPixels = rightSpeed * 0.36;
+                //set the look ahead for hyd Lift in pixels per second
+                vehicle.hydLiftLookAheadDistanceLeft = Math.Min(Tools[i].ToolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10, 200);
+                vehicle.hydLiftLookAheadDistanceRight = Math.Min(Tools[i].ToolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10, 200);
+                Tools[i].lookAheadDistanceOnPixelsLeft = Math.Min(Tools[i].ToolFarLeftSpeed * Tools[i].LookAheadOnSetting * 10, 200);
+                Tools[i].lookAheadDistanceOnPixelsRight = Math.Min(Tools[i].ToolFarRightSpeed * Tools[i].LookAheadOnSetting * 10, 200);
+                Tools[i].lookAheadDistanceOffPixelsLeft = Math.Min(Tools[i].ToolFarLeftSpeed * Tools[i].LookAheadOffSetting * 10, 160);
+                Tools[i].lookAheadDistanceOffPixelsRight = Math.Min(Tools[i].ToolFarRightSpeed * Tools[i].LookAheadOffSetting * 10, 160);
             }
-
-            //fill in tool positions
-            section[tool.numOfSections].leftPoint = section[0].leftPoint;
-            section[tool.numOfSections].rightPoint = section[tool.numOfSections-1].rightPoint;
-
-            //set the look ahead for hyd Lift in pixels per second
-            vehicle.hydLiftLookAheadDistanceLeft =  Math.Min(tool.ToolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10, 200);
-            vehicle.hydLiftLookAheadDistanceRight = Math.Min(tool.ToolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10, 200);
-            tool.lookAheadDistanceOnPixelsLeft =    Math.Min(tool.ToolFarLeftSpeed * tool.LookAheadOnSetting * 10, 200);
-            tool.lookAheadDistanceOnPixelsRight =   Math.Min(tool.ToolFarRightSpeed * tool.LookAheadOnSetting * 10, 200);
-            tool.lookAheadDistanceOffPixelsLeft =   Math.Min(tool.ToolFarLeftSpeed * tool.LookAheadOffSetting * 10, 160);
-            tool.lookAheadDistanceOffPixelsRight =  Math.Min(tool.ToolFarRightSpeed * tool.LookAheadOffSetting * 10, 160);
         }
 
         //the start of first few frames to initialize entire program
@@ -984,7 +982,9 @@ namespace AgOpenGPS
             //in radians
             fixHeading = Math.Atan2(pn.fix.easting - stepFixPts[totalFixSteps - 1].easting, pn.fix.northing - stepFixPts[totalFixSteps - 1].northing);
             if (fixHeading < 0) fixHeading += Glm.twoPI;
-            toolPos.heading = fixHeading;
+
+
+            for (int i = 0; i < Tools.Count; i++) Tools[i].toolPos.heading = fixHeading;
 
             //send out initial zero settings
             //set up the modules
@@ -1210,7 +1210,7 @@ namespace AgOpenGPS
 //        //while (headlandAngleOffPerpendicular > 1.57) headlandAngleOffPerpendicular -= 1.57;
 //        headlandAngleOffPerpendicular -= glm.PIBy2;
 //        headlandDistanceDelta = Math.Tan(Math.Abs(headlandAngleOffPerpendicular));
-//        headlandDistanceDelta *= tool.toolWidth;
+//        headlandDistanceDelta *= Tools[0].toolWidth;
 //    }
 
 //    if (yt.isEnteringDriveThru)

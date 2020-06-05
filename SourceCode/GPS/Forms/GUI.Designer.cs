@@ -456,32 +456,36 @@ namespace AgOpenGPS
             panelSim.Width = Math.Min(panelSim.MaximumSize.Width, oglMain.Width - 10);
             panelSim.Left = oglCenter - panelSim.Width / 2;
 
-            Size Size = new System.Drawing.Size(Math.Min((oglMain.Width * 3 / 4) / tool.numOfSections, 120), 30);
 
-            for (int i = 0; i < MAXSECTIONS; i++)
+            for (int i = 0; i < Tools.Count; i++)
             {
-                if (i < tool.numOfSections)
+                Size Size = new System.Drawing.Size(Math.Min((oglMain.Width * 3 / 4) / Tools[i].numOfSections, 120), 30);
+
+                for (int j = 0; j < MAXSECTIONS; j++)
                 {
-                    section[i].SectionButton.Top = Height - top;
-                    section[i].SectionButton.Size = Size;
-                    section[i].SectionButton.Left = (oglCenter) - (tool.numOfSections * Size.Width) / 2 + Size.Width * i;
-                    section[i].SectionButton.Visible = true;
+                    if (j < Tools[i].numOfSections)
+                    {
+                        Tools[i].section[j].SectionButton.Top = Height - top - 30 * i;
+                        Tools[i].section[j].SectionButton.Size = Size;
+                        Tools[i].section[j].SectionButton.Left = (oglCenter) - (Tools[i].numOfSections * Size.Width) / 2 + Size.Width * j;
+                        Tools[i].section[j].SectionButton.Visible = true;
+                    }
+                    else Tools[i].section[j].SectionButton.Visible = false;
                 }
-                else section[i].SectionButton.Visible = false;
             }
         }
 
         //update individual btn based on state after push
-        private void ManualBtnUpdate(int sectNumber)
+        private void ManualBtnUpdate(int toolNumber, int sectNumber)
         {
-            if (section[sectNumber].BtnSectionState == btnStates.On)
-                section[sectNumber].SectionButton.BackColor = isDay ? Color.Yellow : Color.DarkGoldenrod;
-            else if (section[sectNumber].BtnSectionState == btnStates.Auto)
-                section[sectNumber].SectionButton.BackColor = isDay ? Color.Lime : Color.ForestGreen;
-            else
-                section[sectNumber].SectionButton.BackColor = isDay ? Color.Red : Color.Crimson;
+                if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.On)
+                    Tools[toolNumber].section[sectNumber].SectionButton.BackColor = isDay ? Color.Yellow : Color.DarkGoldenrod;
+                else if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.Auto)
+                    Tools[toolNumber].section[sectNumber].SectionButton.BackColor = isDay ? Color.Lime : Color.ForestGreen;
+                else
+                    Tools[toolNumber].section[sectNumber].SectionButton.BackColor = isDay ? Color.Red : Color.Crimson;
 
-            section[sectNumber].SectionButton.ForeColor = isDay ? Color.Black : Color.White;
+                Tools[toolNumber].section[sectNumber].SectionButton.ForeColor = isDay ? Color.Black : Color.White;
         }
 
         //Mouse Clicks 

@@ -66,7 +66,7 @@ namespace AgOpenGPS
             isSet = false;
 
             //Builds line
-            nudDistance.Value = Math.Min((decimal)(Math.Round(mf.tool.ToolWidth * 3,1)), nudDistance.Maximum);
+            nudDistance.Value = Math.Min((decimal)(Math.Round(mf.Tools[0].ToolWidth * 3,1)), nudDistance.Maximum);
             nudSetDistance.Value = 20;
             if (mf.hd.headArr.Count > Boundary && Boundary >= 0)
             {
@@ -189,7 +189,7 @@ namespace AgOpenGPS
             //make sure distance isn't too small between points on turnLine
             bndCount = foos.Count;
 
-            //double spacing = mf.tool.toolWidth * 0.25;
+            //double spacing = mf.Tools[0].toolWidth * 0.25;
             for (int i = 0; i < bndCount - 1; i++)
             {
                 distance = Glm.Distance(foos[i], foos[i + 1]);
