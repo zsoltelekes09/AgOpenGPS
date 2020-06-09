@@ -269,7 +269,7 @@
             // 
             this.label26.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label26.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label26.Location = new System.Drawing.Point(457, 480);
+            this.label26.Location = new System.Drawing.Point(266, 258);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(134, 51);
             this.label26.TabIndex = 13;
@@ -305,7 +305,7 @@
             this.nudWheelbase.BackColor = System.Drawing.Color.AliceBlue;
             this.nudWheelbase.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.nudWheelbase.InterceptArrowKeys = false;
-            this.nudWheelbase.Location = new System.Drawing.Point(292, 470);
+            this.nudWheelbase.Location = new System.Drawing.Point(266, 312);
             this.nudWheelbase.Maximum = new decimal(new int[] {
             1999,
             0,

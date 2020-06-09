@@ -1042,7 +1042,6 @@ namespace AgOpenGPS
 
                         //get the number of sections from settings
                         Tools[0].numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
-                        Tools[0].numSuperSection = Tools[0].numOfSections + 1;
 
                         //from settings grab the vehicle specifics
                         Tools[0].ToolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
@@ -2746,7 +2745,7 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j < Tools[0].numSuperSection; j++)
+                for (int j = 0; j <= Tools[0].numOfSections; j++)
                 {
                     int patches = Tools[i].section[j].patchList.Count;
 

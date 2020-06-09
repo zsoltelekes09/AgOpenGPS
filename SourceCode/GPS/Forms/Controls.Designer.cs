@@ -1044,7 +1044,7 @@ namespace AgOpenGPS
                         for (int i = 0; i < Tools.Count; i++)
                         {
                             //clear the section lists
-                            for (int j = 0; j < MAXSECTIONS; j++)
+                            for (int j = 0; j <= Tools[i].numOfSections; j++)
                             {
                                 //clean out the lists
                                 Tools[i].section[j].patchList?.Clear();

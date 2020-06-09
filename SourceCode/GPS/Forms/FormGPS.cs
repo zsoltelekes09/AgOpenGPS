@@ -28,8 +28,6 @@ namespace AgOpenGPS
         //list of vec3 points of Dubins shortest path between 2 points - To be converted to RecPt
         public List<vec3> flagDubinsList = new List<vec3>();
 
-        //maximum sections available
-        public const int MAXSECTIONS = 17;
 
         //How many youturn functions
         public const int MAXFUNCTIONS = 8;
@@ -141,9 +139,6 @@ namespace AgOpenGPS
         /// <summary>
         /// Just the tool attachment that includes the sections
         /// </summary>
-        public CTool tool;
-
-
         public List<CTool> Tools = new List<CTool>();
 
         /// <summary>
@@ -1280,7 +1275,7 @@ namespace AgOpenGPS
 
                 Tools[i].section[3].positionLeft = (double)Vehicle.Default.setSection_position4 + Vehicle.Default.setVehicle_toolOffset;
                 Tools[i].section[3].positionRight = (double)Vehicle.Default.setSection_position5 + Vehicle.Default.setVehicle_toolOffset;
-
+                /*
                 Tools[i].section[4].positionLeft = (double)Vehicle.Default.setSection_position5 + Vehicle.Default.setVehicle_toolOffset;
                 Tools[i].section[4].positionRight = (double)Vehicle.Default.setSection_position6 + Vehicle.Default.setVehicle_toolOffset;
 
@@ -1317,7 +1312,9 @@ namespace AgOpenGPS
                 Tools[i].section[15].positionLeft = (double)Vehicle.Default.setSection_position16 + Vehicle.Default.setVehicle_toolOffset;
                 Tools[i].section[15].positionRight = (double)Vehicle.Default.setSection_position17 + Vehicle.Default.setVehicle_toolOffset;
 
-                for (int j = 0; j < MAXSECTIONS; j++)
+    */
+
+                for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
                     Tools[i].section[j].sectionWidth = Tools[i].section[j].positionRight - Tools[i].section[j].positionLeft;
                     Tools[i].section[j].rpSectionPosition = 250 + (int)Math.Round(Tools[i].section[j].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
@@ -1325,7 +1322,7 @@ namespace AgOpenGPS
                 }
 
                 //calculate tool width based on extreme right and left values
-                Tools[i].ToolWidth = Math.Abs(Tools[i].section[0].positionLeft) + Math.Abs(Tools[i].section[Tools[i].numOfSections - 1].positionRight);
+                Tools[i].ToolWidth = Math.Abs(Tools[i].section[Tools[i].numOfSections - 1].positionRight - Tools[i].section[0].positionLeft);
 
 
                 //now do the full width section
@@ -1345,7 +1342,6 @@ namespace AgOpenGPS
                 Tools[0].isToolTrailing = false;
                 Tools[0].isToolBehindPivot = false;
                 Tools[0].numOfSections = 1;
-                Tools[0].numSuperSection = 2;
                 Tools[0].section[0].positionLeft = -1.5;
                 Tools[0].section[0].positionRight = 1.5;
 
@@ -1360,9 +1356,9 @@ namespace AgOpenGPS
                 Tools[0].section[0].rpSectionPosition = 250 + (int)Math.Round(Tools[0].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
 
 
-                Tools[0].WidthMinusOverlap = 6.85;
-                Tools[0].ToolWidth = 6.85;
-                Tools[0].ToolOffset = 1.925;
+                Tools[0].WidthMinusOverlap = 8.80;
+                Tools[0].ToolWidth = 8.80;
+                Tools[0].ToolOffset = 0;
 
 
 
@@ -1371,27 +1367,30 @@ namespace AgOpenGPS
 
                 Tools[1].hitchLength = -0.50;
 
-                Tools[1].isToolTBT = true;
+                Tools[1].isToolTBT = false;
                 Tools[1].toolTankTrailingHitchLength = -2.00;
 
-                Tools[1].isToolTrailing = true;
+                Tools[1].isToolTrailing = false;
                 Tools[1].toolTrailingHitchLength = -2.00;
 
                 Tools[1].isToolBehindPivot = true;
-                Tools[1].numOfSections = 1;
-                Tools[1].numSuperSection = 2;
-                Tools[1].ToolWidth = 4;
-                Tools[1].ToolOffset = 1.35;
-                Tools[1].section[0].positionLeft = 1.35;
-                Tools[1].section[0].positionRight = 5.35;
+                Tools[1].numOfSections = 2;
+                Tools[1].ToolWidth = 8.8;
+                Tools[1].ToolOffset = 0;
+                Tools[1].section[0].positionLeft = -4.4;
+                Tools[1].section[0].positionRight = -1.4;
+                Tools[1].section[1].positionLeft = 1.4;
+                Tools[1].section[1].positionRight = 4.4;
 
 
 
-                Tools[1].section[0].sectionWidth = 4;
+                Tools[1].section[0].sectionWidth = 3;
+                Tools[1].section[1].sectionWidth = 3;
                 Tools[1].rpXPosition = 250 + (int)(Math.Round(Tools[1].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
                 Tools[1].rpWidth = (int)(Math.Round(Tools[1].ToolWidth * 10, 0, MidpointRounding.AwayFromZero));
 
                 Tools[1].section[0].rpSectionPosition = 250 + (int)Math.Round(Tools[1].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
+                Tools[1].section[1].rpSectionPosition = 250 + (int)Math.Round(Tools[1].section[1].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
 
 
             }
@@ -1506,7 +1505,7 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j < MAXSECTIONS; j++)
+                for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
                     //turn section buttons all OFF
                     Tools[i].section[j].SectionButton.Enabled = false;
@@ -1675,7 +1674,7 @@ namespace AgOpenGPS
         {
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j < Tools[i].numSuperSection; j++)
+                for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
                     //SECTIONS - 
                     if (Tools[i].section[j].SectionOnRequest)
@@ -1924,7 +1923,7 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j < Tools[i].numSuperSection; j++)
+                for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
                     if (Tools[i].section[j].IsMappingOn) Tools[i].section[j].TurnMappingOff();
                     Tools[i].section[j].SectionOnRequest = false;

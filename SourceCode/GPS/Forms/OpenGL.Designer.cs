@@ -211,7 +211,7 @@ namespace AgOpenGPS
 
                     for (int i = 0; i < Tools.Count; i++)
                     {
-                        for (int j = 0; j < Tools[i].numSuperSection; j++)
+                        for (int j = 0; j <= Tools[i].numOfSections; j++)
                         {
                             //every time the section turns off and on is a new patch
 
@@ -318,7 +318,7 @@ namespace AgOpenGPS
                         }
                         else
                         {
-                            for (int j = 0; j < Tools[i].numSuperSection; j++)
+                            for (int j = 0; j <= Tools[i].numOfSections; j++)
                             {
                                 if (Tools[i].section[j].IsMappingOn && Tools[i].section[j].patchList.Count > 0)
                                 {
@@ -585,7 +585,7 @@ namespace AgOpenGPS
                 for (int j = 0; j < Tools.Count; j++)
                 {
                     //draw patches j= # of sections
-                    for (int k = 0; k < Tools[j].numSuperSection; k++)
+                    for (int k = 0; k <= Tools[j].numOfSections; k++)
                     {
                         //every time the section turns off and on is a new patch
                         int patchCount = Tools[j].section[k].patchList.Count;
@@ -890,7 +890,7 @@ namespace AgOpenGPS
                 ////draw patches j= # of sections
                 //int count2;
 
-                //for (int j = 0; j < Tools[0].numSuperSection; j++)
+                //for (int j = 0; j <= Tools[0].numOfSections; j++)
                 //{
                 //    //every time the section turns off and on is a new patch
                 //    int patchCount = section[j].patchList.Count;
@@ -1005,7 +1005,7 @@ namespace AgOpenGPS
                     for (int i = 0; i < Tools.Count; i++)
                     {
                         //draw patches j= # of sections
-                        for (int j = 0; j < Tools[i].numSuperSection; j++)
+                        for (int j = 0; j <= Tools[i].numOfSections; j++)
                         {
                             //every time the section turns off and on is a new patch
                             patchCount = Tools[i].section[j].patchList.Count;
@@ -1910,7 +1910,7 @@ namespace AgOpenGPS
                 for (int i = 0; i < Tools.Count; i++)
                 {
                     //draw patches j= # of sections
-                    for (int j = 0; j < Tools[i].numSuperSection; j++)
+                    for (int j = 0; j <= Tools[i].numOfSections; j++)
                     {
                         //every time the section turns off and on is a new patch
                         int patchCount = Tools[i].section[j].patchList.Count;

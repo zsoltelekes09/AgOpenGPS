@@ -57,6 +57,8 @@ namespace AgOpenGPS
         public List<vec2> tramArr = new List<vec2>();
         public List<List<vec2>> tramList = new List<List<vec2>>();
 
+        public List<List<vec3>> GuidanceLines = new List<List<vec3>>();
+
         public CABCurve(FormGPS _f)
         {
             //constructor
@@ -164,6 +166,28 @@ namespace AgOpenGPS
                                 GL.End();
                             }
                             GL.Color3(0.95f, 0.05f, 0.05f);
+                        }
+
+                        if (mf.isSideGuideLines)
+                        {
+                            GL.Color3(0.56f, 0.650f, 0.650f);
+                            GL.Enable(EnableCap.LineStipple);
+                            GL.LineStipple(1, 0x0101);
+
+                            GL.LineWidth(mf.ABLine.lineWidth);
+
+
+
+                            for (int i = 0; i < GuidanceLines.Count; i++)
+                            {
+                                if (GuidanceLines[i].Count > 0)
+                                {
+                                    GL.Begin(PrimitiveType.Lines);
+                                    for (int h = 0; h < GuidanceLines[i].Count; h++) GL.Vertex3(GuidanceLines[i][h].easting, GuidanceLines[i][h].northing, 0);
+                                    GL.End();
+                                }
+                            }
+                            GL.Disable(EnableCap.LineStipple);
                         }
                     }
                 }
@@ -577,6 +601,43 @@ namespace AgOpenGPS
                 {
                     OldisSameWay = isSameWay;
                     OldhowManyPathsAway = howManyPathsAway;
+
+                    if (mf.isSideGuideLines)
+                    {
+                        GuidanceLines.Clear();
+                        for (double i = -2.5; i < 3.5; i++)
+                        {
+                            GuidanceLines.Add(new List<vec3>());
+
+                            for (int j = 0; j < ptCount2 - 1; j++)
+                            {
+
+                                double piSide2;
+
+                                //sign of distance determines which side of line we are on
+                                if (curveNumber > 0) piSide2 = -Glm.PIBy2;
+                                else piSide2 = Glm.PIBy2;
+
+                                double Offset2 = mf.Tools[0].WidthMinusOverlap * (i + howManyPathsAway);
+                                
+                                var point = new vec3(
+                                refList[j].easting + (Math.Sin(piSide2 + refList[j].heading) * Offset2),
+                                refList[j].northing + (Math.Cos(piSide2 + refList[j].heading) * Offset2),
+                                refList[j].heading);
+                                bool Add = true;
+                                for (int t = 0; t < ptCount2; t++)
+                                {
+                                    double dist = ((point.easting - refList[t].easting) * (point.easting - refList[t].easting)) + ((point.northing - refList[t].northing) * (point.northing - refList[t].northing));
+                                    if (dist < (Offset2 * Offset2) * 0.999999)
+                                    {
+                                        Add = false;
+                                        break;
+                                    }
+                                }
+                                if (Add) GuidanceLines[GuidanceLines.Count - 1].Add(point);
+                            }
+                        }
+                    }
 
                     //build the current line
                     curList?.Clear();

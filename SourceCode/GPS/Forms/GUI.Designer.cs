@@ -461,7 +461,7 @@ namespace AgOpenGPS
             {
                 Size Size = new System.Drawing.Size(Math.Min((oglMain.Width * 3 / 4) / Tools[i].numOfSections, 120), 30);
 
-                for (int j = 0; j < MAXSECTIONS; j++)
+                for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
                     if (j < Tools[i].numOfSections)
                     {

@@ -121,59 +121,14 @@ namespace AgOpenGPS
                     GL.LineWidth(lineWidth);
 
                     GL.Begin(PrimitiveType.Lines);
-                    for (int i = -2; i < 3; i++)
+                    for (double i = -2.5; i < 3.5; i++)
                     {
-                        if (i == 0) continue;
-
-
-                        GL.Vertex2(currentABLineP1.easting + (cosHeading * mf.Tools[0].WidthMinusOverlap * i), currentABLineP1.northing + (sinHeading * mf.Tools[0].WidthMinusOverlap * i));
-                        GL.Vertex2(currentABLineP2.easting + (cosHeading * mf.Tools[0].WidthMinusOverlap * i), currentABLineP2.northing + (sinHeading * mf.Tools[0].WidthMinusOverlap * i));
-
+                        GL.Vertex2(refPoint1.easting - (cosHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) - sinHeading * 1600.0, refPoint1.northing - (sinHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) - cosHeading * 1600.0);
+                        GL.Vertex2(refPoint2.easting - (cosHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) + sinHeading * 1600.0, refPoint2.northing - (sinHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) + cosHeading * 1600.0);
                     }
                     GL.End();
                     GL.Disable(EnableCap.LineStipple);
 
-
-
-
-                    /*
-
-
-                    //get the tool offset and width
-                    double toolOffset = mf.Tools[0].ToolOffset * 2;
-                    double toolWidth = mf.Tools[0].WidthMinusOverlap;
-
-
-                    if (isABSameAsVehicleHeading)
-                    {
-                        GL.Vertex3(currentABLineP1.easting + (cosHeading * (toolWidth + toolOffset)), currentABLineP1.northing + (sinHeading * (toolWidth + toolOffset)) , 0);
-                        GL.Vertex3((cosHeading * (toolWidth + toolOffset)) + currentABLineP2.easting, (sinHeading * (toolWidth + toolOffset)) + currentABLineP2.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentABLineP1.easting, (sinHeading * (-toolWidth + toolOffset)) + currentABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth + toolOffset)) + currentABLineP2.easting, (sinHeading * (-toolWidth + toolOffset)) + currentABLineP2.northing, 0);
-
-                        toolWidth *= 2;
-                        GL.Vertex3((cosHeading * toolWidth) + currentABLineP1.easting, (sinHeading * toolWidth) + currentABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading * toolWidth) + currentABLineP2.easting, (sinHeading * toolWidth) + currentABLineP2.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentABLineP1.easting, (sinHeading * (-toolWidth)) + currentABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentABLineP2.easting, (sinHeading * (-toolWidth)) + currentABLineP2.northing, 0);
-                    }
-                    else
-                    {
-                        GL.Vertex3((cosHeading * (toolWidth - toolOffset)) + currentABLineP1.easting, (sinHeading * (toolWidth - toolOffset)) + currentABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading * (toolWidth - toolOffset)) + currentABLineP2.easting, (sinHeading * (toolWidth - toolOffset)) + currentABLineP2.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth - toolOffset)) + currentABLineP1.easting, (sinHeading * (-toolWidth - toolOffset)) + currentABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth - toolOffset)) + currentABLineP2.easting, (sinHeading * (-toolWidth - toolOffset)) + currentABLineP2.northing, 0);
-
-                        toolWidth *= 2;
-                        GL.Vertex3((cosHeading * toolWidth) + currentABLineP1.easting, (sinHeading * toolWidth) + currentABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading * toolWidth) + currentABLineP2.easting, (sinHeading * toolWidth) + currentABLineP2.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentABLineP1.easting, (sinHeading * (-toolWidth)) + currentABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading * (-toolWidth)) + currentABLineP2.easting, (sinHeading * (-toolWidth)) + currentABLineP2.northing, 0);
-                    }
-
-                    GL.End();
-                    GL.Disable(EnableCap.LineStipple);
-                    */
                 }
             }
             else if (isEditing)
@@ -372,8 +327,7 @@ namespace AgOpenGPS
                 else Offset += mf.Tools[0].ToolOffset;
             }
 
-            point1 = new vec2(refPoint1.easting + (Math.Sin(-abHeading + piSide) * Offset), refPoint1.northing + (Math.Cos(-abHeading + piSide) * Offset));
-
+            point1 = new vec2(refPoint1.easting + (Math.Sin(-abHeading + piSide) * Offset), refPoint1.northing + (Math.Cos(abHeading + piSide) * Offset));
 
             //create the new line extent points for current ABLine based on original heading of AB line
             currentABLineP1.easting = point1.easting - (Math.Sin(abHeading) * 1600.0);

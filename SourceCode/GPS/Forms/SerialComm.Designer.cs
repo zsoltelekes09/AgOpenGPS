@@ -329,7 +329,7 @@ namespace AgOpenGPS
 
                 else
                 {
-                    for (int j = 0; j < MAXSECTIONS; j++)
+                    for (int j = 0; j <= Tools[i].numOfSections; j++)
                     {
                         //set if on, reset bit if off
                         if (Tools[i].section[j].IsSectionOn) machine = machine | set;

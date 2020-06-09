@@ -466,7 +466,6 @@ namespace AgOpenGPS
             //Sections ------------------------------------------------------------------------------------------
 
             mf.Tools[Here].numOfSections = numberOfSections;
-            mf.Tools[Here].numSuperSection = numberOfSections + 1;
             Properties.Vehicle.Default.setVehicle_numSections = mf.Tools[Here].numOfSections;
 
             mf.Tools[Here].toolMinUnappliedPixels = minApplied;

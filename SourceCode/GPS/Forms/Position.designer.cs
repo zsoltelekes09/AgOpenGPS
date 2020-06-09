@@ -753,7 +753,7 @@ namespace AgOpenGPS
 
                 //used to increase triangle count when going around corners, less on straight
                 //pick the slow moving side edge of tool
-                double distance = Tools[0].ToolWidth * 0.5;
+                double distance = Tools[i].ToolWidth * 0.5;
                 if (distance > 3) distance = 3;
 
                 //whichever is less
@@ -766,7 +766,7 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    double twist = Tools[0].ToolFarRightSpeed / Tools[i].ToolFarLeftSpeed;
+                    double twist = Tools[i].ToolFarRightSpeed / Tools[i].ToolFarLeftSpeed;
                     //twist *= twist;
                     if (twist < 0.2) twist = 0.2;
 
@@ -833,7 +833,7 @@ namespace AgOpenGPS
             for (int i = 0; i < Tools.Count; i++)
             {
                 //send the current and previous GPS fore/aft corrected fix to each section
-                for (int j = 0; j < Tools[0].numOfSections + 1; j++)
+                for (int j = 0; j <= Tools[0].numOfSections; j++)
                 {
                     if (Tools[i].section[j].IsMappingOn)
                     {
@@ -929,20 +929,15 @@ namespace AgOpenGPS
                     }
 
                     //save the far left and right speed in m/sec averaged over 20%
-                    if (true)
-                    {
-                        Tools[i].ToolFarLeftSpeed = (leftSpeed * 0.1);
-                    }
-                    if (j == Tools[i].numOfSections - 1)
-                    {
-                        Tools[i].ToolFarRightSpeed = (rightSpeed * 0.1);
-                    }
+                    if (j == 0) Tools[i].ToolFarLeftSpeed = (leftSpeed * 0.1);
+
+                    Tools[i].ToolFarRightSpeed = (rightSpeed * 0.1);
 
                     //choose fastest speed
                     if (leftSpeed > rightSpeed)
                     {
                         Tools[i].section[j].speedPixels = leftSpeed * 0.36;
-                        leftSpeed = rightSpeed;
+                        //leftSpeed = rightSpeed;
                     }
                     else Tools[i].section[j].speedPixels = rightSpeed * 0.36;
                 }

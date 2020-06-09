@@ -180,7 +180,7 @@ namespace AgOpenGPS
             for (int i = 0; i < mf.Tools.Count; i++)
             {
                 //draw patches j= # of sections
-                for (int j = 0; j < mf.Tools[0].numSuperSection; j++)
+                for (int j = 0; j <= mf.Tools[0].numOfSections; j++)
                 {
                     //every time the section turns off and on is a new patch
                     int patchCount = mf.Tools[i].section[j].patchList.Count;

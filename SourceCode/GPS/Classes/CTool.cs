@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using OpenTK.Graphics.OpenGL;
@@ -19,10 +20,7 @@ namespace AgOpenGPS
         public double ToolOverlap;
         public double WidthMinusOverlap;
 
-
-        public CSection[] section;
-
-
+        public List<CSection> section = new List<CSection>();
 
         public vec2 hitchPos;
         public vec3 toolPos;
@@ -44,7 +42,7 @@ namespace AgOpenGPS
 
         public bool isToolTrailing, isToolTBT;
         public bool isToolBehindPivot;
-        public string toolAttachType;
+        public string toolsAttachType;
 
         //storage for the cos and sin of heading
         public double cosSectionHeading = 1.0, sinSectionHeading = 0.0;
@@ -54,7 +52,6 @@ namespace AgOpenGPS
 
         //how many individual sections
         public int numOfSections;
-        public int numSuperSection;
 
 
         //read pixel values
@@ -66,17 +63,19 @@ namespace AgOpenGPS
         {
             mf = _f;
 
-            section = new CSection[FormGPS.MAXSECTIONS];
+            numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
 
-            for (int j = 0; j < FormGPS.MAXSECTIONS; j++)
+
+            for (int j = 0; j <= numOfSections; j++)
             {
-                section[j] = new CSection(_f);
+                //section[j] = new CSection(_f);
+                section.Add(new CSection(mf));
 
                 _f.Controls.Add(section[j].SectionButton);
 
                 section[j].SectionButton.BringToFront();
                 section[j].SectionButton.Text = (j + 1).ToString();
-                section[j].SectionButton.Name = num + "," + j.ToString();
+                section[j].SectionButton.Name = (num + "," + j).ToString();
                 section[j].SectionButton.Click += new System.EventHandler(mf.btnSectionMan_Click);
 
                 section[j].SectionButton.Enabled = false;
@@ -112,9 +111,6 @@ namespace AgOpenGPS
 
             MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
             MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
-
-            numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
-            numSuperSection = numOfSections + 1;
 
             toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
 
