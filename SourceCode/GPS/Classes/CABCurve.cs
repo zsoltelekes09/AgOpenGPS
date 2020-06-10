@@ -1200,9 +1200,9 @@ namespace AgOpenGPS
             }
 
 
-            int cnt = refList.Count;
+            int cnt = curList.Count;
             vec3[] arr = new vec3[cnt];
-            refList.CopyTo(arr);
+            curList.CopyTo(arr);
             refList.Clear();
 
             for (int i = 0; i < cnt; i++)
