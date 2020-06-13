@@ -14,6 +14,10 @@ namespace AgOpenGPS
         public static string portNameGPS = "COM GPS";
         public static int baudRateGPS = 4800;
 
+        public static string portNameHEADING = "COM Heading";
+        public static int baudRateHEADING = 4800;
+       
+
         public static string portNameMachine = "COM Sect";
         public static int baudRateMachine = 38400;
 
@@ -24,7 +28,7 @@ namespace AgOpenGPS
 
         //used to decide to autoconnect section arduino this run
         public bool wasRateMachineConnectedLastRun = false;
-        public string recvSentenceSettings = "InitalSetting", lastRecvd = "";
+        public string recvSentenceSettings = "InitalSetting", lastRecvd = "", HEADINGrecvSentenceSettings = "InitalSetting";
 
         public byte checksumSent = 0;
         public byte checksumRecd = 0;
@@ -35,11 +39,16 @@ namespace AgOpenGPS
         //serial port gps is connected to
         public SerialPort spGPS = new SerialPort(portNameGPS, baudRateGPS, Parity.None, 8, StopBits.One);
 
+        //serial port heading is connected to
+        public SerialPort spHEADING = new SerialPort(portNameHEADING, baudRateHEADING, Parity.None, 8, StopBits.One);
+
         //serial port Arduino is connected to
         public SerialPort spMachine = new SerialPort(portNameMachine, baudRateMachine, Parity.None, 8, StopBits.One);
 
         //serial port AutoSteer is connected to
         public SerialPort spAutoSteer = new SerialPort(portNameAutoSteer, baudRateAutoSteer, Parity.None, 8, StopBits.One);
+
+
 
         #region AutoSteerPort // --------------------------------------------------------------------
         private void SerialLineReceivedAutoSteer(string sentence)
@@ -646,6 +655,119 @@ namespace AgOpenGPS
         }
 
         #endregion SerialPortGPS
+
+        #region HEADING SerialPort //--------------------------------------------------------------------------
+
+        //called by the GPS delegate every time a chunk is rec'd
+        private void HEADINGSerialLineReceived(string HEADINGsentence)
+        {
+            //spit it out no matter what it says
+            pn.HEADINGrawBuffer += HEADINGsentence;
+            Console.WriteLine(pn.HEADINGrawBuffer);
+        }
+
+        private delegate void HEADINGLineReceivedEventHandler(string HEADINGsentence);
+
+        //serial port receive in its own thread
+        private void HEADINGsp_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            if (spHEADING.IsOpen)
+            {
+                try
+                {
+                    //give it a sec to spit it out
+                    //System.Threading.Thread.Sleep(2000);
+
+                    //read whatever is in port
+                    string HEADINGsentence = spHEADING.ReadExisting();
+                    this.BeginInvoke(new LineReceivedEventHandler(HEADINGSerialLineReceived), HEADINGsentence);
+                }
+                catch (Exception ex)
+                {
+                    WriteErrorLog("GPS Data Recv" + ex.ToString());
+                    //MessageBox.Show(ex.Message + "\n\r" + "\n\r" + "Go to Settings -> COM Ports to Fix", "ComPort Failure!");
+                }
+            }
+        }
+
+        public void HEADINGSerialPortOpenGPS()
+        {
+            //close it first
+            HEADINGSerialPortCloseGPS();
+
+            if (spHEADING.IsOpen)
+            {
+                simulatorOnToolStripMenuItem.Checked = false;
+                panelSim.Visible = false;
+                timerSim.Enabled = false;
+
+                Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
+                Settings.Default.Save();
+            }
+
+
+            if (!spHEADING.IsOpen)
+            {
+                spHEADING.PortName = portNameHEADING;
+                spHEADING.BaudRate = baudRateHEADING;
+                spHEADING.DataReceived += HEADINGsp_DataReceived;
+                spHEADING.WriteTimeout = 1000;
+            }
+
+            try { spHEADING.Open(); }
+            catch (Exception)
+            {
+                //MessageBox.Show(exc.Message + "\n\r" + "\n\r" + "Go to Settings -> COM Ports to Fix", "No Serial Port Active");
+                //WriteErrorLog("Open GPS Port " + e.ToString());
+
+                //update port status labels
+                //stripPortGPS.Text = " * * ";
+                //stripPortGPS.ForeColor = Color.Red;
+                //stripOnlineGPS.Value = 1;
+
+                //SettingsPageOpen(0);
+            }
+
+            if (spHEADING.IsOpen)
+            {
+                //btnOpenSerial.Enabled = false;
+
+                //discard any stuff in the buffers
+                spHEADING.DiscardOutBuffer();
+                spHEADING.DiscardInBuffer();
+
+                //update port status label
+                //stripPortGPS.Text = portnameHEADING + " " + baudRateGPSHEADING.ToString();
+                //stripPortGPS.ForeColor = Color.ForestGreen;
+
+                Properties.Settings.Default.setPort_portNameHEADING = portNameHEADING;
+                Properties.Settings.Default.setPort_baudRate = baudRateHEADING;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        public void HEADINGSerialPortCloseGPS()
+        {
+            //if (sp.IsOpen)
+            {
+                spHEADING.DataReceived -= HEADINGsp_DataReceived;
+                try { spHEADING.Close(); }
+                catch (Exception e)
+                {
+                    WriteErrorLog("Closing GPS Port" + e.ToString());
+                    MessageBox.Show(e.Message, "Connection already terminated?");
+                }
+
+                //update port status labels
+                //stripPortGPS.Text = " * * " + baudRateGPSHEADING.ToString();
+                //stripPortGPS.ForeColor = Color.ForestGreen;
+                //stripOnlineGPS.Value = 1;
+                spHEADING.Dispose();
+            }
+        }
+
+        #endregion Heading SerialPortGPS
+
 
     }//end class
 }//end namespace

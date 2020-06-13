@@ -92,9 +92,11 @@ namespace AgOpenGPS
         {
             //update the recv string so it can display at least something
             recvSentenceSettings = pn.rawBuffer;
+            HEADINGrecvSentenceSettings = pn.HEADINGrawBuffer;
 
             //parse any data from pn.rawBuffer
             pn.ParseNMEA();
+            pn.ParseHEADING();
 
             //time for a frame update with new valid nmea data
             if (pn.updatedGGA | pn.updatedOGI | pn.updatedRMC)

@@ -320,5 +320,8 @@
     <Setting Name="setIMU_fusionWeight" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.25</Value>
     </Setting>
+    <Setting Name="setPort_portNameHEADING" Type="System.String" Scope="User">
+      <Value Profile="(Default)">COM Heading</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

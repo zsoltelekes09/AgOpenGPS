@@ -89,11 +89,14 @@ namespace AgOpenGPS
             cboxPort.Items.Clear();
             cboxArdPort.Items.Clear();
             cboxASPort.Items.Clear();
+            cboxportheading.Items.Clear();
+
             foreach (String s in System.IO.Ports.SerialPort.GetPortNames())
             {
                 cboxPort.Items.Add(s);
                 cboxArdPort.Items.Add(s);
                 cboxASPort.Items.Add(s);
+                cboxportheading.Items.Add(s);
             }
 
             lblCurrentBaud.Text = mf.spGPS.BaudRate.ToString();
@@ -261,6 +264,11 @@ namespace AgOpenGPS
 
             cboxPort.Items.Clear();
             foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) { cboxPort.Items.Add(s); }
+
+            cboxportheading.Items.Clear();
+            foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) { cboxportheading.Items.Add(s); }
+
+           
         }
 
         #endregion PortSettings //----------------------------------------------------------------
@@ -269,6 +277,7 @@ namespace AgOpenGPS
         {
             //GPS phrase
             textBoxRcv.Text = mf.recvSentenceSettings;
+            textBoxRcvHeading.Text = mf.HEADINGrecvSentenceSettings;
             //mf.recvSentenceSettings = "";
 
             //RateMachine phrases
@@ -287,6 +296,66 @@ namespace AgOpenGPS
             //save
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void groupBox4_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+            mf.spHEADING.PortName = cboxportheading.Text;
+            FormGPS.portNameHEADING = cboxportheading.Text;
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            mf.spHEADING.BaudRate = Convert.ToInt32(cboxbautheading.Text);
+            FormGPS.baudRateHEADING = Convert.ToInt32(cboxbautheading.Text);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            
+                mf.HEADINGSerialPortOpenGPS();
+                if (mf.spHEADING.IsOpen)
+                {
+                cboxbautheading.Enabled = false;
+                cboxportheading.Enabled = false;
+                btnCloseHEADING.Enabled = true;
+                btnOpenHEADING.Enabled = false;
+                    lblCurrentBaud.Text = mf.spHEADING.BaudRate.ToString();
+                    lblCurrentPort.Text = mf.spHEADING.PortName;
+                }
+                else
+                {
+                cboxbautheading.Enabled = true;
+                cboxportheading.Enabled = true;
+                btnCloseHEADING.Enabled = false;
+                btnOpenHEADING.Enabled = true;
+                }
+            
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            mf.HEADINGSerialPortCloseGPS();
+            if (mf.spHEADING.IsOpen)
+            {
+                cboxbautheading.Enabled = false;
+                cboxportheading.Enabled = false;
+                btnCloseHEADING.Enabled = true;
+                btnOpenHEADING.Enabled = false;
+            }
+            else
+            {
+                cboxbautheading.Enabled = true;
+                cboxportheading.Enabled = true;
+                btnCloseHEADING.Enabled = false;
+                btnOpenHEADING.Enabled = true;
+            }
         }
     } //class
 } //namespace
