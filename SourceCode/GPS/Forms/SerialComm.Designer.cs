@@ -32,6 +32,10 @@ namespace AgOpenGPS
 
         public byte checksumSent = 0;
         public byte checksumRecd = 0;
+        
+        int count=0;
+        byte[] ackPacket = new byte[] { 0xB5, 0x62, 0x01, 0x3C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        
 
         //used to decide to autoconnect autosteer arduino this run
         public bool wasAutoSteerConnectedLastRun = false;
@@ -41,12 +45,13 @@ namespace AgOpenGPS
 
         //serial port heading is connected to
         public SerialPort spHEADING = new SerialPort(portNameHEADING, baudRateHEADING, Parity.None, 8, StopBits.One);
-
+        
         //serial port Arduino is connected to
         public SerialPort spMachine = new SerialPort(portNameMachine, baudRateMachine, Parity.None, 8, StopBits.One);
 
         //serial port AutoSteer is connected to
         public SerialPort spAutoSteer = new SerialPort(portNameAutoSteer, baudRateAutoSteer, Parity.None, 8, StopBits.One);
+
 
 
 
@@ -658,15 +663,81 @@ namespace AgOpenGPS
 
         #region HEADING SerialPort //--------------------------------------------------------------------------
 
+       
+
         //called by the GPS delegate every time a chunk is rec'd
-        private void HEADINGSerialLineReceived(string HEADINGsentence)
+       private void HEADINGSerialLineReceived(byte[] Data)
+        
         {
-            //spit it out no matter what it says
-            pn.HEADINGrawBuffer += HEADINGsentence;
-            Console.WriteLine(pn.HEADINGrawBuffer);
+            Console.WriteLine("{0:X02}", x);
+            if (count < 4 && x == ackPacket[count])
+            {
+                Data[count] = x;
+                count++;
+            }
+            else if (count > 3)
+            {
+                Data[count] = x;
+                count++;
+            }
+
+         //   Console.WriteLine("{0:X02}", x);
+
+
+            if (count >71)  //Daniel P
+            {
+                count = 0;
+                Console.WriteLine("found RELPOSNED");
+                int CK_A = 0;
+                int CK_B = 0;
+                for (int j = 2; j < 70; j += 1)// start with Class and end by Checksum
+                {
+                    CK_A = (CK_A + Data[j]);
+                    CK_B = (CK_B + CK_A);
+                }
+
+                if (Data[70] == CK_A && Data[71] == CK_B)
+                {
+                    Console.WriteLine("Parsing data");
+                    long itow = Data[10] | (Data[11] << 8) | (Data[12] << 16) | (Data[13] << 24);
+
+                    if (((Data[67] & 0x01) == 0x01) && (((Data[66] & 0x2D) == 0x2D) || ((Data[66] & 0x35) == 0x35)))
+                    {
+                        int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
+
+                        //   if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
+                        //  {
+                        //save dist?
+                        // ahrs.rollX16 = (int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), pn.DualAntennaDistance) / 0.27925268016f);
+                        Console.Write("Roll: ");
+                        Console.WriteLine((int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), 1) / 0.27925268016f));
+
+                        //  }
+
+                        // pn.headingHDT = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
+                        Console.Write("Heading: ");
+                        Console.WriteLine((Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001);
+
+                        // recvSentenceSettings[3] = recvSentenceSettings[1];
+                        //  recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + (ahrs.rollX16 / 16.0).ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                    }
+                    else //Bad Quality
+                    {
+                        //  ahrs.rollX16 = 9999;
+                        //  pn.headingHDT = 9999;
+                        //  recvSentenceSettings[3] = recvSentenceSettings[1];
+                        // recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
+                        Console.WriteLine("Checksum Fail");
+                    }
+                }
+                else Console.WriteLine("Checksum Fail");
+
+
+            }
         }
 
-        private delegate void HEADINGLineReceivedEventHandler(string HEADINGsentence);
+
+        private delegate void HeadingLineReceivedEventHandler(byte[] Data);
 
         //serial port receive in its own thread
         private void HEADINGsp_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -675,12 +746,12 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    //give it a sec to spit it out
-                    //System.Threading.Thread.Sleep(2000);
-
-                    //read whatever is in port
-                    string HEADINGsentence = spHEADING.ReadExisting();
-                    this.BeginInvoke(new LineReceivedEventHandler(HEADINGSerialLineReceived), HEADINGsentence);
+                    int bytes = spHEADING.BytesToRead;
+                    byte[] Data = new byte[bytes];
+                    spHEADING.Read(Data, 0, 72);
+                   
+                    this.BeginInvoke(new HeadingLineReceivedEventHandler(HEADINGSerialLineReceived), Data);
+                    
                 }
                 catch (Exception ex)
                 {

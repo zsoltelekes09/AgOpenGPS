@@ -141,10 +141,10 @@ Field	Meaning
         public bool updatedGGA, updatedOGI, updatedRMC;
 
         public string rawBuffer = "";
-        public string HEADINGrawBuffer = "";
+        //public string HEADINGrawBuffer = "";
+        public byte[] HEADINGrawbuffer;
         private string[] words;
         private string nextNMEASentence = "";
-        private string nextHEADINGSentence = "";
         public string fixFrom;
 
         //UTM coordinates
@@ -175,6 +175,7 @@ Field	Meaning
         //UTM numbers are huge, these cut them way down.
         public int utmNorth, utmEast;
 
+       
         public StringBuilder logNMEASentence = new StringBuilder();
         private readonly FormGPS mf;
         public CNMEA(FormGPS f)
@@ -231,43 +232,6 @@ Field	Meaning
             return sentence;
         }
 
-        public string HParse()
-        {
-            string HEADINGsentence;
-            do
-            {
-                //double check for valid sentence
-                // Find start of next sentence
-                int start =HEADINGrawBuffer.IndexOf("$", StringComparison.Ordinal);
-                if (start == -1) return null;
-               HEADINGrawBuffer =HEADINGrawBuffer.Substring(start);
-
-                // Find end of sentence
-                int end =HEADINGrawBuffer.IndexOf("\n", StringComparison.Ordinal);
-                if (end == -1) return null;
-
-                //the NMEA sentence to be parsed
-                HEADINGsentence =HEADINGrawBuffer.Substring(0, end + 1);
-
-                //remove the processed sentence from theHEADINGrawBuffer
-               HEADINGrawBuffer =HEADINGrawBuffer.Substring(end + 1);
-            }
-
-            //if sentence has valid checksum, its all good
-            while (!ValidateChecksum(HEADINGsentence));
-
-            //do we want to log? Grab before pieces are missing
-            //if (mf.isLogNMEA )
-            //{
-            //    logNMEASentence.Append(sentence);
-            //    nmeaCntr = 0;
-            //}
-
-            // Remove trailing checksum and \r\n and return
-            HEADINGsentence = HEADINGsentence.Substring(0, HEADINGsentence.IndexOf("*", StringComparison.Ordinal));
-
-            return HEADINGsentence;
-        }
 
         public void ParseNMEA()
         {
@@ -318,52 +282,6 @@ Field	Meaning
                 if (words[0] == "$GNTRA") ParseTRA();
                 if (words[0] == "$PSTI" && words[1] == "032") ParseSTI032(); //there is also an $PSTI,030,... wich contains different data!
 
-            }// while still data
-        }
-
-
-        public void ParseHEADING()
-        {
-            if (HEADINGrawBuffer == null) return;
-           
-            //find end of a sentence
-            int cr =HEADINGrawBuffer.IndexOf("\n", StringComparison.Ordinal);
-            if (cr == -1) return; // No end found, wait for more data
-
-            // Find start of next sentence
-            int dollar =HEADINGrawBuffer.IndexOf("$", StringComparison.Ordinal);
-            if (dollar == -1) return;
-
-            //if the $ isn't first, get rid of the tail of corrupt sentence
-            if (dollar >= cr)HEADINGrawBuffer =HEADINGrawBuffer.Substring(dollar);
-
-            cr =HEADINGrawBuffer.IndexOf("\n", StringComparison.Ordinal);
-            if (cr == -1) return; // No end found, wait for more data
-            dollar =HEADINGrawBuffer.IndexOf("$", StringComparison.Ordinal);
-            if (dollar == -1) return;
-
-            //if the $ isn't first, get rid of the tail of corrupt sentence
-            if (dollar >= cr)HEADINGrawBuffer =HEADINGrawBuffer.Substring(dollar);
-
-            cr =HEADINGrawBuffer.IndexOf("\n", StringComparison.Ordinal);
-            dollar =HEADINGrawBuffer.IndexOf("$", StringComparison.Ordinal);
-            if (cr == -1 || dollar == -1) return;
-
-            //mf.recvSentenceSettings =HEADINGrawBuffer;
-
-            //now we have a complete sentence or more somewhere in the portData
-            while (true)
-            {
-                //extract the next NMEA single sentence
-                nextHEADINGSentence = HParse();
-                if (nextHEADINGSentence == null) return;
-
-                //parse them accordingly
-                words = nextHEADINGSentence.Split(',');
-                if (words.Length < 3) return;
-
-                if (words[0] == "$GPGGA" || words[0] == "$GNGGA") Console.WriteLine("Parsing Heading");
-              
             }// while still data
         }
 
@@ -773,7 +691,7 @@ Field	Meaning
         }
 
         //checks the checksum against the string
-        private void AverageTheSpeed()
+        public void AverageTheSpeed()
         {
             //average the speed
             mf.avgSpeed = (mf.avgSpeed * 0.65) + (speed * 0.35);
