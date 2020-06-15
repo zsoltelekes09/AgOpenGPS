@@ -32,10 +32,13 @@ namespace AgOpenGPS
 
         public byte checksumSent = 0;
         public byte checksumRecd = 0;
-        
-        int count=0;
+
+        int iubx;
+        bool isrelposned;
+        bool ispvt;
         byte[] ackPacket = new byte[] { 0xB5, 0x62, 0x01, 0x3C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-        
+       // byte[] relposned = new byte[72];
+        byte[] ubxdata = new byte[200];
 
         //used to decide to autoconnect autosteer arduino this run
         public bool wasAutoSteerConnectedLastRun = false;
@@ -665,75 +668,197 @@ namespace AgOpenGPS
 
        
 
-        //called by the GPS delegate every time a chunk is rec'd
-       private void HEADINGSerialLineReceived(byte[] Data)
-        
+        private void ubxparsen(byte ubx)
         {
-            Console.WriteLine("{0:X02}", x);
-            if (count < 4 && x == ackPacket[count])
+            if (ubx== '$') //nmea found
             {
-                Data[count] = x;
-                count++;
-            }
-            else if (count > 3)
-            {
-                Data[count] = x;
-                count++;
+                Console.WriteLine("Nmea found! ");
+                iubx = 0;               
+                isrelposned = false;
+                ispvt = false;
+                return;
             }
 
-         //   Console.WriteLine("{0:X02}", x);
-
-
-            if (count >71)  //Daniel P
+            if (iubx < 3 && ubx == ackPacket[iubx])  //check for messages
             {
-                count = 0;
-                Console.WriteLine("found RELPOSNED");
+              //  Console.WriteLine("Header gefunden : " + iubx);
+                ubxdata[iubx] = ubx;
+                iubx++;                                
+                return;
+            }
+
+            if(iubx==3 && ubx== 0x3C)  //found relposned
+            {
+                ubxdata[iubx] = ubx;
+                iubx++;
+                isrelposned = true;
+               // Console.WriteLine("Relposned Header found : ");
+                return;
+            }
+
+            if (iubx == 3 && ubx == 0x07) //found pvt
+            {
+                ubxdata[iubx] = ubx;
+                iubx++;
+               // Console.WriteLine("PVT Header found : ");
+                ispvt = true;
+                return;
+            }
+
+
+
+            if (iubx == 3)//  && !ispvt || !isrelposned) //remove all other messages
+            {
+                iubx = 0;
+                //Console.WriteLine("falscher Header ");
+                isrelposned = false;
+                ispvt = false;             
+                                     
+                return;
+            }
+
+            if (iubx > 3)
+            {
+                ubxdata[iubx] = ubx;
+                iubx++;
+            }
+
+            if(iubx==72 && isrelposned) //relposned found
+                                           
+            {
+                iubx = 0;
+                isrelposned = false;
+                ispvt = false;
+               // Console.WriteLine("parsing RELPOSNED");
                 int CK_A = 0;
                 int CK_B = 0;
                 for (int j = 2; j < 70; j += 1)// start with Class and end by Checksum
                 {
-                    CK_A = (CK_A + Data[j]);
-                    CK_B = (CK_B + CK_A);
+                    CK_A = (CK_A + ubxdata[j]) & 0xFF;
+                    CK_B = (CK_B + CK_A) & 0xFF;
                 }
 
-                if (Data[70] == CK_A && Data[71] == CK_B)
+                if (ubxdata[70] == CK_A && ubxdata[71] == CK_B)
                 {
-                    Console.WriteLine("Parsing data");
-                    long itow = Data[10] | (Data[11] << 8) | (Data[12] << 16) | (Data[13] << 24);
+                   // Console.WriteLine("Parsing relposned data");
+                    long itow = ubxdata[10] | (ubxdata[11] << 8) | (ubxdata[12] << 16) | (ubxdata[13] << 24);
 
-                    if (((Data[67] & 0x01) == 0x01) && (((Data[66] & 0x2D) == 0x2D) || ((Data[66] & 0x35) == 0x35)))
-                    {
-                        int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
+                    // if (((Data[67] & 0x01) == 0x01) && (((Data[66] & 0x2D) == 0x2D) || ((Data[66] & 0x35) == 0x35)))
+                    //  {
+                    float relposlength = ubxdata[26] | (ubxdata[27] << 8) | (ubxdata[28] << 16) | (ubxdata[29] << 24);//in cm!
 
-                        //   if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
-                        //  {
-                        //save dist?
-                        // ahrs.rollX16 = (int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), pn.DualAntennaDistance) / 0.27925268016f);
-                        Console.Write("Roll: ");
-                        Console.WriteLine((int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), 1) / 0.27925268016f));
+                    //   if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
+                    //  {
+                    //save dist?
+                    // ahrs.rollX16 = (int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), pn.DualAntennaDistance) / 0.27925268016f);
+                    relposlength /= 100;
 
-                        //  }
+                    Console.Write("Baseline: ");
+                    Console.WriteLine(relposlength);
 
-                        // pn.headingHDT = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
-                        Console.Write("Heading: ");
-                        Console.WriteLine((Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001);
+                    Console.Write("Roll: ");
+                    Console.WriteLine((float)(Math.Atan2(((ubxdata[22] | (ubxdata[23] << 8) | (ubxdata[24] << 16) | (ubxdata[25] << 24)) + ubxdata[40] * 0.01), relposlength) / 0.27925268016f));
 
-                        // recvSentenceSettings[3] = recvSentenceSettings[1];
-                        //  recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + (ahrs.rollX16 / 16.0).ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
-                    }
-                    else //Bad Quality
-                    {
-                        //  ahrs.rollX16 = 9999;
-                        //  pn.headingHDT = 9999;
-                        //  recvSentenceSettings[3] = recvSentenceSettings[1];
-                        // recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = 9999, Roll = 9999, itow = " + itow.ToString();
-                        Console.WriteLine("Checksum Fail");
-                    }
+                    //  }
+
+                    // pn.headingHDT = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
+                   Console.Write("Heading: ");
+                   Console.WriteLine((ubxdata[30] | (ubxdata[31] << 8) | (ubxdata[32] << 16) | (ubxdata[33] << 24)) * 0.00001);
+
+                    int flags = ubxdata[60 + 6];
+                    int carrSoln = (flags & (0b11 << 3)) >> 3;
+
+                    Console.Write("Loesung: ");
+                    if (carrSoln==2) Console.WriteLine("Fixed");
+                    if (carrSoln == 1) Console.WriteLine("Float");
+                    if (carrSoln == 0) Console.WriteLine("Not Used");
+
                 }
-                else Console.WriteLine("Checksum Fail");
+               // else Console.WriteLine("Checksum Fail");
 
 
             }
+            if (iubx == 100 && ispvt) //pvt
+
+            {
+                iubx = 0;
+                ispvt = false;
+                isrelposned = false;
+
+                int CK_A = 0;
+                int CK_B = 0;
+
+                for (int j = 2; j < 98; j += 1)// start with Class and end by Checksum
+                {
+                    CK_A = (CK_A + ubxdata[j]) & 0xFF;
+                    CK_B = (CK_B + CK_A) & 0xFF;
+                }
+
+                if (ubxdata[98] == CK_A && ubxdata[99] == CK_B)
+                {
+                    //Console.WriteLine("parsing pvt");
+                    long itow = ubxdata[6] | (ubxdata[7] << 8) | (ubxdata[8] << 16) | (ubxdata[9] << 24);
+
+                    if ((ubxdata[27] & 0x81) == 0x81)
+                    {
+                        //pn.FixQuality = 4;
+                        //  pn.EnableHeadRoll = true;
+                    }
+                    else if ((ubxdata[27] & 0x41) == 0x41)
+                    {
+                        // pn.FixQuality = 5;
+                        // pn.EnableHeadRoll = true;
+                    }
+                    else
+                    {
+                        // pn.FixQuality = 1;
+                        //pn.EnableHeadRoll = false;
+                    }
+
+                    pn.satellitesTracked = ubxdata[29];
+
+                    pn.longitude = (ubxdata[30] | (ubxdata[31] << 8) | (ubxdata[32] << 16) | (ubxdata[33] << 24)) * 0.0000001;//to deg
+                    pn.latitude = (ubxdata[34] | (ubxdata[35] << 8) | (ubxdata[36] << 16) | (ubxdata[37] << 24)) * 0.0000001;//to deg
+                    pn.altitude = (ubxdata[42] | (ubxdata[43] << 8) | (ubxdata[44] << 16) | (ubxdata[45] << 24)) * 0.001;//to meters
+
+                    pn.hdop = (ubxdata[46] | (ubxdata[47] << 8) | (ubxdata[48] << 16) | (ubxdata[49] << 24)) * 0.01;
+
+                    if (pn.longitude != 0)
+                    {
+                        // pn.ToUTM_FixConvergenceAngle();
+
+                        //  pn.speed = (ubxdata[66] | (ubxdata[67] << 8) | (ubxdata[68] << 16) | (ubxdata[69] << 24)) * 0.0036;//to km/h
+
+                        //average the speed
+                        // pn.AverageTheSpeed();
+
+                        // recvSentenceSettings[2] = recvSentenceSettings[0];
+                        //  recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                    }
+                    else
+                    {
+                        // pn.EnableHeadRoll = false;
+                        // pn.FixQuality = 0;
+                        //  recvSentenceSettings[2] = recvSentenceSettings[0];
+                        // recvSentenceSettings[0] = "$UBX-PVT, Longitude = ???, Latitude = ???, Altitude = ???, itow = " + itow.ToString();
+                    }
+
+                }
+                }
+
+        }
+
+        //called by the GPS delegate every time a chunk is rec'd
+        private void HEADINGSerialLineReceived(byte[] Data)
+        
+        {
+            int count = 0;
+            do
+            {
+                ubxparsen(Data[count]);
+                count++;
+            } while (count < Data.Length);
+
         }
 
 
@@ -748,10 +873,8 @@ namespace AgOpenGPS
                 {
                     int bytes = spHEADING.BytesToRead;
                     byte[] Data = new byte[bytes];
-                    spHEADING.Read(Data, 0, 72);
-                   
-                    this.BeginInvoke(new HeadingLineReceivedEventHandler(HEADINGSerialLineReceived), Data);
-                    
+                    spHEADING.Read(Data, 0, bytes);                    
+                    if(bytes>0) this.BeginInvoke(new HeadingLineReceivedEventHandler(HEADINGSerialLineReceived), Data);                    
                 }
                 catch (Exception ex)
                 {
