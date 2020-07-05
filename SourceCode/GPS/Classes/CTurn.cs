@@ -26,24 +26,24 @@ namespace AgOpenGPS
         }
 
         // the list of possible bounds points
-        public List<vec4> turnClosestList = new List<vec4>();
+        public List<Vec4> turnClosestList = new List<Vec4>();
 
         public int turnSelected, closestTurnNum;
 
         //generated box for finding closest point
-        public vec2 boxA = new vec2(9000, 9000), boxB = new vec2(9000, 9002);
+        public Vec2 boxA = new Vec2(9000, 9000), boxB = new Vec2(9000, 9002);
 
-        public vec2 boxC = new vec2(9001, 9001), boxD = new vec2(9002, 9003);
+        public Vec2 boxC = new Vec2(9001, 9001), boxD = new Vec2(9002, 9003);
 
         //point at the farthest turn segment from pivotAxle
-        public vec3 closestTurnPt = new vec3();
+        public Vec3 closestTurnPt = new Vec3();
 
 
-        public void FindClosestTurnPoint(bool isYouTurnRight, vec3 fromPt, double headAB)
+        public void FindClosestTurnPoint(bool isYouTurnRight, Vec3 fromPt, double headAB)
         {
             //initial scan is straight ahead of pivot point of vehicle to find the right turnLine/boundary
-            vec3 pt = new vec3();
-            vec3 rayPt = new vec3();
+            Vec3 pt = new Vec3();
+            Vec3 rayPt = new Vec3();
 
             bool isFound = false;
             int closestTurnNum = 99;
@@ -111,7 +111,7 @@ namespace AgOpenGPS
             turnClosestList.Clear();
 
             mf.turn.closestTurnNum = closestTurnNum;
-            vec4 inBox;
+            Vec4 inBox;
 
             int ptCount = turnArr[closestTurnNum].turnLine.Count;
             for (int p = 0; p < ptCount; p++)
@@ -228,7 +228,7 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count == 0) return;
             //to fill the list of line points
-            vec3 point = new vec3();
+            Vec3 point = new Vec3();
 
             //determine how wide a headland space
             double totalHeadWidth = mf.yt.triggerDistanceOffset;
@@ -252,7 +252,7 @@ namespace AgOpenGPS
                     //only add if outside actual field boundary
                     if ((j == 0 && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (j != 0 && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
                     {
-                        vec3 tPnt = new vec3(point.easting, point.northing, point.heading);
+                        Vec3 tPnt = new Vec3(point.easting, point.northing, point.heading);
                         turnArr[j].turnLine.Add(tPnt);
                     }
                 }

@@ -45,13 +45,13 @@ namespace AgOpenGPS
 
         public int shuttleListCount;
 
-        public List<vec3> mazeList = new List<vec3>();
+        public List<Vec3> mazeList = new List<Vec3>();
 
         //list of vec3 points of Dubins shortest path between 2 points - To be converted to RecPt
-        public List<vec3> shortestDubinsList = new List<vec3>();
+        public List<Vec3> shortestDubinsList = new List<Vec3>();
 
         //generated reference line
-        public vec2 refPoint1 = new vec2(1, 1), refPoint2 = new vec2(2, 2);
+        public Vec2 refPoint1 = new Vec2(1, 1), refPoint2 = new Vec2(2, 2);
 
         public double distanceFromRefLine, distanceFromCurrentLine, refLineSide = 1.0;
         private int A, B, C;
@@ -61,10 +61,10 @@ namespace AgOpenGPS
         public int lastPointFound = -1, currentPositonIndex;
 
         //pure pursuit values
-        public vec3 steerAxlePosRP = new vec3(0, 0, 0);
+        public Vec3 steerAxlePosRP = new Vec3(0, 0, 0);
 
-        public vec3 homePos = new vec3();
-        public vec2 goalPointRP = new vec2(0, 0);
+        public Vec3 homePos = new Vec3();
+        public Vec2 goalPointRP = new Vec2(0, 0);
         public double steerAngleRP, rEastRP, rNorthRP;
 
         public bool isBtnFollowOn, isEndOfTheRecLine, isRecordOn;
@@ -78,7 +78,7 @@ namespace AgOpenGPS
             if (recListCount < 5) return false;
 
             //the goal is the first point of path, the start is the current position
-            vec3 goal = new vec3(recList[0].Easting, recList[0].Northing, recList[0].Heading);
+            Vec3 goal = new Vec3(recList[0].Easting, recList[0].Northing, recList[0].Heading);
 
             //save a copy of where we started.
             homePos = mf.pivotAxlePos;
@@ -207,7 +207,7 @@ namespace AgOpenGPS
             isPausedDrivingRecordedPath = false;
         }
 
-        private void GetDubinsPath(vec3 goal)
+        private void GetDubinsPath(Vec3 goal)
         {
             CDubins.turningRadius = mf.vehicle.minTurningRadius * 1.0;
             CDubins dubPath = new CDubins();
@@ -216,7 +216,7 @@ namespace AgOpenGPS
             steerAxlePosRP = mf.pivotAxlePos;
 
             //bump it forward
-            vec3 pt2 = new vec3
+            Vec3 pt2 = new Vec3
             {
                 easting = steerAxlePosRP.easting + (Math.Sin(steerAxlePosRP.heading) * 3),
                 northing = steerAxlePosRP.northing + (Math.Cos(steerAxlePosRP.heading) * 3),

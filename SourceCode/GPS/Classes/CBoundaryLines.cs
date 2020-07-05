@@ -15,11 +15,11 @@ namespace AgOpenGPS
         }
 
         //list of coordinates of boundary line
-        public List<vec3> bndLine = new List<vec3>();
-        public List<vec3> bndArea = new List<vec3>();
+        public List<Vec3> bndLine = new List<Vec3>();
+        public List<Vec3> bndArea = new List<Vec3>();
 
         //the list of constants and multiples of the boundary
-        public List<vec2> calcList = new List<vec2>();
+        public List<Vec2> calcList = new List<Vec2>();
 
         public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
@@ -33,13 +33,13 @@ namespace AgOpenGPS
         {
             //to calc heading based on next and previous points to give an average heading.
             int cnt = bndLine.Count;
-            vec3[] arr = new vec3[cnt];
+            Vec3[] arr = new Vec3[cnt];
             cnt--;
             bndLine.CopyTo(arr);
             bndLine.Clear();
 
             //first point needs last, first, second points
-            vec3 pt3 = arr[0];
+            Vec3 pt3 = arr[0];
             pt3.heading = Math.Atan2(arr[1].easting - arr[cnt].easting, arr[1].northing - arr[cnt].northing);
             if (pt3.heading < 0) pt3.heading += Glm.twoPI;
             bndLine.Add(pt3);
@@ -98,7 +98,7 @@ namespace AgOpenGPS
                 distance = Glm.Distance(bndLine[i], bndLine[j]);
                 if (distance > spacing)
                 {
-                    vec3 pointB = new vec3((bndLine[i].easting + bndLine[j].easting) / 2.0,
+                    Vec3 pointB = new Vec3((bndLine[i].easting + bndLine[j].easting) / 2.0,
                         (bndLine[i].northing + bndLine[j].northing) / 2.0, bndLine[i].heading);
 
                     bndLine.Insert(j, pointB);
@@ -119,7 +119,7 @@ namespace AgOpenGPS
                 distance = Glm.Distance(bndLine[i], bndLine[j]);
                 if (distance > spacing)
                 {
-                    vec3 pointB = new vec3((bndLine[i].easting + bndLine[j].easting) / 2.0,
+                    Vec3 pointB = new Vec3((bndLine[i].easting + bndLine[j].easting) / 2.0,
                         (bndLine[i].northing + bndLine[j].northing) / 2.0, bndLine[i].heading);
 
                     bndLine.Insert(j, pointB);
@@ -136,7 +136,7 @@ namespace AgOpenGPS
         {
             //reverse the boundary
             int cnt = bndLine.Count;
-            vec3[] arr = new vec3[cnt];
+            Vec3[] arr = new Vec3[cnt];
             cnt--;
             bndLine.CopyTo(arr);
             bndLine.Clear();
@@ -153,7 +153,7 @@ namespace AgOpenGPS
             int j = bndLine.Count - 1;
             //clear the list, constant is easting, multiple is northing
             calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
+            Vec2 constantMultiple = new Vec2(0, 0);
 
             Northingmin = Northingmax = bndLine[0].northing;
             Eastingmin = Eastingmax = bndLine[0].easting;
@@ -184,7 +184,7 @@ namespace AgOpenGPS
             }
         }
 
-        public bool IsPointInsideBoundary(vec3 TestPoint)
+        public bool IsPointInsideBoundary(Vec3 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = bndLine.Count - 1;
@@ -205,7 +205,7 @@ namespace AgOpenGPS
             return oddNodes; //true means inside.
         }
 
-        public bool IsPointInsideBoundary(vec2 TestPoint)
+        public bool IsPointInsideBoundary(Vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = bndLine.Count - 1;
@@ -259,11 +259,11 @@ namespace AgOpenGPS
             if (ptCount < 3) return;
 
             double area2 = 0;         // Accumulates area in the loop
-            vec3 lastpoint = new vec3(bndLine[ptCount - 1].easting + (-Math.Sin(Glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), bndLine[ptCount - 1].northing + (-Math.Cos(Glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), 0);
+            Vec3 lastpoint = new Vec3(bndLine[ptCount - 1].easting + (-Math.Sin(Glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), bndLine[ptCount - 1].northing + (-Math.Cos(Glm.PIBy2 + bndLine[ptCount - 1].heading) * 5f), 0);
 
             for (int i = 0; i < ptCount; i++)
             {
-                vec3 point = new vec3(bndLine[i].easting + (-Math.Sin(Glm.PIBy2 + bndLine[i].heading) * 5f), bndLine[i].northing + (-Math.Cos(Glm.PIBy2 + bndLine[i].heading) * 5f), 0);
+                Vec3 point = new Vec3(bndLine[i].easting + (-Math.Sin(Glm.PIBy2 + bndLine[i].heading) * 5f), bndLine[i].northing + (-Math.Cos(Glm.PIBy2 + bndLine[i].heading) * 5f), 0);
                 area2 += (lastpoint.easting + point.easting) * (lastpoint.northing - point.northing);
                 lastpoint = point;
             }
@@ -291,7 +291,7 @@ namespace AgOpenGPS
             var v = new ContourVertex[ptCount];
             for (int i = 0; i < ptCount; i++)
             {
-                v[i].Position = new Vec3(bndLine[i].easting, bndLine[i].northing, 0);
+                v[i].Position = new Vec6(bndLine[i].easting, bndLine[i].northing, 0);
             }
 
             Tess _tess = new Tess();
@@ -307,7 +307,7 @@ namespace AgOpenGPS
                 {
                     int index = _tess.Elements[i * 3 + k];
                     if (index == -1) continue;
-                    bndArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
+                    bndArea.Add(new Vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
                 }
             }
         }

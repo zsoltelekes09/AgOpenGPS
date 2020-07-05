@@ -7,14 +7,14 @@ namespace AgOpenGPS
     public class CGeoFenceLines
     {
         //list of coordinates of boundary line
-        public List<vec2> geoFenceLine = new List<vec2>();
+        public List<Vec2> geoFenceLine = new List<Vec2>();
 
         //the list of constants and multiples of the boundary
-        public List<vec2> calcList = new List<vec2>();
+        public List<Vec2> calcList = new List<Vec2>();
 
         public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
-        public bool IsPointInGeoFenceArea(vec3 TestPoint)
+        public bool IsPointInGeoFenceArea(Vec3 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = geoFenceLine.Count - 1;
@@ -35,7 +35,7 @@ namespace AgOpenGPS
             return oddNodes; //true means inside.
         }
 
-        public bool IsPointInGeoFenceArea(vec2 TestPoint)
+        public bool IsPointInGeoFenceArea(Vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = geoFenceLine.Count - 1;
@@ -70,7 +70,7 @@ namespace AgOpenGPS
             GL.End();
         }
 
-        public void FixGeoFenceLine(double totalHeadWidth, List<vec3> curBnd, double spacing)
+        public void FixGeoFenceLine(double totalHeadWidth, List<Vec3> curBnd, double spacing)
         {
             //count the points from the boundary
             int lineCount = geoFenceLine.Count;
@@ -119,7 +119,7 @@ namespace AgOpenGPS
                 distance = Glm.Distance(geoFenceLine[i], geoFenceLine[j]);
                 if (distance > (spacing * 1.25))
                 {
-                    vec2 pointB = new vec2((geoFenceLine[i].easting + geoFenceLine[j].easting) / 2.0, (geoFenceLine[i].northing + geoFenceLine[j].northing) / 2.0);
+                    Vec2 pointB = new Vec2((geoFenceLine[i].easting + geoFenceLine[j].easting) / 2.0, (geoFenceLine[i].northing + geoFenceLine[j].northing) / 2.0);
 
                     geoFenceLine.Insert(j, pointB);
                     bndCount = geoFenceLine.Count;
@@ -138,7 +138,7 @@ namespace AgOpenGPS
                 int j = geoFenceLine.Count - 1;
                 //clear the list, constant is easting, multiple is northing
                 calcList.Clear();
-                vec2 constantMultiple = new vec2(0, 0);
+                Vec2 constantMultiple = new Vec2(0, 0);
 
                 Northingmin = Northingmax = geoFenceLine[0].northing;
                 Eastingmin = Eastingmax = geoFenceLine[0].easting;

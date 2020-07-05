@@ -236,6 +236,7 @@ namespace AgOpenGPS
                 {
                     curve.refList.Add(curve.curveArr[idx].curvePts[i]);
                 }
+                curve.CalculateTurnHeadings();
                 curve.isCurveSet = true;
                 yt.ResetYouTurn();
                 btnCycleLines.Text = "Cur-" + curve.numCurveLineSelected;
@@ -538,9 +539,10 @@ namespace AgOpenGPS
                 //turn section buttons all On/OFF/Auto
                 for (int j = 0; j < Tools[i].numOfSections; j++)
                 {
-                    Tools[i].section[j].IsAllowedOn = (autoBtnState != 0);
-                    Tools[i].section[j].BtnSectionState = autoBtnState;
-                    ManualBtnUpdate(i, j);
+                    Tools[i].Sections[j].IsAllowedOn = (autoBtnState != 0);
+                    Tools[i].Sections[j].BtnSectionState = autoBtnState;
+                    Tools[i].Sections[j].SectionButton.Enabled = (autoBtnState != 0);
+                    Tools[i].SectionButtonColor(j);
                 }
             }
         }
@@ -558,15 +560,15 @@ namespace AgOpenGPS
                     int sectNumber = Convert.ToInt32(words[1]);
 
                     //if auto is off just have on-off for choices of section buttons
-                    if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.Off)
+                    if (Tools[toolNumber].Sections[sectNumber].BtnSectionState == btnStates.Off)
                     {
-                        if (autoBtnState != btnStates.Auto) Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.On;
-                        else Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.Auto;
+                        if (autoBtnState != btnStates.Auto) Tools[toolNumber].Sections[sectNumber].BtnSectionState = btnStates.On;
+                        else Tools[toolNumber].Sections[sectNumber].BtnSectionState = btnStates.Auto;
                     }
-                    else if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.Auto) Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.On;
-                    else if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.On) Tools[toolNumber].section[sectNumber].BtnSectionState = btnStates.Off;
+                    else if (Tools[toolNumber].Sections[sectNumber].BtnSectionState == btnStates.Auto) Tools[toolNumber].Sections[sectNumber].BtnSectionState = btnStates.On;
+                    else if (Tools[toolNumber].Sections[sectNumber].BtnSectionState == btnStates.On) Tools[toolNumber].Sections[sectNumber].BtnSectionState = btnStates.Off;
 
-                    ManualBtnUpdate(toolNumber, sectNumber);
+                    Tools[toolNumber].SectionButtonColor(sectNumber);
                 }
             }
         }
@@ -911,18 +913,18 @@ namespace AgOpenGPS
             isFullScreen = !isFullScreen;
             if (isFullScreen)
             {
-                this.WindowState = FormWindowState.Normal;
-                //this.TopMost = true;
-                this.FormBorderStyle = FormBorderStyle.None;
-                this.WindowState = FormWindowState.Maximized;
+                WindowState = FormWindowState.Normal;
+                //TopMost = true;
+                FormBorderStyle = FormBorderStyle.None;
+                WindowState = FormWindowState.Maximized;
                 btnFullScreen.BackgroundImage = Properties.Resources.WindowNormal;
 
             }
             else
             {
-                this.TopMost = false;
-                this.FormBorderStyle = FormBorderStyle.Sizable;
-                this.WindowState = FormWindowState.Normal;
+                TopMost = false;
+                FormBorderStyle = FormBorderStyle.Sizable;
+                WindowState = FormWindowState.Normal;
                 btnFullScreen.BackgroundImage = Properties.Resources.WindowFullScreen;
 
             }
@@ -997,7 +999,7 @@ namespace AgOpenGPS
             ct.stripList?.Clear();
             ct.ptList?.Clear();
             ct.ctList?.Clear();
-            contourSaveList?.Clear();
+            ContourSaveList?.Clear();
         }
 
         private void fileExplorerToolStripItem_Click(object sender, EventArgs e)
@@ -1020,50 +1022,49 @@ namespace AgOpenGPS
             ct.stripList?.Clear();
             ct.ptList?.Clear();
             ct.ctList?.Clear();
-            contourSaveList?.Clear();
+            ContourSaveList?.Clear();
         }
 
         private void toolStripAreYouSure_Click_1(object sender, EventArgs e)
         {
             if (isJobStarted)
             {
-                if (autoBtnState == btnStates.Off)
+                DialogResult result3 = MessageBox.Show(gStr.gsDeleteAllContoursAndSections,
+                    gStr.gsDeleteForSure,
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2);
+                if (result3 == DialogResult.Yes)
                 {
-                    DialogResult result3 = MessageBox.Show(gStr.gsDeleteAllContoursAndSections,
-                        gStr.gsDeleteForSure,
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question,
-                        MessageBoxDefaultButton.Button2);
-                    if (result3 == DialogResult.Yes)
-                    {
-                        //clear out the contour Lists
-                        ct.StopContourLine(pivotAxlePos);
-                        ct.ResetContour();
-                        fd.workedAreaTotal = 0;
 
-                        for (int i = 0; i < Tools.Count; i++)
+                    for (int i = 0; i < Tools.Count; i++)
+                    {
+                        //clear the section lists
+                        for (int j = 0; j <= Tools[i].numOfSections; j++)
                         {
-                            //clear the section lists
-                            for (int j = 0; j <= Tools[i].numOfSections; j++)
+                            if (Tools[i].Sections[j].IsMappingOn)
                             {
+                                Tools[i].Sections[j].TurnMappingOff();
                                 //clean out the lists
-                                Tools[i].section[j].patchList?.Clear();
-                                Tools[i].section[j].triangleList?.Clear();
+                                Tools[i].Sections[j].triangleList?.Clear();
+                                Tools[i].Sections[j].TurnMappingOn();
                             }
                         }
-                        patchSaveList?.Clear();
+                    }
 
-                        FileCreateContour();
-                        FileCreateSections();
-                    }
-                    else
-                    {
-                        TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
-                    }
+                    //clear out the contour Lists
+                    ct.StopContourLine(pivotAxlePos);
+                    ct.ResetContour();
+                    fd.workedAreaTotal = 0;
+                    PatchSaveList?.Clear();
+                    PatchDrawList?.Clear();
+
+                    FileCreateContour();
+                    FileCreateSections();
                 }
                 else
                 {
-                   TimedMessageBox(1500, "Sections are on", "Turn Auto or Manual Off First");
+                    TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
                 }
             }
         }
@@ -1544,8 +1545,8 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
-                return;
+                //TimedMessageBox(2000, gStr.gsFieldIsOpen, gStr.gsCloseFieldFirst);
+                //return;
             }
 
             using (var form = new FormToolPicker(this))

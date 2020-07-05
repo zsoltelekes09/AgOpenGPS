@@ -144,10 +144,10 @@ Field	Meaning
 
         //UTM coordinates
         //public double northing, easting;
-        public vec2 fix = new vec2(0, 0);
+        public Vec2 fix = new Vec2(0, 0);
 
         //used to offset the antenna position to compensate for drift
-        public vec2 fixOffset = new vec2(0, 0);
+        public Vec2 fixOffset = new Vec2(0, 0);
 
         //other GIS Info
         public double altitude, speed;

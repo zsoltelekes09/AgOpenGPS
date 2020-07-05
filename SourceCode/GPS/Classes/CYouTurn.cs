@@ -50,18 +50,18 @@ namespace AgOpenGPS
         public bool isTurnCreationTooClose = false, isTurnCreationNotCrossingError = false;
 
         //pure pursuit values
-        public vec3 pivot = new vec3(0, 0, 0);
+        public Vec3 pivot = new Vec3(0, 0, 0);
 
-        public vec2 goalPointYT = new vec2(0, 0);
-        public vec2 radiusPointYT = new vec2(0, 0);
+        public Vec2 goalPointYT = new Vec2(0, 0);
+        public Vec2 radiusPointYT = new Vec2(0, 0);
         public double steerAngleYT, rEastYT, rNorthYT, ppRadiusYT;
         private int numShapePoints;
 
         //list of points for scaled and rotated YouTurn line, used for pattern, dubins, abcurve, abline
-        public List<vec3> ytList = new List<vec3>();
+        public List<Vec3> ytList = new List<Vec3>();
 
         //list of points read from file, this is the actual pattern from a bunch of sources possible
-        public List<vec2> youFileList = new List<vec2>();
+        public List<Vec2> youFileList = new List<Vec2>();
 
         //to try and pull a UTurn back in bounds
         public double turnDistanceAdjuster;
@@ -72,8 +72,8 @@ namespace AgOpenGPS
         //sequence of operations of finding the next turn 0 to 3
         public int youTurnPhase, curListCount;
 
-        public vec4 crossingCurvePoint = new vec4();
-        public vec4 crossingTurnLinePoint = new vec4();
+        public Vec4 crossingCurvePoint = new Vec4();
+        public Vec4 crossingTurnLinePoint = new Vec4();
 
         //constructor
         public CYouTurn(FormGPS _f)
@@ -105,13 +105,12 @@ namespace AgOpenGPS
             //otherwise we count down
             bool isCountingUp = mf.curve.isABSameAsVehicleHeading;
 
+            bool abc = true;
             //check if outside a border
             if (isCountingUp)
             {
                 crossingTurnLinePoint.index = 99;
 
-                //for each point in succession keep going till a turnLine is found.
-                bool abc = true;
                 for (int j = mf.curve.currentLocationIndex; j < mf.curve.currentLocationIndex || abc; j++)
                 {
                     if (!mf.turn.turnArr[0].IsPointInTurnWorkArea(mf.curve.curList[j]))
@@ -153,7 +152,6 @@ namespace AgOpenGPS
             {
                 crossingTurnLinePoint.index = 99;
 
-                bool abc = true;
                 for (int j = mf.curve.currentLocationIndex; j > mf.curve.currentLocationIndex || abc; j--)
                 {
                     if (j == -1)
@@ -240,7 +238,7 @@ namespace AgOpenGPS
 
         public void AddSequenceLines(double head)
         {
-            vec3 pt;
+            Vec3 pt;
             for (int a = 0; a < youTurnStartOffset*2; a++)
             {
                 pt.easting = ytList[0].easting + (Math.Sin(head)*0.5);
@@ -279,7 +277,7 @@ namespace AgOpenGPS
         }
 
         //list of points of collision path avoidance
-        public List<vec3> mazeList = new List<vec3>();
+        public List<Vec3> mazeList = new List<Vec3>();
 
         public bool BuildDriveAround()
         {
@@ -289,12 +287,12 @@ namespace AgOpenGPS
             double cosHead = Math.Cos(headAB);
             double sinHead = Math.Sin(headAB);
 
-            vec3 start = new vec3();
-            vec3 stop = new vec3();
-            vec3 pt2 = new vec3();
+            Vec3 start = new Vec3();
+            Vec3 stop = new Vec3();
+            Vec3 pt2 = new Vec3();
 
             //grab the pure pursuit point right on ABLine
-            vec3 onPurePoint = new vec3(mf.ABLine.rEastAB, mf.ABLine.rNorthAB, 0);
+            Vec3 onPurePoint = new Vec3(mf.ABLine.rEastAB, mf.ABLine.rNorthAB, 0);
 
             //how far are we from any geoFence
             mf.gf.FindPointsDriveAround(onPurePoint, headAB, ref start, ref stop);
@@ -329,16 +327,16 @@ namespace AgOpenGPS
                 pt2.northing = start.northing - (cosHead * mf.vehicle.minTurningRadius * 1.5);
                 pt2.heading = headAB;
 
-                List<vec3> shortestDubinsList = dubPath.GenerateDubins(pt2, mazeList[cut - 1], mf.gf);
+                List<Vec3> shortestDubinsList = dubPath.GenerateDubins(pt2, mazeList[cut - 1], mf.gf);
                 for (int i = 1; i < shortestDubinsList.Count; i++)
                 {
-                    vec3 pt = new vec3(shortestDubinsList[i].easting, shortestDubinsList[i].northing, shortestDubinsList[i].heading);
+                    Vec3 pt = new Vec3(shortestDubinsList[i].easting, shortestDubinsList[i].northing, shortestDubinsList[i].heading);
                     ytList.Add(pt);
                 }
 
                 for (int i = cut; i < mazeList.Count - cut; i++)
                 {
-                    vec3 pt = new vec3(mazeList[i].easting, mazeList[i].northing, mazeList[i].heading);
+                    Vec3 pt = new Vec3(mazeList[i].easting, mazeList[i].northing, mazeList[i].heading);
                     ytList.Add(pt);
                 }
 
@@ -350,14 +348,14 @@ namespace AgOpenGPS
 
                 for (int i = 1; i < shortestDubinsList.Count; i++)
                 {
-                    vec3 pt = new vec3(shortestDubinsList[i].easting, shortestDubinsList[i].northing, shortestDubinsList[i].heading);
+                    Vec3 pt = new Vec3(shortestDubinsList[i].easting, shortestDubinsList[i].northing, shortestDubinsList[i].heading);
                     ytList.Add(pt);
                 }
             }
 
             if (ytList.Count > 10) youTurnPhase = 3;
 
-            vec3 pt3 = new vec3();
+            Vec3 pt3 = new Vec3();
 
             for (int a = 0; a < youTurnStartOffset; a++)
             {
@@ -390,7 +388,7 @@ namespace AgOpenGPS
                 if (BuildDriveAround()) return true;
 
                 //grab the pure pursuit point right on ABLine
-                vec3 onPurePoint = new vec3(mf.ABLine.rEastAB, mf.ABLine.rNorthAB, 0);
+                Vec3 onPurePoint = new Vec3(mf.ABLine.rEastAB, mf.ABLine.rNorthAB, 0);
 
                 //how far are we from any turn boundary
                 mf.turn.FindClosestTurnPoint(isYouTurnRight, onPurePoint, head);
@@ -429,9 +427,9 @@ namespace AgOpenGPS
                 //start point of Dubins
                 rEastYT = mf.ABLine.rEastAB + (Math.Sin(head) * mf.distancePivotToTurnLine);
                 rNorthYT = mf.ABLine.rNorthAB + (Math.Cos(head) * mf.distancePivotToTurnLine);
-                var start = new vec3(rEastYT, rNorthYT, head);
+                var start = new Vec3(rEastYT, rNorthYT, head);
 
-                var goal = new vec3();
+                var goal = new Vec3();
 
                 if (!isTurnRight)//this is actualy right
                 {
@@ -479,7 +477,7 @@ namespace AgOpenGPS
                     double sinHead = Math.Sin(head);
 
                     int cnt = ytList.Count;
-                    vec3[] arr2 = new vec3[cnt];
+                    Vec3[] arr2 = new Vec3[cnt];
 
                     ytList.CopyTo(arr2);
                     ytList.Clear();
@@ -539,7 +537,7 @@ namespace AgOpenGPS
             if (!mf.ABLine.isABSameAsVehicleHeading) headAB += Math.PI;
 
             //grab the pure pursuit point right on ABLine
-            vec3 onPurePoint = new vec3(mf.ABLine.rEastAB, mf.ABLine.rNorthAB, 0);
+            Vec3 onPurePoint = new Vec3(mf.ABLine.rEastAB, mf.ABLine.rNorthAB, 0);
 
             //how far are we from any turn boundary
             mf.turn.FindClosestTurnPoint(isYouTurnRight, onPurePoint, headAB);
@@ -575,7 +573,7 @@ namespace AgOpenGPS
 
             //Pattern Turn
             numShapePoints = youFileList.Count;
-            vec3[] pt = new vec3[numShapePoints];
+            Vec3[] pt = new Vec3[numShapePoints];
 
             //Now put the shape into an array since lists are immutable
             for (int i = 0; i < numShapePoints; i++)
@@ -649,7 +647,7 @@ namespace AgOpenGPS
 
             head += Math.PI;
 
-            vec3 ptt;
+            Vec3 ptt;
             for (int a = 0; a < youTurnStartOffset; a++)
             {
                 ptt.easting = ytList[0].easting + (Math.Sin(head));
@@ -762,12 +760,11 @@ namespace AgOpenGPS
             return isOutOfBounds;
         }
 
-        public bool BuildCurvePatternYouTurn(bool isTurnRight, vec3 pivotPos)
+        public bool BuildCurvePatternYouTurn(bool isTurnRight, Vec3 pivotPos)
         {
             if (youTurnPhase > 0)
             {
                 ytList.Clear();
-                double delta = mf.curve.deltaOfRefAndAveHeadings;
 
                 double head = crossingCurvePoint.heading;
                 if (!mf.curve.isABSameAsVehicleHeading) head += Math.PI;
@@ -782,12 +779,9 @@ namespace AgOpenGPS
                 if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap - toolOffset);
                 else turnOffset = (mf.Tools[0].WidthMinusOverlap + toolOffset);
 
-                //to compensate for AB Curve overlap
-                turnOffset *= delta;
-
                 //Pattern Turn
                 numShapePoints = youFileList.Count;
-                vec3[] pt = new vec3[numShapePoints];
+                Vec3[] pt = new Vec3[numShapePoints];
 
                 //Now put the shape into an array since lists are immutable
                 for (int i = 0; i < numShapePoints; i++)
@@ -838,7 +832,7 @@ namespace AgOpenGPS
                 //pattern all made now is it outside a boundary
                 head -= Math.PI;
 
-                vec3 ptt;
+                Vec3 ptt;
                 for (int a = 0; a < youTurnStartOffset; a++)
                 {
                     ptt.easting = ytList[0].easting + (Math.Sin(head));
@@ -973,7 +967,7 @@ namespace AgOpenGPS
             return true;
         }
 
-        public bool BuildCurveDubinsYouTurn(bool isTurnRight, vec3 pivotPos)
+        public bool BuildCurveDubinsYouTurn(bool isTurnRight, Vec3 pivotPos)
         {
             if (youTurnPhase > 0)
             {
@@ -981,7 +975,6 @@ namespace AgOpenGPS
 
                 double head = crossingCurvePoint.heading;
                 if (!isABSameAsFixHeading) head += Math.PI;
-                double delta = mf.curve.deltaOfRefAndAveHeadings;
 
                 boundaryAngleOffPerpendicular = Glm.PIBy2 + (crossingTurnLinePoint.heading - head);
                 if (boundaryAngleOffPerpendicular > Math.PI) boundaryAngleOffPerpendicular -= Glm.twoPI;
@@ -994,14 +987,14 @@ namespace AgOpenGPS
                 double turnOffset;
 
                 //calculate the true width
-                if (isTurnRight) turnOffset = delta * ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) - toolOffset);
-                else turnOffset = delta * ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) + toolOffset);
+                if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) - toolOffset;
+                else turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) + toolOffset;
 
                 //diagonally across
                 double turnRadius = turnOffset * Math.Tan(boundaryAngleOffPerpendicular);
-                var start = new vec3(crossingCurvePoint.easting, crossingCurvePoint.northing, head);
+                var start = new Vec3(crossingCurvePoint.easting, crossingCurvePoint.northing, head);
 
-                var goal = new vec3();
+                var goal = new Vec3();
                 if (!isTurnRight)//this is actualy right
                 {
 
@@ -1213,7 +1206,7 @@ namespace AgOpenGPS
 
                         if (points > 0)
                         {
-                            vec2 coords = new vec2();
+                            Vec2 coords = new Vec2();
                             for (int v = 0; v < points; v++)
                             {
                                 line = reader.ReadLine();
@@ -1307,8 +1300,8 @@ namespace AgOpenGPS
             rNorthYT += (Math.Cos(head) * 2);
 
             //now we have our start point
-            var start = new vec3(rEastYT, rNorthYT, head);
-            var goal = new vec3();
+            var start = new Vec3(rEastYT, rNorthYT, head);
+            var goal = new Vec3();
 
 
             //now we go the other way to turn round
@@ -1334,7 +1327,7 @@ namespace AgOpenGPS
             //generate the turn points
             ytList = dubYouTurnPath.GenerateDubins(start, goal);
 
-            vec3 pt;
+            Vec3 pt;
             for (int a = 0; a < 3; a++)
             {
                 pt.easting = ytList[0].easting + (Math.Sin(head));

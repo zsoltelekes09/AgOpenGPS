@@ -39,7 +39,7 @@ namespace AgOpenGPS
 
             int numShapePoints = mf.yt.youFileList.Count;
             int i;
-            vec2[] pt = new vec2[numShapePoints];
+            Vec2[] pt = new Vec2[numShapePoints];
 
             //put the driven list into an array
             for (i = 0; i < numShapePoints; i++)

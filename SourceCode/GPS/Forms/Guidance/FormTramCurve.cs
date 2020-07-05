@@ -186,7 +186,7 @@ namespace AgOpenGPS
             {
                 mf.curve.refList.Reverse();
 
-                vec3[] arr = new vec3[cnt];
+                Vec3[] arr = new Vec3[cnt];
                 cnt--;
                 mf.curve.refList.CopyTo(arr);
                 mf.curve.refList.Clear();
@@ -195,7 +195,7 @@ namespace AgOpenGPS
 
                 for (int i = 1; i < cnt; i++)
                 {
-                    vec3 pt3 = arr[i];
+                    Vec3 pt3 = arr[i];
                     pt3.heading += Math.PI;
                     pt3.heading %= Glm.twoPI;
                     if (pt3.heading < 0) pt3.heading += Glm.twoPI;

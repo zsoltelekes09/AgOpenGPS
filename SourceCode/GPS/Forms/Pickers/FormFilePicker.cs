@@ -96,7 +96,7 @@ namespace AgOpenGPS
                 filename = dir + "\\Boundary.txt";
                 if (File.Exists(filename))
                 {
-                    List<vec3> pointList = new List<vec3>();
+                    List<Vec3> pointList = new List<Vec3>();
                     double area = 0;
 
                     using (StreamReader reader = new StreamReader(filename))
@@ -132,7 +132,7 @@ namespace AgOpenGPS
                                     {
                                         line = reader.ReadLine();
                                         string[] words = line.Split(',');
-                                        vec3 vecPt = new vec3(
+                                        Vec3 vecPt = new Vec3(
                                         double.Parse(words[0], CultureInfo.InvariantCulture),
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
                                         double.Parse(words[2], CultureInfo.InvariantCulture));

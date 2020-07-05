@@ -5,7 +5,6 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -26,17 +25,10 @@ namespace AgOpenGPS
         #region // Class Props and instances
 
         //list of vec3 points of Dubins shortest path between 2 points - To be converted to RecPt
-        public List<vec3> flagDubinsList = new List<vec3>();
-
+        public List<Vec3> flagDubinsList = new List<Vec3>();
 
         //How many youturn functions
         public const int MAXFUNCTIONS = 8;
-
-        //How many boundaries allowed
-        public const int MAXBOUNDARIES = 6;
-
-        //How many headlands allowed
-        public const int MAXHEADS = 6;
 
         //The base directory where AgOpenGPS will be stored and fields and vehicles branch from
         public string baseDirectory;
@@ -289,7 +281,7 @@ namespace AgOpenGPS
             stripSectionColor.Text = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
 
             //NTRIP
-            this.lblWatch.Text = "Wait GPS";
+            lblWatch.Text = "Wait GPS";
             NTRIPStartStopStrip.Text = gStr.gsNTRIPOff;
 
             //build the gesture structures
@@ -304,7 +296,6 @@ namespace AgOpenGPS
             Tools.Add(new CTool(this, Tools.Count));
 
             //Tools.Add(new CTool(this, Tools.Count));
-
 
             //our NMEA parser
             pn = new CNMEA(this);
@@ -397,7 +388,7 @@ namespace AgOpenGPS
         //Initialize items before the form Loads or is visible
         private void FormGPS_Load(object sender, EventArgs e)
         {
-            this.MouseWheel += ZoomByMouseWheel;
+            MouseWheel += ZoomByMouseWheel;
 
 
             if (Settings.Default.setF_workingDirectory == "Default")
@@ -1155,32 +1146,30 @@ namespace AgOpenGPS
 
         public void KeypadToNUD(NumericUpDown sender)
         {
-            NumericUpDown nud = (NumericUpDown)sender;
-            nud.BackColor = System.Drawing.Color.Red;
-            using (var form = new FormNumeric((double)nud.Minimum, (double)nud.Maximum, (double)nud.Value))
+            sender.BackColor = Color.Red;
+            using (var form = new FormNumeric((double)sender.Minimum, (double)sender.Maximum, (double)sender.Value))
             {
                 var result = form.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    nud.Value = (decimal)form.ReturnValue;
+                    sender.Value = (decimal)form.ReturnValue;
                 }
             }
-            nud.BackColor = System.Drawing.Color.AliceBlue;
+            sender.BackColor = Color.AliceBlue;
         }
 
         public void KeyboardToText(TextBox sender)
         {
-            TextBox tbox = (TextBox)sender;
-            tbox.BackColor = System.Drawing.Color.Red;
-            using (var form = new FormKeyboard((string)tbox.Text))
+            sender.BackColor = Color.Red;
+            using (var form = new FormKeyboard(sender.Text))
             {
                 var result = form.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    tbox.Text = (string)form.ReturnString;
+                    sender.Text = form.ReturnString;
                 }
             }
-            tbox.BackColor = System.Drawing.Color.AliceBlue;
+            sender.BackColor = Color.AliceBlue;
         }
 
 
@@ -1263,142 +1252,44 @@ namespace AgOpenGPS
         {
             for (int i = 0; i < Tools.Count; i++)
             {
-
-                Tools[i].section[0].positionLeft = (double)Vehicle.Default.setSection_position1 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[0].positionRight = (double)Vehicle.Default.setSection_position2 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[1].positionLeft = (double)Vehicle.Default.setSection_position2 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[1].positionRight = (double)Vehicle.Default.setSection_position3 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[2].positionLeft = (double)Vehicle.Default.setSection_position3 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[2].positionRight = (double)Vehicle.Default.setSection_position4 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[3].positionLeft = (double)Vehicle.Default.setSection_position4 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[3].positionRight = (double)Vehicle.Default.setSection_position5 + Vehicle.Default.setVehicle_toolOffset;
-                /*
-                Tools[i].section[4].positionLeft = (double)Vehicle.Default.setSection_position5 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[4].positionRight = (double)Vehicle.Default.setSection_position6 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[5].positionLeft = (double)Vehicle.Default.setSection_position6 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[5].positionRight = (double)Vehicle.Default.setSection_position7 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[6].positionLeft = (double)Vehicle.Default.setSection_position7 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[6].positionRight = (double)Vehicle.Default.setSection_position8 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[7].positionLeft = (double)Vehicle.Default.setSection_position8 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[7].positionRight = (double)Vehicle.Default.setSection_position9 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[8].positionLeft = (double)Vehicle.Default.setSection_position9 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[8].positionRight = (double)Vehicle.Default.setSection_position10 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[9].positionLeft = (double)Vehicle.Default.setSection_position10 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[9].positionRight = (double)Vehicle.Default.setSection_position11 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[10].positionLeft = (double)Vehicle.Default.setSection_position11 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[10].positionRight = (double)Vehicle.Default.setSection_position12 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[11].positionLeft = (double)Vehicle.Default.setSection_position12 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[11].positionRight = (double)Vehicle.Default.setSection_position13 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[12].positionLeft = (double)Vehicle.Default.setSection_position13 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[12].positionRight = (double)Vehicle.Default.setSection_position14 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[13].positionLeft = (double)Vehicle.Default.setSection_position14 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[13].positionRight = (double)Vehicle.Default.setSection_position15 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[14].positionLeft = (double)Vehicle.Default.setSection_position15 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[14].positionRight = (double)Vehicle.Default.setSection_position16 + Vehicle.Default.setVehicle_toolOffset;
-
-                Tools[i].section[15].positionLeft = (double)Vehicle.Default.setSection_position16 + Vehicle.Default.setVehicle_toolOffset;
-                Tools[i].section[15].positionRight = (double)Vehicle.Default.setSection_position17 + Vehicle.Default.setVehicle_toolOffset;
-
-    */
-
-                for (int j = 0; j <= Tools[i].numOfSections; j++)
+                if (Tools[i].numOfSections > 0)
                 {
-                    Tools[i].section[j].sectionWidth = Tools[i].section[j].positionRight - Tools[i].section[j].positionLeft;
-                    Tools[i].section[j].rpSectionPosition = 250 + (int)Math.Round(Tools[i].section[j].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
-                    Tools[i].section[j].rpSectionWidth = (int)Math.Round(Tools[i].section[j].sectionWidth * 10, 0, MidpointRounding.AwayFromZero);
+                    if (Vehicle.Default.Section_position == null)
+                    {
+                        Vehicle.Default.Section_position = new List<decimal>();
+                        for (int j = -50; j < 51; j++)
+                        {
+                            Vehicle.Default.Section_position.Add(j);
+                        }
+                        Vehicle.Default.Save();
+                    }
+                        
+                    for (int j = 0; j < Tools[i].numOfSections; j++)
+                    {
+
+                        Tools[i].Sections[j].positionLeft = Convert.ToDouble(Vehicle.Default.Section_position[j]) + Vehicle.Default.setVehicle_toolOffset;
+                        Tools[i].Sections[j].positionRight = Convert.ToDouble(Vehicle.Default.Section_position[j + 1]) + Vehicle.Default.setVehicle_toolOffset;
+
+
+                        Tools[i].Sections[j].sectionWidth = Tools[i].Sections[j].positionRight - Tools[i].Sections[j].positionLeft;
+                        Tools[i].Sections[j].rpSectionPosition = 375 + (int)Math.Round(Tools[i].Sections[j].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
+                        Tools[i].Sections[j].rpSectionWidth = (int)Math.Round(Tools[i].Sections[j].sectionWidth * 10, 0, MidpointRounding.AwayFromZero);
+                    }
+
+                    //calculate tool width based on extreme right and left values
+                    Tools[i].ToolWidth = Math.Abs(Tools[i].Sections[Tools[i].numOfSections - 1].positionRight - Tools[i].Sections[0].positionLeft);
+
+
+                    //now do the full width section
+                    Tools[i].Sections[Tools[i].numOfSections].sectionWidth = Tools[i].ToolWidth;
+                    Tools[i].Sections[Tools[i].numOfSections].positionLeft = Tools[i].Sections[0].positionLeft;
+                    Tools[i].Sections[Tools[i].numOfSections].positionRight = Tools[i].Sections[Tools[i].numOfSections - 1].positionRight;
+
+                    //find the right side pixel position
+                    Tools[i].rpXPosition = 375 + (int)(Math.Round(Tools[i].Sections[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
+                    Tools[i].rpWidth = (int)(Math.Round(Tools[i].ToolWidth * 10, 0, MidpointRounding.AwayFromZero));
                 }
-
-                //calculate tool width based on extreme right and left values
-                Tools[i].ToolWidth = Math.Abs(Tools[i].section[Tools[i].numOfSections - 1].positionRight - Tools[i].section[0].positionLeft);
-
-
-                //now do the full width section
-                Tools[i].section[Tools[i].numOfSections].sectionWidth = Tools[i].ToolWidth;
-                Tools[i].section[Tools[i].numOfSections].positionLeft = Tools[i].section[0].positionLeft;
-                Tools[i].section[Tools[i].numOfSections].positionRight = Tools[i].section[Tools[i].numOfSections - 1].positionRight;
-
-                //find the right side pixel position
-                Tools[i].rpXPosition = 250 + (int)(Math.Round(Tools[i].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
-                Tools[i].rpWidth = (int)(Math.Round(Tools[i].ToolWidth * 10, 0, MidpointRounding.AwayFromZero));
             }
-
-            if (Tools.Count > 1)
-            {
-                Tools[0].hitchLength = 3.00;
-                Tools[0].isToolTBT = false;
-                Tools[0].isToolTrailing = false;
-                Tools[0].isToolBehindPivot = false;
-                Tools[0].numOfSections = 1;
-                Tools[0].section[0].positionLeft = -1.5;
-                Tools[0].section[0].positionRight = 1.5;
-
-                Tools[0].section[0].rpSectionWidth = 30;
-
-                Tools[0].section[0].sectionWidth = 3.0;
-
-                Tools[0].rpXPosition = 250 + (int)(Math.Round(Tools[0].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
-                Tools[0].rpWidth = (int)(Math.Round(Tools[0].ToolWidth * 10, 0, MidpointRounding.AwayFromZero));
-
-
-                Tools[0].section[0].rpSectionPosition = 250 + (int)Math.Round(Tools[0].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
-
-
-                Tools[0].WidthMinusOverlap = 8.80;
-                Tools[0].ToolWidth = 8.80;
-                Tools[0].ToolOffset = 0;
-
-
-
-
-
-
-                Tools[1].hitchLength = -0.50;
-
-                Tools[1].isToolTBT = false;
-                Tools[1].toolTankTrailingHitchLength = -2.00;
-
-                Tools[1].isToolTrailing = false;
-                Tools[1].toolTrailingHitchLength = -2.00;
-
-                Tools[1].isToolBehindPivot = true;
-                Tools[1].numOfSections = 2;
-                Tools[1].ToolWidth = 8.8;
-                Tools[1].ToolOffset = 0;
-                Tools[1].section[0].positionLeft = -4.4;
-                Tools[1].section[0].positionRight = -1.4;
-                Tools[1].section[1].positionLeft = 1.4;
-                Tools[1].section[1].positionRight = 4.4;
-
-
-
-                Tools[1].section[0].sectionWidth = 3;
-                Tools[1].section[1].sectionWidth = 3;
-                Tools[1].rpXPosition = 250 + (int)(Math.Round(Tools[1].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
-                Tools[1].rpWidth = (int)(Math.Round(Tools[1].ToolWidth * 10, 0, MidpointRounding.AwayFromZero));
-
-                Tools[1].section[0].rpSectionPosition = 250 + (int)Math.Round(Tools[1].section[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
-                Tools[1].section[1].rpSectionPosition = 250 + (int)Math.Round(Tools[1].section[1].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
-
-
-            }
-
-
-
-
-
         }
 
         //request a new job
@@ -1410,8 +1301,6 @@ namespace AgOpenGPS
                 oglZoom.Width = 300;
                 oglZoom.Height = 300;
             }
-
-                //SendSteerSettingsOutAutoSteerPort();
             isJobStarted = true;
 
             btnManualSection.Enabled = true;
@@ -1419,18 +1308,6 @@ namespace AgOpenGPS
 
             autoBtnState = btnStates.Off;
             btnSection_Update();
-
-
-            for (int i = 0; i < Tools.Count; i++)
-            {
-                for (int j = 0; j < Tools[i].numOfSections; j++)
-                {
-                    Tools[i].section[j].SectionButton.BackColor = Color.Red;
-                    Tools[i].section[j].SectionButton.Enabled = true;
-                }
-            }
-
-
 
 
             btnABLine.Enabled = true;
@@ -1455,7 +1332,7 @@ namespace AgOpenGPS
             LineUpManualBtns();
 
             //update the menu
-            this.menustripLanguage.Enabled = false;
+            menustripLanguage.Enabled = false;
             layoutPanelRight.Enabled = true;
             //boundaryToolStripBtn.Enabled = true;
             toolStripBtnDropDownBoundaryTools.Enabled = true;
@@ -1507,12 +1384,8 @@ namespace AgOpenGPS
             {
                 for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
-                    //turn section buttons all OFF
-                    Tools[i].section[j].SectionButton.Enabled = false;
-                    Tools[i].section[j].SectionButton.BackColor = Color.Silver;
                     //clear the section lists
-                    Tools[i].section[j].patchList?.Clear();
-                    Tools[i].section[j].triangleList?.Clear();
+                    Tools[i].Sections[j].triangleList?.Clear();
                 }
             }
 
@@ -1677,50 +1550,49 @@ namespace AgOpenGPS
                 for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
                     //SECTIONS - 
-                    if (Tools[i].section[j].SectionOnRequest)
+                    if (Tools[i].Sections[j].SectionOnRequest)
                     {
-                        Tools[i].section[j].IsSectionOn = true;
-                        Tools[i].section[j].SectionOverlapTimer = (int)(fixUpdateHz * Tools[i].TurnOffDelay + 1);
+                        Tools[i].Sections[j].IsSectionOn = true;
+                        Tools[i].Sections[j].SectionOverlapTimer = (int)(fixUpdateHz * Tools[i].TurnOffDelay + 1);
 
-                        if (Tools[i].section[j].MappingOnTimer == 0) Tools[i].section[j].MappingOnTimer = (int)(fixUpdateHz * Tools[i].MappingOnDelay + 1);
+                        if (Tools[i].Sections[j].MappingOnTimer == 0) Tools[i].Sections[j].MappingOnTimer = (int)(fixUpdateHz * Tools[i].MappingOnDelay + 1);
                     }
                     else
                     {
-                        if (Tools[i].section[j].SectionOverlapTimer > 0) Tools[i].section[j].SectionOverlapTimer--;
-                        if (Tools[i].section[j].IsSectionOn && Tools[i].section[j].SectionOverlapTimer == 0)
+                        if (Tools[i].Sections[j].SectionOverlapTimer > 0) Tools[i].Sections[j].SectionOverlapTimer--;
+                        if (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].SectionOverlapTimer == 0)
                         {
-                            Tools[i].section[j].IsSectionOn = false;
+                            Tools[i].Sections[j].IsSectionOn = false;
                         }
                     }
 
                     //MAPPING -
-                    if (!Tools[i].section[j].IsMappingOn && isMapping && Tools[i].section[j].MappingOnTimer > 0)
+                    if (!Tools[i].Sections[j].IsMappingOn && isMapping && Tools[i].Sections[j].MappingOnTimer > 0)
                     {
-                        if (Tools[i].section[j].MappingOnTimer > 0) Tools[i].section[j].MappingOnTimer--;
-                        if (Tools[i].section[j].MappingOnTimer == 0)
+                        if (Tools[i].Sections[j].MappingOnTimer > 0) Tools[i].Sections[j].MappingOnTimer--;
+                        if (Tools[i].Sections[j].MappingOnTimer == 0)
                         {
-                            Tools[i].section[j].TurnMappingOn();
+                            Tools[i].Sections[j].TurnMappingOn();
                         }
                     }
 
-                    if (Tools[i].section[j].IsSectionOn)
+                    if (Tools[i].Sections[j].IsSectionOn)
                     {
-                        Tools[i].section[j].MappingOffTimer = (int)(Tools[i].MappingOffDelay * fixUpdateHz + 1);
+                        Tools[i].Sections[j].MappingOffTimer = (int)(Tools[i].MappingOffDelay * fixUpdateHz + 1);
                     }
                     else
                     {
-                        if (Tools[i].section[j].MappingOffTimer > 0) Tools[i].section[j].MappingOffTimer--;
-                        if (Tools[i].section[j].MappingOffTimer == 0)
+                        if (Tools[i].Sections[j].MappingOffTimer > 0) Tools[i].Sections[j].MappingOffTimer--;
+                        if (Tools[i].Sections[j].MappingOffTimer == 0)
                         {
-                            if (Tools[i].section[j].IsMappingOn)
+                            if (Tools[i].Sections[j].IsMappingOn)
                             {
-                                Tools[i].section[j].TurnMappingOff();
-                                Tools[i].section[j].MappingOnTimer = 0;
+                                Tools[i].Sections[j].TurnMappingOff();
+                                Tools[i].Sections[j].MappingOnTimer = 0;
                             }
                         }
                     }
                 }
-
 
 
                 #region notes
@@ -1925,11 +1797,12 @@ namespace AgOpenGPS
             {
                 for (int j = 0; j <= Tools[i].numOfSections; j++)
                 {
-                    if (Tools[i].section[j].IsMappingOn) Tools[i].section[j].TurnMappingOff();
-                    Tools[i].section[j].SectionOnRequest = false;
+                    if (Tools[i].Sections[j].IsMappingOn) Tools[i].Sections[j].TurnMappingOff();
+                    Tools[i].Sections[j].SectionOnRequest = false;
                 }
             }
 
+            PatchDrawList.Clear();
             //FileSaveHeadland();
 
             FileSaveSections();

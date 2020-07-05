@@ -41,8 +41,7 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             GL.Viewport(0, 0, oglMain.Width, oglMain.Height);
-            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView((float)fovy, (float)oglMain.Width / (float)oglMain.Height,
-                10.0f, (float)(camDistanceFactor * camera.camSetDistance));
+            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView((float)fovy, oglMain.AspectRatio, 10.0f, (float)(camDistanceFactor * camera.camSetDistance));
             GL.LoadMatrix(ref mat);
             GL.MatrixMode(MatrixMode.Modelview);
         }
@@ -68,9 +67,9 @@ namespace AgOpenGPS
                 //back the camera up
                 camera.camSetDistance = -40;
                 SetZoom();
-                GL.Translate(0.0, 0.0, -20);
+                GL.Translate(0, 0, -20);
                 //rotate the camera down to look at fix
-                GL.Rotate(-60, 1.0, 0.0, 0.0);
+                GL.Rotate(-60, 1, 0, 0);
 
                 camHeading = 0;
 
@@ -87,11 +86,11 @@ namespace AgOpenGPS
                 GL.End();                       // Done Drawing Reticle
 
                 GL.Rotate(deadCam + 90, 0.0, 0.0, 1.0);
-                font.DrawText3D(0, 0, "  I'm Lost  ", 1);
+                font.DrawText3D(0, 0, "  I'm Lost  ");
                 GL.Color3(0.98f, 0.98f, 0.70f);
 
                 GL.Rotate(deadCam + 180, 0.0, 0.0, 1.0);
-                font.DrawText3D(0, 0, "   No GPS   ", 1);
+                font.DrawText3D(0, 0, "   No GPS   ");
 
 
                 // 2D Ortho ---------------------------------------////////-------------------------------------------------
@@ -185,8 +184,8 @@ namespace AgOpenGPS
                     //  Clear the color and depth buffer.
                     GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
 
-                    if (isDay) GL.ClearColor(0.27f, 0.4f, 0.7f, 1.0f);
-                    else GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                    if (isDay) GL.ClearColor(0.27f, 0.4f, 0.7f, 1);
+                    else GL.ClearColor(0, 0, 0, 1);
 
                     GL.LoadIdentity();
 
@@ -195,6 +194,8 @@ namespace AgOpenGPS
 
                     //the bounding box of the camera for cullling.
                     CalcFrustum();
+
+
                     worldGrid.DrawFieldSurface();
 
                     ////if grid is on draw it
@@ -209,139 +210,93 @@ namespace AgOpenGPS
                     GL.Enable(EnableCap.Blend);
                     //draw patches of sections
 
-                    for (int i = 0; i < Tools.Count; i++)
+                    //check if in frustum or not
+                    bool isDraw;
+
+                    //initialize the steps for mipmap of triangles (skipping detail while zooming out)
+                    int mipmap = 0;
+                    if (camera.camSetDistance < -800) mipmap = 2;
+                    if (camera.camSetDistance < -1500) mipmap = 4;
+                    if (camera.camSetDistance < -2400) mipmap = 8;
+                    if (camera.camSetDistance < -5000) mipmap = 16;
+
+                    //for every new chunk of patch
+                    foreach (var triList in PatchDrawList)
                     {
-                        for (int j = 0; j <= Tools[i].numOfSections; j++)
+                        isDraw = true;
+                        int count2 = triList.Count;
+                        for (int k = 1; k < count2; k += 3)
                         {
-                            //every time the section turns off and on is a new patch
+                            //determine if point is in frustum or not, if < 0, its outside so abort, z always is 0                            
+                            if (frustum[0] * triList[k].easting + frustum[1] * triList[k].northing + frustum[3] <= 0)
+                                continue;//right
+                            if (frustum[4] * triList[k].easting + frustum[5] * triList[k].northing + frustum[7] <= 0)
+                                continue;//left
+                            if (frustum[16] * triList[k].easting + frustum[17] * triList[k].northing + frustum[19] <= 0)
+                                continue;//bottom
+                            if (frustum[20] * triList[k].easting + frustum[21] * triList[k].northing + frustum[23] <= 0)
+                                continue;//top
+                            if (frustum[8] * triList[k].easting + frustum[9] * triList[k].northing + frustum[11] <= 0)
+                                continue;//far
+                            if (frustum[12] * triList[k].easting + frustum[13] * triList[k].northing + frustum[15] <= 0)
+                                continue;//near
 
-                            //check if in frustum or not
-                            bool isDraw;
-
-                            int patches = Tools[i].section[j].patchList.Count;
-
-                            if (patches > 0)
-                            {
-                                //initialize the steps for mipmap of triangles (skipping detail while zooming out)
-                                int mipmap = 0;
-                                if (camera.camSetDistance < -800) mipmap = 2;
-                                if (camera.camSetDistance < -1500) mipmap = 4;
-                                if (camera.camSetDistance < -2400) mipmap = 8;
-                                if (camera.camSetDistance < -5000) mipmap = 16;
-
-                                //for every new chunk of patch
-                                foreach (var triList in Tools[i].section[j].patchList)
-                                {
-                                    isDraw = false;
-                                    int count2 = triList.Count;
-                                    for (int k = 1; k < count2; k += 3)
-                                    {
-                                        //determine if point is in frustum or not, if < 0, its outside so abort, z always is 0                            
-                                        if (frustum[0] * triList[k].easting + frustum[1] * triList[k].northing + frustum[3] <= 0)
-                                            continue;//right
-                                        if (frustum[4] * triList[k].easting + frustum[5] * triList[k].northing + frustum[7] <= 0)
-                                            continue;//left
-                                        if (frustum[16] * triList[k].easting + frustum[17] * triList[k].northing + frustum[19] <= 0)
-                                            continue;//bottom
-                                        if (frustum[20] * triList[k].easting + frustum[21] * triList[k].northing + frustum[23] <= 0)
-                                            continue;//top
-                                        if (frustum[8] * triList[k].easting + frustum[9] * triList[k].northing + frustum[11] <= 0)
-                                            continue;//far
-                                        if (frustum[12] * triList[k].easting + frustum[13] * triList[k].northing + frustum[15] <= 0)
-                                            continue;//near
-
-                                        //point is in frustum so draw the entire patch. The downside of triangle strips.
-                                        isDraw = true;
-                                        break;
-                                    }
-
-                                    if (isDraw)
-                                    {
-
-                                        count2 = triList.Count;
-                                        //GL.Color4((byte)(count2), (byte)(count2*2), (byte)(count2*4), (byte)152);
-                                        //draw the triangle in each triangle strip
-                                        GL.Begin(PrimitiveType.TriangleStrip);
-
-                                        if (isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
-                                        else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
-
-                                        //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                                        if (count2 >= (mipmap + 2))
-                                        {
-                                            int step = mipmap;
-                                            for (int k = 1; k < count2; k += step)
-                                            {
-                                                GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                                GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                                if (count2 - k <= (mipmap + 2)) step = 0;//too small to mipmap it
-                                            }
-                                        }
-                                        else { for (int k = 1; k < count2; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
-                                        GL.End();
-                                    }
-                                }
-                            }
+                            //point is in frustum so draw the entire patch. The downside of triangle strips.
+                            isDraw = true;
+                            break;
                         }
 
-
-                        // the follow up to sections patches
-                        int patchCount = 0;
-
-                        if (isDay) GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)152);
-                        else GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)(152 * 0.5));
-
-                        if (Tools[i].section[Tools[i].numOfSections].IsMappingOn && Tools[i].section[Tools[i].numOfSections].patchList.Count > 0)
+                        if (isDraw)
                         {
-                            patchCount = Tools[i].section[Tools[i].numOfSections].patchList.Count;
+                            count2 = triList.Count;
                             //draw the triangle in each triangle strip
                             GL.Begin(PrimitiveType.TriangleStrip);
 
-                            //left side of triangle
-                            vec2 pt = new vec2((Tools[i].cosSectionHeading * Tools[i].section[Tools[i].numOfSections].positionLeft) + Tools[i].toolPos.easting,
-                                    (Tools[i].sinSectionHeading * Tools[i].section[Tools[i].numOfSections].positionLeft) + Tools[i].toolPos.northing);
+                            if (isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
+                            else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
 
-                            GL.Vertex3(pt.easting, pt.northing, 0);
-
-                            //Right side of triangle
-                            pt = new vec2((Tools[i].cosSectionHeading * Tools[i].section[Tools[i].numOfSections].positionRight) + Tools[i].toolPos.easting,
-                               (Tools[i].sinSectionHeading * Tools[i].section[Tools[i].numOfSections].positionRight) + Tools[i].toolPos.northing);
-
-                            GL.Vertex3(pt.easting, pt.northing, 0);
-
-                            int last = Tools[i].section[Tools[i].numOfSections].patchList[patchCount - 1].Count;
-                            //antenna
-
-                            GL.Vertex3(Tools[i].section[Tools[i].numOfSections].patchList[patchCount - 1][last - 2].easting, Tools[i].section[Tools[i].numOfSections].patchList[patchCount - 1][last - 2].northing, 0);
-                            GL.Vertex3(Tools[i].section[Tools[i].numOfSections].patchList[patchCount - 1][last - 1].easting, Tools[i].section[Tools[i].numOfSections].patchList[patchCount - 1][last - 1].northing, 0);
-                            GL.End();
-                        }
-                        else
-                        {
-                            for (int j = 0; j <= Tools[i].numOfSections; j++)
+                            //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
+                            if (count2 >= (mipmap + 2))
                             {
-                                if (Tools[i].section[j].IsMappingOn && Tools[i].section[j].patchList.Count > 0)
+                                int step = mipmap;
+                                for (int k = 1; k < count2; k += step)
                                 {
-                                    patchCount = Tools[i].section[j].patchList.Count;
-
-                                    //draw the triangle in each triangle strip
-                                    GL.Begin(PrimitiveType.TriangleStrip);
-
-                                    //left side of triangle
-                                    GL.Vertex3(Tools[i].section[j].leftPoint.easting, Tools[i].section[j].leftPoint.northing, 0);
-                                    //Right side of triangle
-                                    GL.Vertex3(Tools[i].section[j].rightPoint.easting, Tools[i].section[j].rightPoint.northing, 0);
-
-                                    int last = Tools[i].section[j].patchList[patchCount - 1].Count;
-                                    //antenna
-                                    GL.Vertex3(Tools[i].section[j].patchList[patchCount - 1][last - 2].easting, Tools[i].section[j].patchList[patchCount - 1][last - 2].northing, 0);
-                                    GL.Vertex3(Tools[i].section[j].patchList[patchCount - 1][last - 1].easting, Tools[i].section[j].patchList[patchCount - 1][last - 1].northing, 0);
-                                    GL.End();
+                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                                    if (count2 - k <= (mipmap + 2)) step = 0;//too small to mipmap it
                                 }
                             }
+                            else { for (int k = 1; k < count2; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
+                            GL.End();
                         }
-
                     }
+
+                    for (int i = 0; i < Tools.Count; i++)
+                    {
+                        // the follow up to sections patches
+                        int patchCount = 0;
+
+                        for (int j = 0; j <= Tools[i].numOfSections; j++)
+                        {
+                            if (Tools[i].Sections[j].IsMappingOn && (patchCount = Tools[i].Sections[j].triangleList.Count) > 0)
+                            {
+                                if (isDay) GL.Color4((byte)Tools[i].Sections[j].triangleList[0].easting, (byte)Tools[i].Sections[j].triangleList[0].northing, (byte)Tools[i].Sections[j].triangleList[0].heading, (byte)152);
+                                else GL.Color4((byte)Tools[i].Sections[j].triangleList[0].easting, (byte)Tools[i].Sections[j].triangleList[0].northing, (byte)Tools[i].Sections[j].triangleList[0].heading, (byte)(152 * 0.5));
+
+                                //draw the triangle in each triangle strip
+                                GL.Begin(PrimitiveType.TriangleStrip);
+
+                                for (int k = 1; k < patchCount; k++)
+                                    GL.Vertex3(Tools[i].Sections[j].triangleList[k].easting, Tools[i].Sections[j].triangleList[k].northing, 0);
+
+                                GL.Vertex3(Tools[i].Sections[j].leftPoint.easting, Tools[i].Sections[j].leftPoint.northing, 0);
+                                GL.Vertex3(Tools[i].Sections[j].rightPoint.easting, Tools[i].Sections[j].rightPoint.northing, 0);
+
+                                GL.End();
+                            }
+                        }
+                    }
+
                     GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
                     GL.Color3(1, 1, 1);
 
@@ -532,9 +487,8 @@ namespace AgOpenGPS
             oglBack.MakeCurrent();
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            //gls.Perspective(6.0f, 1, 1, 5200);
-            GL.Viewport(0, 0, 500, 500);
-            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.1f, 1.0f, 50.0f, 520f);
+            GL.Viewport(0, 0, 750, 300);
+            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.06f, 2.5f, 480f, 520f);
             GL.LoadMatrix(ref mat);
             GL.MatrixMode(MatrixMode.Modelview);
         }
@@ -551,7 +505,6 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Tools.Count; i++)
             {
-
                 GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
                 GL.LoadIdentity();// Reset The View
 
@@ -559,10 +512,10 @@ namespace AgOpenGPS
                 GL.Translate(0, 0, -500);
 
                 //rotate camera so heading matched fix heading in the world
-                GL.Rotate(Glm.ToDegrees(Tools[i].toolPos.heading), 0, 0, 1);
+                GL.Rotate(Glm.ToDegrees(Tools[i].ToolPos.heading), 0, 0, 1);
 
                 //translate to that spot in the world 
-                GL.Translate(-Tools[i].toolPos.easting, -Tools[i].toolPos.northing, 0);
+                GL.Translate(-Tools[i].ToolPos.easting - Math.Sin(Tools[i].ToolPos.heading) * 14, -Tools[i].ToolPos.northing - Math.Cos(Tools[i].ToolPos.heading) * 14, 0);
 
                 if (hd.isOn && vehicle.isHydLiftOn) GL.Enable(EnableCap.Blend);
                 else GL.Disable(EnableCap.Blend);
@@ -580,49 +533,62 @@ namespace AgOpenGPS
                 }
 
                 //patch color
-                GL.Color4(0.0, 0.1, 0.0, 0.1);
+                GL.Color4(0.0f, 0.1f, 0.0f, 0.1f);
+
+                //for every new chunk of patch
+                foreach (var triList in PatchDrawList)
+                {
+                    isDraw = false;
+                    int count2 = triList.Count;
+                    for (int l = 1; l < count2; l += 3)
+                    {
+                        if (triList[l].easting > pivotAxlePos.easting + 50)
+                            continue;
+                        if (triList[l].easting < pivotAxlePos.easting - 50)
+                            continue;
+                        if (triList[l].northing > pivotAxlePos.northing + 50)
+                            continue;
+                        if (triList[l].northing < pivotAxlePos.northing - 50)
+                            continue;
+                        //point is in frustum so draw the entire patch
+                        isDraw = true;
+                        break;
+                    }
+
+                    if (isDraw)
+                    {
+                        //draw the triangles in each triangle strip
+                        GL.Begin(PrimitiveType.TriangleStrip);
+                        for (int l = 1; l < count2; l++) GL.Vertex3(triList[l].easting, triList[l].northing, 0);
+                        GL.End();
+                    }
+                }
 
                 for (int j = 0; j < Tools.Count; j++)
                 {
-                    //draw patches j= # of sections
+                    // the follow up to sections patches
+                    int patchCount = 0;
+
                     for (int k = 0; k <= Tools[j].numOfSections; k++)
                     {
-                        //every time the section turns off and on is a new patch
-                        int patchCount = Tools[j].section[k].patchList.Count;
-
-                        if (patchCount > 0)
+                        
+                        if (Tools[j].Sections[k].IsMappingOn && (patchCount = Tools[j].Sections[k].triangleList.Count) > 0)
                         {
-                            //for every new chunk of patch
-                            foreach (var triList in Tools[j].section[k].patchList)
-                            {
-                                isDraw = false;
-                                int count2 = triList.Count;
-                                for (int l = 1; l < count2; l += 3)
-                                {
-                                    if (triList[l].easting > pivotAxlePos.easting + 30)
-                                        continue;
-                                    if (triList[l].easting < pivotAxlePos.easting - 30)
-                                        continue;
-                                    if (triList[l].northing > pivotAxlePos.northing + 30)
-                                        continue;
-                                    if (triList[l].northing < pivotAxlePos.northing - 30)
-                                        continue;
-                                    //point is in frustum so draw the entire patch
-                                    isDraw = true;
-                                    break;
-                                }
+                            //draw the triangle in each triangle strip
+                            GL.Begin(PrimitiveType.TriangleStrip);
 
-                                if (isDraw)
-                                {
-                                    //draw the triangles in each triangle strip
-                                    GL.Begin(PrimitiveType.TriangleStrip);
-                                    for (int l = 1; l < count2; l++) GL.Vertex3(triList[l].easting, triList[l].northing, 0);
-                                    GL.End();
-                                }
-                            }
+                            for (int l = 1; l < patchCount; l++)
+                                GL.Vertex3(Tools[j].Sections[k].triangleList[l].easting, Tools[j].Sections[k].triangleList[l].northing, 0);
+
+                            GL.Vertex3(Tools[j].Sections[k].leftPoint.easting, Tools[j].Sections[k].leftPoint.northing, 0);
+                            GL.Vertex3(Tools[j].Sections[k].rightPoint.easting, Tools[j].Sections[k].rightPoint.northing, 0);
+
+                            GL.End();
                         }
                     }
                 }
+
+
                 //finish it up - we need to read the ram of video card
                 GL.Flush();
 
@@ -633,11 +599,11 @@ namespace AgOpenGPS
                 byte[] GreenPixels = new byte[(Tools[i].rpWidth * rpHeight)];
 
                 //read the whole block of pixels up to max lookahead, one read only
-                GL.ReadPixels(Tools[i].rpXPosition, 250, Tools[i].rpWidth, rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
+                GL.ReadPixels(Tools[i].rpXPosition, 10, Tools[i].rpWidth, rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
 
                 //Paint to context for troubleshooting
-                //oglBack.BringToFront();
-                //oglBack.SwapBuffers();
+                oglBack.BringToFront();
+                oglBack.SwapBuffers();
 
                 //is applied area coming up?
                 totalPixs = 0;
@@ -683,22 +649,22 @@ namespace AgOpenGPS
                 for (int j = 0; j < Tools[i].numOfSections; j++)
                 {
                     // Manual on, force the section On and exit loop so digital is also overidden
-                    if (Tools[i].section[j].BtnSectionState == btnStates.On)
+                    if (Tools[i].Sections[j].BtnSectionState == btnStates.On)
                     {
-                        Tools[i].section[j].SectionOnRequest = true;
+                        Tools[i].Sections[j].SectionOnRequest = true;
                     }
-                    else if (Tools[i].section[j].BtnSectionState == btnStates.Off || !Tools[i].section[j].IsAllowedOn)
+                    else if (Tools[i].Sections[j].BtnSectionState == btnStates.Off || !Tools[i].Sections[j].IsAllowedOn)
                     {
-                        Tools[i].section[j].SectionOnRequest = false;
-                        Tools[i].section[j].SectionOverlapTimer = 0;
+                        Tools[i].Sections[j].SectionOnRequest = false;
+                        Tools[i].Sections[j].SectionOverlapTimer = 0;
                         isSuperSectionAllowedOn = false;
                     }
-                    else if (Tools[i].section[j].BtnSectionState == btnStates.Auto)
+                    else if (Tools[i].Sections[j].BtnSectionState == btnStates.Auto)
                     {
-                        if (Tools[i].section[j].speedPixels < vehicle.slowSpeedCutoff)
+                        if (Tools[i].Sections[j].speedPixels < vehicle.slowSpeedCutoff)
                         {
-                            Tools[i].section[j].SectionOnRequest = false;
-                            Tools[i].section[j].SectionOverlapTimer = 0;
+                            Tools[i].Sections[j].SectionOnRequest = false;
+                            Tools[i].Sections[j].SectionOverlapTimer = 0;
                             isSuperSectionAllowedOn = false;
                         }
                         else
@@ -708,12 +674,12 @@ namespace AgOpenGPS
                             mOff = (Tools[i].lookAheadDistanceOffPixelsRight - Tools[i].lookAheadDistanceOffPixelsLeft) / Tools[i].rpWidth;
 
                             //determine if headland is in read pixel buffer left middle and right. 
-                            start = Tools[i].section[j].rpSectionPosition - Tools[i].section[0].rpSectionPosition;
-                            end = Tools[i].section[j].rpSectionWidth - 1 + start;
+                            start = Tools[i].Sections[j].rpSectionPosition - Tools[i].Sections[0].rpSectionPosition;
+                            end = start + Tools[i].Sections[j].rpSectionWidth - 1;
                             tagged = 0;
                             totalPixs = 0;
 
-                            for (int pos = start; pos <= end; pos++)
+                            for (int pos = start; pos < end; pos++)
                             {
                                 startHeight = (int)(Tools[i].lookAheadDistanceOffPixelsLeft + (mOff * pos)) * Tools[i].rpWidth + pos;
                                 endHeight = (int)(Tools[i].lookAheadDistanceOnPixelsLeft + (mOn * pos)) * Tools[i].rpWidth + pos;
@@ -732,45 +698,45 @@ namespace AgOpenGPS
 
                             if (tagged != 0 && (tagged * 100) / totalPixs > Tools[i].toolMinUnappliedPixels)
                             {
-                                Tools[i].section[j].IsSectionRequiredOn = true;
+                                Tools[i].Sections[j].IsSectionRequiredOn = true;
                             }
                             else
                             {
-                                Tools[i].section[j].IsSectionRequiredOn = false;
+                                Tools[i].Sections[j].IsSectionRequiredOn = false;
                             }
 
-                            Tools[i].section[j].SectionOnRequest = Tools[i].section[j].IsSectionRequiredOn ? true : false;
+                            Tools[i].Sections[j].SectionOnRequest = Tools[i].Sections[j].IsSectionRequiredOn ? true : false;
 
-                            isSuperSectionAllowedOn &= (Tools[i].section[Tools[i].numOfSections].IsSectionOn && Tools[i].section[j].SectionOnRequest) || (Tools[i].section[j].IsSectionOn && Tools[i].section[j].IsMappingOn);
+                            isSuperSectionAllowedOn &= (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
                         }
                     }
                 }
-                if (isSuperSectionAllowedOn && !isSuperSectionAllowedOn)
+                if (isSuperSectionAllowedOn)
                 {
                     for (int j = 0; j < Tools[i].numOfSections; j++)
                     {
-                        Tools[i].section[j].SectionOnRequest = false;
-                        Tools[i].section[j].SectionOverlapTimer = 0;
-                        Tools[i].section[j].MappingOffTimer = 0;
-                        Tools[i].section[j].MappingOnTimer = 0;
+                        Tools[i].Sections[j].SectionOnRequest = false;
+                        Tools[i].Sections[j].SectionOverlapTimer = 0;
+                        Tools[i].Sections[j].MappingOffTimer = 0;
+                        Tools[i].Sections[j].MappingOnTimer = 0;
                     }
 
                     //turn on super section
-                    Tools[i].section[Tools[i].numOfSections].SectionOnRequest = true;
-                    Tools[i].section[Tools[i].numOfSections].MappingOnTimer = 1;
+                    Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = true;
+                    Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 1;
                 }
-                else if (Tools[i].section[Tools[i].numOfSections].IsSectionOn)
+                else if (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn)
                 {
-                    Tools[i].section[Tools[i].numOfSections].SectionOnRequest = false;
-                    Tools[i].section[Tools[i].numOfSections].SectionOverlapTimer = 0;
-                    Tools[i].section[Tools[i].numOfSections].MappingOffTimer = 0;
-                    Tools[i].section[Tools[i].numOfSections].MappingOnTimer = 0;
+                    Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = false;
+                    Tools[i].Sections[Tools[i].numOfSections].SectionOverlapTimer = 0;
+                    Tools[i].Sections[Tools[i].numOfSections].MappingOffTimer = 0;
+                    Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 0;
 
                     for (int j = 0; j < Tools[i].numOfSections; j++)//set the timers back
                     {
-                        Tools[i].section[j].MappingOffTimer = (int)(fixUpdateHz * Tools[i].MappingOffDelay + 1);
-                        Tools[i].section[j].SectionOverlapTimer = (int)((double)fixUpdateHz * Tools[i].TurnOffDelay + 1);
-                        Tools[i].section[j].MappingOnTimer = 1;
+                        Tools[i].Sections[j].MappingOffTimer = (int)(fixUpdateHz * Tools[i].MappingOffDelay + 1);
+                        Tools[i].Sections[j].SectionOverlapTimer = (int)((double)fixUpdateHz * Tools[i].TurnOffDelay + 1);
+                        Tools[i].Sections[j].MappingOnTimer = 1;
                     }
                 }
             }
@@ -875,112 +841,6 @@ namespace AgOpenGPS
 
             if (isJobStarted)
             {
-                //GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-                //GL.LoadIdentity();                  // Reset The View
-
-                //CalculateMinMax();
-                ////back the camera up
-                //GL.Translate(0, 0, -maxFieldDistance);
-                //GL.Enable(EnableCap.Blend);
-
-                ////translate to that spot in the world 
-                //GL.Translate(-fieldCenterX, -fieldCenterY, 0);
-
-                //GL.Color4(0.5, 0.5, 0.5, 0.5);
-                ////draw patches j= # of sections
-                //int count2;
-
-                //for (int j = 0; j <= Tools[0].numOfSections; j++)
-                //{
-                //    //every time the section turns off and on is a new patch
-                //    int patchCount = section[j].patchList.Count;
-
-                //    if (patchCount > 0)
-                //    {
-                //        //for every new chunk of patch
-                //        foreach (var triList in section[j].patchList)
-                //        {
-                //            //draw the triangle in each triangle strip
-                //            GL.Begin(PrimitiveType.TriangleStrip);
-                //            count2 = triList.Count;
-                //            //int mipmap = 2;
-
-                //            ////if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                //            //if (count2 >= (mipmap))
-                //            //{
-                //            //    int step = mipmap;
-                //            //    for (int i = 0; i < count2; i += step)
-                //            //    {
-                //            //        GL.Vertex3(triList[i].easting, triList[i].northing, 0); i++;
-                //            //        GL.Vertex3(triList[i].easting, triList[i].northing, 0); i++;
-
-                //            //        //too small to mipmap it
-                //            //        if (count2 - i <= (mipmap + 2))
-                //            //            step = 0;
-                //            //    }
-                //            //}
-
-                //            //else 
-                //            //{
-                //            for (int i = 1; i < count2; i++) GL.Vertex3(triList[i].easting, triList[i].northing, 0);
-                //            //}
-                //            GL.End();
-
-                //        }
-                //    }
-                //} //end of section patches
-
-                //GL.Flush();
-
-                //int grnHeight = oglZoom.Height;
-                //int grnWidth = oglZoom.Width;
-                //byte[] overPix = new byte[grnHeight * grnWidth + 1];
-
-                //GL.ReadPixels(0, 0, grnWidth, grnWidth, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, overPix);
-
-                //int once = 0;
-                //int twice = 0;
-                //int more = 0;
-                //int level = 0;
-                //double total = 0;
-                //double total2 = 0;
-
-                ////50, 96, 112                
-                //for (int i = 0; i < grnHeight * grnWidth; i++)
-                //{
-
-                //    if (overPix[i] > 105)
-                //    {
-                //        more++;
-                //        level = overPix[i];
-                //    }
-                //    else if (overPix[i] > 85)
-                //    {
-                //        twice++;
-                //        level = overPix[i];
-                //    }
-                //    else if (overPix[i] > 50)
-                //    {
-                //        once++;
-                //    }
-                //}
-                //total = once + twice + more;
-                //total2 = total + twice + more + more;
-
-                //if (total2 > 0)
-                //{
-                //    fd.actualAreaCovered = (total / total2 * fd.workedAreaTotal);
-                //    fd.overlapPercent = Math.Round(((1 - total / total2) * 100), 2);
-                //}
-                //else
-                //{
-                //    fd.actualAreaCovered = fd.overlapPercent = 0;
-                //}
-
-                ////GL.Flush();
-                ////oglZoom.MakeCurrent();
-                ////oglZoom.SwapBuffers();
-
                 if (oglZoom.Width != 400)
                 {
                     oglZoom.MakeCurrent();
@@ -999,48 +859,87 @@ namespace AgOpenGPS
                     if (isDay) GL.Color3(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B);
                     else GL.Color3(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B);
 
-                    int cnt, step, patchCount;
+                    CalcFrustum();
                     int mipmap = 8;
+
+                    //for every new chunk of patch
+                    foreach (var triList in PatchDrawList)
+                    {
+                        bool isDraw = false;
+                        int count2 = triList.Count;
+                        for (int k = 1; k < count2; k += 3)
+                        {
+                            //determine if point is in frustum or not, if < 0, its outside so abort, z always is 0                            
+                            if (frustum[0] * triList[k].easting + frustum[1] * triList[k].northing + frustum[3] <= 0)
+                                continue;//right
+                            if (frustum[4] * triList[k].easting + frustum[5] * triList[k].northing + frustum[7] <= 0)
+                                continue;//left
+                            if (frustum[16] * triList[k].easting + frustum[17] * triList[k].northing + frustum[19] <= 0)
+                                continue;//bottom
+                            if (frustum[20] * triList[k].easting + frustum[21] * triList[k].northing + frustum[23] <= 0)
+                                continue;//top
+                            if (frustum[8] * triList[k].easting + frustum[9] * triList[k].northing + frustum[11] <= 0)
+                                continue;//far
+                            if (frustum[12] * triList[k].easting + frustum[13] * triList[k].northing + frustum[15] <= 0)
+                                continue;//near
+
+                            //point is in frustum so draw the entire patch. The downside of triangle strips.
+                            isDraw = true;
+                            break;
+                        }
+
+                        if (isDraw)
+                        {
+                            count2 = triList.Count;
+                            //draw the triangle in each triangle strip
+                            GL.Begin(PrimitiveType.TriangleStrip);
+
+                            if (isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
+                            else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
+
+                            //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
+                            if (count2 >= (mipmap + 2))
+                            {
+                                int step = mipmap;
+                                for (int k = 1; k < count2; k += step)
+                                {
+                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                                    if (count2 - k <= (mipmap + 2)) step = 0;//too small to mipmap it
+                                }
+                            }
+                            else { for (int k = 1; k < count2; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
+                            GL.End();
+                        }
+                    }
 
                     for (int i = 0; i < Tools.Count; i++)
                     {
-                        //draw patches j= # of sections
+                        // the follow up to sections patches
+                        int patchCount = 0;
+
+                        if (isDay) GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)152);
+                        else GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)(152 * 0.5));
+
                         for (int j = 0; j <= Tools[i].numOfSections; j++)
                         {
-                            //every time the section turns off and on is a new patch
-                            patchCount = Tools[i].section[j].patchList.Count;
-
-                            if (patchCount > 0)
+                            
+                            if (Tools[i].Sections[j].IsMappingOn && (patchCount = Tools[i].Sections[j].triangleList.Count) > 0)
                             {
-                                //for every new chunk of patch
-                                foreach (var triList in Tools[i].section[j].patchList)
-                                {
-                                    //draw the triangle in each triangle strip
-                                    GL.Begin(PrimitiveType.TriangleStrip);
-                                    cnt = triList.Count;
+                                //draw the triangle in each triangle strip
+                                GL.Begin(PrimitiveType.TriangleStrip);
 
-                                    //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                                    if (cnt >= (mipmap))
-                                    {
-                                        step = mipmap;
-                                        for (int k = 1; k < cnt; k += step)
-                                        {
-                                            GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                            GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                                for (int k = 1; k < patchCount; k++)
+                                    GL.Vertex3(Tools[i].Sections[j].triangleList[k].easting, Tools[i].Sections[j].triangleList[k].northing, 0);
 
-                                            //too small to mipmap it
-                                            if (cnt - k <= (mipmap + 2))
-                                                step = 0;
-                                        }
-                                    }
+                                GL.Vertex3(Tools[i].Sections[j].leftPoint.easting, Tools[i].Sections[j].leftPoint.northing, 0);
+                                GL.Vertex3(Tools[i].Sections[j].rightPoint.easting, Tools[i].Sections[j].rightPoint.northing, 0);
 
-                                    else { for (int k = 1; k < cnt; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
-                                    GL.End();
-
-                                }
+                                GL.End();
                             }
-                        } //end of section patches
+                        }
                     }
+
                     //draw the ABLine
                     if ((ABLine.isABLineSet | ABLine.isABLineBeingSet) && ABLine.isBtnABLineOn)
                     {
@@ -1893,51 +1792,55 @@ namespace AgOpenGPS
         //determine mins maxs of patches and whole field.
         public void CalculateMinMax()
         {
-
             minFieldX = 9999999; minFieldY = 9999999;
             maxFieldX = -9999999; maxFieldY = -9999999;
 
             //min max of the boundary
             if (bnd.bndArr.Count > 0)
             {
-                    minFieldY = bnd.bndArr[0].Northingmin;
-                    maxFieldY = bnd.bndArr[0].Northingmax;
-                    minFieldX = bnd.bndArr[0].Eastingmin;
-                    maxFieldX = bnd.bndArr[0].Eastingmax;
+                minFieldY = bnd.bndArr[0].Northingmin;
+                maxFieldY = bnd.bndArr[0].Northingmax;
+                minFieldX = bnd.bndArr[0].Eastingmin;
+                maxFieldX = bnd.bndArr[0].Eastingmax;
             }
             else
             {
+                //for every new chunk of patch
+                foreach (var triList in PatchDrawList)
+                {
+                    int count2 = triList.Count;
+                    for (int k = 1; k < count2; k += 3)
+                    {
+                        double x = triList[k].easting;
+                        double y = triList[k].northing;
+
+                        //also tally the max/min of field x and z
+                        if (minFieldX > x) minFieldX = x;
+                        if (maxFieldX < x) maxFieldX = x;
+                        if (minFieldY > y) minFieldY = y;
+                        if (maxFieldY < y) maxFieldY = y;
+                    }
+                }
                 for (int i = 0; i < Tools.Count; i++)
                 {
-                    //draw patches j= # of sections
+                    // the follow up to sections patches
                     for (int j = 0; j <= Tools[i].numOfSections; j++)
                     {
-                        //every time the section turns off and on is a new patch
-                        int patchCount = Tools[i].section[j].patchList.Count;
-
-                        if (patchCount > 0)
+                        int patchCount = Tools[i].Sections[j].triangleList.Count;
+                        for (int k = 1; k < patchCount; k++)
                         {
-                            //for every new chunk of patch
-                            foreach (var triList in Tools[i].section[j].patchList)
-                            {
-                                int count2 = triList.Count;
-                                for (int k = 1; k < count2; k += 3)
-                                {
-                                    double x = triList[k].easting;
-                                    double y = triList[k].northing;
+                            double x = Tools[i].Sections[j].triangleList[k].easting;
+                            double y = Tools[i].Sections[j].triangleList[k].northing;
 
-                                    //also tally the max/min of field x and z
-                                    if (minFieldX > x) minFieldX = x;
-                                    if (maxFieldX < x) maxFieldX = x;
-                                    if (minFieldY > y) minFieldY = y;
-                                    if (maxFieldY < y) maxFieldY = y;
-                                }
-                            }
+                            //also tally the max/min of field x and z
+                            if (minFieldX > x) minFieldX = x;
+                            if (maxFieldX < x) maxFieldX = x;
+                            if (minFieldY > y) minFieldY = y;
+                            if (maxFieldY < y) maxFieldY = y;
                         }
                     }
                 }
             }
-
 
             if (maxFieldX == -9999999 | minFieldX == 9999999 | maxFieldY == -9999999 | minFieldY == 9999999)
             {
@@ -1961,27 +1864,6 @@ namespace AgOpenGPS
                 fieldCenterX = (maxFieldX + minFieldX) / 2.0;
                 fieldCenterY = (maxFieldY + minFieldY) / 2.0;
             }
-
-            
-
-            //minFieldX -= 8;
-            //minFieldY -= 8;
-            //maxFieldX += 8;
-            //maxFieldY += 8;
-
-            //if (isMetric)
-            //{
-            //    lblFieldWidthEastWest.Text = Math.Abs((maxFieldX - minFieldX)).ToString("N0") + " m";
-            //    lblFieldWidthNorthSouth.Text = Math.Abs((maxFieldY - minFieldY)).ToString("N0") + " m";
-            //}
-            //else
-            //{
-            //    lblFieldWidthEastWest.Text = Math.Abs((maxFieldX - minFieldX) * glm.m2ft).ToString("N0") + " ft";
-            //    lblFieldWidthNorthSouth.Text = Math.Abs((maxFieldY - minFieldY) * glm.m2ft).ToString("N0") + " ft";
-            //}
-
-            //lblZooom.Text = ((int)(maxFieldDistance)).ToString();
-
         }
 
         private void DrawFieldText()

@@ -9,8 +9,6 @@ namespace AgOpenGPS
 {
     public class CTool
     {
-
-
         //create a new section and set left and right positions
         //created whether used or not, saves restarting program
 
@@ -20,13 +18,14 @@ namespace AgOpenGPS
         public double ToolOverlap;
         public double WidthMinusOverlap;
 
-        public List<CSection> section = new List<CSection>();
+        public List<CSection> Sections = new List<CSection>();
 
-        public vec2 hitchPos;
-        public vec3 toolPos;
-        public vec3 tankPos;
+        public Vec2 HitchPos;
+        public Vec3 ToolPos;
+        public Vec3 TankPos;
 
-        public double hitchLength;
+        public double HitchLength;
+        public int ToolNum;
 
         public double ToolFarLeftSpeed = 0;
         public double ToolFarRightSpeed = 0;
@@ -59,36 +58,18 @@ namespace AgOpenGPS
         public int rpWidth;
 
         //Constructor called by FormGPS
-        public CTool(FormGPS _f, double num)
+        public CTool(FormGPS _f, int num)
         {
             mf = _f;
+            ToolNum = num;
 
             numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
 
+            SetSections();
 
-            for (int j = 0; j <= numOfSections; j++)
-            {
-                //section[j] = new CSection(_f);
-                section.Add(new CSection(mf));
-
-                _f.Controls.Add(section[j].SectionButton);
-
-                section[j].SectionButton.BringToFront();
-                section[j].SectionButton.Text = (j + 1).ToString();
-                section[j].SectionButton.Name = (num + "," + j).ToString();
-                section[j].SectionButton.Click += new System.EventHandler(mf.btnSectionMan_Click);
-
-                section[j].SectionButton.Enabled = false;
-                section[j].SectionButton.FlatAppearance.BorderColor = SystemColors.ActiveCaptionText;
-                section[j].SectionButton.FlatStyle = FlatStyle.Flat;
-                section[j].SectionButton.TextAlign = ContentAlignment.MiddleCenter;
-                section[j].SectionButton.UseVisualStyleBackColor = false;
-                section[j].SectionButton.BackColor = Color.Silver;
-            }
-
-            toolPos = new vec3(0, 0, 0);
-            tankPos = new vec3(0, 0, 0);
-            hitchPos = new vec2(0, 0);
+            ToolPos = new Vec3(0, 0, 0);
+            TankPos = new Vec3(0, 0, 0);
+            HitchPos = new Vec2(0, 0);
 
             //from settings grab the vehicle specifics
             ToolWidth = Properties.Vehicle.Default.setVehicle_toolWidth;
@@ -99,7 +80,7 @@ namespace AgOpenGPS
             
             toolTrailingHitchLength = Properties.Vehicle.Default.setTool_toolTrailingHitchLength;
             toolTankTrailingHitchLength = Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength;
-            hitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
+            HitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
 
             isToolBehindPivot = Properties.Vehicle.Default.setTool_isToolBehindPivot;
             isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
@@ -116,10 +97,73 @@ namespace AgOpenGPS
 
         }
 
+        public void SetSections()
+        {
+            for (int j = Sections.Count-1; j >= 0; j--)
+            {
+                if (Sections[j].IsMappingOn)
+                {
+                    Sections[j].TurnMappingOff();
+                }
+
+                if (j > numOfSections)
+                {
+                    mf.Controls.Remove(Sections[j].SectionButton);
+                    Sections.RemoveAt(j);
+                }
+                else if (j == numOfSections)
+                {
+                    mf.Controls.Remove(Sections[j].SectionButton);
+                }
+            }
+
+            for (int j = 0; j <= numOfSections; j++)
+            {
+                if (Sections.Count <= j) Sections.Add(new CSection(mf));
+
+                if (j < numOfSections && !mf.Controls.Contains(Sections[j].SectionButton))
+                {
+                    Sections[j].BtnSectionState = mf.autoBtnState;
+                    Sections[j].IsAllowedOn = (mf.autoBtnState != 0);
+
+                    mf.Controls.Add(Sections[j].SectionButton);
+
+                    Sections[j].SectionButton.BringToFront();
+                    Sections[j].SectionButton.Text = (j + 1).ToString();
+                    Sections[j].SectionButton.Name = (ToolNum + "," + j).ToString();
+                    Sections[j].SectionButton.Click += new System.EventHandler(mf.btnSectionMan_Click);
+
+                    Sections[j].SectionButton.Enabled = (mf.autoBtnState != 0);
+                    Sections[j].SectionButton.FlatAppearance.BorderColor = SystemColors.ActiveCaptionText;
+                    Sections[j].SectionButton.FlatStyle = FlatStyle.Flat;
+                    Sections[j].SectionButton.TextAlign = ContentAlignment.MiddleCenter;
+                    Sections[j].SectionButton.UseVisualStyleBackColor = false;
+
+                    SectionButtonColor(j);
+                }
+            }
+        }
+
+        public void SectionButtonColor(int j)
+        {
+            if (!mf.isJobStarted)
+            {
+                Sections[j].SectionButton.BackColor = mf.isDay ? Color.Silver : Color.Silver;
+            }
+            else if (Sections[j].BtnSectionState == FormGPS.btnStates.On)
+                Sections[j].SectionButton.BackColor = mf.isDay ? Color.Yellow : Color.DarkGoldenrod;
+            else if (Sections[j].BtnSectionState == FormGPS.btnStates.Auto)
+                Sections[j].SectionButton.BackColor = mf.isDay ? Color.Lime : Color.ForestGreen;
+            else
+                Sections[j].SectionButton.BackColor = mf.isDay ? Color.Red : Color.Crimson;
+
+            Sections[j].SectionButton.ForeColor = mf.isDay ? Color.Black : Color.White;
+        }
+
         public void DrawTool()
         {
             //translate down to the hitch pin
-            GL.Translate(0.0, hitchLength, 0.0);
+            GL.Translate(0.0, HitchLength, 0.0);
 
             //there is a trailing tow between hitch
             if (isToolTrailing)
@@ -127,7 +171,7 @@ namespace AgOpenGPS
                 if (isToolTBT)
                 {
                     //rotate to tank heading
-                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - tankPos.heading), 0.0, 0.0, 1.0);
+                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.heading), 0.0, 0.0, 1.0);
 
                     //draw the tank hitch
                     GL.LineWidth(2f);
@@ -150,7 +194,7 @@ namespace AgOpenGPS
                 }
 
 
-                GL.Rotate(Glm.ToDegrees(tankPos.heading - toolPos.heading), 0.0, 0.0, 1.0);
+                GL.Rotate(Glm.ToDegrees(TankPos.heading - ToolPos.heading), 0.0, 0.0, 1.0);
 
                 //draw the hitch
                 GL.LineWidth(2);
@@ -164,30 +208,31 @@ namespace AgOpenGPS
 
 
             }
-
-            
-            //look ahead lines
-            GL.LineWidth(1);
-            GL.Begin(PrimitiveType.Lines);
-            
-            //lookahead section on
-            GL.Color3(0.20f, 0.7f, 0.2f);//-5.25  and 5.35
-            GL.Vertex3(section[0].positionLeft, (lookAheadDistanceOnPixelsLeft) * 0.1, 0);
-            GL.Vertex3(section[numOfSections - 1].positionRight, (lookAheadDistanceOnPixelsRight) * 0.1, 0);
-
-            //lookahead section off
-            GL.Color3(0.70f, 0.2f, 0.2f);
-            GL.Vertex3(section[0].positionLeft, (lookAheadDistanceOffPixelsLeft) * 0.1, 0);
-            GL.Vertex3(section[numOfSections - 1].positionRight, (lookAheadDistanceOffPixelsRight) * 0.1, 0);
-
-            if (mf.vehicle.isHydLiftOn)
+            if (numOfSections > 0)
             {
-                GL.Color3(0.70f, 0.2f, 0.72f);
-                GL.Vertex3(section[0].positionLeft, (mf.vehicle.hydLiftLookAheadDistanceLeft * 0.1), 0);
-                GL.Vertex3(section[numOfSections - 1].positionRight, (mf.vehicle.hydLiftLookAheadDistanceRight * 0.1), 0);
-            }
+                //look ahead lines
+                GL.LineWidth(1);
+                GL.Begin(PrimitiveType.Lines);
 
-            GL.End();
+                //lookahead section on
+                GL.Color3(0.20f, 0.7f, 0.2f);//-5.25  and 5.35
+                GL.Vertex3(Sections[0].positionLeft, (lookAheadDistanceOnPixelsLeft) * 0.1, 0);
+                GL.Vertex3(Sections[numOfSections - 1].positionRight, (lookAheadDistanceOnPixelsRight) * 0.1, 0);
+
+                //lookahead section off
+                GL.Color3(0.70f, 0.2f, 0.2f);
+                GL.Vertex3(Sections[0].positionLeft, (lookAheadDistanceOffPixelsLeft) * 0.1, 0);
+                GL.Vertex3(Sections[numOfSections - 1].positionRight, (lookAheadDistanceOffPixelsRight) * 0.1, 0);
+
+                if (mf.vehicle.isHydLiftOn)
+                {
+                    GL.Color3(0.70f, 0.2f, 0.72f);
+                    GL.Vertex3(Sections[0].positionLeft, (mf.vehicle.hydLiftLookAheadDistanceLeft * 0.1), 0);
+                    GL.Vertex3(Sections[numOfSections - 1].positionRight, (mf.vehicle.hydLiftLookAheadDistanceRight * 0.1), 0);
+                }
+
+                GL.End();
+            }
 
             //draw the sections
             GL.LineWidth(2);
@@ -200,9 +245,9 @@ namespace AgOpenGPS
             for (int j = 0; j < numOfSections; j++)
             {
                 //if section is on, green, if off, red color
-                if (section[j].IsSectionOn || section[numOfSections].IsSectionOn)
+                if (Sections[j].IsSectionOn || Sections[numOfSections].IsSectionOn)
                 {
-                    if (section[j].BtnSectionState == FormGPS.btnStates.Auto)
+                    if (Sections[j].BtnSectionState == FormGPS.btnStates.Auto)
                     {
                         GL.Color3(0.0f, 0.9f, 0.0f);
                         //if (mf.section[j].isMappingOn) GL.Color3(0.0f, 0.7f, 0.0f);
@@ -217,30 +262,30 @@ namespace AgOpenGPS
                     GL.Color3(0.7f, 0.2f, 0.2f);
                 }
 
-                double mid = (((section[j].positionRight + 100) - (section[j].positionLeft + 100))) / 2 + section[j].positionLeft;
+                double mid = (((Sections[j].positionRight + 100) - (Sections[j].positionLeft + 100))) / 2 + Sections[j].positionLeft;
 
                 GL.Begin(PrimitiveType.TriangleFan);
                 {
-                    GL.Vertex3(section[j].positionLeft, 0, 0);
-                    GL.Vertex3(section[j].positionLeft, -hite, 0);
+                    GL.Vertex3(Sections[j].positionLeft, 0, 0);
+                    GL.Vertex3(Sections[j].positionLeft, -hite, 0);
 
                     GL.Vertex3(mid, -hite * 1.5, 0);
 
-                    GL.Vertex3(section[j].positionRight, -hite, 0);
-                    GL.Vertex3(section[j].positionRight, 0, 0);
+                    GL.Vertex3(Sections[j].positionRight, -hite, 0);
+                    GL.Vertex3(Sections[j].positionRight, 0, 0);
                 }
                 GL.End();
 
                 GL.Begin(PrimitiveType.LineLoop);
                 {
                     GL.Color3(0.0, 0.0, 0.0);
-                    GL.Vertex3(section[j].positionLeft, 0, 0);
-                    GL.Vertex3(section[j].positionLeft, -hite, 0);
+                    GL.Vertex3(Sections[j].positionLeft, 0, 0);
+                    GL.Vertex3(Sections[j].positionLeft, -hite, 0);
 
                     GL.Vertex3(mid, -hite * 1.5, 0);
 
-                    GL.Vertex3(section[j].positionRight, -hite, 0);
-                    GL.Vertex3(section[j].positionRight, 0, 0);
+                    GL.Vertex3(Sections[j].positionRight, -hite, 0);
+                    GL.Vertex3(Sections[j].positionRight, 0, 0);
                 }
                 GL.End();
             }
@@ -255,7 +300,7 @@ namespace AgOpenGPS
                 GL.PointSize(3.0f);
                 GL.Begin(PrimitiveType.Points);
                 for (int j = 0; j < numOfSections - 1; j++)
-                    GL.Vertex3(section[j].positionRight, 0, 0);
+                    GL.Vertex3(Sections[j].positionRight, 0, 0);
                 GL.End();
             }
 
@@ -263,16 +308,16 @@ namespace AgOpenGPS
             if (isToolTrailing)
             {
                 GL.Translate(0.0, -toolTrailingHitchLength, 0.0);
-                GL.Rotate(Glm.ToDegrees(tankPos.heading - toolPos.heading), 0.0, 0.0, -1.0);
+                GL.Rotate(Glm.ToDegrees(TankPos.heading - ToolPos.heading), 0.0, 0.0, -1.0);
 
                 if (isToolTBT)
                 {
                     GL.Translate(0.0, -toolTankTrailingHitchLength, 0.0);
-                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - tankPos.heading), 0.0, 0.0, -1.0);
+                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.heading), 0.0, 0.0, -1.0);
                 }
 
             }
-            GL.Translate(0.0, -hitchLength, 0.0);
+            GL.Translate(0.0, -HitchLength, 0.0);
 
 
 

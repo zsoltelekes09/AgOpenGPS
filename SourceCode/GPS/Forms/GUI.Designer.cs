@@ -302,7 +302,7 @@ namespace AgOpenGPS
                                             string[] words2 = line.Split(',');
                                             double easting = double.Parse(words2[0], CultureInfo.InvariantCulture);
                                             double northing = double.Parse(words2[1], CultureInfo.InvariantCulture);
-                                            vec2 vecPt = new vec2((Math.Cos(convergenceAngle) * easting) - (Math.Sin(convergenceAngle) * northing) + eastingOffset, (Math.Sin(convergenceAngle) * easting) + (Math.Cos(convergenceAngle) * northing) + northingOffset);
+                                            Vec2 vecPt = new Vec2((Math.Cos(convergenceAngle) * easting) - (Math.Sin(convergenceAngle) * northing) + eastingOffset, (Math.Sin(convergenceAngle) * easting) + (Math.Cos(convergenceAngle) * northing) + northingOffset);
                                             Fields[Fields.Count - 1].Boundary.Add(vecPt);
                                         }
                                     }
@@ -459,33 +459,23 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Tools.Count; i++)
             {
-                Size Size = new System.Drawing.Size(Math.Min((oglMain.Width * 3 / 4) / Tools[i].numOfSections, 120), 30);
-
-                for (int j = 0; j <= Tools[i].numOfSections; j++)
+                if (Tools[i].numOfSections > 0)
                 {
-                    if (j < Tools[i].numOfSections)
+                    Size Size = new System.Drawing.Size(Math.Min((oglMain.Width * 3 / 4) / Tools[i].numOfSections, 120), 30);
+
+                    for (int j = 0; j <= Tools[i].numOfSections; j++)
                     {
-                        Tools[i].section[j].SectionButton.Top = Height - top - 30 * i;
-                        Tools[i].section[j].SectionButton.Size = Size;
-                        Tools[i].section[j].SectionButton.Left = (oglCenter) - (Tools[i].numOfSections * Size.Width) / 2 + Size.Width * j;
-                        Tools[i].section[j].SectionButton.Visible = true;
+                        if (j < Tools[i].numOfSections)
+                        {
+                            Tools[i].Sections[j].SectionButton.Top = Height - top - 30 * i;
+                            Tools[i].Sections[j].SectionButton.Size = Size;
+                            Tools[i].Sections[j].SectionButton.Left = (oglCenter) - (Tools[i].numOfSections * Size.Width) / 2 + Size.Width * j;
+                            Tools[i].Sections[j].SectionButton.Visible = true;
+                        }
+                        else Tools[i].Sections[j].SectionButton.Visible = false;
                     }
-                    else Tools[i].section[j].SectionButton.Visible = false;
                 }
             }
-        }
-
-        //update individual btn based on state after push
-        private void ManualBtnUpdate(int toolNumber, int sectNumber)
-        {
-                if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.On)
-                    Tools[toolNumber].section[sectNumber].SectionButton.BackColor = isDay ? Color.Yellow : Color.DarkGoldenrod;
-                else if (Tools[toolNumber].section[sectNumber].BtnSectionState == btnStates.Auto)
-                    Tools[toolNumber].section[sectNumber].SectionButton.BackColor = isDay ? Color.Lime : Color.ForestGreen;
-                else
-                    Tools[toolNumber].section[sectNumber].SectionButton.BackColor = isDay ? Color.Red : Color.Crimson;
-
-                Tools[toolNumber].section[sectNumber].SectionButton.ForeColor = isDay ? Color.Black : Color.White;
         }
 
         //Mouse Clicks 

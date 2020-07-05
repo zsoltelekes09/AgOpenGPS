@@ -15,10 +15,10 @@ namespace AgOpenGPS
         public bool wasSectionOn;
 
         //generated box for finding closest point
-        public vec2 boxA = new vec2(0, 0), boxB = new vec2(0, 2);
-        public vec2 boxC = new vec2(1, 1), boxD = new vec2(2, 3);
-        public vec2 boxE = new vec2(3, 4), boxF = new vec2(4, 5);
-        public vec2 boxG = new vec2(6, 6), boxH = new vec2(7, 7);
+        public Vec2 boxA = new Vec2(0, 0), boxB = new Vec2(0, 2);
+        public Vec2 boxC = new Vec2(1, 1), boxD = new Vec2(2, 3);
+        public Vec2 boxE = new Vec2(3, 4), boxF = new Vec2(4, 5);
+        public Vec2 boxG = new Vec2(6, 6), boxH = new Vec2(7, 7);
 
         //current contour patch and point closest to current fix
         public int closestRefPatch, closestRefPoint;
@@ -32,7 +32,7 @@ namespace AgOpenGPS
         //generated reference line
         public double refLineSide = 1.0;
 
-        public vec2 refPoint1 = new vec2(1, 1), refPoint2 = new vec2(2, 2);
+        public Vec2 refPoint1 = new Vec2(1, 1), refPoint2 = new Vec2(2, 2);
 
         public double distanceFromRefLine;
         public double distanceFromCurrentLine;
@@ -46,23 +46,23 @@ namespace AgOpenGPS
         //pure pursuit values
         public bool isValid;
 
-        public vec2 goalPointCT = new vec2(0, 0);
-        public vec2 radiusPointCT = new vec2(0, 0);
+        public Vec2 goalPointCT = new Vec2(0, 0);
+        public Vec2 radiusPointCT = new Vec2(0, 0);
         public double steerAngleCT;
         public double rEastCT, rNorthCT;
         public double ppRadiusCT;
 
         //list of strip data individual points
-        public List<vec3> ptList = new List<vec3>();
+        public List<Vec3> ptList = new List<Vec3>();
 
         //list of the list of individual Lines for entire field
-        public List<List<vec3>> stripList = new List<List<vec3>>();
+        public List<List<Vec3>> stripList = new List<List<Vec3>>();
 
         //list of points for the new contour line
-        public List<vec3> ctList = new List<vec3>();
+        public List<Vec3> ctList = new List<Vec3>();
 
         //list of points to determine position ofnew contour line
-        public List<cvec> conList = new List<cvec>();
+        public List<CVec> conList = new List<CVec>();
 
         //constructor
         public CContour(FormGPS _f)
@@ -71,7 +71,7 @@ namespace AgOpenGPS
         }
 
         //start stop and add points to list
-        public void StartContourLine(vec3 pivot)
+        public void StartContourLine(Vec3 pivot)
         {
             isContourOn = true;
             if (ptList.Count == 1)
@@ -82,26 +82,26 @@ namespace AgOpenGPS
             else
             {
                 //make new ptList
-                ptList = new List<vec3>();
+                ptList = new List<Vec3>();
                 stripList.Add(ptList);
             }
 
             //pivot.easting -= (Math.Sin(pivot.heading) * 5.0);
             //pivot.northing -= (Math.Cos(pivot.heading) * 5.0);
 
-            vec3 point = new vec3(pivot.easting, pivot.northing, pivot.heading);
+            Vec3 point = new Vec3(pivot.easting, pivot.northing, pivot.heading);
             ptList.Add(point);
         }
 
         //Add current position to stripList
-        public void AddPoint(vec3 pivot)
+        public void AddPoint(Vec3 pivot)
         {
-            vec3 point = new vec3(pivot.easting, pivot.northing, pivot.heading);
+            Vec3 point = new Vec3(pivot.easting, pivot.northing, pivot.heading);
             ptList.Add(point);
         }
 
         //End the strip
-        public void StopContourLine(vec3 pivot)
+        public void StopContourLine(Vec3 pivot)
         {
             //make sure its long enough to bother
             if (ptList.Count > 10)
@@ -109,11 +109,11 @@ namespace AgOpenGPS
                 //pivot.easting += (Math.Sin(pivot.heading) * 5.0);
                 //pivot.northing += (Math.Cos(pivot.heading) * 5.0);
 
-                vec3 point = new vec3(pivot.easting, pivot.northing, mf.fixHeading);
+                Vec3 point = new Vec3(pivot.easting, pivot.northing, mf.fixHeading);
                 ptList.Add(point);
 
                 //add the point list to the save list for appending to contour file
-                mf.contourSaveList.Add(ptList);
+                mf.ContourSaveList.Add(ptList);
             }
 
             //delete ptList
@@ -141,7 +141,7 @@ namespace AgOpenGPS
             double spacing = spacingInt;
             spacing *= 0.01;
 
-            vec3 point = new vec3();
+            Vec3 point = new Vec3();
             double totalHeadWidth;
             int signPass;
 
@@ -149,13 +149,13 @@ namespace AgOpenGPS
             {
                 signPass = -1;
                 //determine how wide a headland space
-                totalHeadWidth = ((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) * 0.5) - spacing;
+                totalHeadWidth = (mf.Tools[0].WidthMinusOverlap * 0.5) - spacing;
             }
 
             else
             {
                 signPass = 1;
-                totalHeadWidth = ((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) * pass) + spacing +
+                totalHeadWidth = (mf.Tools[0].WidthMinusOverlap * pass) + spacing +
                     ((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) * 0.5);
             }
 
@@ -166,7 +166,7 @@ namespace AgOpenGPS
                 //count the points from the boundary
                 int ptCount = mf.bnd.bndArr[j].bndLine.Count;
 
-                ptList = new List<vec3>();
+                ptList = new List<Vec3>();
                 stripList.Add(ptList);
 
                 for (int i = ptCount - 1; i >= 0; i--)
@@ -188,7 +188,7 @@ namespace AgOpenGPS
         }
 
         //determine closest point on left side
-        public void BuildContourGuidanceLine(vec3 pivot)
+        public void BuildContourGuidanceLine(Vec3 pivot)
         {
             double toolWid = mf.Tools[0].ToolWidth;
 
@@ -269,7 +269,7 @@ namespace AgOpenGPS
             int stripCount = stripList.Count;
             if (stripCount == 0) return;
 
-            cvec pointC = new cvec();
+            CVec pointC = new CVec();
             if (isRightPriority)
             {
                 //determine if points are in right side frustum box
@@ -491,7 +491,7 @@ namespace AgOpenGPS
                 //    stripList[strip][i].heading);
                 //ctList.Add(point);
 
-                var point = new vec3(
+                var point = new Vec3(
                     stripList[strip][i].easting + (Math.Sin(piSide + stripList[strip][i].heading) * mf.Tools[0].WidthMinusOverlap),
                     stripList[strip][i].northing + (Math.Cos(piSide + stripList[strip][i].heading) * mf.Tools[0].WidthMinusOverlap),
                     stripList[strip][i].heading);
@@ -582,7 +582,7 @@ namespace AgOpenGPS
         {
             //to calc heading based on next and previous points to give an average heading.
             int cnt = ctList.Count;
-            vec3[] arr = new vec3[cnt];
+            Vec3[] arr = new Vec3[cnt];
             cnt--;
             ctList.CopyTo(arr);
             ctList.Clear();
@@ -590,7 +590,7 @@ namespace AgOpenGPS
             //middle points
             for (int i = 1; i < cnt; i++)
             {
-                vec3 pt3 = arr[i];
+                Vec3 pt3 = arr[i];
                 pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
                 if (pt3.heading < 0) pt3.heading += Glm.twoPI;
                 ctList.Add(pt3);
@@ -598,7 +598,7 @@ namespace AgOpenGPS
         }
 
         //determine distance from contour guidance line
-        public void DistanceFromContourLine(vec3 pivot, vec3 steer)
+        public void DistanceFromContourLine(Vec3 pivot, Vec3 steer)
         {
             isValid = false;
             double minDistA = 1000000, minDistB = 1000000;

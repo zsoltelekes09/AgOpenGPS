@@ -14,7 +14,7 @@ namespace AgOpenGPS
         /// </summary>
         ///
         public List<CBoundaryLines> bndArr = new List<CBoundaryLines>();
-        public List<vec3> bndBeingMadePts = new List<vec3>();
+        public List<Vec3> bndBeingMadePts = new List<Vec3>();
 
         public double createBndOffset;
         public bool isBndBeingMade;
@@ -29,17 +29,17 @@ namespace AgOpenGPS
         }
 
         // the list of possible bounds points
-        public List<vec4> bndClosestList = new List<vec4>();
+        public List<Vec4> bndClosestList = new List<Vec4>();
 
         public int boundarySelected, closestBoundaryNum;
 
         //generated box for finding closest point
-        public vec2 boxA = new vec2(9000, 9000), boxB = new vec2(9000, 9002);
+        public Vec2 boxA = new Vec2(9000, 9000), boxB = new Vec2(9000, 9002);
 
-        public vec2 boxC = new vec2(9001, 9001), boxD = new vec2(9002, 9003);
+        public Vec2 boxC = new Vec2(9001, 9001), boxD = new Vec2(9002, 9003);
 
         //point at the farthest boundary segment from pivotAxle
-        public vec3 closestBoundaryPt = new vec3(-10000, -10000, 9);
+        public Vec3 closestBoundaryPt = new Vec3(-10000, -10000, 9);
 
         public void DrawBoundaryLines()
         {
@@ -53,7 +53,7 @@ namespace AgOpenGPS
             if (bndBeingMadePts.Count > 0)
             {
                 //the boundary so far
-                vec3 pivot = mf.pivotAxlePos;
+                Vec3 pivot = mf.pivotAxlePos;
                 GL.LineWidth(1);
                 GL.Color3(0.825f, 0.22f, 0.90f);
                 GL.Begin(PrimitiveType.LineLoop);

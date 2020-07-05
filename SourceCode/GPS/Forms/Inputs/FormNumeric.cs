@@ -20,7 +20,7 @@ namespace AgOpenGPS
             min = _min;
             InitializeComponent();
 
-            this.Text = gStr.gsEnteraValue;
+            Text = gStr.gsEnteraValue;
             //fill in the display
             tboxNumber.Text = currentValue.ToString();
 
@@ -112,7 +112,7 @@ namespace AgOpenGPS
             //Exit or cancel
             else if (e.KeyChar == 'X')
             {
-                this.DialogResult = DialogResult.Cancel;
+                DialogResult = DialogResult.Cancel;
                 Close();
             }
 
@@ -135,19 +135,19 @@ namespace AgOpenGPS
                 if (tryNumber < min)
                 {
                     tboxNumber.Text = gStr.gsError;
-                    lblMin.ForeColor = System.Drawing.Color.Red;
+                    lblMin.ForeColor = Color.Red;
                 }
                 else if (tryNumber > max)
                 {
                     tboxNumber.Text = gStr.gsError;
-                    lblMax.ForeColor = System.Drawing.Color.Red;
+                    lblMax.ForeColor = Color.Red;
                 }
                 else
                 {
                     //all good, return the value
-                    this.ReturnValue = tryNumber;
-                    this.DialogResult = DialogResult.OK;
-                    this.Close();
+                    ReturnValue = tryNumber;
+                    DialogResult = DialogResult.OK;
+                    Close();
                 }
             }
 

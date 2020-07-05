@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
     public class CAutoLoadField
     {
-        public List<vec2> Boundary = new List<vec2>();
+        public List<Vec2> Boundary = new List<Vec2>();
         public string Dir = "";
         public CAutoLoadField()
         {
             Dir = "";
-            Boundary = new List<vec2>();
+            Boundary = new List<Vec2>();
         }
     }
 }

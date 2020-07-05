@@ -5,9 +5,8 @@ using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
-    //each section is composed of a patchlist and triangle list
+    //each section is composed of a triangle list
     //the triangle list makes up the individual triangles that make the block or patch of applied (green spot)
-    //the patch list is a list of the list of triangles
 
     public class CSection
     {
@@ -15,10 +14,7 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         //list of patch data individual triangles
-        public List<vec3> triangleList = new List<vec3>();
-
-        //list of the list of patch data individual triangles for that entire section activity
-        public List<List<vec3>> patchList = new List<List<vec3>>();
+        public List<Vec3> triangleList = new List<Vec3>();
 
         //is this section on or off
         public bool IsSectionOn = false;
@@ -56,8 +52,8 @@ namespace AgOpenGPS
         public int rpSectionPosition = 0;
 
         //points in world space that start and end of section are in
-        public vec3 leftPoint;
-        public vec3 rightPoint;
+        public Vec3 leftPoint;
+        public Vec3 rightPoint;
 
         //whether or not this section is in boundary, headland
         public int numTriangles = 0;
@@ -83,18 +79,17 @@ namespace AgOpenGPS
                 IsMappingOn = true;
 
                 //starting a new patch chunk so create a new triangle list
-                triangleList = new List<vec3>();
-                patchList.Add(triangleList);
+                triangleList = new List<Vec3>();
 
-                vec3 colur = new vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
+                Vec3 colur = new Vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
                 triangleList.Add(colur);
 
                 //left side of triangle
-                vec3 point = new vec3(leftPoint.easting, leftPoint.northing, 0);
+                Vec3 point = new Vec3(leftPoint.easting, leftPoint.northing, 0);
                 triangleList.Add(point);
 
                 //Right side of triangle
-                point = new vec3(rightPoint.easting, rightPoint.northing, 0);
+                point = new Vec3(rightPoint.easting, rightPoint.northing, 0);
                 triangleList.Add(point);
             }
         }
@@ -109,12 +104,12 @@ namespace AgOpenGPS
             if (triangleList.Count > 4)
             {
                 //save the triangle list in a patch list to add to saving file
-                mf.patchSaveList.Add(triangleList);
+                mf.PatchSaveList.Add(triangleList);
+                mf.PatchDrawList.Add(triangleList);
             }
             else
             {
                 triangleList.Clear();
-                if (patchList.Count > 0) patchList.RemoveAt(patchList.Count - 1);
             }
         }
 
@@ -125,13 +120,13 @@ namespace AgOpenGPS
         {
             //add two triangles for next step.
             //left side
-            vec3 point = new vec3(leftPoint.easting,leftPoint.northing, 0);
+            Vec3 point = new Vec3(leftPoint.easting,leftPoint.northing, 0);
 
             //add the point to List
             triangleList.Add(point);
 
             //Right side
-            vec3 point2 = new vec3(rightPoint.easting, rightPoint.northing, 0);
+            Vec3 point2 = new Vec3(rightPoint.easting, rightPoint.northing, 0);
 
             //add the point to the list
             triangleList.Add(point2);
@@ -172,13 +167,14 @@ namespace AgOpenGPS
                 numTriangles = 0;
 
                 //save the cutoff patch to be saved later
-                mf.patchSaveList.Add(triangleList);
+                mf.PatchSaveList.Add(triangleList);
 
-                triangleList = new List<vec3>();
-                patchList.Add(triangleList);
+                mf.PatchDrawList.Add(triangleList);
+
+                triangleList = new List<Vec3>();
 
                 //Add Patch colour
-                vec3 colur = new vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
+                Vec3 colur = new Vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
                 triangleList.Add(colur);
 
                 //add the points to List, yes its more points, but breaks up patches for culling

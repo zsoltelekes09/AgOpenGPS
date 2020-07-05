@@ -79,7 +79,7 @@ namespace AgOpenGPS
 
         private void BtnAPoint_Click(object sender, EventArgs e)
         {
-            vec3 fix = new vec3();
+            Vec3 fix = new Vec3();
             fix = mf.pivotAxlePos;
 
             tboxHeading.Enabled = true;

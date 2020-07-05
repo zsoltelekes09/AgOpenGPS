@@ -98,7 +98,7 @@ namespace AgOpenGPS
         private void Timer1_Tick(object sender, EventArgs e)
         {
             //MakeDubinsLineFromPivotToFlag();
-            vec3 steerAxlePosRP = mf.pivotAxlePos;
+            Vec3 steerAxlePosRP = mf.pivotAxlePos;
             if (mf.isMetric)
                 lblDistanceToFlag.Text = Glm.Distance(steerAxlePosRP,
                     mf.flagPts[mf.flagNumberPicked - 1].easting, mf.flagPts[mf.flagNumberPicked - 1].northing).ToString("N2") + " m";
@@ -119,10 +119,10 @@ namespace AgOpenGPS
             CDubins dubPath = new CDubins();
 
             // current psition
-            vec3 steerAxlePosRP = mf.pivotAxlePos;
+            Vec3 steerAxlePosRP = mf.pivotAxlePos;
 
             //bump it back so you can line up to point
-            vec3 goal = new vec3
+            Vec3 goal = new Vec3
             {
                 easting = mf.flagPts[mf.flagNumberPicked - 1].easting - (Math.Sin(mf.flagPts[mf.flagNumberPicked - 1].heading) * 6),
                 northing = mf.flagPts[mf.flagNumberPicked - 1].northing - (Math.Cos(mf.flagPts[mf.flagNumberPicked - 1].heading) * 6),
@@ -130,7 +130,7 @@ namespace AgOpenGPS
             };
 
             //bump it forward
-            vec3 pt2 = new vec3
+            Vec3 pt2 = new Vec3
             {
                 easting = steerAxlePosRP.easting + (Math.Sin(steerAxlePosRP.heading) * 6),
                 northing = steerAxlePosRP.northing + (Math.Cos(steerAxlePosRP.heading) * 6),

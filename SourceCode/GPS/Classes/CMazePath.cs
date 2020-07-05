@@ -31,9 +31,9 @@ namespace AgOpenGPS
         private enum Status
         { Ready, Waiting, Processed }
 
-        public List<vec3> Search(int iFromY, int iFromX, int iToY, int iToX)
+        public List<Vec3> Search(int iFromY, int iFromX, int iToY, int iToX)
         {
-            List<vec3> mazeList = new List<vec3>();
+            List<Vec3> mazeList = new List<Vec3>();
 
             int iStart = (int)((iFromY * numCols) + iFromX);
             int iStop = (int)((iToY * numCols) + iToX);
@@ -195,7 +195,7 @@ namespace AgOpenGPS
                 iFront++;
             }
 
-            vec3 ptt = new vec3();
+            Vec3 ptt = new Vec3();
 
             iCurrent = iStop;
             //Y

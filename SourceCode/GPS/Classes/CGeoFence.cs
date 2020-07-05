@@ -20,10 +20,10 @@ namespace AgOpenGPS
         }
 
 
-        public void FindPointsDriveAround(vec3 fromPt, double headAB, ref vec3 start, ref vec3 stop)
+        public void FindPointsDriveAround(Vec3 fromPt, double headAB, ref Vec3 start, ref Vec3 stop)
         {
             //initial scan is straight ahead of pivot point of vehicle to find the right turnLine/boundary
-            vec3 pt = new vec3();
+            Vec3 pt = new Vec3();
 
             bool isFound = false;
             int closestTurnNum = 99;
@@ -133,7 +133,7 @@ namespace AgOpenGPS
             }
         }
 
-        public bool IsPointInsideGeoFences(vec3 pt)
+        public bool IsPointInsideGeoFences(Vec3 pt)
         {
             //if inside outer boundary, then potentially add
             if (geoFenceArr.Count > 0 && geoFenceArr[0].IsPointInGeoFenceArea(pt))
@@ -154,7 +154,7 @@ namespace AgOpenGPS
             }
         }
 
-        public bool IsPointInsideGeoFences(vec2 pt)
+        public bool IsPointInsideGeoFences(Vec2 pt)
         {
             //if inside outer boundary, then potentially add
             if (geoFenceArr.Count > 0 && geoFenceArr[0].IsPointInGeoFenceArea(pt))
@@ -183,7 +183,7 @@ namespace AgOpenGPS
             }
 
             //to fill the list of line points
-            vec3 point = new vec3();
+            Vec3 point = new Vec3();
 
             //inside boundaries
             for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
@@ -204,7 +204,7 @@ namespace AgOpenGPS
                     //only add if outside actual field boundary
                     if ((j == 0 && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (j != 0 && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
                     {
-                        vec2 tPnt = new vec2(point.easting, point.northing);
+                        Vec2 tPnt = new Vec2(point.easting, point.northing);
                         geoFenceArr[j].geoFenceLine.Add(tPnt);
                     }
                 }

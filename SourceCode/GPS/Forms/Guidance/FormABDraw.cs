@@ -23,9 +23,9 @@ namespace AgOpenGPS
         private bool isDrawSections = false;
 
         //list of coordinates of boundary line
-        public List<vec3> turnLine = new List<vec3>();
+        public List<Vec3> turnLine = new List<Vec3>();
 
-        private vec3[] arr;
+        private Vec3[] arr;
 
         private void FixLabelsCurve()
         {
@@ -158,12 +158,12 @@ namespace AgOpenGPS
             isMakingAB = isMakingCurve = false;
             isA = true;
             start = end = 99999;
-            
+
             if (Boundary < 0 || Boundary > mf.bnd.bndArr.Count - 1) Boundary = mf.bnd.bndArr.Count - 1;
             UpdateBoundary();
         }
 
-        public vec3 pint = new vec3(0.0, 1.0, 0.0);
+        public Vec3 pint = new Vec3(0.0, 1.0, 0.0);
 
         public FormABDraw(Form callingForm)
         {
@@ -190,7 +190,7 @@ namespace AgOpenGPS
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
                 int cnt = mf.bnd.bndArr[Boundary].bndLine.Count;
-                arr = new vec3[cnt * 2];
+                arr = new Vec3[cnt * 2];
 
                 for (int i = 0; i < cnt; i++)
                 {
@@ -232,7 +232,7 @@ namespace AgOpenGPS
                 //Convert to Origin in the center of window, 800 pixels
                 fixPt.X = pt.X - 350;
                 fixPt.Y = (700 - pt.Y - 350);
-                vec3 plotPt = new vec3
+                Vec3 plotPt = new Vec3
                 {
                     //convert screen coordinates to field coordinates
                     easting = ((double)fixPt.X) * (double)maxFieldDistance / 632.0,
@@ -343,7 +343,7 @@ namespace AgOpenGPS
             mf.curve.CircleMode = false;
 
             mf.curve.refList?.Clear();
-            vec2 chk = new vec2(arr[start].easting, arr[start].northing);
+            Vec2 chk = new Vec2(arr[start].easting, arr[start].northing);
 
             for (int i = start; i < end; i++)
             {
@@ -361,7 +361,7 @@ namespace AgOpenGPS
                     double distance = Glm.Distance(mf.curve.refList[i], mf.curve.refList[j]);
                     if (distance > 1.2)
                     {
-                        vec3 pointB = new vec3((mf.curve.refList[i].easting + mf.curve.refList[j].easting) / 2.0,
+                        Vec3 pointB = new Vec3((mf.curve.refList[i].easting + mf.curve.refList[j].easting) / 2.0,
                             (mf.curve.refList[i].northing + mf.curve.refList[j].northing) / 2.0,
                             mf.curve.refList[i].heading);
 
@@ -408,7 +408,7 @@ namespace AgOpenGPS
                 }
                 cnt = mf.curve.refList.Count;
 
-                vec3[] arrMove = new vec3[cnt];
+                Vec3[] arrMove = new Vec3[cnt];
                 mf.curve.refList.CopyTo(arrMove);
                 mf.curve.refList.Clear();
 
@@ -491,9 +491,9 @@ namespace AgOpenGPS
             }
 
             //sin x cos z for endpoints, opposite for additional lines
-            mf.ABLine.lineArr[idx].ref1.easting =   mf.ABLine.lineArr[idx].origin.easting - (Math.Sin(mf.ABLine.lineArr[idx].heading) * 1600.0);
+            mf.ABLine.lineArr[idx].ref1.easting = mf.ABLine.lineArr[idx].origin.easting - (Math.Sin(mf.ABLine.lineArr[idx].heading) * 1600.0);
             mf.ABLine.lineArr[idx].ref1.northing = mf.ABLine.lineArr[idx].origin.northing - (Math.Cos(mf.ABLine.lineArr[idx].heading) * 1600.0);
-            mf.ABLine.lineArr[idx].ref2.easting =  mf.ABLine.lineArr[idx].origin.easting +  (Math.Sin(mf.ABLine.lineArr[idx].heading) * 1600.0);
+            mf.ABLine.lineArr[idx].ref2.easting = mf.ABLine.lineArr[idx].origin.easting + (Math.Sin(mf.ABLine.lineArr[idx].heading) * 1600.0);
             mf.ABLine.lineArr[idx].ref2.northing = mf.ABLine.lineArr[idx].origin.northing + (Math.Cos(mf.ABLine.lineArr[idx].heading) * 1600.0);
 
             //create a name
@@ -558,83 +558,56 @@ namespace AgOpenGPS
         private void DrawBuiltLines()
         {
             int numLines = mf.ABLine.lineArr.Count;
+            int numCurves = mf.curve.curveArr.Count;
 
-            if (numLines > 0)
+            if (numLines > 0 || numCurves > 0)
             {
+                GL.LineWidth(2);
+                GL.Color3(1.0f, 0.0f, 0.0f);
                 GL.Enable(EnableCap.LineStipple);
                 GL.LineStipple(1, 0x0707);
-                GL.Color3(1.0f, 0.0f, 0.0f);
 
                 for (int i = 0; i < numLines; i++)
                 {
-                    GL.LineWidth(2);
-                    GL.Begin(PrimitiveType.Lines);
-
-                    foreach (var item in mf.ABLine.lineArr)
+                    if (mf.ABLine.numABLineSelected - 1 != i)
                     {
-                        GL.Vertex3(item.ref1.easting, item.ref1.northing, 0);
-                        GL.Vertex3(item.ref2.easting, item.ref2.northing, 0);
+                        GL.Begin(PrimitiveType.Lines);
+                        GL.Vertex3(mf.ABLine.lineArr[i].ref1.easting, mf.ABLine.lineArr[i].ref1.northing, 0);
+                        GL.Vertex3(mf.ABLine.lineArr[i].ref2.easting, mf.ABLine.lineArr[i].ref2.northing, 0);
+                        GL.End();
                     }
-                    GL.End();
+                }
+
+                GL.Color3(0.0f, 1.0f, 0.0f);
+                for (int i = 0; i < numCurves; i++)
+                {
+                    if (mf.curve.numCurveLineSelected - 1 != i)
+                    {
+                        GL.Begin(PrimitiveType.LineStrip);
+                        foreach (Vec3 item in mf.curve.curveArr[i].curvePts)
+                        {
+                            GL.Vertex3(item.easting, item.northing, 0);
+                        }
+                        GL.End();
+                    }
                 }
 
                 GL.Disable(EnableCap.LineStipple);
-
+                GL.LineWidth(4);
                 if (mf.ABLine.numABLineSelected > 0)
                 {
                     GL.Color3(1.0f, 0.0f, 0.0f);
-
-                    GL.LineWidth(4);
                     GL.Begin(PrimitiveType.Lines);
-
-                    foreach (var item in mf.ABLine.lineArr)
-                    {
-                        GL.Vertex3(mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref1.easting, mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref1.northing, 0);
-                        GL.Vertex3(mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref2.easting, mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref2.northing, 0);
-                    }
+                    GL.Vertex3(mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref1.easting, mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref1.northing, 0);
+                    GL.Vertex3(mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref2.easting, mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].ref2.northing, 0);
                     GL.End();
                 }
-            }
-
-            int numCurv = mf.curve.curveArr.Count;
-
-            if (numCurv > 0)
-            {
-                GL.Enable(EnableCap.LineStipple);
-                GL.LineStipple(1, 0x7070);
-
-                for (int i = 0; i < numCurv; i++)
-                {
-                    if (mf.curve.curveArr[i].circlemode || mf.curve.curveArr[i].spiralmode)
-                    {
-                        //System.Windows.Forms.MessageBox.Show("circle / spiral");
-                    }
-                    GL.LineWidth(2);
-                    GL.Color3(0.0f, 1.0f, 0.0f);
-                    GL.Begin(PrimitiveType.LineStrip);
-                    foreach (var item in mf.curve.curveArr[i].curvePts)
-                    {
-                        GL.Vertex3(item.easting, item.northing, 0);
-                    }
-                    GL.End();
-                }
-
-
-                //why double draw?;)
-
-
-                GL.Disable(EnableCap.LineStipple);
 
                 if (mf.curve.numCurveLineSelected > 0)
                 {
-                    if (mf.curve.curveArr[mf.curve.numCurveLineSelected - 1].circlemode || mf.curve.curveArr[mf.curve.numCurveLineSelected - 1].spiralmode)
-                    {
-                        //System.Windows.Forms.MessageBox.Show("circle / spiral");
-                    }
-                    GL.LineWidth(4);
                     GL.Color3(0.0f, 1.0f, 0.0f);
                     GL.Begin(PrimitiveType.LineStrip);
-                    foreach (var item in mf.curve.curveArr[mf.curve.numCurveLineSelected - 1].curvePts)
+                    foreach (Vec3 item in mf.curve.curveArr[mf.curve.numCurveLineSelected - 1].curvePts)
                     {
                         GL.Vertex3(item.easting, item.northing, 0);
                     }
@@ -717,7 +690,7 @@ namespace AgOpenGPS
                 }
                 mf.curve.aveLineHeading = mf.curve.curveArr[idx].aveHeading;
                 mf.curve.refList?.Clear();
-                foreach (vec3 v in mf.curve.curveArr[idx].curvePts) mf.curve.refList.Add(v);
+                foreach (Vec3 v in mf.curve.curveArr[idx].curvePts) mf.curve.refList.Add(v);
                 mf.curve.isCurveSet = true;
             }
             else
@@ -785,44 +758,56 @@ namespace AgOpenGPS
 
             GL.Color3(0.0, 0.0, 0.352);
 
-            for (int i = 0; i < mf.Tools.Count; i++)
+            //for every new chunk of patch
+            foreach (var triList in mf.PatchDrawList)
             {
-                //draw patches j= # of sections
-                for (int j = 0; j <= mf.Tools[i].numOfSections; j++)
+                //draw the triangle in each triangle strip
+                GL.Begin(PrimitiveType.TriangleStrip);
+                cnt = triList.Count;
+                if (mf.isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
+                else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
+
+                //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
+                if (cnt >= (mipmap + 2))
                 {
-                    //every time the section turns off and on is a new patch
-                    patchCount = mf.Tools[i].section[j].patchList.Count;
-
-                    if (patchCount > 0)
+                    step = mipmap;
+                    for (int k = 1; k < cnt - 2; k += step)
                     {
-                        //for every new chunk of patch
-                        foreach (var triList in mf.Tools[i].section[j].patchList)
-                        {
-                            //draw the triangle in each triangle strip
-                            GL.Begin(PrimitiveType.TriangleStrip);
-                            cnt = triList.Count;
-                            if (mf.isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
-                            else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
-
-                            //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                            if (cnt >= (mipmap + 2))
-                            {
-                                step = mipmap;
-                                for (int k = 1; k < cnt - 2; k += step)
-                                {
-                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                    if (cnt - k <= (mipmap + 2)) step = 0;//too small to mipmap it
-                                }
-                            }
-                            else { for (int k = 1; k < cnt; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
-                            GL.End();
-
-                        }
+                        GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                        GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
+                        if (cnt - k <= (mipmap + 2)) step = 0;//too small to mipmap it
                     }
-                } //end of section patches
+                }
+                else { for (int k = 1; k < cnt; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
+                GL.End();
             }
 
+            for (int i = 0; i < mf.Tools.Count; i++)
+            {
+                for (int j = 0; j <= mf.Tools[i].numOfSections; j++)
+                {
+                    // the follow up to sections patches
+                    if ((patchCount = mf.Tools[i].Sections[j].triangleList.Count) > 0)
+                    {
+                        if (mf.isDay) GL.Color4((byte)mf.Tools[i].Sections[j].triangleList[0].easting, (byte)mf.Tools[i].Sections[j].triangleList[0].northing, (byte)mf.Tools[i].Sections[j].triangleList[0].heading, (byte)152);
+                        else GL.Color4((byte)mf.Tools[i].Sections[j].triangleList[0].easting, (byte)mf.Tools[i].Sections[j].triangleList[0].northing, (byte)mf.Tools[i].Sections[j].triangleList[0].heading, (byte)(152 * 0.5));
+
+                        //draw the triangle in each triangle strip
+                        GL.Begin(PrimitiveType.TriangleStrip);
+
+                        for (int k = 1; k < patchCount; k++)
+                        {
+                            GL.Vertex3(mf.Tools[i].Sections[j].triangleList[k].easting, mf.Tools[i].Sections[j].triangleList[k].northing, 0);
+                        }
+                        if (mf.Tools[i].Sections[j].IsMappingOn)
+                        {
+                            GL.Vertex3(mf.Tools[i].Sections[j].leftPoint.easting, mf.Tools[i].Sections[j].leftPoint.northing, 0);
+                            GL.Vertex3(mf.Tools[i].Sections[j].rightPoint.easting, mf.Tools[i].Sections[j].rightPoint.northing, 0);
+                        }
+                        GL.End();
+                    }
+                }
+            }
         }
 
         //determine mins maxs of patches and whole field.

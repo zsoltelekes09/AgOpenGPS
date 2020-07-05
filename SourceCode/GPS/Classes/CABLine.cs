@@ -10,13 +10,13 @@ namespace AgOpenGPS
         public double abHeading;
         public double angVel;
         //the current AB guidance line
-        public vec2 currentABLineP1 = new vec2(0.0, 0.0);
+        public Vec2 currentABLineP1 = new Vec2(0.0, 0.0);
 
-        public vec2 currentABLineP2 = new vec2(0.0, 1.0);
+        public Vec2 currentABLineP2 = new Vec2(0.0, 1.0);
         public double distanceFromCurrentLine;
         public double distanceFromRefLine;
         //pure pursuit values
-        public vec2 goalPointAB = new vec2(0, 0);
+        public Vec2 goalPointAB = new Vec2(0, 0);
 
         //List of all available ABLines
         public List<CABLines> lineArr = new List<CABLines>();
@@ -34,24 +34,24 @@ namespace AgOpenGPS
         //public int tramBasedOn;
         public double passNumber;
         public double ppRadiusAB;
-        public vec2 radiusPointAB = new vec2(0, 0);
+        public Vec2 radiusPointAB = new Vec2(0, 0);
         public double rEastAB, rNorthAB;
         //the reference line endpoints
-        public vec2 refABLineP1 = new vec2(0.0, 0.0);
-        public vec2 refABLineP2 = new vec2(0.0, 1.0);
+        public Vec2 refABLineP1 = new Vec2(0.0, 0.0);
+        public Vec2 refABLineP2 = new Vec2(0.0, 1.0);
         
         public double refLineSide = 1.0;
         //the two inital A and B points
-        public vec2 refPoint1 = new vec2(0.2, 0.15);
-        public vec2 refPoint2 = new vec2(0.3, 0.3);
+        public Vec2 refPoint1 = new Vec2(0.2, 0.15);
+        public Vec2 refPoint2 = new Vec2(0.3, 0.3);
 
         public double snapDistance;
         public double steerAngleAB;
         public int lineWidth;
 
         //tramlines
-        public List<vec2> tramArr = new List<vec2>();
-        public List<List<vec2>> tramList = new List<List<vec2>>();
+        public List<Vec2> tramArr = new List<Vec2>();
+        public List<List<Vec2>> tramList = new List<List<Vec2>>();
 
         //Color tramColor = Color.YellowGreen;
         public int tramPassEvery;
@@ -108,7 +108,7 @@ namespace AgOpenGPS
 
             if (!isEditing)
             {
-                if (mf.isSideGuideLines && mf.camera.camSetDistance > mf.Tools[0].ToolWidth * -120)
+                if (mf.isSideGuideLines)
                 {
 
                     double cosHeading = Math.Cos(-abHeading);
@@ -228,14 +228,14 @@ namespace AgOpenGPS
 
             tramList?.Clear();
             tramArr?.Clear();
-            List<vec2> tramRef = new List<vec2>();
+            List<Vec2> tramRef = new List<Vec2>();
 
             double pass = 0.5;
             double hsin = Math.Sin(abHeading);
             double hcos = Math.Cos(abHeading);
 
             //divide up the AB line into segments
-            vec2 P1 = new vec2();
+            Vec2 P1 = new Vec2();
             for (int i = 0; i < 3200; i += 4)
             {
                 P1.easting = (hsin * i) + refABLineP1.easting;
@@ -253,7 +253,7 @@ namespace AgOpenGPS
 
             for (int i = 0; i < mf.tram.passes; i++)
             {
-                tramArr = new List<vec2>();
+                tramArr = new List<Vec2>();
                 tramList.Add(tramArr);
 
                 for (int j = 0; j < tramRef.Count; j++)
@@ -286,7 +286,7 @@ namespace AgOpenGPS
             //outside tram
         }
 
-        public void GetCurrentABLine(vec3 pivot, vec3 steer)
+        public void GetCurrentABLine(Vec3 pivot, Vec3 steer)
         {
             isABSameAsVehicleHeading = Math.PI - Math.Abs(Math.Abs(pivot.heading - abHeading) - Math.PI) < Glm.PIBy2;
 
@@ -306,7 +306,7 @@ namespace AgOpenGPS
             if (distanceFromRefLine < 0) passNumber = -passNumber;
 
             //calculate the new point that is number of implement widths over
-            vec2 point1;
+            Vec2 point1;
 
 
             double piSide;
@@ -327,7 +327,7 @@ namespace AgOpenGPS
                 else Offset += mf.Tools[0].ToolOffset;
             }
 
-            point1 = new vec2(refPoint1.easting + (Math.Sin(-abHeading + piSide) * Offset), refPoint1.northing + (Math.Cos(abHeading + piSide) * Offset));
+            point1 = new Vec2(refPoint1.easting + (Math.Sin(-abHeading + piSide) * Offset), refPoint1.northing + (Math.Cos(abHeading + piSide) * Offset));
 
             //create the new line extent points for current ABLine based on original heading of AB line
             currentABLineP1.easting = point1.easting - (Math.Sin(abHeading) * 1600.0);
@@ -575,14 +575,14 @@ namespace AgOpenGPS
 
         public void DeleteAB()
         {
-            refPoint1 = new vec2(0.0, 0.0);
-            refPoint2 = new vec2(0.0, 1.0);
+            refPoint1 = new Vec2(0.0, 0.0);
+            refPoint2 = new Vec2(0.0, 1.0);
 
-            refABLineP1 = new vec2(0.0, 0.0);
-            refABLineP2 = new vec2(0.0, 1.0);
+            refABLineP1 = new Vec2(0.0, 0.0);
+            refABLineP2 = new Vec2(0.0, 1.0);
 
-            currentABLineP1 = new vec2(0.0, 0.0);
-            currentABLineP2 = new vec2(0.0, 1.0);
+            currentABLineP1 = new Vec2(0.0, 0.0);
+            currentABLineP2 = new Vec2(0.0, 1.0);
 
             abHeading = 0.0;
             passNumber = 0.0;
@@ -668,9 +668,9 @@ namespace AgOpenGPS
 
         public class CABLines
     {
-        public vec2 ref1 = new vec2();
-        public vec2 ref2 = new vec2();
-        public vec2 origin = new vec2();
+        public Vec2 ref1 = new Vec2();
+        public Vec2 ref2 = new Vec2();
+        public Vec2 origin = new Vec2();
         public double heading = 0;
         public string Name = "aa";
     }

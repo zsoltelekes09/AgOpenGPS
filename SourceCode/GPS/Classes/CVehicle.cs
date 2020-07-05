@@ -111,7 +111,7 @@ namespace AgOpenGPS
                     //hitch pin
                     GL.Vertex3(0, antennaPivot, 0);
                     GL.Color3(0.95f, 0.0f, 0.0f);
-                    GL.Vertex3(0, mf.Tools[i].hitchLength, 0);
+                    GL.Vertex3(0, mf.Tools[i].HitchLength, 0);
                     GL.End();
                 }
             }
@@ -267,7 +267,7 @@ namespace AgOpenGPS
                 if (mf.Tools[i].isToolBehindPivot)
                 {
                     GL.Begin(PrimitiveType.Lines);
-                    GL.Vertex3(0, mf.Tools[i].hitchLength, 0);
+                    GL.Vertex3(0, mf.Tools[i].HitchLength, 0);
                     GL.Vertex3(0, 0, 0);
                     GL.End();
                 }

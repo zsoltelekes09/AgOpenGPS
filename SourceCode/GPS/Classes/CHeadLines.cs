@@ -7,11 +7,11 @@ namespace AgOpenGPS
     public class CHeadLines
     {
         //list of coordinates of boundary line
-        public List<vec3> HeadLine = new List<vec3>();
-        public List<vec3> HeadArea = new List<vec3>();
+        public List<Vec3> HeadLine = new List<Vec3>();
+        public List<Vec3> HeadArea = new List<Vec3>();
 
         //the list of constants and multiples of the boundary
-        public List<vec2> calcList = new List<vec2>();
+        public List<Vec2> calcList = new List<Vec2>();
         public List<bool> isDrawList = new List<bool>();
 
         public double Northingmin, Northingmax, Eastingmin, Eastingmax;
@@ -82,7 +82,7 @@ namespace AgOpenGPS
             int j = HeadLine.Count - 1;
             //clear the list, constant is easting, multiple is northing
             calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
+            Vec2 constantMultiple = new Vec2(0, 0);
 
             Northingmin = Northingmax = HeadLine[0].northing;
             Eastingmin = Eastingmax = HeadLine[0].easting;
@@ -132,7 +132,7 @@ namespace AgOpenGPS
             var v = new ContourVertex[HeadLine.Count];
             for (int i = 0; i < HeadLine.Count; i++)
             {
-                if (isDrawList[i]) v[i].Position = new Vec3(HeadLine[i].easting, HeadLine[i].northing, 0);
+                if (isDrawList[i]) v[i].Position = new Vec6(HeadLine[i].easting, HeadLine[i].northing, 0);
             }
 
             Tess _tess = new Tess();
@@ -148,7 +148,7 @@ namespace AgOpenGPS
                 {
                     int index = _tess.Elements[i * 3 + k];
                     if (index == -1) continue;
-                    HeadArea.Add(new vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
+                    HeadArea.Add(new Vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
                 }
             }
         }

@@ -158,7 +158,7 @@ namespace AgOpenGPS
 
                     if (File.Exists(filename))
                     {
-                        List<vec3> pointList = new List<vec3>();
+                        List<Vec3> pointList = new List<Vec3>();
 
                         using (StreamReader reader = new StreamReader(filename))
                         {
@@ -187,7 +187,7 @@ namespace AgOpenGPS
                                     }
 
                                     int numPoints = int.Parse(line);
-                                    vec2[] linePoints = new vec2[numPoints];
+                                    Vec2[] linePoints = new Vec2[numPoints];
 
                                     if (numPoints > 0)
                                     {
@@ -196,7 +196,7 @@ namespace AgOpenGPS
                                         {
                                             line = reader.ReadLine();
                                             string[] words = line.Split(',');
-                                            vec2 vecPt = new vec2(
+                                            Vec2 vecPt = new Vec2(
                                             double.Parse(words[0], CultureInfo.InvariantCulture) + eastingOffset,
                                             double.Parse(words[1], CultureInfo.InvariantCulture) + northingOffset);
 

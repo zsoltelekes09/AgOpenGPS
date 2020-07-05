@@ -20,13 +20,13 @@ namespace AgOpenGPS
         private int A, B, C, D, E, start = 99999, end = 99999;     
 
         private int Boundary = -1;
-        public vec3 pint = new vec3(0.0, 1.0, 0.0);
+        public Vec3 pint = new Vec3(0.0, 1.0, 0.0);
 
         //list of coordinates of boundary line
-        public List<vec3> headLineTemplate = new List<vec3>();
+        public List<Vec3> headLineTemplate = new List<Vec3>();
 
-        private vec3[] hdx2;
-        private vec3[] hdArr = new vec3[0];
+        private Vec3[] hdx2;
+        private Vec3[] hdArr = new Vec3[0];
 
         public FormHeadland(Form callingForm)
         {
@@ -72,7 +72,7 @@ namespace AgOpenGPS
             {
                 if (mf.hd.headArr[Boundary].HeadLine.Count > 0)
                 {
-                    hdArr = new vec3[mf.hd.headArr[Boundary].HeadLine.Count];
+                    hdArr = new Vec3[mf.hd.headArr[Boundary].HeadLine.Count];
                     mf.hd.headArr[Boundary].HeadLine.CopyTo(hdArr);
                     RebuildHeadLineTemplate();
                 }
@@ -86,7 +86,7 @@ namespace AgOpenGPS
         public void BuildHeadLineTemplateFromBoundary()
         {
             //to fill the list of line points
-            vec3 point = new vec3();
+            Vec3 point = new Vec3();
 
             //outside boundary - count the points from the boundary
             headLineTemplate.Clear();
@@ -107,10 +107,10 @@ namespace AgOpenGPS
 
             int cnt = headLineTemplate.Count;
 
-            hdArr = new vec3[cnt];
+            hdArr = new Vec3[cnt];
             headLineTemplate.CopyTo(hdArr);
 
-            hdx2 = new vec3[cnt * 2];
+            hdx2 = new Vec3[cnt * 2];
 
             for (int i = 0; i < cnt; i++)
             {
@@ -132,16 +132,16 @@ namespace AgOpenGPS
             int cnt = hdArr.Length;
             for (int i = 0; i < cnt; i++)
             {
-                vec3 pt = new vec3(hdArr[i]);
+                Vec3 pt = new Vec3(hdArr[i]);
                 headLineTemplate.Add(pt);
             }
 
             cnt = headLineTemplate.Count;
 
-            hdArr = new vec3[cnt];
+            hdArr = new Vec3[cnt];
             headLineTemplate.CopyTo(hdArr);
 
-            hdx2 = new vec3[cnt * 2];
+            hdx2 = new Vec3[cnt * 2];
 
             for (int i = 0; i < cnt; i++)
             {
@@ -158,11 +158,11 @@ namespace AgOpenGPS
             UpdateBoundary();
         }
 
-        private void FixTurnLine(double totalHeadWidth, List<vec3> curBnd, double spacing)
+        private void FixTurnLine(double totalHeadWidth, List<Vec3> curBnd, double spacing)
         {
             //count the points from the boundary
 
-            var foos = new List<vec3>(hdArr);
+            var foos = new List<Vec3>(hdArr);
 
             int lineCount = foos.Count;
             double distance;
@@ -203,7 +203,7 @@ namespace AgOpenGPS
 
             bndCount = foos.Count;
 
-            hdArr = new vec3[bndCount];
+            hdArr = new Vec3[bndCount];
             foos.CopyTo(hdArr);
 
             ////make sure distance isn't too big between points on Turn
@@ -364,7 +364,7 @@ namespace AgOpenGPS
                 //Convert to Origin in the center of window, 800 pixels
                 fixPt.X = pt.X - 350;
                 fixPt.Y = (700 - pt.Y - 350);
-                vec3 plotPt = new vec3
+                Vec3 plotPt = new Vec3
                 {
                     //convert screen coordinates to field coordinates
                     easting = ((double)fixPt.X) * (double)maxFieldDistance / 632.0,
@@ -590,7 +590,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < hdArr.Length; i++)
                 {
-                    vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
+                    Vec3 pt = new Vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
                     mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
                     if (Boundary == 0 ? mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt) : !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
@@ -611,7 +611,7 @@ namespace AgOpenGPS
 
             if (mf.hd.headArr[Boundary].HeadLine.Count > 0)
             {
-                hdArr = new vec3[mf.hd.headArr[Boundary].HeadLine.Count];
+                hdArr = new Vec3[mf.hd.headArr[Boundary].HeadLine.Count];
                 mf.hd.headArr[Boundary].HeadLine.CopyTo(hdArr);
                 RebuildHeadLineTemplate();
             }
@@ -630,7 +630,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < hdArr.Length; i++)
                 {
-                    vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
+                    Vec3 pt = new Vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
                     mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
                     if (Boundary == 0 ? mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt) : !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
@@ -650,7 +650,7 @@ namespace AgOpenGPS
 
             if (mf.hd.headArr[Boundary].HeadLine.Count > 0)
             {
-                hdArr = new vec3[mf.hd.headArr[Boundary].HeadLine.Count];
+                hdArr = new Vec3[mf.hd.headArr[Boundary].HeadLine.Count];
                 mf.hd.headArr[Boundary].HeadLine.CopyTo(hdArr);
                 RebuildHeadLineTemplate();
             }
@@ -729,7 +729,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < hdArr.Length; i++)
                 {
-                    vec3 pt = new vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
+                    Vec3 pt = new Vec3(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
                     mf.hd.headArr[Boundary].HeadLine.Add(pt);
 
                     if (Boundary == 0 ? mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt) : !mf.gf.geoFenceArr[Boundary].IsPointInGeoFenceArea(pt)) mf.hd.headArr[Boundary].isDrawList.Add(true);
@@ -772,7 +772,7 @@ namespace AgOpenGPS
                                                 headLineTemplate[j].easting, headLineTemplate[j].northing);
                 if (distanceSq > 2.3)
                 {
-                    vec3 pointB = new vec3((headLineTemplate[i].easting + headLineTemplate[j].easting) / 2.0,
+                    Vec3 pointB = new Vec3((headLineTemplate[i].easting + headLineTemplate[j].easting) / 2.0,
                         (headLineTemplate[i].northing + headLineTemplate[j].northing) / 2.0,
                         headLineTemplate[j].heading);
 
@@ -783,7 +783,7 @@ namespace AgOpenGPS
             }
 
             int cnt = headLineTemplate.Count;
-            hdArr = new vec3[cnt];
+            hdArr = new Vec3[cnt];
             headLineTemplate.CopyTo(hdArr);
 
             RebuildHeadLineTemplate();

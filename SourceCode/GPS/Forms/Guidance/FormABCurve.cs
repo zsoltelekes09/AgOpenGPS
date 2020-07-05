@@ -91,7 +91,7 @@ namespace AgOpenGPS
             int cnt = mf.curve.refList.Count;
 
             //the temp array
-            vec3[] arr = new vec3[cnt];
+            Vec3[] arr = new Vec3[cnt];
 
             //read the points before and after the setpoint
             for (int s = 0; s < smPts / 2; s++)
@@ -274,12 +274,12 @@ namespace AgOpenGPS
                     northing /= mf.curve.refList.Count;
 
                     mf.curve.refList?.Clear();
-                    mf.curve.refList.Add(new vec3(easting, northing, 0));
+                    mf.curve.refList.Add(new Vec3(easting, northing, 0));
 
                 }
                 else if (mf.curve.refList.Count < 1)
                 {
-                    mf.curve.refList.Add(new vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
+                    mf.curve.refList.Add(new Vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
                 }
 
 
@@ -314,7 +314,7 @@ namespace AgOpenGPS
                     double distance = Glm.Distance(mf.curve.refList[i], mf.curve.refList[j]);
                     if (distance > 1.2)
                     {
-                        vec3 pointB = new vec3((mf.curve.refList[i].easting + mf.curve.refList[j].easting) / 2.0,
+                        Vec3 pointB = new Vec3((mf.curve.refList[i].easting + mf.curve.refList[j].easting) / 2.0,
                             (mf.curve.refList[i].northing + mf.curve.refList[j].northing) / 2.0,
                             mf.curve.refList[i].heading);
 
@@ -450,7 +450,7 @@ namespace AgOpenGPS
                     if (mf.curve.curveArr[idx].curvePts.Count == 1)
                     {
                         mf.curve.refList.Clear();
-                        mf.curve.refList.Add(new vec3(mf.curve.curveArr[idx].curvePts[0].easting, mf.curve.curveArr[idx].curvePts[0].northing, 0));
+                        mf.curve.refList.Add(new Vec3(mf.curve.curveArr[idx].curvePts[0].easting, mf.curve.curveArr[idx].curvePts[0].northing, 0));
                     }
                     else if (mf.curve.curveArr[idx].curvePts.Count > 1)
                     {
@@ -464,12 +464,12 @@ namespace AgOpenGPS
                         easting /= mf.curve.curveArr[idx].curvePts.Count;
                         northing /= mf.curve.curveArr[idx].curvePts.Count;
                         mf.curve.refList.Clear();
-                        mf.curve.refList.Add(new vec3(easting, northing, 0));
+                        mf.curve.refList.Add(new Vec3(easting, northing, 0));
                     }
                     else
                     {
                         mf.curve.refList.Clear();
-                        mf.curve.refList.Add(new vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
+                        mf.curve.refList.Add(new Vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
                     }
                     mf.curve.OldhowManyPathsAway = -1;//reset
                     mf.curve.isCurveSet = true;
@@ -612,7 +612,7 @@ namespace AgOpenGPS
                     if (mf.curve.curveArr[idx].curvePts.Count == 1)
                     {
                         mf.curve.refList.Clear();
-                        mf.curve.refList.Add(new vec3(mf.curve.curveArr[idx].curvePts[0].easting, mf.curve.curveArr[idx].curvePts[0].northing, 0));
+                        mf.curve.refList.Add(new Vec3(mf.curve.curveArr[idx].curvePts[0].easting, mf.curve.curveArr[idx].curvePts[0].northing, 0));
                     }
                     else if (mf.curve.curveArr[idx].curvePts.Count > 1)
                     {
@@ -626,12 +626,12 @@ namespace AgOpenGPS
                         easting /= mf.curve.curveArr[idx].curvePts.Count;
                         northing /= mf.curve.curveArr[idx].curvePts.Count;
                         mf.curve.refList.Clear();
-                        mf.curve.refList.Add(new vec3(easting, northing, 0));
+                        mf.curve.refList.Add(new Vec3(easting, northing, 0));
                     }
                     else
                     {
                         mf.curve.refList.Clear();
-                        mf.curve.refList.Add(new vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
+                        mf.curve.refList.Add(new Vec3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0));
                     }
                     mf.curve.OldhowManyPathsAway = -1;//reset
                     mf.curve.isCurveSet = true;

@@ -12,7 +12,7 @@ namespace AgOpenGPS.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
     internal sealed partial class Vehicle : global::System.Configuration.ApplicationSettingsBase {
         
         private static Vehicle defaultInstance = ((Vehicle)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Vehicle())));
@@ -20,6 +20,17 @@ namespace AgOpenGPS.Properties {
         public static Vehicle Default {
             get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Generic.List<decimal> Section_position {
+            get {
+                return ((global::System.Collections.Generic.List<decimal>)(this["Section_position"]));
+            }
+            set {
+                this["Section_position"] = value;
             }
         }
         
@@ -68,78 +79,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setVehicle_numSections"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-2.0")]
-        public decimal setSection_position1 {
-            get {
-                return ((decimal)(this["setSection_position1"]));
-            }
-            set {
-                this["setSection_position1"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1.0")]
-        public decimal setSection_position2 {
-            get {
-                return ((decimal)(this["setSection_position2"]));
-            }
-            set {
-                this["setSection_position2"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.0")]
-        public decimal setSection_position3 {
-            get {
-                return ((decimal)(this["setSection_position3"]));
-            }
-            set {
-                this["setSection_position3"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.0")]
-        public decimal setSection_position4 {
-            get {
-                return ((decimal)(this["setSection_position4"]));
-            }
-            set {
-                this["setSection_position4"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position5 {
-            get {
-                return ((decimal)(this["setSection_position5"]));
-            }
-            set {
-                this["setSection_position5"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position6 {
-            get {
-                return ((decimal)(this["setSection_position6"]));
-            }
-            set {
-                this["setSection_position6"] = value;
             }
         }
         
@@ -284,42 +223,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setVehicle_vehicleName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position7 {
-            get {
-                return ((decimal)(this["setSection_position7"]));
-            }
-            set {
-                this["setSection_position7"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position8 {
-            get {
-                return ((decimal)(this["setSection_position8"]));
-            }
-            set {
-                this["setSection_position8"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position9 {
-            get {
-                return ((decimal)(this["setSection_position9"]));
-            }
-            set {
-                this["setSection_position9"] = value;
             }
         }
         
@@ -553,54 +456,6 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position10 {
-            get {
-                return ((decimal)(this["setSection_position10"]));
-            }
-            set {
-                this["setSection_position10"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position11 {
-            get {
-                return ((decimal)(this["setSection_position11"]));
-            }
-            set {
-                this["setSection_position11"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position12 {
-            get {
-                return ((decimal)(this["setSection_position12"]));
-            }
-            set {
-                this["setSection_position12"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position13 {
-            get {
-                return ((decimal)(this["setSection_position13"]));
-            }
-            set {
-                this["setSection_position13"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public double set_youTriggerDistance {
             get {
@@ -824,54 +679,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setArdSteer_setting0"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position14 {
-            get {
-                return ((decimal)(this["setSection_position14"]));
-            }
-            set {
-                this["setSection_position14"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position15 {
-            get {
-                return ((decimal)(this["setSection_position15"]));
-            }
-            set {
-                this["setSection_position15"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position16 {
-            get {
-                return ((decimal)(this["setSection_position16"]));
-            }
-            set {
-                this["setSection_position16"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal setSection_position17 {
-            get {
-                return ((decimal)(this["setSection_position17"]));
-            }
-            set {
-                this["setSection_position17"] = value;
             }
         }
         

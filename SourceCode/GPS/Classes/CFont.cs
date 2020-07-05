@@ -1,5 +1,5 @@
-﻿using System;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
+using System;
 
 namespace AgOpenGPS
 {
@@ -105,7 +105,7 @@ namespace AgOpenGPS
             GL.PopMatrix();
         }
 
-        public void DrawText3D(double x1, double y1, string text, double size = 1.0)
+        public void DrawText3D(double x1, double y1, string text)
         {
             double x = 0, y = 0;
 
@@ -113,6 +113,7 @@ namespace AgOpenGPS
 
             GL.Translate(x1, y1, 0);
 
+            double size;
             if (mf.camera.camPitch < -45)
             {
                 GL.Rotate(90, 1, 0, 0);

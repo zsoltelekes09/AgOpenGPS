@@ -10,13 +10,13 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         //the list of constants and multiples of the boundary
-        public List<vec2> calcList = new List<vec2>();
+        public List<Vec2> calcList = new List<Vec2>();
 
         //the outer ring of boundary tram - also used for clipping
-        public List<vec3> outArr = new List<vec3>();
+        public List<Vec3> outArr = new List<Vec3>();
 
         //the triangle strip of the outer tram highlight
-        public List<vec2> tramBndArr = new List<vec2>();
+        public List<Vec2> tramBndArr = new List<Vec2>();
 
         //tram settings
         public double wheelTrack;
@@ -74,7 +74,7 @@ namespace AgOpenGPS
             outArr?.Clear();
 
             //outside point
-            vec3 pt3 = new vec3();
+            Vec3 pt3 = new Vec3();
 
             double distSq = ((tramWidth * 0.5) - halfWheelTrack) * ((tramWidth * 0.5) - halfWheelTrack) * 0.97;
             bool fail = false;
@@ -134,8 +134,8 @@ namespace AgOpenGPS
 
             if (cnt > 0)
             {
-                vec2 pt = new vec2();
-                vec2 pt2 = new vec2();
+                Vec2 pt = new Vec2();
+                Vec2 pt2 = new Vec2();
 
                 for (int i = 0; i < cnt; i++)
                 {
@@ -153,7 +153,7 @@ namespace AgOpenGPS
             }
         }
 
-        public bool IsPointInTramBndArea(vec2 TestPoint)
+        public bool IsPointInTramBndArea(Vec2 TestPoint)
         {
             if (calcList.Count < 3) return false;
             int j = outArr.Count - 1;
@@ -176,7 +176,7 @@ namespace AgOpenGPS
             int j = outArr.Count - 1;
             //clear the list, constant is easting, multiple is northing
             calcList.Clear();
-            vec2 constantMultiple = new vec2(0, 0);
+            Vec2 constantMultiple = new Vec2(0, 0);
 
             for (int i = 0; i < outArr.Count; j = i++)
             {

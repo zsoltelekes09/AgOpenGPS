@@ -122,7 +122,6 @@ namespace AgOpenGPS
                     if (Data[70] == CK_A && Data[71] == CK_B)
                     {
                         long itow = Data[10] | (Data[11] << 8) | (Data[12] << 16) | (Data[13] << 24);
-
                         if (pn.EnableHeadRoll && ((Data[67] & 0x01) == 0x01) && (((Data[66] & 0x2D) == 0x2D) || ((Data[66] & 0x35) == 0x35)))
                         {
                             int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
@@ -130,7 +129,9 @@ namespace AgOpenGPS
                             if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
                             {
                                 //save dist?
-                                ahrs.rollX16 = (int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), pn.DualAntennaDistance) / 0.27925268016f);
+                                double RelPosN = ((Data[14] | (Data[15] << 8) | (Data[16] << 16) | (Data[17] << 24)) + Data[38] * 0.01);
+                                double RelPosE = ((Data[18] | (Data[19] << 8) | (Data[20] << 16) | (Data[21] << 24)) + Data[39] * 0.01);
+                                ahrs.rollX16 = (int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), Math.Sqrt(RelPosN * RelPosN + RelPosE * RelPosE)) / 0.27925268016f);
                             }
 
                             pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;

@@ -65,8 +65,7 @@
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>AgOpenGPS.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup />
@@ -139,7 +138,6 @@
     <Compile Include="Classes\CSection.cs" />
     <Compile Include="Classes\CPointData.cs" />
     <Compile Include="Classes\CVehicle.cs" />
-    <Compile Include="Classes\CWaypoint.cs" />
     <Compile Include="Classes\CWorldGrid.cs" />
     <Compile Include="Classes\CSequence.cs" />
     <Compile Include="Classes\CTurn.cs" />
@@ -548,14 +546,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>gStr.uk.resx</DependentUpon>
     </Compile>
-    <Compile Include="LibTessDotNet\Sweep.cs" />
-    <Compile Include="LibTessDotNet\Tess.cs" />
-    <Compile Include="LibTessDotNet\PriorityQueue.cs" />
-    <Compile Include="LibTessDotNet\PriorityHeap.cs" />
-    <Compile Include="LibTessDotNet\Dict.cs" />
-    <Compile Include="LibTessDotNet\Geom.cs" />
-    <Compile Include="LibTessDotNet\MeshUtils.cs" />
-    <Compile Include="LibTessDotNet\Mesh.cs" />
+    <Compile Include="Classes\LibTessDotNet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -568,7 +559,7 @@
       <SubType>Form</SubType>
       <DependentUpon>FormGPS.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\vec3.cs" />
+    <Compile Include="Classes\Vec3.cs" />
     <Compile Include="Properties\Vehicle.Designer.cs">
       <DependentUpon>Vehicle.settings</DependentUpon>
       <AutoGen>True</AutoGen>

@@ -317,7 +317,7 @@ namespace AgOpenGPS
             for (int i = 0; i < Tools.Count; i++)
             {
                 //check if super section is on
-                if (Tools[i].section[Tools[i].numOfSections].IsSectionOn)
+                if (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn)
                 {
                     for (int j = 0; j < Tools[i].numOfSections; j++)
                     {
@@ -332,7 +332,7 @@ namespace AgOpenGPS
                     for (int j = 0; j <= Tools[i].numOfSections; j++)
                     {
                         //set if on, reset bit if off
-                        if (Tools[i].section[j].IsSectionOn) machine = machine | set;
+                        if (Tools[i].Sections[j].IsSectionOn) machine = machine | set;
                         else machine = machine & reset;
 
                         //move set and reset over 1 bit left

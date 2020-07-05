@@ -37,7 +37,7 @@ namespace AgOpenGPS
             mazeArr = new int[mazeRowYDim * mazeColXDim];
 
             //row is Y, col is X   int[Y,X] [i,j] [row,col]
-            vec3 pot = new vec3();
+            Vec3 pot = new Vec3();
 
             //mf.yt.triggerDistanceOffset += mazeScale;
             //mf.turn.BuildTurnLines();
@@ -113,11 +113,11 @@ namespace AgOpenGPS
             //}
         }
 
-        public List<vec3> SearchForPath(vec3 start, vec3 stop)
+        public List<Vec3> SearchForPath(Vec3 start, Vec3 stop)
         {
             CMazePath maze = new CMazePath(mazeRowYDim, mazeColXDim, mazeArr);
 
-            List<vec3> mazeList = maze.Search((int)((start.northing - mf.minFieldY) / mf.mazeGrid.mazeScale),
+            List<Vec3> mazeList = maze.Search((int)((start.northing - mf.minFieldY) / mf.mazeGrid.mazeScale),
                                                 (int)((start.easting - mf.minFieldX) / mf.mazeGrid.mazeScale),
                                           (int)((stop.northing - mf.minFieldY) / mf.mazeGrid.mazeScale),
                                           (int)((stop.easting - mf.minFieldX) / mf.mazeGrid.mazeScale));
@@ -136,7 +136,7 @@ namespace AgOpenGPS
             }
 
             //the temp array
-            vec3[] arr2 = new vec3[cnt];
+            Vec3[] arr2 = new Vec3[cnt];
 
             mazeList.CopyTo(arr2);
             mazeList.Clear();
@@ -157,7 +157,7 @@ namespace AgOpenGPS
                 double distance = Glm.Distance(mazeList[i], mazeList[j]);
                 if (distance > 2)
                 {
-                    vec3 pointB = new vec3((mazeList[i].easting + mazeList[j].easting) / 2.0,
+                    Vec3 pointB = new Vec3((mazeList[i].easting + mazeList[j].easting) / 2.0,
                                         (mazeList[i].northing + mazeList[j].northing) / 2.0, 0);
 
                     mazeList.Insert(j, pointB);
@@ -169,7 +169,7 @@ namespace AgOpenGPS
             cnt = mazeList.Count;
 
             //the temp array
-            vec3[] arr = new vec3[cnt];
+            Vec3[] arr = new Vec3[cnt];
 
             //how many samples
             int smPts = mazeScale;
@@ -207,7 +207,7 @@ namespace AgOpenGPS
 
             for (int i = mazeScale; i < cnt - mazeScale; i++)
             {
-                vec3 pt3 = arr[i];
+                Vec3 pt3 = arr[i];
                 pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i].easting, arr[i + 1].northing - arr[i].northing);
                 if (pt3.heading < 0) pt3.heading += Glm.twoPI;
                 mazeList.Add(pt3);

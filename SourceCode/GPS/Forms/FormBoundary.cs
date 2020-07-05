@@ -584,7 +584,7 @@ namespace AgOpenGPS
                                         northing = (Math.Sin(-mf.pn.convergenceAngle) * east) + (Math.Cos(-mf.pn.convergenceAngle) * nort);
 
                                         //add the point to boundary
-                                        vec3 bndPt = new vec3(easting, northing, 0);
+                                        Vec3 bndPt = new Vec3(easting, northing, 0);
                                         mf.bnd.bndArr[i].bndLine.Add(bndPt);
                                     }
 

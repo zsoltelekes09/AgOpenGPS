@@ -14,10 +14,11 @@ namespace AgOpenGPS
     public partial class FormGPS
     {
         //list of the list of patch data individual triangles for field sections
-        public List<List<vec3>> patchSaveList = new List<List<vec3>>();
+        public List<List<Vec3>> PatchSaveList = new List<List<Vec3>>();
+        public List<List<Vec3>> PatchDrawList = new List<List<Vec3>>();
 
         //list of the list of patch data individual triangles for contour tracking
-        public List<List<vec3>> contourSaveList = new List<List<vec3>>();
+        public List<List<Vec3>> ContourSaveList = new List<List<Vec3>>();
 
         public List<CAutoLoadField> Fields = new List<CAutoLoadField>();
 
@@ -167,7 +168,7 @@ namespace AgOpenGPS
                                 {
                                     line = reader.ReadLine();
                                     string[] words = line.Split(',');
-                                    vec3 vecPt = new vec3(double.Parse(words[0], CultureInfo.InvariantCulture),
+                                    Vec3 vecPt = new Vec3(double.Parse(words[0], CultureInfo.InvariantCulture),
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
                                     curve.curveArr[curve.numCurveLines].curvePts.Add(vecPt);
@@ -822,23 +823,17 @@ namespace AgOpenGPS
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
 
-                writer.WriteLine("Spinner1," + Properties.Vehicle.Default.setSection_position1.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner2," + Properties.Vehicle.Default.setSection_position2.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner3," + Properties.Vehicle.Default.setSection_position3.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner4," + Properties.Vehicle.Default.setSection_position4.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner5," + Properties.Vehicle.Default.setSection_position5.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner6," + Properties.Vehicle.Default.setSection_position6.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner7," + Properties.Vehicle.Default.setSection_position7.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner8," + Properties.Vehicle.Default.setSection_position8.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner9," + Properties.Vehicle.Default.setSection_position9.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner10," + Properties.Vehicle.Default.setSection_position10.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner11," + Properties.Vehicle.Default.setSection_position11.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner12," + Properties.Vehicle.Default.setSection_position12.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner13," + Properties.Vehicle.Default.setSection_position13.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner14," + Properties.Vehicle.Default.setSection_position14.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner15," + Properties.Vehicle.Default.setSection_position15.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner16," + Properties.Vehicle.Default.setSection_position16.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Spinner17," + Properties.Vehicle.Default.setSection_position17.ToString(CultureInfo.InvariantCulture));
+                //writer.WriteLine("ToolCount," + Tools.Count.ToString());
+                writer.WriteLine("ToolCount,1");
+                //for (int i = 0; i < Tools.Count; i++)
+                int i = 0;
+                {
+                    writer.WriteLine("Sections," + Tools[i].numOfSections.ToString());
+                    for (int j = 0; j <= Tools[i].numOfSections; j++)
+                    {
+                        writer.WriteLine("Spinner"+ j.ToString() + "," + (Properties.Vehicle.Default.Section_position[j]).ToString());
+                    }
+                }
 
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
@@ -954,42 +949,41 @@ namespace AgOpenGPS
                         line = reader.ReadLine();
                         line = reader.ReadLine();
                         line = reader.ReadLine();
+                        line = reader.ReadLine(); words = line.Split(',');
 
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position1 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position2 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position3 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position4 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position5 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position6 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position7 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position8 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position9 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position10 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position11 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position12 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position13 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position14 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position15 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position16 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setSection_position17 = decimal.Parse(words[1], CultureInfo.InvariantCulture);
+                        if (Properties.Vehicle.Default.Section_position == null)
+                        {
+                            Properties.Vehicle.Default.Section_position = new List<decimal>();
+                            for (int j = -50; j < 51; j++)
+                            {
+                                Properties.Vehicle.Default.Section_position.Add(j);
+                            }
+                            Properties.Vehicle.Default.Save();
+                        }
 
+                        if (words[0] == "ToolCount")
+                        {
+                            int count = int.Parse(words[1], CultureInfo.InvariantCulture);
+
+                            for (int i = 0; i < count; i++)
+                            {
+                                line = reader.ReadLine(); words = line.Split(',');
+                                int count2 = int.Parse(words[1], CultureInfo.InvariantCulture);
+                                for (int j = 0; j <= count2; j++)
+                                {
+                                    line = reader.ReadLine(); words = line.Split(',');
+                                    Properties.Vehicle.Default.Section_position[j] = decimal.Parse(words[1], CultureInfo.InvariantCulture);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < 17; i++)
+                            {
+                                line = reader.ReadLine(); words = line.Split(',');
+                                Properties.Vehicle.Default.Section_position[i] = decimal.Parse(words[1], CultureInfo.InvariantCulture);
+                            }
+                        }
 
                         line = reader.ReadLine();
                         line = reader.ReadLine();
@@ -1043,6 +1037,8 @@ namespace AgOpenGPS
                         //get the number of sections from settings
                         Tools[0].numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
 
+                        Tools[0].SetSections();
+
                         //from settings grab the vehicle specifics
                         Tools[0].ToolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
                         Tools[0].ToolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
@@ -1060,7 +1056,7 @@ namespace AgOpenGPS
 
                         Tools[0].toolTrailingHitchLength = Properties.Vehicle.Default.setTool_toolTrailingHitchLength;
                         Tools[0].toolTankTrailingHitchLength = Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength;
-                        Tools[0].hitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
+                        Tools[0].HitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
 
                         Tools[0].isToolBehindPivot = Properties.Vehicle.Default.setTool_isToolBehindPivot;
                         Tools[0].isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
@@ -1544,7 +1540,7 @@ namespace AgOpenGPS
                     {
                         fd.workedAreaTotal = 0;
                         fd.distanceUser = 0;
-                        vec3 vecFix = new vec3();
+                        Vec3 vecFix = new Vec3();
 
                         //read header
                         while (!reader.EndOfStream)
@@ -1557,9 +1553,8 @@ namespace AgOpenGPS
                             }
                             int verts = int.Parse(line);
 
-                            Tools[0].section[0].triangleList = new List<vec3>();
-                            Tools[0].section[0].patchList.Add(Tools[0].section[0].triangleList);
 
+                            PatchDrawList.Add(new List<Vec3>());
 
                             for (int v = 0; v < verts; v++)
                             {
@@ -1568,9 +1563,8 @@ namespace AgOpenGPS
                                 vecFix.easting = double.Parse(words[0], CultureInfo.InvariantCulture);
                                 vecFix.northing = double.Parse(words[1], CultureInfo.InvariantCulture);
                                 vecFix.heading = double.Parse(words[2], CultureInfo.InvariantCulture);
-                                Tools[0].section[0].triangleList.Add(vecFix);
+                                PatchDrawList[PatchDrawList.Count-1].Add(vecFix);
                             }
-
                             //calculate area of this patch - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
                             verts -= 2;
                             if (verts >= 2)
@@ -1578,9 +1572,9 @@ namespace AgOpenGPS
                                 for (int j = 1; j < verts; j++)
                                 {
                                     double temp = 0;
-                                    temp = Tools[0].section[0].triangleList[j].easting * (Tools[0].section[0].triangleList[j + 1].northing - Tools[0].section[0].triangleList[j + 2].northing) +
-                                              Tools[0].section[0].triangleList[j + 1].easting * (Tools[0].section[0].triangleList[j + 2].northing - Tools[0].section[0].triangleList[j].northing) +
-                                                  Tools[0].section[0].triangleList[j + 2].easting * (Tools[0].section[0].triangleList[j].northing - Tools[0].section[0].triangleList[j + 1].northing);
+                                    temp = PatchDrawList[PatchDrawList.Count - 1][j].easting * (PatchDrawList[PatchDrawList.Count - 1][j + 1].northing - PatchDrawList[PatchDrawList.Count - 1][j + 2].northing) +
+                                           PatchDrawList[PatchDrawList.Count - 1][j + 1].easting * (PatchDrawList[PatchDrawList.Count - 1][j + 2].northing - PatchDrawList[PatchDrawList.Count - 1][j].northing) +
+                                           PatchDrawList[PatchDrawList.Count - 1][j + 2].easting * (PatchDrawList[PatchDrawList.Count - 1][j].northing - PatchDrawList[PatchDrawList.Count - 1][j + 1].northing);
 
                                     fd.workedAreaTotal += Math.Abs((temp * 0.5));
                                 }
@@ -1631,9 +1625,9 @@ namespace AgOpenGPS
                             line = reader.ReadLine();
                             int verts = int.Parse(line);
 
-                            vec3 vecFix = new vec3(0, 0, 0);
+                            Vec3 vecFix = new Vec3(0, 0, 0);
 
-                            ct.ptList = new List<vec3>();
+                            ct.ptList = new List<Vec3>();
                             ct.stripList.Add(ct.ptList);
 
                             for (int v = 0; v < verts; v++)
@@ -1779,7 +1773,7 @@ namespace AgOpenGPS
                                 {
                                     line = reader.ReadLine();
                                     string[] words = line.Split(',');
-                                    vec3 vecPt = new vec3(
+                                    Vec3 vecPt = new Vec3(
                                     double.Parse(words[0], CultureInfo.InvariantCulture),
                                     double.Parse(words[1], CultureInfo.InvariantCulture),
                                     double.Parse(words[2], CultureInfo.InvariantCulture));
@@ -1853,7 +1847,7 @@ namespace AgOpenGPS
                                 {
                                     line = reader.ReadLine();
                                     string[] words = line.Split(',');
-                                    vec3 vecPt = new vec3(
+                                    Vec3 vecPt = new Vec3(
                                         double.Parse(words[0], CultureInfo.InvariantCulture),
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
@@ -2024,13 +2018,13 @@ namespace AgOpenGPS
         public void FileSaveSections()
         {
             //make sure there is something to save
-            if (patchSaveList.Count() > 0)
+            if (PatchSaveList.Count() > 0)
             {
                 //Append the current list to the field file
                 using (StreamWriter writer = new StreamWriter((fieldsDirectory + currentFieldDirectory + "\\Sections.txt"), true))
                 {
                     //for each patch, write out the list of triangles to the file
-                    foreach (var triList in patchSaveList)
+                    foreach (var triList in PatchSaveList)
                     {
                         int count2 = triList.Count();
                         writer.WriteLine(count2.ToString(CultureInfo.InvariantCulture));
@@ -2042,8 +2036,8 @@ namespace AgOpenGPS
                     }
                 }
 
-                //clear out that patchList and begin adding new ones for next save
-                patchSaveList.Clear();
+                //clear out that patchSaveList and begin adding new ones for next save
+                PatchSaveList.Clear();
             }
         }
 
@@ -2124,14 +2118,14 @@ namespace AgOpenGPS
             //64.697,0.168,-21.654,0 - east, heading, north, altitude
 
             //make sure there is something to save
-            if (contourSaveList.Count() > 0)
+            if (ContourSaveList.Count() > 0)
             {
                 //Append the current list to the field file
                 using (StreamWriter writer = new StreamWriter((fieldsDirectory + currentFieldDirectory + "\\Contour.txt"), true))
                 {
 
                     //for every new chunk of patch in the whole section
-                    foreach (var triList in contourSaveList)
+                    foreach (var triList in ContourSaveList)
                     {
                         int count2 = triList.Count;
 
@@ -2146,7 +2140,7 @@ namespace AgOpenGPS
                     }
                 }
 
-                contourSaveList.Clear();
+                ContourSaveList.Clear();
 
             }
         }
@@ -2666,7 +2660,7 @@ namespace AgOpenGPS
             for (int i = 0; i < flagPts.Count; i++)
             {
                 kml.WriteStartElement("Placemark");
-                kml.WriteElementString("name", "Flag_"+ i.ToString());
+                kml.WriteElementString("name", "Flag_" + i.ToString());
 
                 kml.WriteStartElement("Style");
                 kml.WriteStartElement("IconStyle");
@@ -2681,7 +2675,7 @@ namespace AgOpenGPS
                 kml.WriteEndElement(); //IconStyle
                 kml.WriteEndElement(); //Style
 
-                kml.WriteElementString("name", (i+1).ToString());
+                kml.WriteElementString("name", (i + 1).ToString());
                 kml.WriteStartElement("Point");
                 kml.WriteElementString("coordinates", flagPts[i].longitude.ToString(CultureInfo.InvariantCulture) +
                     "," + flagPts[i].latitude.ToString(CultureInfo.InvariantCulture) + ",0");
@@ -2689,9 +2683,9 @@ namespace AgOpenGPS
                 kml.WriteEndElement(); // <Placemark>
             }
             kml.WriteEndElement(); // <Folder>   
-            //End of Flags
+                                   //End of Flags
 
-                //Boundary  ----------------------------------------------------------------------
+            //Boundary  ----------------------------------------------------------------------
             kml.WriteStartElement("Folder");
             kml.WriteElementString("name", "Boundaries");
 
@@ -2709,7 +2703,7 @@ namespace AgOpenGPS
                 kml.WriteEndElement(); // <LineStyle>
 
                 kml.WriteStartElement("PolyStyle");
-                if (i == 0)   kml.WriteElementString("color", "407f3f55");
+                if (i == 0) kml.WriteElementString("color", "407f3f55");
                 else kml.WriteElementString("color", "703f38f1");
                 kml.WriteEndElement(); // <PloyStyle>
                 kml.WriteEndElement(); //Style
@@ -2743,69 +2737,60 @@ namespace AgOpenGPS
             string secPts = "";
             int cntr = 0;
 
-            for (int i = 0; i < Tools.Count; i++)
+            //for every new chunk of patch
+            foreach (var triList in PatchDrawList)
             {
-                for (int j = 0; j <= Tools[0].numOfSections; j++)
+                if (triList.Count > 0)
                 {
-                    int patches = Tools[i].section[j].patchList.Count;
+                    kml.WriteStartElement("Placemark");
+                    kml.WriteElementString("name", "Sections_" + cntr.ToString());
+                    cntr++;
 
-                    if (patches > 0)
+                    string collor = "F0" + ((byte)(triList[0].heading)).ToString("X2") +
+                        ((byte)(triList[0].northing)).ToString("X2") + ((byte)(triList[0].easting)).ToString("X2");
+
+                    //lineStyle
+                    kml.WriteStartElement("Style");
+
+                    kml.WriteStartElement("LineStyle");
+                    kml.WriteElementString("color", collor);
+                    //kml.WriteElementString("width", "6");
+                    kml.WriteEndElement(); // <LineStyle>
+
+                    kml.WriteStartElement("PolyStyle");
+                    kml.WriteElementString("color", collor);
+                    kml.WriteEndElement(); // <PloyStyle>
+                    kml.WriteEndElement(); //Style
+
+                    kml.WriteStartElement("Polygon");
+                    kml.WriteElementString("tessellate", "1");
+                    kml.WriteStartElement("outerBoundaryIs");
+                    kml.WriteStartElement("LinearRing");
+
+                    //coords
+                    kml.WriteStartElement("coordinates");
+                    secPts = "";
+                    for (int k = 1; k < triList.Count; k += 2)
                     {
-                        //for every new chunk of patch
-                        foreach (var triList in Tools[i].section[j].patchList)
-                        {
-                            if (triList.Count > 0)
-                            {
-                                kml.WriteStartElement("Placemark");
-                                kml.WriteElementString("name", "Sections_" + cntr.ToString());
-                                cntr++;
-
-                                string collor = "F0" + ((byte)(triList[0].heading)).ToString("X2") +
-                                    ((byte)(triList[0].northing)).ToString("X2") + ((byte)(triList[0].easting)).ToString("X2");
-
-                                //lineStyle
-                                kml.WriteStartElement("Style");
-
-                                kml.WriteStartElement("LineStyle");
-                                kml.WriteElementString("color", collor);
-                                //kml.WriteElementString("width", "6");
-                                kml.WriteEndElement(); // <LineStyle>
-
-                                kml.WriteStartElement("PolyStyle");
-                                kml.WriteElementString("color", collor);
-                                kml.WriteEndElement(); // <PloyStyle>
-                                kml.WriteEndElement(); //Style
-
-                                kml.WriteStartElement("Polygon");
-                                kml.WriteElementString("tessellate", "1");
-                                kml.WriteStartElement("outerBoundaryIs");
-                                kml.WriteStartElement("LinearRing");
-
-                                //coords
-                                kml.WriteStartElement("coordinates");
-                                secPts = "";
-                                for (int k = 1; k < triList.Count; k += 2)
-                                {
-                                    secPts += GetUTMToLatLon(triList[k].easting, triList[k].northing);
-                                }
-                                for (int k = triList.Count - 1; k > 1; k -= 2)
-                                {
-                                    secPts += GetUTMToLatLon(triList[k].easting, triList[k].northing);
-                                }
-                                secPts += GetUTMToLatLon(triList[1].easting, triList[1].northing);
-                                kml.WriteRaw(secPts);
-                                kml.WriteEndElement(); // <coordinates>
-
-                                kml.WriteEndElement(); // <LinearRing>
-                                kml.WriteEndElement(); // <outerBoundaryIs>
-                                kml.WriteEndElement(); // <Polygon>
-
-                                kml.WriteEndElement(); // <Placemark>
-                            }
-                        }
+                        secPts += GetUTMToLatLon(triList[k].easting, triList[k].northing);
                     }
+                    for (int k = triList.Count - 1; k > 1; k -= 2)
+                    {
+                        secPts += GetUTMToLatLon(triList[k].easting, triList[k].northing);
+                    }
+                    secPts += GetUTMToLatLon(triList[1].easting, triList[1].northing);
+                    kml.WriteRaw(secPts);
+                    kml.WriteEndElement(); // <coordinates>
+
+                    kml.WriteEndElement(); // <LinearRing>
+                    kml.WriteEndElement(); // <outerBoundaryIs>
+                    kml.WriteEndElement(); // <Polygon>
+
+                    kml.WriteEndElement(); // <Placemark>
                 }
             }
+
+
             kml.WriteEndElement(); // <Folder>
             //End of sections
 
