@@ -69,6 +69,9 @@
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup />
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Control.Draggable, Version=1.0.7235.37687, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -110,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\CAutoLoadField.cs" />
+    <Compile Include="Classes\Guidance.cs" />
     <Compile Include="Classes\CSunTimes.cs" />
     <Compile Include="Classes\CFieldData.cs" />
     <Compile Include="Classes\CBoundaryLines.cs" />
@@ -554,7 +558,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Settings.cs" />
     <Compile Include="Forms\UDPComm.Designer.cs">
       <SubType>Form</SubType>
       <DependentUpon>FormGPS.cs</DependentUpon>
@@ -591,6 +594,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Pickers\FormEnvPicker.resx">
       <DependentUpon>FormEnvPicker.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Pickers\FormEnvSaver.resx">
       <DependentUpon>FormEnvSaver.cs</DependentUpon>
@@ -617,6 +621,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Guidance\FormEditAB.resx">
       <DependentUpon>FormEditAB.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Pickers\FormFilePicker.resx">
       <DependentUpon>FormFilePicker.cs</DependentUpon>
@@ -695,6 +700,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormJob.resx">
       <DependentUpon>FormJob.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormSaveOrNot.resx">
       <DependentUpon>FormSaveOrNot.cs</DependentUpon>
@@ -736,6 +742,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form_About.resx">
       <DependentUpon>Form_About.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\FormTreePlant.resx">
       <DependentUpon>FormTreePlant.cs</DependentUpon>
@@ -794,7 +801,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </None>
@@ -804,7 +811,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Properties\Vehicle.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Vehicle.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </None>

@@ -249,6 +249,7 @@ namespace AgOpenGPS
                         if (isDraw)
                         {
                             count2 = triList.Count;
+                            if (count2 < 4) continue;
                             //draw the triangle in each triangle strip
                             GL.Begin(PrimitiveType.TriangleStrip);
 
@@ -498,7 +499,7 @@ namespace AgOpenGPS
             oglBack.MakeCurrent();
 
             double mOn, mOff;
-            int start, end, tagged, rpHeight, totalPixs;
+            int start, end, tagged, rpHeight, rpHeight2, totalPixs;
             bool isDraw;
 
             CalculateSectionLookAhead();
@@ -568,42 +569,51 @@ namespace AgOpenGPS
                 {
                     // the follow up to sections patches
                     int patchCount = 0;
-
-                    for (int k = 0; k <= Tools[j].numOfSections; k++)
+                    if (Tools[j].numOfSections > 0)
                     {
-                        
-                        if (Tools[j].Sections[k].IsMappingOn && (patchCount = Tools[j].Sections[k].triangleList.Count) > 0)
+                        for (int k = 0; k <= Tools[j].numOfSections; k++)
                         {
-                            //draw the triangle in each triangle strip
-                            GL.Begin(PrimitiveType.TriangleStrip);
+                            if (Tools[j].Sections[k].IsMappingOn && (patchCount = Tools[j].Sections[k].triangleList.Count) > 0)
+                            {
+                                //draw the triangle in each triangle strip
+                                GL.Begin(PrimitiveType.TriangleStrip);
 
-                            for (int l = 1; l < patchCount; l++)
-                                GL.Vertex3(Tools[j].Sections[k].triangleList[l].easting, Tools[j].Sections[k].triangleList[l].northing, 0);
+                                for (int l = 1; l < patchCount; l++)
+                                    GL.Vertex3(Tools[j].Sections[k].triangleList[l].easting, Tools[j].Sections[k].triangleList[l].northing, 0);
 
-                            GL.Vertex3(Tools[j].Sections[k].leftPoint.easting, Tools[j].Sections[k].leftPoint.northing, 0);
-                            GL.Vertex3(Tools[j].Sections[k].rightPoint.easting, Tools[j].Sections[k].rightPoint.northing, 0);
+                                GL.Vertex3(Tools[j].Sections[k].leftPoint.easting, Tools[j].Sections[k].leftPoint.northing, 0);
+                                GL.Vertex3(Tools[j].Sections[k].rightPoint.easting, Tools[j].Sections[k].rightPoint.northing, 0);
 
-                            GL.End();
+                                GL.End();
+                            }
                         }
                     }
                 }
+                double MaxForwardPixels = 0;
+                for (int k = 0; k <= Tools[i].numOfSections; k++)
+                {
+                    if (Tools[i].Sections[k].positionForward > MaxForwardPixels)
+                        MaxForwardPixels = Tools[i].Sections[k].positionForward;
+                }
+
 
 
                 //finish it up - we need to read the ram of video card
                 GL.Flush();
 
                 //determine farthest ahead lookahead - is the height of the readpixel line
-                rpHeight = (int)Math.Min(Math.Max(Math.Max((hd.isOn && vehicle.isHydLiftOn ? Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft) : 0), Math.Max(Tools[i].lookAheadDistanceOnPixelsRight, Tools[i].lookAheadDistanceOnPixelsLeft)) + 2, 8), 240);
+                rpHeight = (int)Math.Round(Math.Min(Math.Max(Math.Max((hd.isOn && vehicle.isHydLiftOn ? Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft) : 0), Math.Max(Tools[i].lookAheadDistanceOnPixelsRight, Tools[i].lookAheadDistanceOnPixelsLeft)) + 1, 2), 200), MidpointRounding.AwayFromZero);
+                rpHeight2 = (int)Math.Round(Math.Min(Math.Max(Math.Min(Tools[i].lookAheadDistanceOffPixelsRight, Tools[i].lookAheadDistanceOffPixelsLeft), 1), 198), MidpointRounding.AwayFromZero);
 
 
-                byte[] GreenPixels = new byte[(Tools[i].rpWidth * rpHeight)];
+                byte[] GreenPixels = new byte[(Tools[i].rpWidth * (rpHeight - rpHeight2 + (int)(MaxForwardPixels*10)))];
 
                 //read the whole block of pixels up to max lookahead, one read only
-                GL.ReadPixels(Tools[i].rpXPosition, 10, Tools[i].rpWidth, rpHeight, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
+                GL.ReadPixels(Tools[i].rpXPosition, 10 + rpHeight2, Tools[i].rpWidth, rpHeight - rpHeight2 + (int)(MaxForwardPixels * 10), OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
 
                 //Paint to context for troubleshooting
-                oglBack.BringToFront();
-                oglBack.SwapBuffers();
+                //oglBack.BringToFront();
+                //oglBack.SwapBuffers();
 
                 //is applied area coming up?
                 totalPixs = 0;
@@ -651,6 +661,14 @@ namespace AgOpenGPS
                     // Manual on, force the section On and exit loop so digital is also overidden
                     if (Tools[i].Sections[j].BtnSectionState == btnStates.On)
                     {
+                        if (j + 1 < Tools[i].numOfSections)
+                        {
+                            if (Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft && Tools[i].Sections[j].positionForward == Tools[i].Sections[j + 1].positionForward)
+                            {
+                                isSuperSectionAllowedOn &= true;
+                            }
+                            else isSuperSectionAllowedOn = false;
+                        }
                         Tools[i].Sections[j].SectionOnRequest = true;
                     }
                     else if (Tools[i].Sections[j].BtnSectionState == btnStates.Off || !Tools[i].Sections[j].IsAllowedOn)
@@ -661,7 +679,7 @@ namespace AgOpenGPS
                     }
                     else if (Tools[i].Sections[j].BtnSectionState == btnStates.Auto)
                     {
-                        if (Tools[i].Sections[j].speedPixels < vehicle.slowSpeedCutoff)
+                        if (Tools[i].Sections[j].speedPixels < Tools[i].SlowSpeedCutoff)
                         {
                             Tools[i].Sections[j].SectionOnRequest = false;
                             Tools[i].Sections[j].SectionOverlapTimer = 0;
@@ -675,17 +693,17 @@ namespace AgOpenGPS
 
                             //determine if headland is in read pixel buffer left middle and right. 
                             start = Tools[i].Sections[j].rpSectionPosition - Tools[i].Sections[0].rpSectionPosition;
-                            end = start + Tools[i].Sections[j].rpSectionWidth - 1;
+                            end = start + Tools[i].Sections[j].rpSectionWidth;
                             tagged = 0;
                             totalPixs = 0;
 
                             for (int pos = start; pos < end; pos++)
                             {
-                                startHeight = (int)(Tools[i].lookAheadDistanceOffPixelsLeft + (mOff * pos)) * Tools[i].rpWidth + pos;
-                                endHeight = (int)(Tools[i].lookAheadDistanceOnPixelsLeft + (mOn * pos)) * Tools[i].rpWidth + pos;
-                                for (int a = startHeight; a <= endHeight; a += Tools[i].rpWidth)
+                                startHeight = (int)(Tools[i].Sections[j].positionForward * 10 + (Tools[i].lookAheadDistanceOffPixelsLeft - rpHeight2) + (mOff * pos)) * Tools[i].rpWidth + pos;
+                                endHeight = (int)Math.Round(Tools[i].Sections[j].positionForward * 10 + (Tools[i].lookAheadDistanceOnPixelsLeft - rpHeight2) + (mOn * pos), MidpointRounding.AwayFromZero) * Tools[i].rpWidth + pos;
+                                for (int a = startHeight; a < endHeight; a += Tools[i].rpWidth)
                                 {
-                                    if (a >= 0)
+                                    if (a >= 0 && a < GreenPixels.Length)
                                     {
                                         totalPixs++;
                                         if (GreenPixels[a] == 255 || (bnd.bndArr.Count == 0 && GreenPixels[a] == 0))
@@ -707,7 +725,13 @@ namespace AgOpenGPS
 
                             Tools[i].Sections[j].SectionOnRequest = Tools[i].Sections[j].IsSectionRequiredOn ? true : false;
 
-                            isSuperSectionAllowedOn &= (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
+                            if ((j + 1 < Tools[i].numOfSections) && Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft)
+                            {
+
+                                isSuperSectionAllowedOn &= (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
+
+                            }
+                            else isSuperSectionAllowedOn = false;
                         }
                     }
                 }

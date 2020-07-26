@@ -207,7 +207,7 @@ namespace AgOpenGPS
                 }
 
                 nudDistance.Value = 0; // 
-                label6.Text = Math.Round((mf.Tools[0].ToolWidth * 100), 1).ToString();
+                label6.Text = Math.Round((mf.Guidance.GuidanceWidth * 100), 1).ToString();
                 FixLabelsABLine();
                 FixLabelsCurve();
                 CalculateMinMax();

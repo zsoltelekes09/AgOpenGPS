@@ -13,72 +13,13 @@ namespace AgOpenGPS.Properties {
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
-    internal sealed partial class Vehicle : global::System.Configuration.ApplicationSettingsBase {
+    public sealed partial class Vehicle : global::System.Configuration.ApplicationSettingsBase {
         
         private static Vehicle defaultInstance = ((Vehicle)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Vehicle())));
         
         public static Vehicle Default {
             get {
                 return defaultInstance;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<decimal> Section_position {
-            get {
-                return ((global::System.Collections.Generic.List<decimal>)(this["Section_position"]));
-            }
-            set {
-                this["Section_position"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
-        public double setVehicle_toolWidth {
-            get {
-                return ((double)(this["setVehicle_toolWidth"]));
-            }
-            set {
-                this["setVehicle_toolWidth"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double setVehicle_toolOverlap {
-            get {
-                return ((double)(this["setVehicle_toolOverlap"]));
-            }
-            set {
-                this["setVehicle_toolOverlap"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-2")]
-        public double setTool_toolTrailingHitchLength {
-            get {
-                return ((double)(this["setTool_toolTrailingHitchLength"]));
-            }
-            set {
-                this["setTool_toolTrailingHitchLength"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
-        public int setVehicle_numSections {
-            get {
-                return ((int)(this["setVehicle_numSections"]));
-            }
-            set {
-                this["setVehicle_numSections"] = value;
             }
         }
         
@@ -91,54 +32,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setVehicle_antennaHeight"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double setVehicle_toolLookAheadOn {
-            get {
-                return ((double)(this["setVehicle_toolLookAheadOn"]));
-            }
-            set {
-                this["setVehicle_toolLookAheadOn"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool setTool_isToolTrailing {
-            get {
-                return ((bool)(this["setTool_isToolTrailing"]));
-            }
-            set {
-                this["setTool_isToolTrailing"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double setVehicle_toolOffset {
-            get {
-                return ((double)(this["setVehicle_toolOffset"]));
-            }
-            set {
-                this["setVehicle_toolOffset"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool setTool_isToolBehindPivot {
-            get {
-                return ((bool)(this["setTool_isToolBehindPivot"]));
-            }
-            set {
-                this["setTool_isToolBehindPivot"] = value;
             }
         }
         
@@ -163,30 +56,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setVehicle_wheelbase"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-0.5")]
-        public double setVehicle_hitchLength {
-            get {
-                return ((double)(this["setVehicle_hitchLength"]));
-            }
-            set {
-                this["setVehicle_hitchLength"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.5")]
-        public double setVehicle_toolLookAheadOff {
-            get {
-                return ((double)(this["setVehicle_toolLookAheadOff"]));
-            }
-            set {
-                this["setVehicle_toolLookAheadOff"] = value;
             }
         }
         
@@ -223,42 +92,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setVehicle_vehicleName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double setVehicle_slowSpeedCutoff {
-            get {
-                return ((double)(this["setVehicle_slowSpeedCutoff"]));
-            }
-            set {
-                this["setVehicle_slowSpeedCutoff"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1.5")]
-        public double setVehicle_tankTrailingHitchLength {
-            get {
-                return ((double)(this["setVehicle_tankTrailingHitchLength"]));
-            }
-            set {
-                this["setVehicle_tankTrailingHitchLength"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int setVehicle_minApplied {
-            get {
-                return ((int)(this["setVehicle_minApplied"]));
-            }
-            set {
-                this["setVehicle_minApplied"] = value;
             }
         }
         
@@ -552,30 +385,6 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int setTram_BasedOn {
-            get {
-                return ((int)(this["setTram_BasedOn"]));
-            }
-            set {
-                this["setTram_BasedOn"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int setTram_Skips {
-            get {
-                return ((int)(this["setTram_Skips"]));
-            }
-            set {
-                this["setTram_Skips"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Tool - ")]
         public string setVehicle_toolName {
             get {
@@ -595,18 +404,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setVehicle_envName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool setTool_isToolTBT {
-            get {
-                return ((bool)(this["setTool_isToolTBT"]));
-            }
-            set {
-                this["setTool_isToolTBT"] = value;
             }
         }
         
@@ -780,42 +577,6 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double setVehicle_toolOffDelay {
-            get {
-                return ((double)(this["setVehicle_toolOffDelay"]));
-            }
-            set {
-                this["setVehicle_toolOffDelay"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double setVehicle_MappingOnDelay {
-            get {
-                return ((double)(this["setVehicle_MappingOnDelay"]));
-            }
-            set {
-                this["setVehicle_MappingOnDelay"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double setVehicle_MappingOffDelay {
-            get {
-                return ((double)(this["setVehicle_MappingOffDelay"]));
-            }
-            set {
-                this["setVehicle_MappingOffDelay"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public byte setArdSteer_ackermanFix {
             get {
@@ -847,6 +608,54 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setArdSteer_setting2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Generic.List<ToolSettings> ToolSettings {
+            get {
+                if ((this["ToolSettings"]) == null) (this["ToolSettings"]) = new System.Collections.Generic.List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -6.25, -3.05, 4 }, new double[] { 3.05, 6.25, 4 }, new double[] { -3.9, -0.7, 0 }, new double[] { 0.7, 3.9, 0 } } } };
+                return ((global::System.Collections.Generic.List<ToolSettings>)(this["ToolSettings"]));
+            }
+            set {
+                this["ToolSettings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9")]
+        public double GuidanceWidth {
+            get {
+                return ((double)(this["GuidanceWidth"]));
+            }
+            set {
+                this["GuidanceWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double GuidanceOverlap {
+            get {
+                return ((double)(this["GuidanceOverlap"]));
+            }
+            set {
+                this["GuidanceOverlap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double GuidanceOffset {
+            get {
+                return ((double)(this["GuidanceOffset"]));
+            }
+            set {
+                this["GuidanceOffset"] = value;
             }
         }
     }

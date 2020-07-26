@@ -123,8 +123,8 @@ namespace AgOpenGPS
                     GL.Begin(PrimitiveType.Lines);
                     for (double i = -2.5; i < 3.5; i++)
                     {
-                        GL.Vertex2(refPoint1.easting - (cosHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) - sinHeading * 1600.0, refPoint1.northing - (sinHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) - cosHeading * 1600.0);
-                        GL.Vertex2(refPoint2.easting - (cosHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) + sinHeading * 1600.0, refPoint2.northing - (sinHeading * mf.Tools[0].WidthMinusOverlap * (passNumber + i)) + cosHeading * 1600.0);
+                        GL.Vertex2(refPoint1.easting - (cosHeading * mf.Guidance.WidthMinusOverlap * (passNumber + i)) - sinHeading * 1600.0, refPoint1.northing - (sinHeading * mf.Guidance.WidthMinusOverlap * (passNumber + i)) - cosHeading * 1600.0);
+                        GL.Vertex2(refPoint2.easting - (cosHeading * mf.Guidance.WidthMinusOverlap * (passNumber + i)) + sinHeading * 1600.0, refPoint2.northing - (sinHeading * mf.Guidance.WidthMinusOverlap * (passNumber + i)) + cosHeading * 1600.0);
                     }
                     GL.End();
                     GL.Disable(EnableCap.LineStipple);
@@ -147,8 +147,8 @@ namespace AgOpenGPS
 
                     for (int i = 1; i <= 6; i++)
                     {
-                        GL.Vertex3((cosHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP1.easting, (sinHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP1.northing, 0);
-                        GL.Vertex3((cosHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP2.easting, (sinHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.ABLine.refABLineP2.northing, 0);
+                        GL.Vertex3((cosHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.ABLine.refABLineP1.easting, (sinHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.ABLine.refABLineP1.northing, 0);
+                        GL.Vertex3((cosHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.ABLine.refABLineP2.easting, (sinHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.ABLine.refABLineP2.northing, 0);
                     }
 
                     GL.End();
@@ -294,11 +294,11 @@ namespace AgOpenGPS
                     Math.Sqrt((refABLineP1.easting - refABLineP2.easting) * (refABLineP1.easting - refABLineP2.easting) + (refABLineP1.northing - refABLineP2.northing) * (refABLineP1.northing - refABLineP2.northing));
 
 
-            if (isABSameAsVehicleHeading) distanceFromRefLine -= mf.Tools[0].ToolOffset;
-            else distanceFromRefLine += mf.Tools[0].ToolOffset;
+            if (isABSameAsVehicleHeading) distanceFromRefLine -= mf.Guidance.GuidanceOffset;
+            else distanceFromRefLine += mf.Guidance.GuidanceOffset;
 
             //Which ABLine is the vehicle on, negative is left and positive is right side
-            howManyPathsAway = Math.Round(Math.Abs(distanceFromRefLine) / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+            howManyPathsAway = Math.Round(Math.Abs(distanceFromRefLine) / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
 
 
             //generate that pass number as signed integer
@@ -314,17 +314,17 @@ namespace AgOpenGPS
             if (passNumber > 0) piSide = -Glm.PIBy2;
             else piSide = Glm.PIBy2;
 
-            double Offset = mf.Tools[0].WidthMinusOverlap * howManyPathsAway;
+            double Offset = mf.Guidance.WidthMinusOverlap * howManyPathsAway;
 
             if (isABSameAsVehicleHeading)
             {
-                if (passNumber > 0) Offset += mf.Tools[0].ToolOffset;
-                else Offset -= mf.Tools[0].ToolOffset;
+                if (passNumber > 0) Offset += mf.Guidance.GuidanceOffset;
+                else Offset -= mf.Guidance.GuidanceOffset;
             }
             else
             {
-                if (passNumber > 0) Offset -= mf.Tools[0].ToolOffset;
-                else Offset += mf.Tools[0].ToolOffset;
+                if (passNumber > 0) Offset -= mf.Guidance.GuidanceOffset;
+                else Offset += mf.Guidance.GuidanceOffset;
             }
 
             point1 = new Vec2(refPoint1.easting + (Math.Sin(-abHeading + piSide) * Offset), refPoint1.northing + (Math.Cos(abHeading + piSide) * Offset));

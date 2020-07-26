@@ -149,14 +149,13 @@ namespace AgOpenGPS
             {
                 signPass = -1;
                 //determine how wide a headland space
-                totalHeadWidth = (mf.Tools[0].WidthMinusOverlap * 0.5) - spacing;
+                totalHeadWidth = ((mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap) * 0.5) - spacing;
             }
 
             else
             {
                 signPass = 1;
-                totalHeadWidth = (mf.Tools[0].WidthMinusOverlap * pass) + spacing +
-                    ((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap) * 0.5);
+                totalHeadWidth = ((mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap) * pass) + spacing + ((mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap) * 0.5);
             }
 
             for (int j = 0; j < mf.bnd.bndArr.Count; j++)
@@ -190,7 +189,7 @@ namespace AgOpenGPS
         //determine closest point on left side
         public void BuildContourGuidanceLine(Vec3 pivot)
         {
-            double toolWid = mf.Tools[0].ToolWidth;
+            double toolWid = mf.Guidance.GuidanceWidth;
 
             double sinH = Math.Sin(pivot.heading) * 2.0 * toolWid;
             double cosH = Math.Cos(pivot.heading) * 2.0 * toolWid;
@@ -200,27 +199,27 @@ namespace AgOpenGPS
             double sin2HR;
             double cos2HR;
 
-            if (mf.Tools[0].ToolOffset < 0)
+            if (mf.Guidance.GuidanceOffset < 0)
             {
                 //sticks out more left
-                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
-                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
+                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset * 2)));
+                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset * 2)));
 
-                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
-                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
+                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset)));
+                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset)));
             }
             else
             {
                 //sticks out more right
-                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
-                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset)));
+                sin2HL = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset)));
+                cos2HL = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset)));
 
-                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
-                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Tools[0].ToolOffset * 2)));
+                sin2HR = Math.Sin(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset * 2)));
+                cos2HR = Math.Cos(pivot.heading + Glm.PIBy2) * (1.33 * (toolWid + Math.Abs(mf.Guidance.GuidanceOffset * 2)));
             }
 
             //narrow equipment needs bigger bounding box.
-            if (mf.Tools[0].ToolWidth < 6)
+            if (mf.Guidance.GuidanceWidth < 6)
             {
                 sinH = Math.Sin(pivot.heading) * 4 * toolWid;
                 cosH = Math.Cos(pivot.heading) * 4 * toolWid;
@@ -480,20 +479,14 @@ namespace AgOpenGPS
             start = pt - 35; if (start < 0) start = 0;
             stop = pt + 35; if (stop > ptCount) stop = ptCount + 1;
 
-            double distSq = mf.Tools[0].WidthMinusOverlap * mf.Tools[0].WidthMinusOverlap * 0.95;
+            double distSq = mf.Guidance.WidthMinusOverlap * mf.Guidance.WidthMinusOverlap * 0.95;
             bool fail = false;
 
             for (int i = start; i < stop; i++)
             {
-                //var point = new vec3(
-                //    stripList[strip][i].easting + (Math.Sin(piSide + stripList[strip][i].heading) * widthMinusOverlap),
-                //    stripList[strip][i].northing + (Math.Cos(piSide + stripList[strip][i].heading) * widthMinusOverlap),
-                //    stripList[strip][i].heading);
-                //ctList.Add(point);
-
                 var point = new Vec3(
-                    stripList[strip][i].easting + (Math.Sin(piSide + stripList[strip][i].heading) * mf.Tools[0].WidthMinusOverlap),
-                    stripList[strip][i].northing + (Math.Cos(piSide + stripList[strip][i].heading) * mf.Tools[0].WidthMinusOverlap),
+                    stripList[strip][i].easting + (Math.Sin(piSide + stripList[strip][i].heading) * mf.Guidance.WidthMinusOverlap),
+                    stripList[strip][i].northing + (Math.Cos(piSide + stripList[strip][i].heading) * mf.Guidance.WidthMinusOverlap),
                     stripList[strip][i].heading);
                 //ctList.Add(point);
 

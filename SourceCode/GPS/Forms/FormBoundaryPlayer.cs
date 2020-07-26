@@ -31,7 +31,7 @@ namespace AgOpenGPS
                 mf.hd.headArr.Add(new CHeadLines());
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].bndLine.AddRange(mf.bnd.bndBeingMadePts);
 
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.bnd.bndArr.Count - 1, mf.Tools[0].ToolWidth);
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.bnd.bndArr.Count - 1, mf.Guidance.GuidanceWidth);
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();

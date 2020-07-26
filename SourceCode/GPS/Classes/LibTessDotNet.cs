@@ -82,21 +82,15 @@ namespace AgOpenGPS
         CounterClockwise
     }
 
-    public struct ContourVertex
-    {
-        public Vec6 Position;
-
-    }
-
-    public delegate object CombineCallback(Vec6 position, object[] data, double[] weights);
+    public delegate object CombineCallback(Vec3 position, object[] data, double[] weights);
 
     public partial class Tess
     {
         private readonly IPool _pool;
         private Mesh _mesh;
-        private Vec6 _normal;
-        private Vec6 _sUnit;
-        private Vec6 _tUnit;
+        private Vec3 _normal;
+        private Vec3 _sUnit;
+        private Vec3 _tUnit;
 
         private double _bminX, _bminY, _bmaxX, _bmaxY;
 
@@ -121,12 +115,12 @@ namespace AgOpenGPS
         /// <summary>
         /// Normal of the tessellated mesh. The normal is the main axis of sweep that has been used.
         /// </summary>
-        public Vec6 Normal { get { return _normal; } }
+        public Vec3 Normal { get { return _normal; } }
 
         /// <summary>
         /// Vertices of the tessellated mesh.
         /// </summary>
-        public ContourVertex[] Vertices { get; private set; }
+        public Vec3[] Vertices { get; private set; }
         /// <summary>
         /// Number of vertices in the tessellated mesh.
         /// </summary>
@@ -141,12 +135,9 @@ namespace AgOpenGPS
         /// </summary>
         public int ElementCount { get; private set; }
 
-        public Tess() : this(new DefaultPool())
+        public Tess(IPool pool, IList<Vec3> vertices, Vec3 normal = new Vec3(), ContourOrientation forceOrientation = ContourOrientation.Clockwise)
         {
-        }
-        public Tess(IPool pool)
-        {
-            _normal = Vec6.Zero;
+            _normal = Vec3.Zero;
             _bminX = _bminY = _bmaxX = _bmaxY = 0;
 
             _windingRule = WindingRule.EvenOdd;
@@ -161,25 +152,27 @@ namespace AgOpenGPS
             VertexCount = 0;
             Elements = null;
             ElementCount = 0;
+            AddContourInternal(vertices, forceOrientation);
+            Tessellate(normal);
         }
 
-        private void ComputeNormal(ref Vec6 norm)
+        private void ComputeNormal(ref Vec3 norm)
         {
             var v = _mesh._vHead._next;
 
-            var minVal = new double[3] { v._coords.X, v._coords.Y, v._coords.Z };
+            var minVal = new double[3] { v._coords.easting, v._coords.northing, v._coords.heading};
             var minVert = new MeshUtils.Vertex[3] { v, v, v };
-            var maxVal = new double[3] { v._coords.X, v._coords.Y, v._coords.Z };
+            var maxVal = new double[3] { v._coords.easting, v._coords.northing, v._coords.heading};
             var maxVert = new MeshUtils.Vertex[3] { v, v, v };
 
             for (; v != _mesh._vHead; v = v._next)
             {
-                if (v._coords.X < minVal[0]) { minVal[0] = v._coords.X; minVert[0] = v; }
-                if (v._coords.Y < minVal[1]) { minVal[1] = v._coords.Y; minVert[1] = v; }
-                if (v._coords.Z < minVal[2]) { minVal[2] = v._coords.Z; minVert[2] = v; }
-                if (v._coords.X > maxVal[0]) { maxVal[0] = v._coords.X; maxVert[0] = v; }
-                if (v._coords.Y > maxVal[1]) { maxVal[1] = v._coords.Y; maxVert[1] = v; }
-                if (v._coords.Z > maxVal[2]) { maxVal[2] = v._coords.Z; maxVert[2] = v; }
+                if (v._coords.easting < minVal[0]) { minVal[0] = v._coords.easting; minVert[0] = v; }
+                if (v._coords.northing < minVal[1]) { minVal[1] = v._coords.northing; minVert[1] = v; }
+                if (v._coords.heading< minVal[2]) { minVal[2] = v._coords.heading; minVert[2] = v; }
+                if (v._coords.easting > maxVal[0]) { maxVal[0] = v._coords.easting; maxVert[0] = v; }
+                if (v._coords.northing > maxVal[1]) { maxVal[1] = v._coords.northing; maxVert[1] = v; }
+                if (v._coords.heading> maxVal[2]) { maxVal[2] = v._coords.heading; maxVert[2] = v; }
             }
 
             // Find two vertices separated by at least 1/sqrt(3) of the maximum
@@ -190,7 +183,7 @@ namespace AgOpenGPS
             if (minVal[i] >= maxVal[i])
             {
                 // All vertices are the same -- normal doesn't matter
-                norm = new Vec6(0, 0, 1);
+                norm = new Vec3(0, 0, 1);
                 return;
             }
 
@@ -199,15 +192,15 @@ namespace AgOpenGPS
             double maxLen2 = 0, tLen2;
             var v1 = minVert[i];
             var v2 = maxVert[i];
-            Vec6 tNorm;
-            Vec6.Sub(ref v1._coords, ref v2._coords, out Vec6 d1);
+            Vec3 tNorm;
+            Vec3 d1 = v1._coords - v2._coords;
             for (v = _mesh._vHead._next; v != _mesh._vHead; v = v._next)
             {
-                Vec6.Sub(ref v._coords, ref v2._coords, out Vec6 d2);
-                tNorm.X = d1.Y * d2.Z - d1.Z * d2.Y;
-                tNorm.Y = d1.Z * d2.X - d1.X * d2.Z;
-                tNorm.Z = d1.X * d2.Y - d1.Y * d2.X;
-                tLen2 = tNorm.X * tNorm.X + tNorm.Y * tNorm.Y + tNorm.Z * tNorm.Z;
+                Vec3 d2 = v._coords - v2._coords;
+                tNorm.easting = d1.northing * d2.heading- d1.heading* d2.northing;
+                tNorm.northing = d1.heading* d2.easting - d1.easting * d2.heading;
+                tNorm.heading= d1.easting * d2.northing - d1.northing * d2.easting;
+                tLen2 = tNorm.easting * tNorm.easting + tNorm.northing * tNorm.northing + tNorm.heading* tNorm.heading;
                 if (tLen2 > maxLen2)
                 {
                     maxLen2 = tLen2;
@@ -218,8 +211,8 @@ namespace AgOpenGPS
             if (maxLen2 <= 0.0f)
             {
                 // All points lie on a single line -- any decent normal will do
-                norm = Vec6.Zero;
-                i = Vec6.LongAxis(ref d1);
+                norm = Vec3.Zero;
+                i = Vec3.LongAxis(ref d1);
                 norm[i] = 1;
             }
         }
@@ -244,7 +237,7 @@ namespace AgOpenGPS
                 {
                     v._t = -v._t;
                 }
-                Vec6.Neg(ref _tUnit);
+                Vec3.Neg(ref _tUnit);
             }
         }
 
@@ -253,14 +246,14 @@ namespace AgOpenGPS
             var norm = _normal;
 
             bool computedNormal = false;
-            if (norm.X == 0.0f && norm.Y == 0.0f && norm.Z == 0.0f)
+            if (norm.easting == 0.0f && norm.northing == 0.0f && norm.heading== 0.0f)
             {
                 ComputeNormal(ref norm);
                 _normal = norm;
                 computedNormal = true;
             }
 
-            int i = Vec6.LongAxis(ref norm);
+            int i = Vec3.LongAxis(ref norm);
 
             _sUnit[i] = 0;
             _sUnit[(i + 1) % 3] = SUnitX;
@@ -273,8 +266,8 @@ namespace AgOpenGPS
             // Project the vertices onto the sweep plane
             for (var v = _mesh._vHead._next; v != _mesh._vHead; v = v._next)
             {
-                Vec6.Dot(ref v._coords, ref _sUnit, out v._s);
-                Vec6.Dot(ref v._coords, ref _tUnit, out v._t);
+                Vec3.Dot(ref v._coords, ref _sUnit, out v._s);
+                Vec3.Dot(ref v._coords, ref _tUnit, out v._t);
             }
             if (computedNormal)
             {
@@ -515,7 +508,7 @@ namespace AgOpenGPS
             Elements = new int[maxFaceCount * polySize];
 
             VertexCount = maxVertexCount;
-            Vertices = new ContourVertex[VertexCount];
+            Vertices = new Vec3[VertexCount];
 
             // Output vertices.
             for (v = _mesh._vHead._next; v != _mesh._vHead; v = v._next)
@@ -523,7 +516,7 @@ namespace AgOpenGPS
                 if (v._n != Undef)
                 {
                     // Store coordinate
-                    Vertices[v._n].Position = v._coords;
+                    Vertices[v._n] = v._coords;
                 }
             }
 
@@ -597,7 +590,7 @@ namespace AgOpenGPS
             }
 
             Elements = new int[ElementCount * 2];
-            Vertices = new ContourVertex[VertexCount];
+            Vertices = new Vec3[VertexCount];
 
             int vertIndex = 0;
             int elementIndex = 0;
@@ -612,7 +605,7 @@ namespace AgOpenGPS
                 start = edge = f._anEdge;
                 do
                 {
-                    Vertices[vertIndex].Position = edge._Org._coords;
+                    Vertices[vertIndex] = edge._Org._coords;
                     ++vertIndex;
                     ++vertCount;
                     edge = edge._Lnext;
@@ -625,7 +618,7 @@ namespace AgOpenGPS
             }
         }
 
-        private double SignedArea(IList<ContourVertex> vertices)
+        private double SignedArea(IList<Vec3> vertices)
         {
             double area = 0.0f;
 
@@ -634,8 +627,8 @@ namespace AgOpenGPS
                 var v0 = vertices[i];
                 var v1 = vertices[(i + 1) % vertices.Count];
 
-                area += v0.Position.X * v1.Position.Y;
-                area -= v0.Position.Y * v1.Position.X;
+                area += v0.easting * v1.northing;
+                area -= v0.northing * v1.easting;
             }
 
             return 0.5f * area;
@@ -651,23 +644,8 @@ namespace AgOpenGPS
         /// <see cref="ContourOrientation.Clockwise"/> and <see cref="ContourOrientation.CounterClockwise"/> 
         /// force the vertices to have a specified orientation.
         /// </param>
-        public void AddContour(ContourVertex[] vertices, ContourOrientation forceOrientation = ContourOrientation.Original)
-        {
-            AddContourInternal(vertices, forceOrientation);
-        }
 
-        /// <summary>
-        /// Adds a closed contour to be tessellated.
-        /// </summary>
-        /// <param name="vertices"> Vertices of the contour. </param>
-        /// <param name="forceOrientation">
-        /// Orientation of the contour.
-        /// <see cref="ContourOrientation.Original"/> keeps the orientation of the input vertices.
-        /// <see cref="ContourOrientation.Clockwise"/> and <see cref="ContourOrientation.CounterClockwise"/> 
-        /// force the vertices to have a specified orientation.
-        /// </param>
-
-        private void AddContourInternal(IList<ContourVertex> vertices, ContourOrientation forceOrientation)
+        public void AddContourInternal(IList<Vec3> vertices, ContourOrientation forceOrientation = ContourOrientation.Clockwise)
         {
             if (_mesh == null)
             {
@@ -699,7 +677,7 @@ namespace AgOpenGPS
 
                 int index = reverse ? vertices.Count - 1 - i : i;
                 // The new vertex is now e._Org.
-                e._Org._coords = vertices[index].Position;
+                e._Org._coords = vertices[index];
 
                 // The winding of an edge says how the winding number changes as we
                 // cross from the edge's right face to its left face.  We add the
@@ -718,8 +696,8 @@ namespace AgOpenGPS
         /// <param name="polySize"> Number of vertices per polygon if output is polygons. </param>
         /// <param name="combineCallback"> Interpolator used to determine the data payload of generated vertices. </param>
         /// <param name="normal"> Normal of the input contours. If set to zero, the normal will be calculated during tessellation. </param>
-        public void Tessellate(WindingRule windingRule = WindingRule.EvenOdd, ElementType elementType = ElementType.Polygons, int polySize = 3,
-            CombineCallback combineCallback = null, Vec6 normal = new Vec6())
+        public void Tessellate(Vec3 normal = new Vec3(), WindingRule windingRule = WindingRule.Positive, ElementType elementType = ElementType.Polygons, int polySize = 3,
+            CombineCallback combineCallback = null)
         {
             _normal = normal;
             Vertices = null;
@@ -1052,14 +1030,14 @@ namespace AgOpenGPS
             w0 = (t2 / (t1 + t2)) / 2.0f;
             w1 = (t1 / (t1 + t2)) / 2.0f;
 
-            isect._coords.X += w0 * org._coords.X + w1 * dst._coords.X;
-            isect._coords.Y += w0 * org._coords.Y + w1 * dst._coords.Y;
-            isect._coords.Z += w0 * org._coords.Z + w1 * dst._coords.Z;
+            isect._coords.easting += w0 * org._coords.easting + w1 * dst._coords.easting;
+            isect._coords.northing += w0 * org._coords.northing + w1 * dst._coords.northing;
+            isect._coords.heading+= w0 * org._coords.heading + w1 * dst._coords.heading;
         }
 
         private void GetIntersectData(MeshUtils.Vertex isect, MeshUtils.Vertex orgUp, MeshUtils.Vertex dstUp, MeshUtils.Vertex orgLo, MeshUtils.Vertex dstLo)
         {
-            isect._coords = Vec6.Zero;
+            isect._coords = Vec3.Zero;
             VertexWeights(isect, orgUp, dstUp, out double w0, out double w1);
             VertexWeights(isect, orgLo, dstLo, out double w2, out double w3);
 
@@ -2570,76 +2548,6 @@ namespace AgOpenGPS
         }
     }
 
-    public struct Vec6
-    {
-        public readonly static Vec6 Zero = new Vec6();
-
-        public double X, Y, Z;
-
-        public double this[int index]
-        {
-            get
-            {
-                if (index == 0) return X;
-                if (index == 1) return Y;
-                if (index == 2) return Z;
-                throw new IndexOutOfRangeException();
-            }
-            set
-            {
-                if (index == 0) X = value;
-                else if (index == 1) Y = value;
-                else if (index == 2) Z = value;
-                else throw new IndexOutOfRangeException();
-            }
-        }
-
-        public Vec6(double x, double y, double z)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        public static void Sub(ref Vec6 lhs, ref Vec6 rhs, out Vec6 result)
-        {
-            result.X = lhs.X - rhs.X;
-            result.Y = lhs.Y - rhs.Y;
-            result.Z = lhs.Z - rhs.Z;
-        }
-
-        public static void Neg(ref Vec6 v)
-        {
-            v.X = -v.X;
-            v.Y = -v.Y;
-            v.Z = -v.Z;
-        }
-
-        public static void Dot(ref Vec6 u, ref Vec6 v, out double dot)
-        {
-            dot = u.X * v.X + u.Y * v.Y + u.Z * v.Z;
-        }
-
-        public static void Normalize(ref Vec6 v)
-        {
-            var len = v.X * v.X + v.Y * v.Y + v.Z * v.Z;
-            Debug.Assert(len >= 0.0f);
-            len = 1.0f / (double)Math.Sqrt(len);
-            v.X *= len;
-            v.Y *= len;
-            v.Z *= len;
-        }
-
-        public static int LongAxis(ref Vec6 v)
-        {
-            int i = 0;
-            if (Math.Abs(v.Y) > Math.Abs(v.X)) i = 1;
-            if (Math.Abs(v.Z) > Math.Abs(i == 0 ? v.X : v.Y)) i = 2;
-            return i;
-        }
-
-    }
-
     public interface ITypePool
     {
         object Get();
@@ -2768,7 +2676,7 @@ namespace AgOpenGPS
             internal Vertex _prev, _next;
             internal Edge _anEdge;
 
-            internal Vec6 _coords;
+            internal Vec3 _coords;
             internal double _s, _t;
             internal PQHandle _pqHandle;
             internal int _n;
@@ -2782,7 +2690,7 @@ namespace AgOpenGPS
             {
                 _prev = _next = null;
                 _anEdge = null;
-                _coords = Vec6.Zero;
+                _coords = Vec3.Zero;
                 _s = 0;
                 _t = 0;
                 _pqHandle = new PQHandle();

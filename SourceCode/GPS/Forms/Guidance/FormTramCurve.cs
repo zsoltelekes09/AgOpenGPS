@@ -38,7 +38,7 @@ namespace AgOpenGPS
         private void FormTram_Load(object sender, EventArgs e)
         { 
             nudSnapAdj.ValueChanged -= NudSnapAdj_ValueChanged;
-            snapAdj = (Math.Round((mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap)/2.0,3));
+            snapAdj = (Math.Round((mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap) /2.0,3));
             nudSnapAdj.Value = (decimal)snapAdj;
             nudSnapAdj.ValueChanged += NudSnapAdj_ValueChanged;
 

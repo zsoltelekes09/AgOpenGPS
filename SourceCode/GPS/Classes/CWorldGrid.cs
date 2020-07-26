@@ -59,14 +59,24 @@ namespace AgOpenGPS
         public void DrawWorldGrid(double _gridZoom)
         {
             GL.Color3(0, 0, 0);
-            //GL.LineWidth(1);
+            GL.LineWidth(1);
             GL.Begin(PrimitiveType.Lines);
-            for (double num = eastingMin; num < eastingMax; num += _gridZoom)
+            for (double num = 0; num < eastingMax; num += _gridZoom)
             {
                 GL.Vertex3(num, northingMax, 0.1);
                 GL.Vertex3(num, northingMin, 0.1);
             }
-            for (double num2 = northingMin; num2 < northingMax; num2 += _gridZoom)
+            for (double num = -_gridZoom; num > eastingMin; num -= _gridZoom)
+            {
+                GL.Vertex3(num, northingMax, 0.1);
+                GL.Vertex3(num, northingMin, 0.1);
+            }
+            for (double num2 = 0; num2 < northingMax; num2 += _gridZoom)
+            {
+                GL.Vertex3(eastingMax, num2, 0.1);
+                GL.Vertex3(eastingMin, num2, 0.1);
+            }
+            for (double num2 = - _gridZoom; num2 > northingMin; num2 -= _gridZoom)
             {
                 GL.Vertex3(eastingMax, num2, 0.1);
                 GL.Vertex3(eastingMin, num2, 0.1);
@@ -76,10 +86,10 @@ namespace AgOpenGPS
 
         public void CreateWorldGrid(double northing, double easting)
         {
-            northingMax = northing + 5000.0;
-            northingMin = northing - 5000.0;
-            eastingMax = easting +   5000.0;
-            eastingMin = easting -   5000.0;
+            northingMax = northing + 2000.0;
+            northingMin = northing - 2000.0;
+            eastingMax = easting +   2000.0;
+            eastingMin = easting -   2000.0;
         }
 
         public void CheckZoomWorldGrid(double northing, double easting)

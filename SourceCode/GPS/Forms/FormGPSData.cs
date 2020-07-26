@@ -53,7 +53,7 @@ namespace AgOpenGPS
                 lblWorkRemaining.Text = mf.fd.WorkedAreaRemainHectares;
                 lblPercentRemaining.Text = mf.fd.WorkedAreaRemainPercentage;
                 lblTimeRemaining.Text = mf.fd.TimeTillFinished;
-                lblEqSpec.Text = (Math.Round(mf.Tools[0].ToolWidth, 2)).ToString() + " m  " + mf.vehicleFileName + mf.toolFileName;
+                lblEqSpec.Text = (Math.Round(mf.Guidance.GuidanceWidth, 2)).ToString() + " m  " + mf.vehicleFileName + mf.toolFileName;
             }
             else //imperial
             {
@@ -63,7 +63,7 @@ namespace AgOpenGPS
                 lblWorkRemaining.Text = mf.fd.WorkedAreaRemainAcres;
                 lblPercentRemaining.Text = mf.fd.WorkedAreaRemainPercentage;
                 lblTimeRemaining.Text = mf.fd.TimeTillFinished;
-                lblEqSpec.Text =  (Math.Round(mf.Tools[0].ToolWidth * Glm.m2ft, 2)).ToString() + " ft  " + mf.vehicleFileName + mf.toolFileName;
+                lblEqSpec.Text =  (Math.Round(mf.Guidance.GuidanceWidth * Glm.m2ft, 2)).ToString() + " ft  " + mf.vehicleFileName + mf.toolFileName;
             }
 
             if (mf.isUDPSendConnected)
@@ -91,26 +91,3 @@ namespace AgOpenGPS
         }
     }
 }
-
-
-    //lblAreaAppliedMinusOverlap.Text = ((fd.actualAreaCovered * glm.m2ac).ToString("N2"));
-    //lblAreaMinusActualApplied.Text = (((mf.fd.areaBoundaryOuterLessInner - mf.fd.actualAreaCovered) * glm.m2ac).ToString("N2"));
-    //lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
-    //lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ac).ToString("N3"));
-            
-    //lblAreaAppliedMinusOverlap.Text = ((fd.actualAreaCovered * glm.m2ha).ToString("N2"));
-    //lblAreaMinusActualApplied.Text = (((mf.fd.areaBoundaryOuterLessInner - mf.fd.actualAreaCovered) * glm.m2ha).ToString("N2"));
-    //lblOverlapPercent.Text = (fd.overlapPercent.ToString("N2")) + "%";
-    //lblAreaOverlapped.Text = (((fd.workedAreaTotal - fd.actualAreaCovered) * glm.m2ha).ToString("N3"));
-
-
-    //lblLookOnLeft.Text = mf.Tools[0].lookAheadDistanceOnPixelsLeft.ToString("N0");
-    //lblLookOnRight.Text = mf.Tools[0].lookAheadDistanceOnPixelsRight.ToString("N0");
-    //lblLookOffLeft.Text = mf.Tools[0].lookAheadDistanceOffPixelsLeft.ToString("N0");
-    //lblLookOffRight.Text = mf.Tools[0].lookAheadDistanceOffPixelsRight.ToString("N0");
-
-    //lblLeftToolSpd.Text = (mf.Tools[0].toolFarLeftSpeed*3.6).ToString("N1");
-    //lblRightToolSpd.Text = (mf.Tools[0].toolFarRightSpeed*3.6).ToString("N1");
-
-    //lblSectSpdLeft.Text = (mf.section[0].speedPixels*0.36).ToString("N1");
-    //lblSectSpdRight.Text = (mf.section[mf.Tools[0].numOfSections-1].speedPixels*0.36).ToString("N1");

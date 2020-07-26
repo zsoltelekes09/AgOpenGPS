@@ -66,7 +66,7 @@ namespace AgOpenGPS
 
             //scale the drawing to match exactly the ABLine width
             double adjustFactor = pt[pt.Length - 1].easting;
-            adjustFactor = (mf.Tools[0].ToolWidth - mf.Tools[0].ToolOverlap + mf.Tools[0].ToolOffset) / adjustFactor;
+            adjustFactor = (mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap + mf.Guidance.GuidanceOffset) / adjustFactor;
             for (i = 0; i < pt.Length; i++)
             {
                 pt[i].easting *= adjustFactor;

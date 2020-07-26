@@ -5,11 +5,11 @@ namespace AgOpenGPS
 {
     public static class NudChk
     {
-        public static bool CheckValue(this NumericUpDown numericUpDown, ref decimal value)
+        public static bool CheckValue(this NumericUpDown numericUpDown, ref double value)
         {
-            if (value < numericUpDown.Minimum)
+            if (value < (double)numericUpDown.Minimum)
             {
-                value = numericUpDown.Minimum;
+                value = (double)numericUpDown.Minimum;
                 MessageBox.Show("Serious Settings Problem with - " + numericUpDown.Name
                     + " \n\rMinimum has been exceeded\n\rDouble check ALL your Settings and \n\rFix it and Resave Vehicle File",
                 "Critical Settings Warning",
@@ -17,9 +17,9 @@ namespace AgOpenGPS
                 MessageBoxIcon.Error);
                 return true;
             }
-            else if (value > numericUpDown.Maximum)
+            else if (value > (double)numericUpDown.Maximum)
             {
-                value = numericUpDown.Maximum;
+                value = (double)numericUpDown.Maximum;
                 MessageBox.Show("Serious Settings Problem with - " + numericUpDown.Name
                     + " \n\rMaximum has been exceeded\n\rDouble check ALL your Settings and \n\rFix it and Resave Vehicle File",
                 "Critical Settings Warning",

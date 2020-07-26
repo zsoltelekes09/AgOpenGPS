@@ -244,11 +244,9 @@ namespace AgOpenGPS
             if (ptCount < 3) return;
 
             GL.Begin(PrimitiveType.Triangles);
-            for (int h = 0; h < ptCount - 2; h += 3)
+            for (int h = 0; h < ptCount - 2; h++)
             {
                 GL.Vertex3(bndArea[h].easting, bndArea[h].northing, 0);
-                GL.Vertex3(bndArea[h + 1].easting, bndArea[h + 1].northing, 0);
-                GL.Vertex3(bndArea[h + 2].easting, bndArea[h + 2].northing, 0);
             }
             GL.End();
         }
@@ -288,26 +286,15 @@ namespace AgOpenGPS
             }
             area = Math.Abs(area / 2);
 
-            var v = new ContourVertex[ptCount];
-            for (int i = 0; i < ptCount; i++)
-            {
-                v[i].Position = new Vec6(bndLine[i].easting, bndLine[i].northing, 0);
-            }
 
-            Tess _tess = new Tess();
-            _tess.AddContour(v, ContourOrientation.Clockwise);
-            _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3, null);
-
+            Tess tess = new Tess(new DefaultPool(), bndLine, new Vec3(0, 0, 1));
             bndArea.Clear();
-
-            //var output = new List<Polygon>();
-            for (int i = 0; i < _tess.ElementCount; i++)
+            for (int i = 0; i < tess.ElementCount; i++)
             {
                 for (int k = 0; k < 3; k++)
                 {
-                    int index = _tess.Elements[i * 3 + k];
-                    if (index == -1) continue;
-                    bndArea.Add(new Vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
+                    int index = tess.Elements[i * 3 + k];
+                    bndArea.Add(new Vec3(tess.Vertices[index].easting, tess.Vertices[index].northing, 0));
                 }
             }
         }

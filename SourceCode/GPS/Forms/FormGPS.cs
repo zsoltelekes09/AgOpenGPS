@@ -78,6 +78,8 @@ namespace AgOpenGPS
         //the autoManual drive button. Assume in Auto
         public bool isInAutoDrive = true;
 
+        public Guidance Guidance;
+
         /// <summary>
         /// create the scene camera
         /// </summary>
@@ -287,15 +289,16 @@ namespace AgOpenGPS
             //build the gesture structures
             SetupStructSizes();
 
+
+            Guidance = new Guidance();
+
             //create the world grid
             worldGrid = new CWorldGrid(this);
 
             //our vehicle made with gl object and pointer of mainform
             vehicle = new CVehicle(this);
 
-            Tools.Add(new CTool(this, Tools.Count));
 
-            //Tools.Add(new CTool(this, Tools.Count));
 
             //our NMEA parser
             pn = new CNMEA(this);
@@ -440,7 +443,7 @@ namespace AgOpenGPS
             }
             else
             {
-                SndBoundaryAlarm = new SoundPlayer(Properties.Resources.Alarm10);
+                SndBoundaryAlarm = new SoundPlayer(Resources.Alarm10);
             }
 
             //grab the current vehicle filename - make sure it exists
@@ -488,7 +491,7 @@ namespace AgOpenGPS
             if (wasAutoSteerConnectedLastRun) SerialPortAutoSteerOpen();
 
             //Calculate total width and each section width
-            SectionCalcWidths();
+            LoadTools();
 
             //set the correct zoom and grid
             camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
@@ -556,22 +559,22 @@ namespace AgOpenGPS
             //boundaryTriggerDistance = Settings.Default.setF_boundaryTriggerDistance;
 
             //load the last used auto turn shape
-            string fileAndDir = @".\Dependencies\YouTurnShapes\" + Properties.Settings.Default.setAS_youTurnShape;
+            string fileAndDir = @".\Dependencies\YouTurnShapes\" + Settings.Default.setAS_youTurnShape;
             yt.LoadYouTurnShapeFromFile(fileAndDir);
 
             //sim.latitude = Settings.Default.setSim_lastLat;
             //sim.longitude = Settings.Default.setSim_lastLong;
 
             //load th elightbar resolution
-            lightbarCmPerPixel = Properties.Settings.Default.setDisplay_lightbarCmPerPixel;
+            lightbarCmPerPixel = Settings.Default.setDisplay_lightbarCmPerPixel;
 
             // load all the gui elements in gui.designer.cs
             LoadGUI();
 
             //Stanley guidance
-            isStanleyUsed = Properties.Vehicle.Default.setVehicle_isStanleyUsed;
+            isStanleyUsed = Vehicle.Default.setVehicle_isStanleyUsed;
 
-            isRTK = Properties.Settings.Default.setGPS_isRTK;
+            isRTK = Settings.Default.setGPS_isRTK;
         }
 
         //form is closing so tidy up and save settings
@@ -1248,46 +1251,23 @@ namespace AgOpenGPS
 
         //function to set section positions
         //function to calculate the width of each section and update
-        public void SectionCalcWidths()
+        public void LoadTools()
         {
-            for (int i = 0; i < Tools.Count; i++)
+            for (int i = Tools.Count - 1; i >= Vehicle.Default.ToolSettings.Count; i--)
             {
-                if (Tools[i].numOfSections > 0)
+                Tools[i].RemoveSections();
+                Tools.RemoveAt(i);
+            }
+
+            for (int i = 0; i < Vehicle.Default.ToolSettings.Count; i++)
+            {
+                if (Tools.Count <= i)
                 {
-                    if (Vehicle.Default.Section_position == null)
-                    {
-                        Vehicle.Default.Section_position = new List<decimal>();
-                        for (int j = -50; j < 51; j++)
-                        {
-                            Vehicle.Default.Section_position.Add(j);
-                        }
-                        Vehicle.Default.Save();
-                    }
-                        
-                    for (int j = 0; j < Tools[i].numOfSections; j++)
-                    {
-
-                        Tools[i].Sections[j].positionLeft = Convert.ToDouble(Vehicle.Default.Section_position[j]) + Vehicle.Default.setVehicle_toolOffset;
-                        Tools[i].Sections[j].positionRight = Convert.ToDouble(Vehicle.Default.Section_position[j + 1]) + Vehicle.Default.setVehicle_toolOffset;
-
-
-                        Tools[i].Sections[j].sectionWidth = Tools[i].Sections[j].positionRight - Tools[i].Sections[j].positionLeft;
-                        Tools[i].Sections[j].rpSectionPosition = 375 + (int)Math.Round(Tools[i].Sections[j].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
-                        Tools[i].Sections[j].rpSectionWidth = (int)Math.Round(Tools[i].Sections[j].sectionWidth * 10, 0, MidpointRounding.AwayFromZero);
-                    }
-
-                    //calculate tool width based on extreme right and left values
-                    Tools[i].ToolWidth = Math.Abs(Tools[i].Sections[Tools[i].numOfSections - 1].positionRight - Tools[i].Sections[0].positionLeft);
-
-
-                    //now do the full width section
-                    Tools[i].Sections[Tools[i].numOfSections].sectionWidth = Tools[i].ToolWidth;
-                    Tools[i].Sections[Tools[i].numOfSections].positionLeft = Tools[i].Sections[0].positionLeft;
-                    Tools[i].Sections[Tools[i].numOfSections].positionRight = Tools[i].Sections[Tools[i].numOfSections - 1].positionRight;
-
-                    //find the right side pixel position
-                    Tools[i].rpXPosition = 375 + (int)(Math.Round(Tools[i].Sections[0].positionLeft * 10, 0, MidpointRounding.AwayFromZero));
-                    Tools[i].rpWidth = (int)(Math.Round(Tools[i].ToolWidth * 10, 0, MidpointRounding.AwayFromZero));
+                    Tools.Add(new CTool(this, Tools.Count));
+                }
+                else
+                {
+                    Tools[i].SetToolSettings(i);
                 }
             }
         }
@@ -1595,51 +1575,6 @@ namespace AgOpenGPS
                 }
 
 
-                #region notes
-                //Turn ON
-                //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
-                //if (section[j].sectionOnRequest)
-                //{
-                //    section[j].sectionOnTimer = (int)(pn.speed * section[j].lookAheadOn) + 1;
-                //    if (section[j].sectionOnTimer > fixUpdateHz + 3) section[j].sectionOnTimer = fixUpdateHz + 3;
-                //}
-
-                ////reset the ON request
-                //section[j].sectionOnRequest = false;
-
-                ////decrement the timer if not zero
-                //if (section[j].sectionOnTimer > 0)
-                //{
-                //    //turn the section ON if not and decrement timer
-                //    section[j].sectionOnTimer--;
-                //    if (!section[j].IsSectionOn) section[j].IsSectionOn = true;
-
-                //    //keep resetting the section OFF timer while the ON is active
-                //    //section[j].sectionOffTimer = (int)(fixUpdateHz * Tools[0].toolTurnOffDelay);
-                //}
-                //if (!section[j].sectionOffRequest) 
-                //    section[j].sectionOffTimer = (int)(fixUpdateHz * Tools[0].turnOffDelay);
-
-                ////decrement the off timer
-                //if (section[j].sectionOffTimer > 0 && section[j].sectionOnTimer == 0) section[j].sectionOffTimer--;
-
-                ////Turn OFF
-                ////if Off section timer is zero, turn off the section
-                //if (section[j].sectionOffTimer == 0 && section[j].sectionOnTimer == 0 && section[j].sectionOffRequest)
-                //{
-                //    if (section[j].IsSectionOn) section[j].IsSectionOn = false;
-                //    //section[j].sectionOnOffCycle = false;
-                //    section[j].sectionOffRequest = false;
-                //    //}
-                //}
-                //Turn ON
-                //if requested to be on, set the timer to Max 10 (1 seconds) = 10 frames per second
-
-                ////reset the ON request
-                //section[j].mappingOnRequest = false;
-
-                //decrement the timer if not zero
-                #endregion notes
             }
         }
 
@@ -1765,16 +1700,16 @@ namespace AgOpenGPS
         public void SetZoom()
         {
             //match grid to cam distance and redo perspective
-            if (camera.camSetDistance <= -20000) camera.gridZoom = 2000;
-            else if (camera.camSetDistance >= -20000 && camera.camSetDistance < -10000) camera.gridZoom = 2012 * 2;
-            else if (camera.camSetDistance >= -10000 && camera.camSetDistance < -5000) camera.gridZoom = 1006 * 2;
-            else if (camera.camSetDistance >= -5000 && camera.camSetDistance < -2000) camera.gridZoom = 503 * 2;
-            else if (camera.camSetDistance >= -2000 && camera.camSetDistance < -1000) camera.gridZoom = 201.2 * 2;
-            else if (camera.camSetDistance >= -1000 && camera.camSetDistance < -500) camera.gridZoom = 100.6 * 2;
-            else if (camera.camSetDistance >= -500 && camera.camSetDistance < -250) camera.gridZoom = 50.3 * 2;
-            else if (camera.camSetDistance >= -250 && camera.camSetDistance < -150) camera.gridZoom = 25.15 * 2;
-            else if (camera.camSetDistance >= -150 && camera.camSetDistance < -50) camera.gridZoom = 10.06 * 2;
-            else if (camera.camSetDistance >= -50 && camera.camSetDistance < -1) camera.gridZoom = 5.03 * 2;
+            if (camera.camSetDistance <= -20000) camera.gridZoom = 4000;
+            else if (camera.camSetDistance >= -20000 && camera.camSetDistance < -10000) camera.gridZoom = 4000;
+            else if (camera.camSetDistance >= -10000 && camera.camSetDistance < -5000) camera.gridZoom = 2000;
+            else if (camera.camSetDistance >= -5000 && camera.camSetDistance < -2000) camera.gridZoom = 1000;
+            else if (camera.camSetDistance >= -2000 && camera.camSetDistance < -1000) camera.gridZoom = 400;
+            else if (camera.camSetDistance >= -1000 && camera.camSetDistance < -500) camera.gridZoom = 200;
+            else if (camera.camSetDistance >= -500 && camera.camSetDistance < -250) camera.gridZoom = 100;
+            else if (camera.camSetDistance >= -250 && camera.camSetDistance < -150) camera.gridZoom = 50;
+            else if (camera.camSetDistance >= -150 && camera.camSetDistance < -50) camera.gridZoom = 30;
+            else if (camera.camSetDistance >= -50 && camera.camSetDistance < -1) camera.gridZoom = 10;
             //1.216 2.532
 
             oglMain.MakeCurrent();

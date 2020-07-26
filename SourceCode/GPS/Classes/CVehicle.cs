@@ -19,8 +19,6 @@ namespace AgOpenGPS
         public double antennaOffset;
         public int vehicleType;
 
-        //min vehicle speed allowed before turning shit off
-        public double slowSpeedCutoff = 0;
 
         //autosteer values
         public double goalPointLookAheadSeconds, goalPointLookAheadMinimumDistance, goalPointDistanceMultiplier, goalPointLookAheadUturnMult;
@@ -49,8 +47,6 @@ namespace AgOpenGPS
             wheelbase = Properties.Vehicle.Default.setVehicle_wheelbase;
             minTurningRadius = Properties.Vehicle.Default.setVehicle_minTurningRadius;
             isSteerAxleAhead = Properties.Vehicle.Default.setVehicle_isSteerAxleAhead;
-
-            slowSpeedCutoff = Properties.Vehicle.Default.setVehicle_slowSpeedCutoff;
 
             goalPointLookAheadSeconds = Properties.Vehicle.Default.setVehicle_goalPointLookAhead;
             goalPointLookAheadMinimumDistance = Properties.Vehicle.Default.setVehicle_lookAheadMinimum;

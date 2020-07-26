@@ -28,6 +28,8 @@ namespace AgOpenGPS
         private readonly double metImp2m, m2MetImp, maxWidth ;
         private double cutoffSpeed, cutoffMetricImperial;
 
+        int Here = 0;
+
         //constructor
         public FormToolSettings(Form callingForm, int page)
         {
@@ -119,63 +121,52 @@ namespace AgOpenGPS
                 //nudDefaultSectionWidth.Enabled = false;
             }
 
-            hitchLength = Math.Abs(Properties.Vehicle.Default.setVehicle_hitchLength);
-            if (nudHitchLength.CheckValueCm(ref hitchLength)) nudHitchLength.BackColor = System.Drawing.Color.OrangeRed;
+            hitchLength = Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].HitchLength);
+            if (nudHitchLength.CheckValueCm(ref hitchLength)) nudHitchLength.BackColor = Color.OrangeRed;
 
-            toolTrailingHitchLength = Math.Abs(Properties.Vehicle.Default.setTool_toolTrailingHitchLength);
-            if (nudForeAft.CheckValueCm(ref toolTrailingHitchLength)) nudForeAft.BackColor = System.Drawing.Color.OrangeRed;
+            toolTrailingHitchLength = Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TrailingHitchLength);
+            if (nudForeAft.CheckValueCm(ref toolTrailingHitchLength)) nudForeAft.BackColor = Color.OrangeRed;
 
-            tankTrailingHitchLength = Math.Abs(Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength);
-            if (nudTankHitch.CheckValueCm(ref tankTrailingHitchLength)) nudTankHitch.BackColor = System.Drawing.Color.OrangeRed;
+            tankTrailingHitchLength = Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TankTrailingHitchLength);
+            if (nudTankHitch.CheckValueCm(ref tankTrailingHitchLength)) nudTankHitch.BackColor = Color.OrangeRed;
 
-            toolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
-            if (nudOverlap.CheckValueCm(ref toolOverlap)) nudOverlap.BackColor = System.Drawing.Color.OrangeRed;
+            toolOverlap = Properties.Vehicle.Default.GuidanceOverlap;
+            if (nudOverlap.CheckValueCm(ref toolOverlap)) nudOverlap.BackColor = Color.OrangeRed;
 
-            toolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
-            if (nudOffset.CheckValueCm(ref toolOffset)) nudOffset.BackColor = System.Drawing.Color.OrangeRed;
+            toolOffset = Properties.Vehicle.Default.GuidanceOffset;
+            if (nudOffset.CheckValueCm(ref toolOffset)) nudOffset.BackColor = Color.OrangeRed;
 
-            defaultSectionWidth = Properties.Vehicle.Default.setTool_defaultSectionWidth;
-            if (nudDefaultSectionWidth.CheckValueCm(ref defaultSectionWidth)) nudDefaultSectionWidth.BackColor = System.Drawing.Color.OrangeRed;
+            defaultSectionWidth = Properties.Vehicle.Default.setTool_defaultSectionWidth * m2MetImp;
+            if (nudDefaultSectionWidth.CheckValue(ref defaultSectionWidth)) nudDefaultSectionWidth.BackColor = Color.OrangeRed;
 
-            decimal temp;
-            toolTurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
-            temp = (decimal)toolTurnOffDelay;
-            if (nudTurnOffDelay.CheckValue(ref temp)) nudTurnOffDelay.BackColor = System.Drawing.Color.OrangeRed;
-            toolTurnOffDelay = (double)temp;
-
-            toolLookAheadOff = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
-            temp = (decimal)toolLookAheadOff;
-            if (nudLookAheadOff.CheckValue(ref temp)) nudLookAheadOff.BackColor = System.Drawing.Color.OrangeRed;
-            toolLookAheadOff = (double)temp;
-
-            MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
-            temp = (decimal)MappingOnDelay;
-            if (nudMappingOnDelay.CheckValue(ref temp)) nudMappingOnDelay.BackColor = System.Drawing.Color.OrangeRed;
-            MappingOnDelay = (double)temp;
-
-            MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
-            temp = (decimal)MappingOffDelay;
-            if (nudMappingOffDelay.CheckValue(ref temp)) nudMappingOffDelay.BackColor = System.Drawing.Color.OrangeRed;
-            MappingOffDelay = (double)temp;
+            toolTurnOffDelay = Properties.Vehicle.Default.ToolSettings[Here].TurnOffDelay;
+            if (nudTurnOffDelay.CheckValue(ref toolTurnOffDelay)) nudTurnOffDelay.BackColor = Color.OrangeRed;
 
 
+            toolLookAheadOff = Properties.Vehicle.Default.ToolSettings[Here].LookAheadOff;
+            if (nudLookAheadOff.CheckValue(ref toolLookAheadOff)) nudLookAheadOff.BackColor = Color.OrangeRed;
 
-            toolLookAheadOn = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
-            temp = (decimal)toolLookAheadOn;
-            if (nudLookAhead.CheckValue(ref temp)) nudLookAhead.BackColor = System.Drawing.Color.OrangeRed;
-            toolLookAheadOn = (double)temp;
+            MappingOnDelay = Properties.Vehicle.Default.ToolSettings[Here].MappingOnDelay;
+            if (nudMappingOnDelay.CheckValue(ref MappingOnDelay)) nudMappingOnDelay.BackColor = Color.OrangeRed;
 
-
-            minApplied = Properties.Vehicle.Default.setVehicle_minApplied;
-            temp = minApplied;
-            if (nudMinApplied.CheckValue(ref temp)) nudMinApplied.BackColor = System.Drawing.Color.OrangeRed;
+            MappingOffDelay = Properties.Vehicle.Default.ToolSettings[Here].MappingOffDelay;
+            if (nudMappingOffDelay.CheckValue(ref MappingOffDelay)) nudMappingOffDelay.BackColor = Color.OrangeRed;
 
 
-            NumSections.Value = numberOfSections = Properties.Vehicle.Default.setVehicle_numSections;
+            toolLookAheadOn = Properties.Vehicle.Default.ToolSettings[Here].LookAheadOn;
+            if (nudLookAhead.CheckValue(ref toolLookAheadOn)) nudLookAhead.BackColor = Color.OrangeRed;
 
-            isToolBehindPivot = Properties.Vehicle.Default.setTool_isToolBehindPivot;
-            isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
-            isToolTBT = Properties.Vehicle.Default.setTool_isToolTBT;
+
+            minApplied = Properties.Vehicle.Default.ToolSettings[Here].MinApplied;
+            double temp = minApplied;
+            if (nudMinApplied.CheckValue(ref temp)) nudMinApplied.BackColor = Color.OrangeRed;
+
+
+            NumSections.Value = numberOfSections = Properties.Vehicle.Default.ToolSettings[Here].Sections.Count;
+
+            isToolBehindPivot = Properties.Vehicle.Default.ToolSettings[Here].BehindPivot;
+            isToolTrailing = Properties.Vehicle.Default.ToolSettings[Here].Trailing;
+            isToolTBT = Properties.Vehicle.Default.ToolSettings[Here].TBT;
 
             if (!isToolBehindPivot)
             {
@@ -265,7 +256,7 @@ namespace AgOpenGPS
             nudOffset.Value = (decimal)(toolOffset * m2MetImp);
             nudOffset.ValueChanged += NudOffset_ValueChanged;
 
-            nudDefaultSectionWidth.Value = (decimal)(defaultSectionWidth * m2MetImp);
+            nudDefaultSectionWidth.Value = (decimal)(defaultSectionWidth);
             nudDefaultSectionWidth.ValueChanged += NudDefaultSectionWidth_ValueChanged;
 
             nudTurnOffDelay.ValueChanged -= NudTurnOffDelay_ValueChanged;
@@ -315,14 +306,12 @@ namespace AgOpenGPS
             checkWorkSwitchManual.Checked = isWorkSwitchManual;
             checkWorkSwitchManual.CheckedChanged += CheckWorkSwitchManual_CheckedChanged;
 
-            btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
+            btnChangeAttachment.BackColor = Color.Transparent;
             btnChangeAttachment.Enabled = false;
 
 
-            cutoffSpeed = Properties.Vehicle.Default.setVehicle_slowSpeedCutoff / cutoffMetricImperial;
-            temp = (decimal)cutoffSpeed;
-            if (nudCutoffSpeed.CheckValue(ref temp)) nudCutoffSpeed.BackColor = System.Drawing.Color.OrangeRed;
-            cutoffSpeed = (double)temp;
+            cutoffSpeed = Properties.Vehicle.Default.ToolSettings[Here].SlowSpeedCutoff / cutoffMetricImperial;
+            if (nudCutoffSpeed.CheckValue(ref cutoffSpeed)) nudCutoffSpeed.BackColor = System.Drawing.Color.OrangeRed;
 
             nudCutoffSpeed.ValueChanged -= NudCutoffSpeed_ValueChanged;
             nudCutoffSpeed.Value = (decimal)cutoffSpeed;
@@ -332,88 +321,65 @@ namespace AgOpenGPS
         private void BtnOK_Click(object sender, EventArgs e)
         {
             //Tool  ------------------------------------------------------------------------------------------
-            int Here = 0;
-            //trailing hitch is always behind
-            toolTrailingHitchLength *= -1;
-            mf.Tools[Here].toolTrailingHitchLength = toolTrailingHitchLength;
-            Properties.Vehicle.Default.setTool_toolTrailingHitchLength = mf.Tools[Here].toolTrailingHitchLength;
 
-            tankTrailingHitchLength *= -1;
-            mf.Tools[Here].toolTankTrailingHitchLength = tankTrailingHitchLength;
-            Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength = mf.Tools[Here].toolTankTrailingHitchLength;
+            Properties.Vehicle.Default.ToolSettings[Here].LookAheadOn = toolLookAheadOn;
+            Properties.Vehicle.Default.ToolSettings[Here].LookAheadOff = toolLookAheadOff;
+            Properties.Vehicle.Default.ToolSettings[Here].TurnOffDelay = toolTurnOffDelay;
+            Properties.Vehicle.Default.ToolSettings[Here].MappingOnDelay = MappingOnDelay;
+            Properties.Vehicle.Default.ToolSettings[Here].MappingOffDelay = MappingOffDelay;
 
+            Properties.Vehicle.Default.ToolSettings[Here].TrailingHitchLength = toolTrailingHitchLength *= -1;
+            Properties.Vehicle.Default.ToolSettings[Here].TankTrailingHitchLength = tankTrailingHitchLength *= -1;
+            Properties.Vehicle.Default.ToolSettings[Here].HitchLength = hitchLength *= isToolBehindPivot? -1 : 1;
 
+            Properties.Vehicle.Default.ToolSettings[Here].Trailing = isToolTrailing;
+            Properties.Vehicle.Default.ToolSettings[Here].BehindPivot = isToolBehindPivot;
+            Properties.Vehicle.Default.ToolSettings[Here].TBT = isToolTBT;
 
-
-            mf.Tools[Here].ToolOverlap = toolOverlap;
-            Properties.Vehicle.Default.setVehicle_toolOverlap = mf.Tools[Here].ToolOverlap;
-
-            mf.Tools[Here].ToolOffset = toolOffset;
-            Properties.Vehicle.Default.setVehicle_toolOffset = mf.Tools[Here].ToolOffset;
-            Properties.Vehicle.Default.setVehicle_toolWidth = mf.Tools[Here].ToolWidth;
-
-            mf.Tools[Here].WidthMinusOverlap = mf.Tools[Here].ToolWidth - mf.Tools[Here].ToolOverlap;
+            Properties.Vehicle.Default.ToolSettings[Here].MinApplied = minApplied;
+            Properties.Vehicle.Default.ToolSettings[Here].SlowSpeedCutoff = cutoffSpeed * cutoffMetricImperial;
 
 
 
 
 
-            mf.Tools[Here].LookAheadOnSetting = toolLookAheadOn;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOn = mf.Tools[Here].LookAheadOnSetting;
-           
-            mf.Tools[Here].LookAheadOffSetting = toolLookAheadOff;
-            Properties.Vehicle.Default.setVehicle_toolLookAheadOff = mf.Tools[Here].LookAheadOffSetting;
 
-            mf.Tools[Here].TurnOffDelay = toolTurnOffDelay;
-            Properties.Vehicle.Default.setVehicle_toolOffDelay = mf.Tools[Here].TurnOffDelay;
-
-            mf.Tools[Here].MappingOnDelay = MappingOnDelay;
-            Properties.Vehicle.Default.setVehicle_MappingOnDelay = mf.Tools[Here].MappingOnDelay;
-
-            mf.Tools[Here].MappingOffDelay = MappingOffDelay;
-            Properties.Vehicle.Default.setVehicle_MappingOffDelay = mf.Tools[Here].MappingOffDelay;
+            double Width = 0;
+            for (int i = 0; i < Section.Count; i++)
+            {
+                Width += (double)Section[i].Value * metImp2m;
+            }
+            List<double[]> aa = new List<double[]>();
 
 
-            mf.Tools[Here].isToolTrailing = isToolTrailing;
-            Properties.Vehicle.Default.setTool_isToolTrailing = mf.Tools[Here].isToolTrailing;
-
-            mf.Tools[Here].isToolBehindPivot = isToolBehindPivot;
-            Properties.Vehicle.Default.setTool_isToolBehindPivot = mf.Tools[Here].isToolBehindPivot;
-
-            mf.Tools[Here].isToolTBT = isToolTBT;
-            Properties.Vehicle.Default.setTool_isToolTBT = mf.Tools[Here].isToolTBT;
-
-            if (isToolBehindPivot) hitchLength *= -1;
-            mf.Tools[Here].HitchLength = hitchLength;
-            Properties.Vehicle.Default.setVehicle_hitchLength = mf.Tools[Here].HitchLength;
-
-            //Slow speed cutoff
-            Properties.Vehicle.Default.setVehicle_slowSpeedCutoff = cutoffSpeed * cutoffMetricImperial;
-            mf.vehicle.slowSpeedCutoff = cutoffSpeed * cutoffMetricImperial;
-
-            //Sections ------------------------------------------------------------------------------------------
+            Properties.Vehicle.Default.GuidanceOverlap = mf.Guidance.GuidanceOverlap = toolOverlap;
+            Properties.Vehicle.Default.GuidanceOffset = mf.Guidance.GuidanceOffset = toolOffset;
+            Properties.Vehicle.Default.GuidanceWidth = mf.Guidance.GuidanceWidth = Width;
+            mf.Guidance.WidthMinusOverlap = Width - mf.Guidance.GuidanceOverlap;
 
 
 
-            mf.Tools[Here].numOfSections = numberOfSections;
-            Properties.Vehicle.Default.setVehicle_numSections = mf.Tools[Here].numOfSections;
 
-            mf.Tools[Here].SetSections();
+            Width /= -2;
 
-            mf.Tools[Here].toolMinUnappliedPixels = minApplied;
-            Properties.Vehicle.Default.setVehicle_minApplied = minApplied;
+            //save the values in each spinner for section position widths in settings
+            for (int i = 0; i < Section.Count; i++)
+            {
+                aa.Add(new double[] { Width, Width += (double)Section[i].Value * metImp2m, 0 });
+            }
+            Properties.Vehicle.Default.ToolSettings[Here].Sections = aa;
 
-            //take the section widths and convert to meters and positions along 
+            Properties.Settings.Default.Save();
+            Properties.Vehicle.Default.Save();
 
-            CalculateSectionPositions();
 
 
-            //line up manual buttons based on # of sections
+
+            mf.LoadTools();
+
             mf.LineUpManualBtns();
 
-            //update the sections to newly configured widths and positions in main
-            //update the widths of sections and tool width in main
-            mf.SectionCalcWidths();
+
 
 
             //WorkSwitch settings
@@ -426,9 +392,12 @@ namespace AgOpenGPS
             mf.mc.isWorkSwitchManual = isWorkSwitchManual;
             Properties.Settings.Default.setF_IsWorkSwitchManual = isWorkSwitchManual;
 
-            mf.tram.abOffset = (Math.Round((mf.Tools[Here].ToolWidth - mf.Tools[Here].ToolOverlap) / 2.0, 3));
 
-            Properties.Vehicle.Default.setTool_defaultSectionWidth = defaultSectionWidth;
+
+
+            mf.tram.abOffset = (Math.Round(mf.Guidance.WidthMinusOverlap / 2.0, 3));
+
+            Properties.Vehicle.Default.setTool_defaultSectionWidth = defaultSectionWidth *0.01;
             Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
 
@@ -529,7 +498,7 @@ namespace AgOpenGPS
         private void BtnChangeAttachment_Click(object sender, EventArgs e)
         {
             btnChangeAttachment.Enabled = false;
-            btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
+            btnChangeAttachment.BackColor = Color.Transparent;
             FixRadioButtonsAndImages();
             tabControl1.SelectedTab = tabHitch;
             btnNext.Focus();
@@ -577,10 +546,13 @@ namespace AgOpenGPS
                         Section[i].Maximum /= 2.54M;
                         Section[i].Minimum /= 2.54M;
                     }
-                   
 
 
-                    Section[i].Value = Math.Max((Math.Abs(Properties.Vehicle.Default.Section_position[i + 1] - Properties.Vehicle.Default.Section_position[i]) * (decimal)m2MetImp), 1);
+                    if (i < Properties.Vehicle.Default.ToolSettings[Here].Sections.Count)
+                        Section[i].Value = (decimal)Math.Max((Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].Sections[i][1] - Properties.Vehicle.Default.ToolSettings[Here].Sections[i][0]) * m2MetImp), 1);
+                    else Section[i].Value = (decimal)Properties.Vehicle.Default.setTool_defaultSectionWidth;
+
+
                     //Section[i].Value = Math.Max(Math.Abs(nudDefaultSectionWidth.Value), 1);
 
                     Section[i].ValueChanged += Section_ValueChanged;
@@ -709,7 +681,7 @@ namespace AgOpenGPS
 
             UpdateSpinners();
 
-            defaultSectionWidth = (double)nudDefaultSectionWidth.Value * metImp2m;
+            defaultSectionWidth = (double)nudDefaultSectionWidth.Value;
         }
 
 
@@ -753,26 +725,6 @@ namespace AgOpenGPS
         private void NudMinApplied_ValueChanged(object sender, EventArgs e)
         {
             minApplied = (int)nudMinApplied.Value;
-        }
-
-        //Convert section width to positions along toolbar
-        private void CalculateSectionPositions()
-        {
-            decimal Width = 0;
-            for (int i = 0; i < Section.Count; i++)
-            {
-                Width += Section[i].Value * (decimal)metImp2m;
-            }
-
-            Width /= -2;
-
-            //save the values in each spinner for section position widths in settings
-            for (int i = 0; i < Section.Count; i++)
-            {   
-                Properties.Vehicle.Default.Section_position[i] = Width;
-                Width += Section[i].Value * (decimal)metImp2m;
-            }
-            Properties.Vehicle.Default.Section_position[Section.Count] = Width;
         }
 
         //Did user spin a section distance spinner?

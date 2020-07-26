@@ -14,10 +14,6 @@ namespace AgOpenGPS
 
         private readonly FormGPS mf;
 
-        public double ToolWidth;
-        public double ToolOverlap;
-        public double WidthMinusOverlap;
-
         public List<CSection> Sections = new List<CSection>();
 
         public Vec2 HitchPos;
@@ -31,7 +27,7 @@ namespace AgOpenGPS
         public double ToolFarRightSpeed = 0;
 
         public double toolTrailingHitchLength, toolTankTrailingHitchLength;
-        public double ToolOffset;
+        public double ToolOffset, SlowSpeedCutoff;
 
         public double LookAheadOffSetting, LookAheadOnSetting;
         public double TurnOffDelay, MappingOnDelay, MappingOffDelay;
@@ -63,7 +59,13 @@ namespace AgOpenGPS
             mf = _f;
             ToolNum = num;
 
-            numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
+            SetToolSettings(num);
+        }
+
+        public void SetToolSettings(int num)
+        {
+            ToolNum = num;
+            numOfSections = Properties.Vehicle.Default.ToolSettings[ToolNum].Sections.Count;
 
             SetSections();
 
@@ -71,31 +73,41 @@ namespace AgOpenGPS
             TankPos = new Vec3(0, 0, 0);
             HitchPos = new Vec2(0, 0);
 
-            //from settings grab the vehicle specifics
-            ToolWidth = Properties.Vehicle.Default.setVehicle_toolWidth;
-            ToolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
-            ToolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
-            WidthMinusOverlap = ToolWidth - ToolOverlap;
-            
-            
-            toolTrailingHitchLength = Properties.Vehicle.Default.setTool_toolTrailingHitchLength;
-            toolTankTrailingHitchLength = Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength;
-            HitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
+            toolTrailingHitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].TrailingHitchLength;
+            toolTankTrailingHitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].TankTrailingHitchLength;
+            HitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].HitchLength;
 
-            isToolBehindPivot = Properties.Vehicle.Default.setTool_isToolBehindPivot;
-            isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
-            isToolTBT = Properties.Vehicle.Default.setTool_isToolTBT;
+            isToolBehindPivot = Properties.Vehicle.Default.ToolSettings[ToolNum].BehindPivot;
+            isToolTrailing = Properties.Vehicle.Default.ToolSettings[ToolNum].Trailing;
+            isToolTBT = Properties.Vehicle.Default.ToolSettings[ToolNum].TBT;
 
-            LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
-            LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
-            TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
+            LookAheadOnSetting = Properties.Vehicle.Default.ToolSettings[ToolNum].LookAheadOn;
+            LookAheadOffSetting = Properties.Vehicle.Default.ToolSettings[ToolNum].LookAheadOff;
 
-            MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
-            MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
+            TurnOffDelay = Properties.Vehicle.Default.ToolSettings[ToolNum].TurnOffDelay;
 
-            toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
+            MappingOnDelay = Properties.Vehicle.Default.ToolSettings[ToolNum].MappingOnDelay;
+            MappingOffDelay = Properties.Vehicle.Default.ToolSettings[ToolNum].MappingOffDelay;
 
+            toolMinUnappliedPixels = Properties.Vehicle.Default.ToolSettings[ToolNum].MinApplied;
+            SlowSpeedCutoff = Properties.Vehicle.Default.ToolSettings[ToolNum].SlowSpeedCutoff;
         }
+
+        public void RemoveSections()
+        {
+            for (int j = Sections.Count - 1; j >= 0; j--)
+            {
+                if (Sections[j].IsMappingOn)
+                {
+                    Sections[j].TurnMappingOff();
+                }
+
+                mf.Controls.Remove(Sections[j].SectionButton);
+                Sections[j].SectionButton.Dispose();
+                Sections.RemoveAt(j);
+            }
+        }
+
 
         public void SetSections()
         {
@@ -109,38 +121,66 @@ namespace AgOpenGPS
                 if (j > numOfSections)
                 {
                     mf.Controls.Remove(Sections[j].SectionButton);
+                    Sections[j].SectionButton.Dispose();
                     Sections.RemoveAt(j);
                 }
                 else if (j == numOfSections)
                 {
                     mf.Controls.Remove(Sections[j].SectionButton);
+                    Sections[j].SectionButton.Dispose();
                 }
             }
 
-            for (int j = 0; j <= numOfSections; j++)
+            if (numOfSections > 0)
             {
-                if (Sections.Count <= j) Sections.Add(new CSection(mf));
-
-                if (j < numOfSections && !mf.Controls.Contains(Sections[j].SectionButton))
+                double MostLeft = 35, MostRight = -35;
+                for (int j = 0; j <= numOfSections; j++)
                 {
-                    Sections[j].BtnSectionState = mf.autoBtnState;
-                    Sections[j].IsAllowedOn = (mf.autoBtnState != 0);
 
-                    mf.Controls.Add(Sections[j].SectionButton);
+                    if (Sections.Count <= j) Sections.Add(new CSection(mf));
+                    if (j < numOfSections)
+                    {
 
-                    Sections[j].SectionButton.BringToFront();
-                    Sections[j].SectionButton.Text = (j + 1).ToString();
-                    Sections[j].SectionButton.Name = (ToolNum + "," + j).ToString();
-                    Sections[j].SectionButton.Click += new System.EventHandler(mf.btnSectionMan_Click);
+                        Sections[j].positionLeft = Properties.Vehicle.Default.ToolSettings[ToolNum].Sections[j][0];
+                        MostLeft = Math.Min(MostLeft, Sections[j].positionLeft);
+                        Sections[j].positionRight = Properties.Vehicle.Default.ToolSettings[ToolNum].Sections[j][1];
+                        MostRight = Math.Max(MostRight, Sections[j].positionRight);
 
-                    Sections[j].SectionButton.Enabled = (mf.autoBtnState != 0);
-                    Sections[j].SectionButton.FlatAppearance.BorderColor = SystemColors.ActiveCaptionText;
-                    Sections[j].SectionButton.FlatStyle = FlatStyle.Flat;
-                    Sections[j].SectionButton.TextAlign = ContentAlignment.MiddleCenter;
-                    Sections[j].SectionButton.UseVisualStyleBackColor = false;
 
-                    SectionButtonColor(j);
+                        Sections[j].positionForward = Properties.Vehicle.Default.ToolSettings[ToolNum].Sections[j][2];
+                        Sections[j].rpSectionPosition = 375 + (int)Math.Round(Sections[j].positionLeft * 10, 0, MidpointRounding.AwayFromZero);
+                        Sections[j].rpSectionWidth = (int)Math.Round((Sections[j].positionRight - Sections[j].positionLeft) * 10, 0, MidpointRounding.AwayFromZero);
+
+
+                        if (!mf.Controls.Contains(Sections[j].SectionButton))
+                        {
+                            Sections[j].BtnSectionState = mf.autoBtnState;
+                            Sections[j].IsAllowedOn = (mf.autoBtnState != 0);
+
+                            mf.Controls.Add(Sections[j].SectionButton);
+
+                            Sections[j].SectionButton.BringToFront();
+                            Sections[j].SectionButton.Text = (j + 1).ToString();
+                            Sections[j].SectionButton.Name = (ToolNum + "," + j).ToString();
+                            Sections[j].SectionButton.Click += new EventHandler(mf.btnSectionMan_Click);
+
+                            Sections[j].SectionButton.Enabled = (mf.autoBtnState != 0);
+                            Sections[j].SectionButton.FlatAppearance.BorderColor = SystemColors.ActiveCaptionText;
+                            Sections[j].SectionButton.FlatStyle = FlatStyle.Flat;
+                            Sections[j].SectionButton.TextAlign = ContentAlignment.MiddleCenter;
+                            Sections[j].SectionButton.UseVisualStyleBackColor = false;
+
+                            SectionButtonColor(j);
+                        }
+                    }
                 }
+
+                //now do the full width section
+                Sections[numOfSections].positionLeft = MostLeft;
+                Sections[numOfSections].positionRight = MostRight;
+
+                rpXPosition = 375 + (int)(Math.Round(MostLeft * 10, 0, MidpointRounding.AwayFromZero));
+                rpWidth = (int)(Math.Round((MostRight - MostLeft) * 10, 0, MidpointRounding.AwayFromZero));
             }
         }
 
@@ -215,14 +255,31 @@ namespace AgOpenGPS
                 GL.Begin(PrimitiveType.Lines);
 
                 //lookahead section on
-                GL.Color3(0.20f, 0.7f, 0.2f);//-5.25  and 5.35
-                GL.Vertex3(Sections[0].positionLeft, (lookAheadDistanceOnPixelsLeft) * 0.1, 0);
-                GL.Vertex3(Sections[numOfSections - 1].positionRight, (lookAheadDistanceOnPixelsRight) * 0.1, 0);
+                GL.Color3(0.20f, 0.7f, 0.2f);
+                GL.Vertex3(Sections[0].positionLeft, Sections[0].positionForward + (lookAheadDistanceOnPixelsLeft) * 0.1, 0);
+                for (int j = 0; j < numOfSections; j++)
+                {
+                    if (j > 0 && (Sections[j - 1].positionRight != Sections[j].positionLeft || Sections[j - 1].positionForward != Sections[j].positionForward))
+                    {
+                        GL.Vertex3(Sections[j - 1].positionRight, Sections[j - 1].positionForward + (lookAheadDistanceOnPixelsLeft + (((lookAheadDistanceOnPixelsRight - lookAheadDistanceOnPixelsLeft) / (rpWidth * 0.1)) * (Sections[j - 1].positionRight - Sections[0].positionLeft))) * 0.1, 0);
+                        GL.Vertex3(Sections[j].positionLeft, Sections[j].positionForward + (lookAheadDistanceOnPixelsLeft + (((lookAheadDistanceOnPixelsRight - lookAheadDistanceOnPixelsLeft) / (rpWidth * 0.1)) * (Sections[j].positionLeft - Sections[0].positionLeft))) * 0.1, 0);
+                    }
+                }
+                GL.Vertex3(Sections[numOfSections - 1].positionRight, Sections[numOfSections - 1].positionForward + (lookAheadDistanceOnPixelsRight) * 0.1, 0);
+
 
                 //lookahead section off
                 GL.Color3(0.70f, 0.2f, 0.2f);
-                GL.Vertex3(Sections[0].positionLeft, (lookAheadDistanceOffPixelsLeft) * 0.1, 0);
-                GL.Vertex3(Sections[numOfSections - 1].positionRight, (lookAheadDistanceOffPixelsRight) * 0.1, 0);
+                GL.Vertex3(Sections[0].positionLeft, Sections[0].positionForward + (lookAheadDistanceOffPixelsLeft) * 0.1, 0);
+                for (int j = 0; j < numOfSections; j++)
+                {
+                    if (j > 0 && (Sections[j - 1].positionRight != Sections[j].positionLeft || Sections[j - 1].positionForward != Sections[j].positionForward))
+                    {
+                        GL.Vertex3(Sections[j - 1].positionRight, Sections[j -1].positionForward + (lookAheadDistanceOffPixelsLeft + (((lookAheadDistanceOffPixelsRight - lookAheadDistanceOffPixelsLeft) / (rpWidth * 0.1)) * (Sections[j - 1].positionRight - Sections[0].positionLeft))) * 0.1, 0);
+                        GL.Vertex3(Sections[j].positionLeft, Sections[j].positionForward + (lookAheadDistanceOffPixelsLeft + (((lookAheadDistanceOffPixelsRight - lookAheadDistanceOffPixelsLeft) / (rpWidth * 0.1)) * (Sections[j].positionLeft - Sections[0].positionLeft))) * 0.1, 0);
+                    }
+                }
+                GL.Vertex3(Sections[numOfSections - 1].positionRight, Sections[numOfSections - 1].positionForward + (lookAheadDistanceOffPixelsRight) * 0.1, 0);
 
                 if (mf.vehicle.isHydLiftOn)
                 {
@@ -240,7 +297,6 @@ namespace AgOpenGPS
             double hite = mf.camera.camSetDistance / -100;
             if (hite > 1.3) hite = 1.0;
             if (hite < 0.5) hite = 0.5;
-
 
             for (int j = 0; j < numOfSections; j++)
             {
@@ -262,38 +318,42 @@ namespace AgOpenGPS
                     GL.Color3(0.7f, 0.2f, 0.2f);
                 }
 
-                double mid = (((Sections[j].positionRight + 100) - (Sections[j].positionLeft + 100))) / 2 + Sections[j].positionLeft;
+                double mid = (Sections[j].positionLeft + Sections[j].positionRight) /2;
+
+
+
+                
 
                 GL.Begin(PrimitiveType.TriangleFan);
                 {
-                    GL.Vertex3(Sections[j].positionLeft, 0, 0);
-                    GL.Vertex3(Sections[j].positionLeft, -hite, 0);
+                    GL.Vertex3(Sections[j].positionLeft, Sections[j].positionForward, 0);
+                    GL.Vertex3(Sections[j].positionLeft, Sections[j].positionForward - hite, 0);
 
-                    GL.Vertex3(mid, -hite * 1.5, 0);
+                    GL.Vertex3(mid, Sections[j].positionForward - hite * 1.5, 0);
 
-                    GL.Vertex3(Sections[j].positionRight, -hite, 0);
-                    GL.Vertex3(Sections[j].positionRight, 0, 0);
+                    GL.Vertex3(Sections[j].positionRight, Sections[j].positionForward - hite, 0);
+                    GL.Vertex3(Sections[j].positionRight, Sections[j].positionForward, 0);
                 }
                 GL.End();
 
                 GL.Begin(PrimitiveType.LineLoop);
                 {
                     GL.Color3(0.0, 0.0, 0.0);
-                    GL.Vertex3(Sections[j].positionLeft, 0, 0);
-                    GL.Vertex3(Sections[j].positionLeft, -hite, 0);
+                    GL.Vertex3(Sections[j].positionLeft, Sections[j].positionForward, 0);
+                    GL.Vertex3(Sections[j].positionLeft, Sections[j].positionForward - hite, 0);
 
-                    GL.Vertex3(mid, -hite * 1.5, 0);
+                    GL.Vertex3(mid, Sections[j].positionForward - hite * 1.5, 0);
 
-                    GL.Vertex3(Sections[j].positionRight, -hite, 0);
-                    GL.Vertex3(Sections[j].positionRight, 0, 0);
+                    GL.Vertex3(Sections[j].positionRight, Sections[j].positionForward - hite, 0);
+                    GL.Vertex3(Sections[j].positionRight, Sections[j].positionForward, 0);
                 }
                 GL.End();
             }
 
             //GL.End();
-
+            
             //draw section markers if close enough
-            if (mf.camera.camSetDistance > -250)
+            if (mf.camera.camSetDistance > 250)
             {
                 GL.Color3(0.0f, 0.0f, 0.0f);
                 //section markers

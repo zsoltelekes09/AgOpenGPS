@@ -414,12 +414,12 @@ namespace AgOpenGPS
                 CDubins.turningRadius = mf.vehicle.minTurningRadius;
 
                 //grab the vehicle widths and offsets
-                double toolOffset = mf.Tools[0].ToolOffset * 2.0;
+                double toolOffset = mf.Guidance.GuidanceOffset * 2.0;
                 double turnOffset;
 
                 //calculate the true width
-                if (!isTurnRight) turnOffset = ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) + toolOffset);
-                else turnOffset = ((mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) - toolOffset);
+                if (!isTurnRight) turnOffset = ((mf.Guidance.WidthMinusOverlap * rowSkipsWidth) + toolOffset);
+                else turnOffset = ((mf.Guidance.WidthMinusOverlap * rowSkipsWidth) - toolOffset);
 
 
                 double turnRadius = turnOffset * Math.Tan(boundaryAngleOffPerpendicular);
@@ -564,12 +564,12 @@ namespace AgOpenGPS
             double head = mf.ABLine.abHeading;
 
             //grab the vehicle widths and offsets
-            double toolOffset = mf.Tools[0].ToolOffset * 2.0;
+            double toolOffset = mf.Guidance.GuidanceOffset * 2.0;
             double turnOffset;
 
             //turning right
-            if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap - toolOffset);
-            else turnOffset = (mf.Tools[0].WidthMinusOverlap + toolOffset);
+            if (isTurnRight) turnOffset = (mf.Guidance.WidthMinusOverlap - toolOffset);
+            else turnOffset = (mf.Guidance.WidthMinusOverlap + toolOffset);
 
             //Pattern Turn
             numShapePoints = youFileList.Count;
@@ -772,12 +772,12 @@ namespace AgOpenGPS
                 //are we going same way as creation of curve
                 //bool isCountingUp = mf.curve.isABSameAsVehicleHeading;
 
-                double toolOffset = mf.Tools[0].ToolOffset * 2.0;
+                double toolOffset = mf.Guidance.GuidanceOffset * 2.0;
                 double turnOffset;
 
                 //turning right
-                if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap - toolOffset);
-                else turnOffset = (mf.Tools[0].WidthMinusOverlap + toolOffset);
+                if (isTurnRight) turnOffset = (mf.Guidance.WidthMinusOverlap - toolOffset);
+                else turnOffset = (mf.Guidance.WidthMinusOverlap + toolOffset);
 
                 //Pattern Turn
                 numShapePoints = youFileList.Count;
@@ -983,12 +983,12 @@ namespace AgOpenGPS
                 CDubins dubYouTurnPath = new CDubins();
                 CDubins.turningRadius = mf.vehicle.minTurningRadius;
 
-                double toolOffset = mf.Tools[0].ToolOffset * 2.0;
+                double toolOffset = mf.Guidance.GuidanceOffset * 2.0;
                 double turnOffset;
 
                 //calculate the true width
-                if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) - toolOffset;
-                else turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth) + toolOffset;
+                if (isTurnRight) turnOffset = (mf.Guidance.WidthMinusOverlap * rowSkipsWidth) - toolOffset;
+                else turnOffset = (mf.Guidance.WidthMinusOverlap * rowSkipsWidth) + toolOffset;
 
                 //diagonally across
                 double turnRadius = turnOffset * Math.Tan(boundaryAngleOffPerpendicular);
@@ -1281,12 +1281,12 @@ namespace AgOpenGPS
                 head = mf.curve.curList[mf.curve.currentLocationIndex].heading;//set to curent line heading ;)
             }
 
-            double toolOffset = mf.Tools[0].ToolOffset * 2.0;
+            double toolOffset = mf.Guidance.GuidanceOffset * 2.0;
             double turnOffset;
 
             //turning right
-            if (isTurnRight) turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth + toolOffset);
-            else turnOffset = (mf.Tools[0].WidthMinusOverlap * rowSkipsWidth - toolOffset);
+            if (isTurnRight) turnOffset = (mf.Guidance.WidthMinusOverlap * rowSkipsWidth + toolOffset);
+            else turnOffset = (mf.Guidance.WidthMinusOverlap * rowSkipsWidth - toolOffset);
 
             CDubins dubYouTurnPath = new CDubins();
             CDubins.turningRadius = mf.vehicle.minTurningRadius;

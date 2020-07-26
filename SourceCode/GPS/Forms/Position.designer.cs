@@ -754,7 +754,7 @@ namespace AgOpenGPS
 
                 //used to increase triangle count when going around corners, less on straight
                 //pick the slow moving side edge of tool
-                double distance = Tools[i].ToolWidth * 0.5;
+                double distance = Guidance.GuidanceWidth * 0.5;
                 if (distance > 3) distance = 3;
 
                 double twist;
@@ -885,12 +885,16 @@ namespace AgOpenGPS
                 {
                     for (int j = 0; j < Tools[i].numOfSections; j++)
                     {
-
                         lastLeftPoint = Tools[i].Sections[j].leftPoint;
 
-                        //only one first left point, the rest are all rights moved over to left
-                        Tools[i].Sections[j].leftPoint = new Vec3(Tools[i].cosSectionHeading * (Tools[i].Sections[j].positionLeft) + Tools[i].ToolPos.easting, Tools[i].sinSectionHeading * (Tools[i].Sections[j].positionLeft) + Tools[i].ToolPos.northing, 0);
-
+                        if (j > 0 && Tools[i].Sections[j - 1].positionRight == Tools[i].Sections[j].positionLeft && Tools[i].Sections[j - 1].positionForward == Tools[i].Sections[j].positionForward)
+                        {
+                            Tools[i].Sections[j].leftPoint = Tools[i].Sections[j-1].rightPoint;
+                        }
+                        else
+                        {
+                            Tools[i].Sections[j].leftPoint = new Vec3(Tools[i].cosSectionHeading * Tools[i].Sections[j].positionLeft + Tools[i].ToolPos.easting - Tools[i].sinSectionHeading * Tools[i].Sections[j].positionForward, Tools[i].sinSectionHeading * Tools[i].Sections[j].positionLeft + Tools[i].ToolPos.northing + Tools[i].cosSectionHeading * Tools[i].Sections[j].positionForward, 0);
+                        }
                         left = Tools[i].Sections[j].leftPoint - lastLeftPoint;
 
                         //get the speed for left side only once
@@ -900,8 +904,7 @@ namespace AgOpenGPS
 
 
                         lastRightPoint = Tools[i].Sections[j].rightPoint;
-
-                        Tools[i].Sections[j].rightPoint = new Vec3(Tools[i].cosSectionHeading * (Tools[i].Sections[j].positionRight) + Tools[i].ToolPos.easting, Tools[i].sinSectionHeading * (Tools[i].Sections[j].positionRight) + Tools[i].ToolPos.northing, 0);
+                        Tools[i].Sections[j].rightPoint = new Vec3(Tools[i].cosSectionHeading * Tools[i].Sections[j].positionRight + Tools[i].ToolPos.easting - Tools[i].sinSectionHeading * Tools[i].Sections[j].positionForward, Tools[i].sinSectionHeading * Tools[i].Sections[j].positionRight + Tools[i].ToolPos.northing + Tools[i].cosSectionHeading * Tools[i].Sections[j].positionForward, 0);
 
                         //now we have left and right for this section
                         right = Tools[i].Sections[j].rightPoint - lastRightPoint;
@@ -940,10 +943,10 @@ namespace AgOpenGPS
                     Tools[i].Sections[Tools[i].numOfSections].leftPoint = Tools[i].Sections[0].leftPoint;
                     Tools[i].Sections[Tools[i].numOfSections].rightPoint = Tools[i].Sections[Tools[i].numOfSections - 1].rightPoint;
                     //set the look ahead for hyd Lift in pixels per second
-                    vehicle.hydLiftLookAheadDistanceLeft = Math.Min(Tools[i].ToolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10, 200);
-                    vehicle.hydLiftLookAheadDistanceRight = Math.Min(Tools[i].ToolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10, 200);
-                    Tools[i].lookAheadDistanceOnPixelsLeft = Math.Min(Tools[i].ToolFarLeftSpeed * Tools[i].LookAheadOnSetting * 10, 200);
-                    Tools[i].lookAheadDistanceOnPixelsRight = Math.Min(Tools[i].ToolFarRightSpeed * Tools[i].LookAheadOnSetting * 10, 200);
+                    vehicle.hydLiftLookAheadDistanceLeft = Math.Min(Tools[i].ToolFarLeftSpeed * vehicle.hydLiftLookAheadTime * 10, 199);
+                    vehicle.hydLiftLookAheadDistanceRight = Math.Min(Tools[i].ToolFarRightSpeed * vehicle.hydLiftLookAheadTime * 10, 199);
+                    Tools[i].lookAheadDistanceOnPixelsLeft = Math.Min(Tools[i].ToolFarLeftSpeed * Tools[i].LookAheadOnSetting * 10, 199);
+                    Tools[i].lookAheadDistanceOnPixelsRight = Math.Min(Tools[i].ToolFarRightSpeed * Tools[i].LookAheadOnSetting * 10, 199);
                     Tools[i].lookAheadDistanceOffPixelsLeft = Math.Min(Tools[i].ToolFarLeftSpeed * Tools[i].LookAheadOffSetting * 10, 160);
                     Tools[i].lookAheadDistanceOffPixelsRight = Math.Min(Tools[i].ToolFarRightSpeed * Tools[i].LookAheadOffSetting * 10, 160);
                 }
@@ -1185,78 +1188,3 @@ namespace AgOpenGPS
     }//end class
 }//end namespace
 
-////its a drive thru inner boundary
-//else
-//{
-
-//    if (distPivot < yt.triggerDistance && distPivot > (yt.triggerDistance - 2.0) && !yt.isEnteringDriveThru && isBndInWay)
-//    {
-//        //our direction heading into turn
-//        //yt.youTurnTriggerPoint = pivotAxlePos;
-//        yt.isEnteringDriveThru = true;
-//        headlandAngleOffPerpendicular = Math.PI - Math.Abs(Math.Abs(hl.closestHeadlandPt.heading - pivotAxlePos.heading) - Math.PI);
-//        if (headlandAngleOffPerpendicular < 0) headlandAngleOffPerpendicular += glm.twoPI;
-//        //while (headlandAngleOffPerpendicular > 1.57) headlandAngleOffPerpendicular -= 1.57;
-//        headlandAngleOffPerpendicular -= glm.PIBy2;
-//        headlandDistanceDelta = Math.Tan(Math.Abs(headlandAngleOffPerpendicular));
-//        headlandDistanceDelta *= Tools[0].toolWidth;
-//    }
-
-//    if (yt.isEnteringDriveThru)
-//    {
-//        int c = 0;
-//        for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-//        {
-//            //checked for any not triggered yet (false) - if there is, not done yet
-//            if (!seq.seqEnter[i].isTrig) c++;
-//        }
-
-//        if (c == 0)
-//        {
-//            //sequences all done so reset everything
-//            //yt.isSequenceTriggered = false;
-//            yt.whereAmI = 0;
-//            yt.ResetSequenceEventTriggers();
-//            distTool = -2222;
-//            yt.isEnteringDriveThru = false;
-//            yt.isExitingDriveThru = true;
-//            //yt.youTurnTriggerPoint = pivotAxlePos;
-//        }
-//    }
-
-//    if (yt.isExitingDriveThru)
-//    {
-//        int c = 0;
-//        for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-//        {
-//            //checked for any not triggered yet (false) - if there is, not done yet
-//            if (!seq.seqExit[i].isTrig) c++;
-//        }
-
-//        if (c == 0)
-//        {
-//            //sequences all done so reset everything
-//            //yt.isSequenceTriggered = false;
-//            yt.whereAmI = 0;
-//            yt.ResetSequenceEventTriggers();
-//            distTool = -2222;
-//            yt.isEnteringDriveThru = false;
-//            yt.isExitingDriveThru = false;
-//            yt.youTurnTriggerPoint = pivotAxlePos;
-//        }
-//    }
-//}
-
-//Do the sequencing of functions around the turn.
-//if (yt.isSequenceTriggered) yt.DoSequenceEvent();
-
-//do sequencing for drive thru boundaries
-//if (yt.isEnteringDriveThru || yt.isExitingDriveThru) yt.DoDriveThruSequenceEvent();
-
-//else //make sure youturn and sequence is off - we are not in normal turn here
-//{
-//    if (yt.isYouTurnTriggered | yt.isSequenceTriggered)
-//    {
-//        yt.ResetYouTurn();
-//    }
-//}

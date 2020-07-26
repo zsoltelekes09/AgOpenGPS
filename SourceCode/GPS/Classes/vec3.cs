@@ -1,6 +1,7 @@
 ﻿//Please, if you use this, share the improvements
 
 using System;
+using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
@@ -9,9 +10,8 @@ namespace AgOpenGPS
     /// </summary>
     public struct Vec3
     {
-        public double easting;
-        public double northing;
-        public double heading;
+        public readonly static Vec3 Zero = new Vec3();
+        public double easting, northing, heading;
 
         public Vec3(double easting, double northing, double heading)
         {
@@ -62,6 +62,43 @@ namespace AgOpenGPS
             return new Vec3(lhs.easting - rhs.easting, lhs.northing - rhs.northing, lhs.heading - rhs.heading);
         }
 
+        public static void Neg(ref Vec3 v)
+        {
+            v.easting = -v.easting;
+            v.northing = -v.northing;
+            v.heading = -v.heading;
+        }
+
+        public static void Dot(ref Vec3 u, ref Vec3 v, out double dot)
+        {
+            dot = u.easting * v.easting + u.northing * v.northing + u.heading * v.heading;
+        }
+
+        public static int LongAxis(ref Vec3 v)
+        {
+            int i = 0;
+            if (Math.Abs(v.northing) > Math.Abs(v.easting)) i = 1;
+            if (Math.Abs(v.heading) > Math.Abs(i == 0 ? v.easting : v.northing)) i = 2;
+            return i;
+        }
+
+        public double this[int index]
+        {
+            get
+            {
+                if (index == 0) return easting;
+                if (index == 1) return northing;
+                if (index == 2) return heading;
+                throw new IndexOutOfRangeException();
+            }
+            set
+            {
+                if (index == 0) easting = value;
+                else if (index == 1) northing = value;
+                else if (index == 2) heading = value;
+                else throw new IndexOutOfRangeException();
+            }
+        }
     }
 
     //
@@ -83,6 +120,16 @@ namespace AgOpenGPS
             northing = _northing;
             index = _index;
         }
+    }
+
+    public class ToolSettings
+    {
+        public double LookAheadOn = 1, LookAheadOff = 0.8, TurnOffDelay = 0, MappingOnDelay = 0.95, MappingOffDelay = 0.85;
+        public double TrailingHitchLength = -6, TankTrailingHitchLength = -1.5, HitchLength = -0.5, ToolOffset = 0, SlowSpeedCutoff = 0;
+        public bool BehindPivot = true, Trailing = true, TBT = false;
+        public int MinApplied = 0;
+        public List<double[]> Sections = new List<double[]> {};
+
     }
 
     public struct Vec2

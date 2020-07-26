@@ -227,8 +227,8 @@ namespace AgOpenGPS
                     for (int i = 1; i <= 6; i++)
                     {
                         for (int h = 0; h < ptCount; h++)
-                            GL.Vertex3((cosHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.curve.refList[h].easting,
-                                          (sinHeading2 * mf.Tools[0].WidthMinusOverlap * i) + mf.curve.refList[h].northing, 0);
+                            GL.Vertex3((cosHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.curve.refList[h].easting,
+                                          (sinHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.curve.refList[h].northing, 0);
                     }
 
                     GL.End();
@@ -419,7 +419,7 @@ namespace AgOpenGPS
 
                 minDistance = Math.Sqrt(dist);
 
-                howManyPathsAway = Math.Round(minDistance / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                howManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
                 if (OldhowManyPathsAway != howManyPathsAway && howManyPathsAway == 0)
                 {
                     OldhowManyPathsAway = howManyPathsAway;
@@ -430,7 +430,7 @@ namespace AgOpenGPS
                     OldhowManyPathsAway = howManyPathsAway;
                     if (howManyPathsAway < 2) howManyPathsAway = 2;
 
-                    double s = mf.Tools[0].WidthMinusOverlap / 2;
+                    double s = mf.Guidance.WidthMinusOverlap / 2;
 
                     curList?.Clear();
                     //double circumference = (glm.twoPI * s) / (boundaryTriggerDistance * 0.1);
@@ -487,7 +487,7 @@ namespace AgOpenGPS
 
                 minDistance = Math.Sqrt(dist);
 
-                howManyPathsAway = Math.Round(minDistance / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                howManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
                 if (OldhowManyPathsAway != howManyPathsAway && howManyPathsAway == 0)
                 {
                     OldhowManyPathsAway = howManyPathsAway;
@@ -500,11 +500,11 @@ namespace AgOpenGPS
 
                     curList?.Clear();
 
-                    int aa = (int)((Glm.twoPI * mf.Tools[0].WidthMinusOverlap * howManyPathsAway) / (boundaryTriggerDistance));
+                    int aa = (int)((Glm.twoPI * mf.Guidance.WidthMinusOverlap * howManyPathsAway) / (boundaryTriggerDistance));
 
                     for (double round = 0; round <= Glm.twoPI + 0.00001; round += (Glm.twoPI) / aa)
                     {
-                        Vec3 pt = new Vec3(refList[0].easting + (Math.Sin(round) * mf.Tools[0].WidthMinusOverlap * howManyPathsAway), refList[0].northing + (Math.Cos(round) * mf.Tools[0].WidthMinusOverlap * howManyPathsAway), 0);
+                        Vec3 pt = new Vec3(refList[0].easting + (Math.Sin(round) * mf.Guidance.WidthMinusOverlap * howManyPathsAway), refList[0].northing + (Math.Cos(round) * mf.Guidance.WidthMinusOverlap * howManyPathsAway), 0);
                         curList.Add(pt);
                     }
 
@@ -581,10 +581,10 @@ namespace AgOpenGPS
                             Math.Sqrt((refList[A].easting - refList[B].easting) * (refList[A].easting - refList[B].easting) + (refList[A].northing - refList[B].northing) * (refList[A].northing - refList[B].northing));
 
 
-                    if (isSameWay) distanceFromRefLine -= mf.Tools[0].ToolOffset;
-                    else distanceFromRefLine += mf.Tools[0].ToolOffset;
+                    if (isSameWay) distanceFromRefLine -= mf.Guidance.GuidanceOffset;
+                    else distanceFromRefLine += mf.Guidance.GuidanceOffset;
 
-                    howManyPathsAway = Math.Round(Math.Abs(distanceFromRefLine) / mf.Tools[0].WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                    howManyPathsAway = Math.Round(Math.Abs(distanceFromRefLine) / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
 
                     curveNumber = howManyPathsAway;
                     if (distanceFromRefLine < 0) curveNumber = -curveNumber;
@@ -631,7 +631,7 @@ namespace AgOpenGPS
                                 if (curveNumber > 0) piSide2 = -Glm.PIBy2;
                                 else piSide2 = Glm.PIBy2;
 
-                                double Offset2 = mf.Tools[0].WidthMinusOverlap * (i + howManyPathsAway);
+                                double Offset2 = mf.Guidance.WidthMinusOverlap * (i + howManyPathsAway);
                                 
                                 var point = new Vec3(
                                 refList[j].easting + (Math.Sin(piSide2 + refList[j].heading) * Offset2),
@@ -663,16 +663,16 @@ namespace AgOpenGPS
 
 
 
-                    double Offset = mf.Tools[0].WidthMinusOverlap * howManyPathsAway;
+                    double Offset = mf.Guidance.WidthMinusOverlap * howManyPathsAway;
                     if (isSameWay)
                     {
-                        if (curveNumber > 0) Offset += mf.Tools[0].ToolOffset;
-                        else Offset -= mf.Tools[0].ToolOffset;
+                        if (curveNumber > 0) Offset += mf.Guidance.GuidanceOffset;
+                        else Offset -= mf.Guidance.GuidanceOffset;
                     }
                     else
                     {
-                        if (curveNumber > 0) Offset -= mf.Tools[0].ToolOffset;
-                        else Offset += mf.Tools[0].ToolOffset;
+                        if (curveNumber > 0) Offset -= mf.Guidance.GuidanceOffset;
+                        else Offset += mf.Guidance.GuidanceOffset;
                     }
 
 

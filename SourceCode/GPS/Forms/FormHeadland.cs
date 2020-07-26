@@ -66,7 +66,7 @@ namespace AgOpenGPS
             isSet = false;
 
             //Builds line
-            nudDistance.Value = Math.Min((decimal)(Math.Round(mf.Tools[0].ToolWidth * 3,1)), nudDistance.Maximum);
+            nudDistance.Value = Math.Min((decimal)(Math.Round(mf.Guidance.GuidanceWidth)), nudDistance.Maximum);
             nudSetDistance.Value = 20;
             if (mf.hd.headArr.Count > Boundary && Boundary >= 0)
             {

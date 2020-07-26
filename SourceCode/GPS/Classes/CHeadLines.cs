@@ -118,37 +118,26 @@ namespace AgOpenGPS
             int ptCount = HeadArea.Count;
             if (ptCount < 3) return;
             GL.Begin(PrimitiveType.Triangles);
-            for (int h = 0; h < ptCount - 2; h += 3)
+            for (int h = 0; h < ptCount - 2; h++)
             {
                 GL.Vertex3(HeadArea[h].easting, HeadArea[h].northing, 0);
-                GL.Vertex3(HeadArea[h + 1].easting, HeadArea[h + 1].northing, 0);
-                GL.Vertex3(HeadArea[h + 2].easting, HeadArea[h + 2].northing, 0);
             }
             GL.End();
         }
 
         public void PreCalcHeadArea()
         {
-            var v = new ContourVertex[HeadLine.Count];
-            for (int i = 0; i < HeadLine.Count; i++)
-            {
-                if (isDrawList[i]) v[i].Position = new Vec6(HeadLine[i].easting, HeadLine[i].northing, 0);
-            }
-
-            Tess _tess = new Tess();
-            _tess.AddContour(v, ContourOrientation.Clockwise);
-            _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3, null);
+            Tess tess = new Tess(new DefaultPool(), HeadLine, new Vec3(0, 0, 1));
 
             HeadArea.Clear();
 
-            //var output = new List<Polygon>();
-            for (int i = 0; i < _tess.ElementCount; i++)
+            for (int i = 0; i < tess.ElementCount; i++)
             {
                 for (int k = 0; k < 3; k++)
                 {
-                    int index = _tess.Elements[i * 3 + k];
+                    int index = tess.Elements[i * 3 + k];
                     if (index == -1) continue;
-                    HeadArea.Add(new Vec3(_tess.Vertices[index].Position.X, _tess.Vertices[index].Position.Y, 0));
+                    HeadArea.Add(new Vec3(tess.Vertices[index].easting, tess.Vertices[index].northing, 0));
                 }
             }
         }

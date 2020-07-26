@@ -240,7 +240,7 @@ namespace AgOpenGPS
             //update the list view with real data
             UpdateScroll(-1);
             UpdateChart();
-            nudBndOffset.Value = (decimal)(mf.Tools[0].ToolWidth * 0.5);
+            nudBndOffset.Value = (decimal)(mf.Guidance.GuidanceWidth * 0.5);
         }
 
         void DriveThru_Click(object sender, EventArgs e)
@@ -591,7 +591,7 @@ namespace AgOpenGPS
                                     if (mf.bnd.bndArr[i].bndLine.Count > 0)
                                     {
                                         //fix the points if there are gaps bigger then
-                                        mf.bnd.bndArr[i].FixBoundaryLine(i, mf.Tools[0].ToolWidth);
+                                        mf.bnd.bndArr[i].FixBoundaryLine(i, mf.Guidance.GuidanceWidth);
                                         mf.bnd.bndArr[i].PreCalcBoundaryLines();
                                         mf.bnd.bndArr[i].CalculateBoundaryArea();
                                         mf.bnd.bndArr[i].CalculateBoundaryWinding();

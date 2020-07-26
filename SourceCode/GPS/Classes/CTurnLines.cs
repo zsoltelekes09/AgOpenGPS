@@ -73,7 +73,6 @@ namespace AgOpenGPS
             //make sure distance isn't too small between points on turnLine
             bndCount = turnLine.Count;
 
-            //double spacing = mf.Tools[0].toolWidth * 0.25;
             for (int i = 0; i < bndCount - 1; i++)
             {
                 distance = Glm.Distance(turnLine[i], turnLine[i + 1]);

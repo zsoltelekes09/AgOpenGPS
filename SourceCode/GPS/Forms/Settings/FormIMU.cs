@@ -8,7 +8,7 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        private decimal minFixStepDistance;
+        private double minFixStepDistance;
 
         public FormIMU(Form callingForm)
         {
@@ -112,9 +112,9 @@ namespace AgOpenGPS
                 cboxNMEAHz.Enabled = false;
             }
 
-            minFixStepDistance = (decimal)Properties.Settings.Default.setF_minFixStep;
+            minFixStepDistance = Properties.Settings.Default.setF_minFixStep;
             if (nudMinFixStepDistance.CheckValue(ref minFixStepDistance)) nudMinFixStepDistance.BackColor = System.Drawing.Color.OrangeRed;
-            nudMinFixStepDistance.Value = minFixStepDistance;
+            nudMinFixStepDistance.Value = (decimal)minFixStepDistance;
 
             tboxTinkerUID.Text = Properties.Settings.Default.setIMU_UID;
 
@@ -178,7 +178,7 @@ namespace AgOpenGPS
 
         private void NudMinFixStepDistance_ValueChanged(object sender, EventArgs e)
         {
-            minFixStepDistance = nudMinFixStepDistance.Value;
+            minFixStepDistance = (double)nudMinFixStepDistance.Value;
         }
 
         private void NudMinFixStepDistance_Enter(object sender, EventArgs e)

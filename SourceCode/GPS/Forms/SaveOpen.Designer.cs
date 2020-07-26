@@ -325,7 +325,6 @@ namespace AgOpenGPS
                 writer.WriteLine("Wheelbase," + Properties.Vehicle.Default.setVehicle_wheelbase.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("MinTurningRadius," + Properties.Vehicle.Default.setVehicle_minTurningRadius.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("MinFixStep," + Properties.Settings.Default.setF_minFixStep.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("LowSpeedCutoff," + Properties.Vehicle.Default.setVehicle_slowSpeedCutoff.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("VehicleType," + Properties.Vehicle.Default.setVehicle_vehicleType.ToString(CultureInfo.InvariantCulture));
 
                 writer.WriteLine("Empty," + "10");
@@ -504,8 +503,6 @@ namespace AgOpenGPS
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Settings.Default.setF_minFixStep = double.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_slowSpeedCutoff = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.setVehicle_vehicleType = int.Parse(words[1], CultureInfo.InvariantCulture);
 
                         line = reader.ReadLine();
@@ -671,7 +668,6 @@ namespace AgOpenGPS
                         vehicle.wheelbase = Properties.Vehicle.Default.setVehicle_wheelbase;
                         vehicle.minTurningRadius = Properties.Vehicle.Default.setVehicle_minTurningRadius;
                         minFixStepDist = Properties.Settings.Default.setF_minFixStep;
-                        vehicle.slowSpeedCutoff = Properties.Vehicle.Default.setVehicle_slowSpeedCutoff;
                         vehicle.vehicleType = Properties.Vehicle.Default.setVehicle_vehicleType;
 
                         yt.geoFenceDistance = Properties.Vehicle.Default.set_geoFenceDistance;
@@ -697,7 +693,7 @@ namespace AgOpenGPS
                         vehicle.stanleyGain = Properties.Vehicle.Default.setVehicle_stanleyGain;
                         vehicle.stanleyHeadingErrorGain = Properties.Vehicle.Default.setVehicle_stanleyHeadingErrorGain;
 
-                        vehicle.goalPointLookAheadSeconds = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
+                        vehicle.goalPointLookAheadSeconds = Properties.Vehicle.Default.setVehicle_goalPointLookAhead;
                         vehicle.goalPointLookAheadMinimumDistance = Properties.Vehicle.Default.setVehicle_lookAheadMinimum;
                         vehicle.goalPointDistanceMultiplier = Properties.Vehicle.Default.setVehicle_lookAheadDistanceFromLine;
                         vehicle.goalPointLookAheadUturnMult = Properties.Vehicle.Default.setVehicle_goalPointLookAheadUturnMult;
@@ -798,76 +794,58 @@ namespace AgOpenGPS
             {
                 writer.WriteLine("Version," + Application.ProductVersion.ToString(CultureInfo.InvariantCulture));
 
-                writer.WriteLine("Overlap," + Properties.Vehicle.Default.setVehicle_toolOverlap.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("ToolOffset," + Properties.Vehicle.Default.setVehicle_toolOffset.ToString(CultureInfo.InvariantCulture));
 
-                writer.WriteLine("LookAheadOff," + Properties.Vehicle.Default.setVehicle_toolLookAheadOff.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("LookAheadOn," + Properties.Vehicle.Default.setVehicle_toolLookAheadOn.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("TurnOffDelay," + Properties.Vehicle.Default.setVehicle_toolOffDelay.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("ToolMinUnappliedPixels," + Properties.Vehicle.Default.setVehicle_minApplied.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("MappingOnDelay," + Properties.Vehicle.Default.setVehicle_MappingOnDelay.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("MappingOffDelay," + Properties.Vehicle.Default.setVehicle_MappingOffDelay.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-
-                writer.WriteLine("ToolTrailingHitchLength," + Properties.Vehicle.Default.setTool_toolTrailingHitchLength.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("TankTrailingHitchLength," + Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("HitchLength," + Properties.Vehicle.Default.setVehicle_hitchLength.ToString(CultureInfo.InvariantCulture));
-
-                writer.WriteLine("IsToolBehindPivot," + Properties.Vehicle.Default.setTool_isToolBehindPivot.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("IsToolTrailing," + Properties.Vehicle.Default.setTool_isToolTrailing.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("IsToolTBT," + Properties.Vehicle.Default.setTool_isToolTBT.ToString(CultureInfo.InvariantCulture));
-
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-
-                //writer.WriteLine("ToolCount," + Tools.Count.ToString());
-                writer.WriteLine("ToolCount,1");
-                //for (int i = 0; i < Tools.Count; i++)
-                int i = 0;
+                writer.WriteLine("ToolCount," + Properties.Vehicle.Default.ToolSettings.Count.ToString());
+                for (int i = 0; i < Properties.Vehicle.Default.ToolSettings.Count; i++)
                 {
-                    writer.WriteLine("Sections," + Tools[i].numOfSections.ToString());
-                    for (int j = 0; j <= Tools[i].numOfSections; j++)
+                    writer.WriteLine("LookAheadOn," + Properties.Vehicle.Default.ToolSettings[i].LookAheadOn.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("LookAheadOff," + Properties.Vehicle.Default.ToolSettings[i].LookAheadOff.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("TurnOffDelay," + Properties.Vehicle.Default.ToolSettings[i].TurnOffDelay.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("MappingOnDelay," + Properties.Vehicle.Default.ToolSettings[i].MappingOnDelay.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("MappingOffDelay," + Properties.Vehicle.Default.ToolSettings[i].MappingOffDelay.ToString(CultureInfo.InvariantCulture));
+
+                    writer.WriteLine("ToolTrailingHitchLength," + Properties.Vehicle.Default.ToolSettings[i].TrailingHitchLength.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("TankTrailingHitchLength," + Properties.Vehicle.Default.ToolSettings[i].TankTrailingHitchLength.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("HitchLength," + Properties.Vehicle.Default.ToolSettings[i].HitchLength.ToString(CultureInfo.InvariantCulture));
+
+                    writer.WriteLine("IsToolBehindPivot," + Properties.Vehicle.Default.ToolSettings[i].BehindPivot.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("IsToolTrailing," + Properties.Vehicle.Default.ToolSettings[i].Trailing.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("IsToolTBT," + Properties.Vehicle.Default.ToolSettings[i].TBT.ToString(CultureInfo.InvariantCulture));
+
+                    writer.WriteLine("ToolMinUnappliedPixels," + Properties.Vehicle.Default.ToolSettings[i].MinApplied.ToString(CultureInfo.InvariantCulture));
+
+                    writer.WriteLine("Sections," + Properties.Vehicle.Default.ToolSettings[i].Sections.Count.ToString());
+                    for (int j = 0; j < Properties.Vehicle.Default.ToolSettings[i].Sections.Count; j++)
                     {
-                        writer.WriteLine("Spinner"+ j.ToString() + "," + (Properties.Vehicle.Default.Section_position[j]).ToString());
+                        writer.WriteLine("Section"+ (j + 1).ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][0].ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][1].ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][2].ToString());
                     }
                 }
 
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
-
-
-                writer.WriteLine("Sections," + Properties.Vehicle.Default.setVehicle_numSections.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("ToolWidth," + Properties.Vehicle.Default.setVehicle_toolWidth.ToString(CultureInfo.InvariantCulture));
-
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("GuidanceWidth," + Properties.Vehicle.Default.GuidanceWidth.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("GuidanceOverlap," + Properties.Vehicle.Default.GuidanceOverlap.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("GuidanceOffset," + Properties.Vehicle.Default.GuidanceOffset.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
 
                 writer.WriteLine("WorkSwitch," + Properties.Settings.Default.setF_IsWorkSwitchEnabled.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("ActiveLow," + Properties.Settings.Default.setF_IsWorkSwitchActiveLow.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("SwitchManual," + Properties.Settings.Default.setF_IsWorkSwitchManual.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
 
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("Empty," + "10");
+
+                writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
@@ -909,109 +887,63 @@ namespace AgOpenGPS
 
                     else
                     {
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_toolOverlap = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_toolOffset = double.Parse(words[1], CultureInfo.InvariantCulture);
+                        List<ToolSettings> test = new List<ToolSettings>();// {new ToolSettings() { Sections = { new double[] { -4.5, -1.5, 0 }, new double[] { -1.5, 1.5, 0 }, new double[] { 1.5, 4.5, 0 } } } };
+
+
+
+
 
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_toolLookAheadOff = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_toolLookAheadOn = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_toolOffDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
-
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_minApplied = int.Parse(words[1], CultureInfo.InvariantCulture);
-
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_MappingOnDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_MappingOffDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setTool_toolTrailingHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_hitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
-
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setTool_isToolBehindPivot = bool.Parse(words[1]);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setTool_isToolTrailing = bool.Parse(words[1]);
-                        line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setTool_isToolTBT = bool.Parse(words[1]);
-
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine(); words = line.Split(',');
-
-                        if (Properties.Vehicle.Default.Section_position == null)
+                        int count = int.Parse(words[1], CultureInfo.InvariantCulture);
+                        for (int i = 0; i < count; i++)
                         {
-                            Properties.Vehicle.Default.Section_position = new List<decimal>();
-                            for (int j = -50; j < 51; j++)
-                            {
-                                Properties.Vehicle.Default.Section_position.Add(j);
-                            }
-                            Properties.Vehicle.Default.Save();
-                        }
+                            test.Add(new ToolSettings());
 
-                        if (words[0] == "ToolCount")
-                        {
-                            int count = int.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].LookAheadOn = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].LookAheadOff = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].TurnOffDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].MappingOnDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].MappingOffDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].TrailingHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].TankTrailingHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].HitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
 
-                            for (int i = 0; i < count; i++)
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].BehindPivot = bool.Parse(words[1]);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].Trailing = bool.Parse(words[1]);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].TBT = bool.Parse(words[1]);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].MinApplied = int.Parse(words[1], CultureInfo.InvariantCulture);
+
+                            line = reader.ReadLine(); words = line.Split(',');
+                            int count2 = int.Parse(words[1], CultureInfo.InvariantCulture);
+                            for (int j = 0; j < count2; j++)
                             {
                                 line = reader.ReadLine(); words = line.Split(',');
-                                int count2 = int.Parse(words[1], CultureInfo.InvariantCulture);
-                                for (int j = 0; j <= count2; j++)
-                                {
-                                    line = reader.ReadLine(); words = line.Split(',');
-                                    Properties.Vehicle.Default.Section_position[j] = decimal.Parse(words[1], CultureInfo.InvariantCulture);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < 17; i++)
-                            {
-                                line = reader.ReadLine(); words = line.Split(',');
-                                Properties.Vehicle.Default.Section_position[i] = decimal.Parse(words[1], CultureInfo.InvariantCulture);
+                                test[i].Sections.Add(new double[] { double.Parse(words[1], CultureInfo.InvariantCulture) , double.Parse(words[2], CultureInfo.InvariantCulture) , double.Parse(words[3], CultureInfo.InvariantCulture) });
                             }
                         }
 
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
 
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
+                        Properties.Vehicle.Default.ToolSettings = test;
 
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
 
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_numSections = int.Parse(words[1], CultureInfo.InvariantCulture);
+                        Properties.Vehicle.Default.GuidanceWidth = double.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setVehicle_toolWidth = double.Parse(words[1], CultureInfo.InvariantCulture);
-
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
+                        Properties.Vehicle.Default.GuidanceOverlap = double.Parse(words[1], CultureInfo.InvariantCulture);
+                        line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Vehicle.Default.GuidanceOffset = double.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine();
                         line = reader.ReadLine();
 
@@ -1021,11 +953,31 @@ namespace AgOpenGPS
                         Properties.Settings.Default.setF_IsWorkSwitchActiveLow = bool.Parse(words[1]);
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Settings.Default.setF_IsWorkSwitchManual = bool.Parse(words[1]);
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+
+
 
                         line = reader.ReadLine();
                         line = reader.ReadLine();
                         line = reader.ReadLine();
                         line = reader.ReadLine();
+                        line = reader.ReadLine();
+
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+
+
+
 
                         //fill in the current variables with restored data
                         toolFileName = Path.GetFileNameWithoutExtension(fileName) + " - ";
@@ -1034,40 +986,16 @@ namespace AgOpenGPS
                         Properties.Settings.Default.Save();
                         Properties.Vehicle.Default.Save();
 
-                        //get the number of sections from settings
-                        Tools[0].numOfSections = Properties.Vehicle.Default.setVehicle_numSections;
 
-                        Tools[0].SetSections();
-
-                        //from settings grab the vehicle specifics
-                        Tools[0].ToolOverlap = Properties.Vehicle.Default.setVehicle_toolOverlap;
-                        Tools[0].ToolOffset = Properties.Vehicle.Default.setVehicle_toolOffset;
-                        Tools[0].WidthMinusOverlap = Tools[0].ToolWidth - Tools[0].ToolOverlap;
-
-                        Tools[0].LookAheadOffSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOff;
-                        Tools[0].LookAheadOnSetting = Properties.Vehicle.Default.setVehicle_toolLookAheadOn;
-                        Tools[0].TurnOffDelay = Properties.Vehicle.Default.setVehicle_toolOffDelay;
-
-                        Tools[0].MappingOnDelay = Properties.Vehicle.Default.setVehicle_MappingOnDelay;
-                        Tools[0].MappingOffDelay = Properties.Vehicle.Default.setVehicle_MappingOffDelay;
-
-
-                        Tools[0].toolMinUnappliedPixels = Properties.Vehicle.Default.setVehicle_minApplied;
-
-                        Tools[0].toolTrailingHitchLength = Properties.Vehicle.Default.setTool_toolTrailingHitchLength;
-                        Tools[0].toolTankTrailingHitchLength = Properties.Vehicle.Default.setVehicle_tankTrailingHitchLength;
-                        Tools[0].HitchLength = Properties.Vehicle.Default.setVehicle_hitchLength;
-
-                        Tools[0].isToolBehindPivot = Properties.Vehicle.Default.setTool_isToolBehindPivot;
-                        Tools[0].isToolTrailing = Properties.Vehicle.Default.setTool_isToolTrailing;
-                        Tools[0].isToolTBT = Properties.Vehicle.Default.setTool_isToolTBT;
 
                         mc.isWorkSwitchEnabled = Properties.Settings.Default.setF_IsWorkSwitchEnabled;
                         mc.isWorkSwitchActiveLow = Properties.Settings.Default.setF_IsWorkSwitchActiveLow;
                         mc.isWorkSwitchManual = Properties.Settings.Default.setF_IsWorkSwitchManual;
 
-                        //Calculate total width and each section width
-                        SectionCalcWidths();
+
+
+
+                        LoadTools();
 
                         //enable disable manual buttons
                         LineUpManualBtns();
@@ -1780,7 +1708,7 @@ namespace AgOpenGPS
                                     bnd.bndArr[k].bndLine.Add(vecPt);
                                 }
 
-                                bnd.bndArr[k].FixBoundaryLine(k, Tools[0].ToolWidth);
+                                bnd.bndArr[k].FixBoundaryLine(k, Guidance.GuidanceWidth);
                                 bnd.bndArr[k].PreCalcBoundaryLines();
                                 bnd.bndArr[k].CalculateBoundaryArea();
                                 bnd.bndArr[k].CalculateBoundaryWinding();
