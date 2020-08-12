@@ -21,8 +21,7 @@ namespace AgOpenGPS
         public FormABLine(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
-
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
             this.Text = gStr.gsABline;
         }
@@ -220,9 +219,9 @@ namespace AgOpenGPS
         {
             tboxHeading.Text = "";
 
-            using (var form = new FormNumeric(0, 360, upDnHeading))
+            using (var form = new FormNumeric(0, 360, upDnHeading, this))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     upDnHeading = form.ReturnValue;

@@ -12,7 +12,7 @@ namespace AgOpenGPS
         public FormEditCurve(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
 
@@ -38,7 +38,7 @@ namespace AgOpenGPS
 
         private void NudMinTurnRadius_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 

@@ -12,7 +12,7 @@ namespace AgOpenGPS
 
         public FormGPSData(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
         }
 

@@ -205,6 +205,7 @@
             this.btnSerialCancel.Size = new System.Drawing.Size(88, 76);
             this.btnSerialCancel.TabIndex = 71;
             this.btnSerialCancel.UseVisualStyleBackColor = true;
+            this.btnSerialCancel.Click += new System.EventHandler(this.BtnSerialCancel_Click);
             // 
             // btnSerialOK
             // 

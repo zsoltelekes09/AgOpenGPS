@@ -31,7 +31,7 @@ namespace AgOpenGPS
         public FormHeadland(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
             //lblPick.Text = gStr.gsSelectALine;
@@ -662,13 +662,13 @@ namespace AgOpenGPS
 
         private void NudDistance_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnExit.Focus();
         }
 
         private void NudSetDistance_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnExit.Focus();
         }
 
@@ -746,6 +746,7 @@ namespace AgOpenGPS
         private void BtnTurnOffHeadland_Click(object sender, EventArgs e)
         {
             mf.FileSaveHeadland();
+            mf.CloseHeadland();
             Close();
         }
 

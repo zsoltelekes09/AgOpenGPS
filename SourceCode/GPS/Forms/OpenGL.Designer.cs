@@ -436,8 +436,7 @@ namespace AgOpenGPS
 
                     if (isRTK)
                     {
-                        if (pn.FixQuality == 4 || pn.FixQuality == 5) { }
-                        else DrawLostRTK();
+                        if (!(pn.FixQuality == 4 || pn.FixQuality == 5)) DrawLostRTK();
                     }
 
 
@@ -1177,7 +1176,7 @@ namespace AgOpenGPS
                 if (flagPts.Count > 0)
                 {
                     Form form = new FormFlags(this);
-                    form.Show();
+                    form.Show(this);
                 }
             }
         }

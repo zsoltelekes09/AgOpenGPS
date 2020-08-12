@@ -10,9 +10,9 @@ namespace AgOpenGPS
     public partial class FormKeyboard : Form
     {
         public string ReturnString { get; set; }
-        public FormKeyboard(string currentString)
+        public FormKeyboard(string currentString,Form callingForm)
         {
-
+            Owner = callingForm;
             InitializeComponent();
 
             this.Text = gStr.gsEnteraValue;

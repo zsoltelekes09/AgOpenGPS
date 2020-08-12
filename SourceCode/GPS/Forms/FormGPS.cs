@@ -220,71 +220,10 @@ namespace AgOpenGPS
             ControlExtension.Draggable(oglZoom, true);
             //ControlExtension.Draggable(panelSim, true);
 
-            setWorkingDirectoryToolStripMenuItem.Text = gStr.gsDirectories;
-            enterSimCoordsToolStripMenuItem.Text = gStr.gsEnterSimCoords;
-            topMenuLoadVehicle.Text = gStr.gsLoadVehicle;
-            topMenuSaveVehicle.Text = gStr.gsSaveVehicle;
-            aboutToolStripMenuItem.Text = gStr.gsAbout;
-            shortcutKeysToolStripMenuItem.Text = gStr.gsShortcutKeys;
-            menustripLanguage.Text = gStr.gsLanguage;
-            topMenuLoadTool.Text = gStr.gsLoadTool;
-            topMenuSaveTool.Text = gStr.gsSaveTool;
-            topMenuLoadEnvironment.Text = gStr.gsLoadEnvironment;
-            topMenuSaveEnvironment.Text = gStr.gsSaveEnvironment;
-            gPSInfoToolStripMenuItem.Text = gStr.gsModuleInfo;
-            showStartScreenToolStripMenuItem.Text = gStr.gsShowStartScreen;
-            //Display Menu
 
-            //settingsToolStripMenuItem.Text = gStr.gsDisplay;
-            topMenuFileExplorer.Text = gStr.gsWindowsFileExplorer;
-            optionsToolStripMenuItem.Text = gStr.gsOptions;
 
-            simulatorOnToolStripMenuItem.Text = gStr.gsSimulatorOn;
+            //UpdateGuiText();
 
-            resetALLToolStripMenuItem.Text = gStr.gsResetAll;
-            colorsToolStripMenuItem.Text = gStr.gsColors;
-            lightbarToolStripMenuItem.Text = gStr.gsLightbarOn;
-            topFieldViewToolStripMenuItem.Text = gStr.gsTopFieldView;
-            toolToolStripMenu.Text = gStr.gsTool;
-
-            resetEverythingToolStripMenuItem.Text = gStr.gsResetAllForSure;
-            fileExplorerToolStripMenuItem.Text = gStr.gsWindowsFileExplorer;
-
-            //Settings Menu
-            toolstripYouTurnConfig.Text = gStr.gsUTurn;
-            toolstripAutoSteerConfig.Text = gStr.gsAutoSteer;
-            steerChartStripMenu.Text = gStr.gsSteerChart;
-            toolstripVehicleConfig.Text = gStr.gsVehicle;
-            toolstripDisplayConfig.Text = gStr.gsDataSources;
-            toolstripUSBPortsConfig.Text = gStr.gsSerialPorts;
-            toolstripUDPConfig.Text = gStr.gsUDP;
-            toolStripNTRIPConfig.Text = gStr.gsNTRIP;
-
-            //Tools Menu
-            treePlantToolStrip.Text = gStr.gsTreePlanter;
-            SmoothABtoolStripMenu.Text = gStr.gsSmoothABCurve;
-            toolStripBtnMakeBndContour.Text = gStr.gsMakeBoundaryContours;
-            boundariesToolStripMenuItem.Text = gStr.gsBoundary;
-            headlandToolStripMenuItem.Text = gStr.gsHeadland;
-            deleteContourPathsToolStripMenuItem.Text = gStr.gsDeleteContourPaths;
-            deleteAppliedAreaToolStripMenuItem.Text = gStr.gsDeleteAppliedArea;
-            deleteForSureToolStripMenuItem.Text = gStr.gsAreYouSure;
-            webcamToolStrip.Text = gStr.gsWebCam;
-            googleEarthFlagsToolStrip.Text = gStr.gsGoogleEarth;
-            offsetFixToolStrip.Text = gStr.gsOffsetFix;
-            moduleConfigToolStripMenuItem.Text = gStr.gsModuleConfiguration;
-
-            //Recorded Path
-            deletePathMenu.Text = gStr.gsDeletePath;
-            recordPathMenu.Text = gStr.gsRecordStop;
-            goPathMenu.Text = gStr.gsGoStop;
-            pausePathMenu.Text = gStr.gsPauseResume;
-
-            stripSectionColor.Text = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
-
-            //NTRIP
-            lblWatch.Text = "Wait GPS";
-            NTRIPStartStopStrip.Text = gStr.gsNTRIPOff;
 
             //build the gesture structures
             SetupStructSizes();
@@ -367,6 +306,81 @@ namespace AgOpenGPS
             font = new CFont(this);
         }
 
+        private void UpdateGuiText()
+        {
+            setWorkingDirectoryToolStripMenuItem.Text = gStr.gsDirectories;
+            enterSimCoordsToolStripMenuItem.Text = gStr.gsEnterSimCoords;
+            topMenuLoadVehicle.Text = gStr.gsLoadVehicle;
+            topMenuSaveVehicle.Text = gStr.gsSaveVehicle;
+            aboutToolStripMenuItem.Text = gStr.gsAbout;
+            shortcutKeysToolStripMenuItem.Text = gStr.gsShortcutKeys;
+            menustripLanguage.Text = gStr.gsLanguage;
+            topMenuLoadTool.Text = gStr.gsLoadTool;
+            topMenuSaveTool.Text = gStr.gsSaveTool;
+            topMenuLoadEnvironment.Text = gStr.gsLoadEnvironment;
+            topMenuSaveEnvironment.Text = gStr.gsSaveEnvironment;
+            gPSInfoToolStripMenuItem.Text = gStr.gsModuleInfo;
+            showStartScreenToolStripMenuItem.Text = gStr.gsShowStartScreen;
+            //Display Menu
+
+            //settingsToolStripMenuItem.Text = gStr.gsDisplay;
+            topMenuFileExplorer.Text = gStr.gsWindowsFileExplorer;
+            optionsToolStripMenuItem.Text = gStr.gsOptions;
+
+            simulatorOnToolStripMenuItem.Text = gStr.gsSimulatorOn;
+
+            resetALLToolStripMenuItem.Text = gStr.gsResetAll;
+            colorsToolStripMenuItem.Text = gStr.gsColors;
+            lightbarToolStripMenuItem.Text = gStr.gsLightbarOn;
+            topFieldViewToolStripMenuItem.Text = gStr.gsTopFieldView;
+            toolToolStripMenu.Text = gStr.gsTool;
+
+            resetEverythingToolStripMenuItem.Text = gStr.gsResetAllForSure;
+            fileExplorerToolStripMenuItem.Text = gStr.gsWindowsFileExplorer;
+
+            //Settings Menu
+            toolstripYouTurnConfig.Text = gStr.gsUTurn;
+            toolstripAutoSteerConfig.Text = gStr.gsAutoSteer;
+            steerChartStripMenu.Text = gStr.gsSteerChart;
+            toolstripVehicleConfig.Text = gStr.gsVehicle;
+            toolstripDisplayConfig.Text = gStr.gsDataSources;
+            toolstripUSBPortsConfig.Text = gStr.gsSerialPorts;
+            toolstripUDPConfig.Text = gStr.gsUDP;
+            toolStripNTRIPConfig.Text = gStr.gsNTRIP;
+
+            //Tools Menu
+            treePlantToolStrip.Text = gStr.gsTreePlanter;
+            SmoothABtoolStripMenu.Text = gStr.gsSmoothABCurve;
+            toolStripBtnMakeBndContour.Text = gStr.gsMakeBoundaryContours;
+            boundariesToolStripMenuItem.Text = gStr.gsBoundary;
+            headlandToolStripMenuItem.Text = gStr.gsHeadland;
+            deleteContourPathsToolStripMenuItem.Text = gStr.gsDeleteContourPaths;
+            deleteAppliedAreaToolStripMenuItem.Text = gStr.gsDeleteAppliedArea;
+            deleteForSureToolStripMenuItem.Text = gStr.gsAreYouSure;
+            webcamToolStrip.Text = gStr.gsWebCam;
+            googleEarthFlagsToolStrip.Text = gStr.gsGoogleEarth;
+            offsetFixToolStrip.Text = gStr.gsOffsetFix;
+            moduleConfigToolStripMenuItem.Text = gStr.gsModuleConfiguration;
+
+            //Recorded Path
+            deletePathMenu.Text = gStr.gsDeletePath;
+            recordPathMenu.Text = gStr.gsRecordStop;
+            goPathMenu.Text = gStr.gsGoStop;
+            pausePathMenu.Text = gStr.gsPauseResume;
+
+
+            stripSectionColor.Text = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
+
+
+            if (isNTRIP_TurnedOn)
+            {
+                if (NtripCounter > 20) NTRIPStartStopStrip.Text = (isNTRIP_Connecting ? gStr.gsAuthourizing : isNTRIP_Sending ? gStr.gsSendingGGA : (NTRIP_Watchdog > 10 ? gStr.gsWaiting : gStr.gsListening)) + "\n" + string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
+                else NTRIPStartStopStrip.Text = gStr.gsConnectingIn + "\n" + (Math.Abs(NtripCounter - 21));
+            }
+            else NTRIPStartStopStrip.Text = gStr.gsNTRIPOff + "\n";
+        }
+
+
         private void ZoomByMouseWheel(object sender, MouseEventArgs e)
         {
             if (e.Delta > 0)
@@ -393,188 +407,74 @@ namespace AgOpenGPS
         {
             MouseWheel += ZoomByMouseWheel;
 
-
-            if (Settings.Default.setF_workingDirectory == "Default")
-                baseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\AgOpenGPS\\";
-            else baseDirectory = Settings.Default.setF_workingDirectory + "\\AgOpenGPS\\";
-
-            //get the fields directory, if not exist, create
-            fieldsDirectory = baseDirectory + "Fields\\";
-            string dir = Path.GetDirectoryName(fieldsDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
-
-            //get the fields directory, if not exist, create
-            vehiclesDirectory = baseDirectory + "Vehicles\\";
-            dir = Path.GetDirectoryName(vehiclesDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
-
-            //get the Tools directory, if not exist, create
-            toolsDirectory = baseDirectory + "Tools\\";
-            dir = Path.GetDirectoryName(toolsDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
-
-            //get the Tools directory, if not exist, create
-            envDirectory = baseDirectory + "Environments\\";
-            dir = Path.GetDirectoryName(envDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
-
-
-            //make sure current field directory exists, null if not
-            currentFieldDirectory = Settings.Default.setF_CurrentDir;
-
-            string curDir;
-            if (currentFieldDirectory != "")
-            {
-                curDir = fieldsDirectory + currentFieldDirectory + "//";
-                dir = Path.GetDirectoryName(curDir);
-                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                {
-                    currentFieldDirectory = "";
-                    Settings.Default.setF_CurrentDir = "";
-                    Settings.Default.Save();
-                }
-            }
-
-            string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string wave = Path.Combine(directoryName, "Dependencies\\Audio", "Boundary.Wav");
-            if (File.Exists(wave))
-            {
-                SndBoundaryAlarm = new SoundPlayer(wave);
-            }
-            else
-            {
-                SndBoundaryAlarm = new SoundPlayer(Resources.Alarm10);
-            }
-
-            //grab the current vehicle filename - make sure it exists
-            vehicleFileName = Vehicle.Default.setVehicle_vehicleName;
-            toolFileName = Vehicle.Default.setVehicle_toolName;
-            envFileName = Vehicle.Default.setVehicle_envName;
-
-            fixUpdateHz = Settings.Default.setPort_NMEAHz;
-
-            if (timerSim.Enabled) fixUpdateHz = 10;
-
-            fixUpdateTime = 1 / (double)fixUpdateHz;
-
-            timerSim.Interval = (int)((1.0 / (double)fixUpdateHz) * 1000.0);
-
-            //get the abLines directory, if not exist, create
-            ablinesDirectory = baseDirectory + "ABLines\\";
-            dir = Path.GetDirectoryName(fieldsDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
-
-            //set baud and port from last time run
-            baudRateGPS = Settings.Default.setPort_baudRate;
-            portNameGPS = Settings.Default.setPort_portNameGPS;
-
-            if (Settings.Default.setMenu_isSimulatorOn)
-            {
-                simulatorOnToolStripMenuItem.Checked = true;
-                panelSim.Visible = true;
-                timerSim.Enabled = true;
-            }
-            else
-            {
-                //try and open
-                SerialPortOpenGPS();
-            }
-
-            //same for SectionMachine port
-            portNameMachine = Settings.Default.setPort_portNameMachine;
-            wasRateMachineConnectedLastRun = Settings.Default.setPort_wasMachineConnected;
-            if (wasRateMachineConnectedLastRun) SerialPortMachineOpen();
-
-            //same for AutoSteer port
-            portNameAutoSteer = Settings.Default.setPort_portNameAutoSteer;
-            wasAutoSteerConnectedLastRun = Settings.Default.setPort_wasAutoSteerConnected;
-            if (wasAutoSteerConnectedLastRun) SerialPortAutoSteerOpen();
-
-            //Calculate total width and each section width
-            LoadTools();
-
-            //set the correct zoom and grid
-            camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
-            SetZoom();
-
-            //which heading source is being used
-            headingFromSource = Settings.Default.setGPS_headingFromWhichSource;
-
-            //triangle resolution is how far to next triangle point trigger distance
-            //triangleResolution = Settings.Default.setDisplay_triangleResolution;
-
-            //start udp server if required
-            if (Properties.Settings.Default.setUDP_isOn 
-                && !Properties.Settings.Default.setUDP_isInterAppOn) StartUDPServer();
-
-            if (Properties.Settings.Default.setUDP_isInterAppOn) StartLocalUDPServer();
-
-            //start NTRIP if required
-            if (Settings.Default.setNTRIP_isOn)
-            {
-                isNTRIP_TurnedOn = true;
-            }
-            else
-            {
-                isNTRIP_TurnedOn = false;
-            }
-
             //remembered window position
+
+
             if (Settings.Default.setWindow_Maximized)
             {
                 WindowState = FormWindowState.Normal;
                 Location = Settings.Default.setWindow_Location;
                 Size = Settings.Default.setWindow_Size;
             }
-            else if (Settings.Default.setWindow_Minimized)
-            {
-                //WindowState = FormWindowState.Minimized;
-                Location = Settings.Default.setWindow_Location;
-                Size = Settings.Default.setWindow_Size;
-            }
             else
             {
                 Location = Settings.Default.setWindow_Location;
                 Size = Settings.Default.setWindow_Size;
             }
-
-            //don't draw the back opengl to GDI - it still works tho
-            //openGLControlBack.Visible = false;
+            if (Properties.Settings.Default.setDisplay_isStartFullScreen)
+            {
+                this.WindowState = FormWindowState.Normal;
+                this.FormBorderStyle = FormBorderStyle.None;
+                this.WindowState = FormWindowState.Maximized;
+                btnFullScreen.BackgroundImage = Properties.Resources.WindowNormal;
+                isFullScreen = true;
+            }
+            else
+            {
+                isFullScreen = false;
+            }
 
             //clear the flags
             flagPts.Clear();
             btnFlag.Enabled = false;
 
-            //workswitch stuff
-            mc.isWorkSwitchEnabled = Settings.Default.setF_IsWorkSwitchEnabled;
-            mc.isWorkSwitchActiveLow = Settings.Default.setF_IsWorkSwitchActiveLow;
-            mc.isWorkSwitchManual = Settings.Default.setF_IsWorkSwitchManual;
 
-            minFixStepDist = Settings.Default.setF_minFixStep;
+            vehicleFileName = Vehicle.Default.setVehicle_vehicleName;
+            toolFileName = Vehicle.Default.setVehicle_toolName;
 
-            fd.workedAreaTotalUser = Settings.Default.setF_UserTotalArea;
-            fd.userSquareMetersAlarm = Settings.Default.setF_UserTripAlarm;
 
-            //space between points while recording a boundary
-            //boundaryTriggerDistance = Settings.Default.setF_boundaryTriggerDistance;
+            currentVersionStr = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
 
-            //load the last used auto turn shape
-            string fileAndDir = @".\Dependencies\YouTurnShapes\" + Settings.Default.setAS_youTurnShape;
-            yt.LoadYouTurnShapeFromFile(fileAndDir);
+            string[] fullVers = currentVersionStr.Split('.');
+            int inoV = int.Parse(fullVers[0], CultureInfo.InvariantCulture);
+            inoV += int.Parse(fullVers[1], CultureInfo.InvariantCulture);
+            inoV += int.Parse(fullVers[2], CultureInfo.InvariantCulture);
+            inoVersionInt = inoV;
+            inoVersionStr = inoV.ToString();
 
-            //sim.latitude = Settings.Default.setSim_lastLat;
-            //sim.longitude = Settings.Default.setSim_lastLong;
 
-            //load th elightbar resolution
-            lightbarCmPerPixel = Settings.Default.setDisplay_lightbarCmPerPixel;
+            if (Settings.Default.setDisplay_isTermsOn)
+            {
+                using (var form = new Form_First(this))
+                {
+                    var result = form.ShowDialog(this);
+                    if (result != DialogResult.OK)
+                    {
+                        //Close();
+                    }
+                }
+            }
 
-            // load all the gui elements in gui.designer.cs
-            LoadGUI();
 
-            //Stanley guidance
-            isStanleyUsed = Vehicle.Default.setVehicle_isStanleyUsed;
+            // load all the gui settings in gui.designer.cs
+            LoadSettings();
 
-            isRTK = Settings.Default.setGPS_isRTK;
+            //Calculate total width and each section width
+            LoadTools();
+
+
+
+
         }
 
         //form is closing so tidy up and save settings
@@ -942,46 +842,6 @@ namespace AgOpenGPS
 
         }// Load Bitmaps And Convert To Textures
 
-        //start the UDP server
-        private void StartUDPServer()
-        {            
-            try
-            {
-                // Initialise the delegate which updates the message received
-                updateRecvMessageDelegate = UpdateRecvMessage;
-
-                // Initialise the socket
-                sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                recvSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-                sendSocket.EnableBroadcast = true;
-                recvSocket.EnableBroadcast = true;
-
-                // Initialise the IPEndPoint for the server and listen on port 9999
-                IPEndPoint recv = new IPEndPoint(IPAddress.Any, Properties.Settings.Default.setIP_thisPort);
-
-                // Associate the socket with this IP address and port
-                recvSocket.Bind(recv);
-
-                // Initialise the IPEndPoint for the server to send on port 9998
-                IPEndPoint server = new IPEndPoint(IPAddress.Any, 9998);
-                sendSocket.Bind(server);
-
-                // Initialise the IPEndPoint for the client - async listner client only!
-                EndPoint client = new IPEndPoint(IPAddress.Any, 0);
-
-                // Start listening for incoming data
-                recvSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None,
-                                                ref client, new AsyncCallback(ReceiveData), recvSocket);
-                isUDPSendConnected = true;
-            }
-            catch (Exception e)
-            {
-                //WriteErrorLog("UDP Server" + e);
-                MessageBox.Show("Load Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         public void StartLocalUDPServer()
         {
             //inter App sockets
@@ -1049,9 +909,9 @@ namespace AgOpenGPS
         //dialog for requesting user to save or cancel
         public int SaveOrNot(bool closing)
         {
-            using (var form = new FormSaveOrNot(closing))
+            using (var form = new FormSaveOrNot(closing, this))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
 
                 if (result == DialogResult.OK) return 0;      //Save and Exit
                 if (result == DialogResult.Ignore) return 1;   //Ignore
@@ -1067,35 +927,30 @@ namespace AgOpenGPS
             //else btnTestIsMapping.Text = "No Map";
         }
 
-        public void GetHeadland()
+        public void CloseHeadland()
         {
-            using (var form = new FormHeadland(this))
-            {
-                var result = form.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                }
-            }
             btnHeadlandOnOff.Image = (hd.isOn = hd.headArr.Count > 0) ? Resources.HeadlandOn : Resources.HeadlandOff;
         }
 
         private void OptionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var form = new FormDisplayOptions(this))
+            Form f = Application.OpenForms["FormDisplayOptions"];
+
+            if (f != null)
             {
-                var result = form.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                }
+                f.Focus();
+                return;
             }
 
+            Form form = new FormDisplayOptions(this);
+            form.Show(this);
         }
 
         private void ColorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var form = new FormColor(this))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                 }
@@ -1106,7 +961,7 @@ namespace AgOpenGPS
         {
             using (var form = new FormColorPicker(this, sectionColorDay))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     sectionColorDay = form.UseThisColor;
@@ -1127,32 +982,12 @@ namespace AgOpenGPS
             Settings.Default.Save();
         }
 
-        public void GetAB()
-        {
-            curve.isOkToAddPoints = false;
-
-            if (ct.isContourBtnOn) { if (ct.isContourBtnOn) btnContour.PerformClick(); }
-
-            using (var form = new FormABDraw(this))
-            {
-                var result = form.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                }
-                ABLine.moveDistance = 0;
-                curve.moveDistance = 0;
-            }
-
-            if (curve.isBtnCurveOn) btnCycleLines.Text = "Cu-" + curve.numCurveLineSelected;
-            if (ABLine.isBtnABLineOn) btnCycleLines.Text = "AB-" + ABLine.numABLineSelected;
-        }
-
-        public void KeypadToNUD(NumericUpDown sender)
+        public void KeypadToNUD(NumericUpDown sender, Form Ownerform)
         {
             sender.BackColor = Color.Red;
-            using (var form = new FormNumeric((double)sender.Minimum, (double)sender.Maximum, (double)sender.Value))
+            using (var form = new FormNumeric((double)sender.Minimum, (double)sender.Maximum, (double)sender.Value, Ownerform))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(Ownerform);
                 if (result == DialogResult.OK)
                 {
                     sender.Value = (decimal)form.ReturnValue;
@@ -1161,92 +996,18 @@ namespace AgOpenGPS
             sender.BackColor = Color.AliceBlue;
         }
 
-        public void KeyboardToText(TextBox sender)
+        public void KeyboardToText(TextBox sender, Form callingForm)
         {
             sender.BackColor = Color.Red;
-            using (var form = new FormKeyboard(sender.Text))
+            using (var form = new FormKeyboard(sender.Text, callingForm))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(callingForm);
                 if (result == DialogResult.OK)
                 {
                     sender.Text = form.ReturnString;
                 }
             }
             sender.BackColor = Color.AliceBlue;
-        }
-
-
-        //show the communications window
-        private void SettingsCommunications()
-        {
-            using (var form = new FormCommSet(this))
-            {
-                var result = form.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    fixUpdateTime = 1 / (double)fixUpdateHz;
-                }
-            }
-            //SendSteerSettingsOutAutoSteerPort();
-            //SendArduinoSettingsOutToAutoSteerPort();
-        }
-
-        //show the UDP ethernet settings page
-        private void SettingsUDP()
-        {
-            using (var form = new FormUDP(this))
-            {
-                var result = form.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    //Clicked Save
-                    Application.Restart();
-                    Environment.Exit(0);
-                }
-                else
-                {
-                    //Clicked X - No Save
-                }
-            }
-        }
-
-        //show the UDP ethernet settings page
-        private void SettingsNTRIP()
-        {
-            using (var form = new FormNtrip(this))
-            {
-                var result = form.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    if (isNTRIP_Connected)
-                    {
-                        ShutDownNTRIP();
-                    }
-                }
-                else
-                {
-                    //Clicked X - No Save
-                }
-                
-
-                if (Properties.Settings.Default.setNTRIP_isOn)
-                {
-                    isNTRIP_TurnedOn = true;
-                    NTRIPStartStopStrip.Visible = true;
-                    lblWatch.Visible = true;
-                    NTRIPBytesMenu.Visible = true;
-                    pbarNtripMenu.Visible = true;
-
-                }
-                else
-                {
-                    isNTRIP_TurnedOn = false;
-                    NTRIPStartStopStrip.Visible = false;
-                    lblWatch.Visible = false;
-                    NTRIPBytesMenu.Visible = false;
-                    pbarNtripMenu.Visible = false;
-                }
-            }
         }
 
         //function to set section positions
@@ -1454,12 +1215,12 @@ namespace AgOpenGPS
             {
                 using (var form = new FormJob(this))
                 {
-                    var result = form.ShowDialog();
+                    var result = form.ShowDialog(this);
                     if (result == DialogResult.Yes)
                     {
                         //ask for a directory name
                         using (var form2 = new FormFieldDir(this))
-                        { form2.ShowDialog(); }
+                        { form2.ShowDialog(this); }
                     }
                 }
 
@@ -1513,7 +1274,7 @@ namespace AgOpenGPS
                         //ask for a directory name
                         using (var form2 = new FormSaveAs(this))
                         {
-                            form2.ShowDialog();
+                            form2.ShowDialog(this);
                         }
 
                         break;
@@ -1770,10 +1531,6 @@ namespace AgOpenGPS
         public void TimedMessageBox(int timeout, string s1, string s2)
         {
             Form.SetTimedMessage(timeout, s1, s2, this);
-
-            Form.TopLevel = false;
-            Form.BringToFront();
-            Controls.Add(Form);
         }
     }//class FormGPS
 }//namespace AgOpenGPS

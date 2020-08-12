@@ -101,7 +101,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "WebCam";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormWebCam_Load);
             this.ResumeLayout(false);
 

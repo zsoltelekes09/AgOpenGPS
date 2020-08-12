@@ -250,6 +250,7 @@
             this.btnSerialCancel.Size = new System.Drawing.Size(88, 76);
             this.btnSerialCancel.TabIndex = 95;
             this.btnSerialCancel.UseVisualStyleBackColor = true;
+            this.btnSerialCancel.Click += new System.EventHandler(this.BtnSerialCancel_Click);
             // 
             // btnSerialOK
             // 
@@ -722,7 +723,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "NTRIP Client Settings";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormNtrip_Load);
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudCasterPort)).EndInit();

@@ -13,7 +13,7 @@ namespace AgOpenGPS
 
         public FormTreePlant(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             //winform initialization
             InitializeComponent();
@@ -117,7 +117,7 @@ namespace AgOpenGPS
 
         private void NudTreeSpacing_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnStop.Focus();
         }
 

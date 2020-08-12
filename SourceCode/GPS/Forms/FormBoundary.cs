@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -30,7 +28,7 @@ namespace AgOpenGPS
 
         public FormBoundary(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             //winform initialization
             InitializeComponent();
@@ -284,6 +282,7 @@ namespace AgOpenGPS
         {
             mf.bnd.boundarySelected = -1;
             mf.bnd.isOkToAddPoints = false;
+            Close();
         }
 
         private void BtnLeftRight_Click(object sender, EventArgs e)
@@ -370,7 +369,7 @@ namespace AgOpenGPS
 
         private void NudBndOffset_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             //btnCancel.Focus();
         }
 
@@ -379,7 +378,11 @@ namespace AgOpenGPS
             mf.bnd.createBndOffset = (double)nudBndOffset.Value;
             mf.bnd.isBndBeingMade = true;
 
-            this.DialogResult = DialogResult.OK;
+            Form form2 = new FormBoundaryPlayer(mf, this);
+            form2.Show(this);
+
+
+            Hide();
         }
 
         private void BtnDeleteAll_Click(object sender, EventArgs e)
@@ -505,7 +508,7 @@ namespace AgOpenGPS
                     })
                     {
                         //was a file selected
-                        if (ofd.ShowDialog() == DialogResult.Cancel) return;
+                        if (ofd.ShowDialog(this) == DialogResult.Cancel) return;
                         else fileAndDirectory = ofd.FileName;
                     }
                 }

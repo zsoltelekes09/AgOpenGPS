@@ -334,36 +334,35 @@ namespace AgOpenGPS
             return Convert.ToBase64String(byteArray, 0, byteArray.Length);
         }
 
-        private void ShutDownNTRIP()
+        public void UpdateNtripButton()
         {
+            NtripCounter = 15;
+            isNTRIP_Connected = false;
+            isNTRIP_Connecting = false;
+
+            //if we had a timer already, kill it
+            if (tmr != null)
+            {
+                tmr.Dispose();
+            }
             if (clientSocket != null && clientSocket.Connected)
             {
                 clientSocket.Shutdown(SocketShutdown.Both);
                 clientSocket.Close();
-                System.Threading.Thread.Sleep(500);
-
-                //TimedMessageBox(2000, gStr.gsNTRIPOff, gStr.gsClickStartToResume);
-                ReconnectRequest();
-
-                //Also stop the requests now
-                isNTRIP_TurnedOn = false;
             }
 
-        }
-
-        private void SettingsShutDownNTRIP()
-        {
-            if (clientSocket != null && clientSocket.Connected)
+            NTRIPStartStopStrip.Visible = true;
+            if (isNTRIP_TurnedOn)
             {
-                clientSocket.Shutdown(SocketShutdown.Both);
-                clientSocket.Close();
-                System.Threading.Thread.Sleep(500);
-
-                //TimedMessageBox(2000, gStr.gsNTRIPRestarting, gStr.gsResumingWithNewSettings);
-                ReconnectRequest();
-
-                //Continue to restart
-                isNTRIP_TurnedOn = true;
+                NTRIPStartStopStrip.Text = gStr.gsConnectingIn + "\n" + (Math.Abs(NtripCounter - 21));
+                NTRIPBytesMenu.Visible = true;
+                pbarNtripMenu.Visible = true;
+            }
+            else
+            {
+                NTRIPStartStopStrip.Text = gStr.gsNTRIPOff + "\n";
+                NTRIPBytesMenu.Visible = false;
+                pbarNtripMenu.Visible = false;
             }
         }
 

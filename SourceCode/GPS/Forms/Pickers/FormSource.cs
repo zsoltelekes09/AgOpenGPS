@@ -24,18 +24,17 @@ namespace AgOpenGPS
 
         public FormSource(Form callingForm, List<string> _dataList, double _lat, double _lon, string syte)
         {
+            Owner = nt = callingForm as FormNtrip;
             InitializeComponent();
             dataList = _dataList;
             lat = _lat;
             lon = _lon;
             site = syte;
-            nt = callingForm as FormNtrip;
         }
 
         private void FormSource_Load(object sender, EventArgs e)
         {
-            double minDist = 999999999, cLat = 0, cLon = 0;
-            int place = 99999;
+            double minDist = 999999999;
             ListViewItem itm;
             if (dataList.Count > 0)
             {
@@ -44,8 +43,8 @@ namespace AgOpenGPS
                 for (int i = 0; i < dataList.Count; i++)
                 {
                     string[] data = dataList[i].Split(',');
-                    double.TryParse(data[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out cLat);
-                    double.TryParse(data[2].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out cLon);
+                    double.TryParse(data[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out double cLat);
+                    double.TryParse(data[2].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out double cLon);
 
                     if (cLat == 0 || cLon == 0)
                     {
@@ -59,7 +58,6 @@ namespace AgOpenGPS
                     if (temp < minDist)
                     {
                         minDist = temp;
-                        place = i;
                     }                    
 
                     //load up the listview
@@ -75,28 +73,29 @@ namespace AgOpenGPS
             this.chName.Width = 250;
         }
 
-        private void btnSite_Click(object sender, EventArgs e)
+        private void BtnSite_Click(object sender, EventArgs e)
         {
              Process.Start(site);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void btnUseMount_Click(object sender, EventArgs e)
+        private void BtnUseMount_Click(object sender, EventArgs e)
         {
             int count = lvLines.SelectedItems.Count;
             if (count > 0)
             {
                 nt.tboxMount.Text = (lvLines.SelectedItems[0].SubItems[1].Text);
+                
                 Close();
             }
 
         }
 
-        private void lvLines_SelectedIndexChanged(object sender, EventArgs e)
+        private void LvLines_SelectedIndexChanged(object sender, EventArgs e)
         {
             int count = lvLines.SelectedItems.Count;
             if (count > 0)

@@ -13,7 +13,7 @@ namespace AgOpenGPS
         public FormVehiclePicker(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             //this.bntOK.Text = gStr.gsForNow;

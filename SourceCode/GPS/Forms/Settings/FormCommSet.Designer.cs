@@ -459,7 +459,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Communication Settings";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormCommSet_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

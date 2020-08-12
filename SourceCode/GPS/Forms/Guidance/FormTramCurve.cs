@@ -19,7 +19,7 @@ namespace AgOpenGPS
         public FormTramCurve(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
 
@@ -147,7 +147,7 @@ namespace AgOpenGPS
 
         private void NudSnapAdj_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
@@ -161,7 +161,7 @@ namespace AgOpenGPS
 
         private void NudPasses_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
@@ -175,7 +175,7 @@ namespace AgOpenGPS
 
         private void NudOffset_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
@@ -252,7 +252,7 @@ namespace AgOpenGPS
 
         private void NudEqWidth_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
@@ -269,7 +269,7 @@ namespace AgOpenGPS
 
         private void NudWheelSpacing_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();        
         }
 

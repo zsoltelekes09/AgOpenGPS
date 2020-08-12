@@ -58,6 +58,7 @@
             this.nudLookAhead = new System.Windows.Forms.NumericUpDown();
             this.nudOverlap = new System.Windows.Forms.NumericUpDown();
             this.tabSections = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
             this.SectionPanel = new System.Windows.Forms.Panel();
             this.NumSections = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
@@ -65,7 +66,6 @@
             this.lblVehicleToolWidth = new System.Windows.Forms.Label();
             this.label41 = new System.Windows.Forms.Label();
             this.nudMinApplied = new System.Windows.Forms.NumericUpDown();
-            this.label2 = new System.Windows.Forms.Label();
             this.tabWorkSwitch = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.checkWorkSwitchManual = new System.Windows.Forms.CheckBox();
@@ -687,6 +687,18 @@
             this.tabSections.TabIndex = 2;
             this.tabSections.Text = " Sections ";
             // 
+            // label2
+            // 
+            this.label2.BackColor = System.Drawing.SystemColors.Window;
+            this.label2.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.label2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label2.Location = new System.Drawing.Point(3, 419);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(220, 34);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "# Of Sections";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            // 
             // SectionPanel
             // 
             this.SectionPanel.AutoScroll = true;
@@ -793,18 +805,6 @@
             0});
             this.nudMinApplied.ValueChanged += new System.EventHandler(this.NudMinApplied_ValueChanged);
             this.nudMinApplied.Enter += new System.EventHandler(this.NudMinApplied_Enter);
-            // 
-            // label2
-            // 
-            this.label2.BackColor = System.Drawing.SystemColors.Window;
-            this.label2.Font = new System.Drawing.Font("Tahoma", 15.75F);
-            this.label2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label2.Location = new System.Drawing.Point(3, 419);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(220, 34);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "# Of Sections";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // tabWorkSwitch
             // 
@@ -1002,7 +1002,6 @@
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormToolSettings_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabConfig.ResumeLayout(false);

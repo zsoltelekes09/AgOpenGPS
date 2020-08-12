@@ -1954,7 +1954,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "U Turn";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormYouTurn_Load);
             this.tabEdit.ResumeLayout(false);
             this.tabEdit.PerformLayout();

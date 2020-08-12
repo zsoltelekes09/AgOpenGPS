@@ -14,7 +14,7 @@ namespace AgOpenGPS
 
         public FormABCurve(Form _mf)
         {
-            mf = _mf as FormGPS;
+            Owner = mf = _mf as FormGPS;
             InitializeComponent();
 
             btnPausePlay.Text = gStr.gsPause;

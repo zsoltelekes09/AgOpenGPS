@@ -70,7 +70,7 @@
             this.lvLines.TabIndex = 97;
             this.lvLines.UseCompatibleStateImageBehavior = false;
             this.lvLines.View = System.Windows.Forms.View.Details;
-            this.lvLines.SelectedIndexChanged += new System.EventHandler(this.lvLines_SelectedIndexChanged);
+            this.lvLines.SelectedIndexChanged += new System.EventHandler(this.LvLines_SelectedIndexChanged);
             // 
             // chDistance
             // 
@@ -138,7 +138,7 @@
             this.btnSite.Size = new System.Drawing.Size(157, 64);
             this.btnSite.TabIndex = 100;
             this.btnSite.UseVisualStyleBackColor = true;
-            this.btnSite.Click += new System.EventHandler(this.btnSite_Click);
+            this.btnSite.Click += new System.EventHandler(this.BtnSite_Click);
             // 
             // button1
             // 
@@ -152,7 +152,7 @@
             this.button1.Size = new System.Drawing.Size(157, 64);
             this.button1.TabIndex = 101;
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // btnUseMount
             // 
@@ -166,7 +166,7 @@
             this.btnUseMount.Size = new System.Drawing.Size(157, 64);
             this.btnUseMount.TabIndex = 100;
             this.btnUseMount.UseVisualStyleBackColor = true;
-            this.btnUseMount.Click += new System.EventHandler(this.btnUseMount_Click);
+            this.btnUseMount.Click += new System.EventHandler(this.BtnUseMount_Click);
             // 
             // FormSource
             // 
@@ -183,7 +183,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Source Data";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormSource_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

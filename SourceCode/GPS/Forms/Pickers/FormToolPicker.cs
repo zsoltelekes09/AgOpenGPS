@@ -13,7 +13,7 @@ namespace AgOpenGPS
         public FormToolPicker(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             this.Text = gStr.gsLoadTool;

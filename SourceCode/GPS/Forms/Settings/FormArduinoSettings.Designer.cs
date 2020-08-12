@@ -820,7 +820,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Module Configure";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormToolSettings_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudMinSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxSpeed)).EndInit();

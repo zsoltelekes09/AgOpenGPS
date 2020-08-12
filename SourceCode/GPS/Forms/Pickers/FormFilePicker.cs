@@ -17,7 +17,7 @@ namespace AgOpenGPS
         public FormFilePicker(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
             btnByDistance.Text = gStr.gsSort;

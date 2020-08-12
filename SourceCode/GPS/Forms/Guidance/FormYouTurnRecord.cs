@@ -12,7 +12,7 @@ namespace AgOpenGPS
 
         public FormYouTurnRecord(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
             btnStop.Text = gStr.gsDone;
             btnRecord.Text = gStr.gsRecord;

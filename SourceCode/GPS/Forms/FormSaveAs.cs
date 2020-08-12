@@ -14,7 +14,7 @@ namespace AgOpenGPS
         public FormSaveAs(Form _callingForm)
         {
             //get copy of the calling main form
-            mf = _callingForm as FormGPS;
+            Owner = mf = _callingForm as FormGPS;
 
             InitializeComponent();
 
@@ -272,29 +272,29 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void tboxFieldName_Click(object sender, EventArgs e)
+        private void TboxFieldName_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
 
-        private void tboxTask_Click(object sender, EventArgs e)
+        private void TboxTask_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
 
-        private void tboxVehicle_Click(object sender, EventArgs e)
+        private void TboxVehicle_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }

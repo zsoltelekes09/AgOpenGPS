@@ -98,7 +98,7 @@
             this.btnSaveAs.Size = new System.Drawing.Size(127, 85);
             this.btnSaveAs.TabIndex = 258;
             this.btnSaveAs.UseVisualStyleBackColor = true;
-            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+            this.btnSaveAs.Click += new System.EventHandler(this.BtnSaveAs_Click);
             // 
             // btnReturn
             // 

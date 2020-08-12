@@ -19,7 +19,7 @@ namespace AgOpenGPS
         public FormColorPicker(Form callingForm, Color _inColor)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             inColor = _inColor;

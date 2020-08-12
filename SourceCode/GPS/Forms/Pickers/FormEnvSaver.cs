@@ -14,7 +14,7 @@ namespace AgOpenGPS
         public FormEnvSaver(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             //this.bntOK.Text = gStr.gsForNow;
@@ -74,7 +74,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSave.Focus();
             }
         }

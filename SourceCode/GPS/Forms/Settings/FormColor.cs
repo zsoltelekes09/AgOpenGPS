@@ -18,7 +18,7 @@ namespace AgOpenGPS
         public FormColor(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             //Language keys
@@ -40,7 +40,7 @@ namespace AgOpenGPS
 
             using (var form = new FormColorPicker(mf, mf.dayColor))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     mf.dayColor = form.UseThisColor;
@@ -60,7 +60,7 @@ namespace AgOpenGPS
 
             using (var form = new FormColorPicker(mf, mf.nightColor))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     mf.nightColor = form.UseThisColor;
@@ -80,7 +80,7 @@ namespace AgOpenGPS
 
             using (var form = new FormColorPicker(mf, mf.fieldColorDay))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     mf.fieldColorDay = form.UseThisColor;
@@ -98,7 +98,7 @@ namespace AgOpenGPS
 
             using (var form = new FormColorPicker(mf, mf.fieldColorNight))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     mf.fieldColorNight = form.UseThisColor;

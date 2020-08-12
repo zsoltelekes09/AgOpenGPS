@@ -361,7 +361,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Enter Coordinates For Simulator";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormSimCoords_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudLongitude)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudLatitude)).EndInit();

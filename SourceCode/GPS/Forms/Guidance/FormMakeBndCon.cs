@@ -9,7 +9,7 @@ namespace AgOpenGPS
 
         public FormMakeBndCon(Form _mf)
         {
-            mf = _mf as FormGPS;
+            Owner = mf = _mf as FormGPS;
             InitializeComponent();
 
             lblHz.Text = gStr.gsPass;
@@ -34,14 +34,14 @@ namespace AgOpenGPS
 
         private void NudPass_Enter(object sender, System.EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
 
         }
 
         private void NudSpacing_Enter(object sender, System.EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 

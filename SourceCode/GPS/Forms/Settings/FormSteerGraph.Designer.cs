@@ -181,7 +181,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "AutoSteer Graph";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormSteerGraph_Load);
             ((System.ComponentModel.ISupportInitialize)(this.unoChart)).EndInit();
             this.ResumeLayout(false);

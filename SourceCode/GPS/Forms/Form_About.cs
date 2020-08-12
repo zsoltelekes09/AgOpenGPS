@@ -6,8 +6,9 @@ namespace AgOpenGPS
 {
     public partial class Form_About : Form
     {
-        public Form_About()
+        public Form_About(Form callingForm)
         {
+            Owner = callingForm;
             InitializeComponent();
         }
 

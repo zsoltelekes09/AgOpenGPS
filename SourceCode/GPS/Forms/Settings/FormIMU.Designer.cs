@@ -420,7 +420,7 @@
             this.tboxTinkerUID.Name = "tboxTinkerUID";
             this.tboxTinkerUID.Size = new System.Drawing.Size(169, 33);
             this.tboxTinkerUID.TabIndex = 78;
-            this.tboxTinkerUID.Click += new System.EventHandler(this.tboxTinkerUID_Click);
+            this.tboxTinkerUID.Click += new System.EventHandler(this.TboxTinkerUID_Click);
             // 
             // groupBox1
             // 
@@ -737,7 +737,7 @@
             this.hsbarFusion.Size = new System.Drawing.Size(260, 43);
             this.hsbarFusion.TabIndex = 289;
             this.hsbarFusion.Value = 25;
-            this.hsbarFusion.ValueChanged += new System.EventHandler(this.hsbarFusion_ValueChanged);
+            this.hsbarFusion.ValueChanged += new System.EventHandler(this.HsbarFusion_ValueChanged);
             // 
             // lblIMUFusion
             // 
@@ -789,7 +789,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormDisplaySettings";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormDisplaySettings_Load);
             this.headingGroupBox.ResumeLayout(false);
             this.btnRollZero.ResumeLayout(false);

@@ -1232,6 +1232,7 @@ namespace AgOpenGPS
         //build the points and path of youturn to be scaled and transformed
         public void BuildManualYouTurn(bool isTurnRight, bool isTurnButtonTriggered)
         {
+
             isYouTurnTriggered = true;
 
             double head;
@@ -1245,6 +1246,7 @@ namespace AgOpenGPS
             }
             else
             {
+                if (mf.curve.curList.Count < 3) return;
                 if (mf.curve.isSameWay)
                 {
                     if (isTurnRight)

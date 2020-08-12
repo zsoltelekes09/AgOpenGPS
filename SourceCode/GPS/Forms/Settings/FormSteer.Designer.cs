@@ -183,8 +183,8 @@
             this.hsbarProportionalGain.Name = "hsbarProportionalGain";
             this.hsbarProportionalGain.Size = new System.Drawing.Size(260, 30);
             this.hsbarProportionalGain.TabIndex = 254;
-            this.hsbarProportionalGain.ValueChanged += new System.EventHandler(this.HsbarProportionalGain_ValueChanged);
             this.hsbarProportionalGain.Value = 4;
+            this.hsbarProportionalGain.ValueChanged += new System.EventHandler(this.HsbarProportionalGain_ValueChanged);
             // 
             // label45
             // 
@@ -622,7 +622,6 @@
             // 
             this.hsbarHeadingErrorGain.LargeChange = 1;
             this.hsbarHeadingErrorGain.Location = new System.Drawing.Point(6, 114);
-            this.hsbarHeadingErrorGain.Maximum = 100;
             this.hsbarHeadingErrorGain.Minimum = 1;
             this.hsbarHeadingErrorGain.Name = "hsbarHeadingErrorGain";
             this.hsbarHeadingErrorGain.Size = new System.Drawing.Size(260, 30);
@@ -912,7 +911,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Auto Steer Configuration";
-            this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSteer_FormClosing);
             this.Load += new System.EventHandler(this.FormSteer_Load);
             this.tabControl1.ResumeLayout(false);

@@ -7,8 +7,9 @@ namespace AgOpenGPS
     {
         //class variables
 
-        public FormSaveOrNot(bool closing)
+        public FormSaveOrNot(bool closing,Form callingForm)
         {
+            Owner = callingForm;
             InitializeComponent();
 
             this.label7.Text = gStr.gsReturn;
@@ -31,7 +32,7 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void btnSaveAs_Click(object sender, EventArgs e)
+        private void BtnSaveAs_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Yes;
             Close();

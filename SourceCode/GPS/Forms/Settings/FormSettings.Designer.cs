@@ -720,7 +720,6 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormSettings_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabConfig.ResumeLayout(false);

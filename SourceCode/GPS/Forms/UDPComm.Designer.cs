@@ -42,6 +42,72 @@ namespace AgOpenGPS
         private delegate void UpdateStatusDelegate(string status);
         private UpdateStatusDelegate updateStatusDelegate = null;
 
+        //start the UDP server
+        public void StartUDPServer()
+        {
+            try
+            {
+
+
+
+                if (isUDPSendConnected) StopUDPServer();
+
+
+
+
+                // Initialise the delegate which updates the message received
+                updateRecvMessageDelegate = UpdateRecvMessage;
+
+                // Initialise the socket
+                sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                recvSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+                sendSocket.EnableBroadcast = true;
+                recvSocket.EnableBroadcast = true;
+
+                // Initialise the IPEndPoint for the server and listen on port 9999
+                IPEndPoint recv = new IPEndPoint(IPAddress.Any, Properties.Settings.Default.setIP_thisPort);
+
+                // Associate the socket with this IP address and port
+                recvSocket.Bind(recv);
+
+                // Initialise the IPEndPoint for the server to send on port 9998
+                IPEndPoint server = new IPEndPoint(IPAddress.Any, 9998);
+                sendSocket.Bind(server);
+
+                // Initialise the IPEndPoint for the client - async listner client only!
+                EndPoint client = new IPEndPoint(IPAddress.Any, 0);
+
+                // Start listening for incoming data
+                recvSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref client, new AsyncCallback(ReceiveData), recvSocket);
+                isUDPSendConnected = true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Load Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void StopUDPServer()
+        {
+            try
+            {
+                if (isUDPSendConnected)
+                {
+                    sendSocket.Shutdown(SocketShutdown.Both);
+                    sendSocket.Close();
+                    recvSocket.Shutdown(SocketShutdown.Both);
+                    recvSocket.Close();
+                }
+
+                isUDPSendConnected = false;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Close Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void UpdateRecvMessage(int port, byte[] Data)
         {
             //update progress bar for autosteer

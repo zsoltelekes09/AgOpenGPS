@@ -11,7 +11,7 @@ namespace AgOpenGPS
         public FormSimCoords(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             this.label18.Text = gStr.gsLatitude;
@@ -81,13 +81,13 @@ namespace AgOpenGPS
 
         private void NudLongitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
         private void NudLatitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
     }

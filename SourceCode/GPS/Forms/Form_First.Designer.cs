@@ -114,7 +114,6 @@
             // 
             // button1
             // 
-            this.button1.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.button1.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button1.Image = global::AgOpenGPS.Properties.Resources.OK64;
             this.button1.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -180,7 +179,6 @@
             // 
             // button2
             // 
-            this.button2.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.button2.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button2.Image = global::AgOpenGPS.Properties.Resources.Cancel64;
             this.button2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -296,7 +294,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "About AgOpenGPS";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.Form_About_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

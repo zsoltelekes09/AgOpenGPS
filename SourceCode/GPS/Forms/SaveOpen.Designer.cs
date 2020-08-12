@@ -1003,18 +1003,14 @@ namespace AgOpenGPS
                         return true;
                     }
                 }
-                catch (Exception e) //FormatException e || IndexOutOfRangeException e2)
+                catch (Exception e)
                 {
                     WriteErrorLog("pen Tool" + e.ToString());
 
-                    //vehicle is corrupt, reload with all default information
-                    //Properties.Settings.Default.Reset();
                     Properties.Settings.Default.Save();
 
                     TimedMessageBox(3000, gStr.gsFileError, gStr.gsVehicleFileIsCorrupt);
 
-                    //Application.Restart();
-                    //Environment.Exit(0);
                     return false;
                 }
             }    //cancelled out of open file
@@ -1283,9 +1279,8 @@ namespace AgOpenGPS
                     //vehicle is corrupt, reload with all default information
                     Properties.Settings.Default.Reset();
                     Properties.Settings.Default.Save();
-                    MessageBox.Show(gStr.gsProgramWillResetToRecoverPleaseRestart, gStr.gsLoadEnvironment, MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                    Application.Restart();
-                    Environment.Exit(0);
+
+                    TimedMessageBox(3000, gStr.gsFileError, gStr.gsVehicleFileIsCorrupt);
                     return DialogResult.Cancel;
                 }
             }
@@ -1329,7 +1324,7 @@ namespace AgOpenGPS
                         ofd.Filter = "Field files (Field.txt)|Field.txt";
 
                         //was a file selected
-                        if (ofd.ShowDialog() == DialogResult.Cancel) fileAndDirectory = "Cancel";
+                        if (ofd.ShowDialog(this) == DialogResult.Cancel) fileAndDirectory = "Cancel";
                         else fileAndDirectory = ofd.FileName;
                         break;
                     }

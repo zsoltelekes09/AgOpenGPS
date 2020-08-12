@@ -1143,7 +1143,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Module Communication";
-            this.TopMost = true;
             this.ResumeLayout(false);
 
         }

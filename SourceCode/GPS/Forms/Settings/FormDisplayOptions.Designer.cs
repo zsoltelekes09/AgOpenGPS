@@ -83,6 +83,7 @@
             this.btnCancel.Size = new System.Drawing.Size(90, 67);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -334,7 +335,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Module Configure";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormDisplaySettings_Load);
             this.unitsGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);

@@ -217,7 +217,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Tree Plant Control";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormTreePlant_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudTreeSpacing)).EndInit();
             this.ResumeLayout(false);

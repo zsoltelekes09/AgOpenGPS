@@ -17,7 +17,7 @@ namespace AgOpenGPS
         public FormDisplayOptions(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             //Language keys
@@ -92,6 +92,11 @@ namespace AgOpenGPS
             else { Settings.Default.setMenu_isMetric = false; mf.isMetric = false; }
 
             Settings.Default.Save();
+            Close();
+        }
+
+        private void BtnCancel_Click(object sender, EventArgs e)
+        {
             Close();
         }
     }

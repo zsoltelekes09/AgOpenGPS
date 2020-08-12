@@ -208,7 +208,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Stop Record Pause Boundary";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormBoundaryPlayer_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).EndInit();
             this.ResumeLayout(false);

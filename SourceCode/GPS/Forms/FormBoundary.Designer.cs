@@ -228,7 +228,6 @@
             // btnGo
             // 
             this.btnGo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnGo.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnGo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.btnGo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGo.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -318,7 +317,6 @@
             // btnSerialCancel
             // 
             this.btnSerialCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnSerialCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnSerialCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSerialCancel.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSerialCancel.Image = global::AgOpenGPS.Properties.Resources.back_button;
@@ -375,8 +373,8 @@
             // 
             // FormBoundary
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ClientSize = new System.Drawing.Size(798, 568);
             this.ControlBox = false;
@@ -408,7 +406,6 @@
             this.Name = "FormBoundary";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormBoundary_Load);
             this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.MouseWheel_Scroll);
             ((System.ComponentModel.ISupportInitialize)(this.nudBndOffset)).EndInit();

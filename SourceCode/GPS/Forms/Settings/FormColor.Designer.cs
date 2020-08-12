@@ -167,7 +167,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Module Configure";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormDisplaySettings_Load);
             this.ResumeLayout(false);
 

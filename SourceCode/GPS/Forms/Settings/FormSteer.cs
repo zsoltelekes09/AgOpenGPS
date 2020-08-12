@@ -13,7 +13,7 @@ namespace AgOpenGPS
         //Form stuff
         public FormSteer(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             this.btnFreeDrive.Text = gStr.gsDrive;

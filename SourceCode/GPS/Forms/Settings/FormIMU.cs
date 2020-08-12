@@ -12,7 +12,7 @@ namespace AgOpenGPS
 
         public FormIMU(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             //Languages
@@ -88,18 +88,21 @@ namespace AgOpenGPS
             Properties.Settings.Default.setIMU_fusionWeight = (double)(hsbarFusion.Value) * 0.01;
             mf.ahrs.fusionWeight = (double)(hsbarFusion.Value) * 0.01;
 
+
+            if (Properties.Settings.Default.setAS_isAutoSteerAutoOn) mf.btnAutoSteer.Text = "R";
+            else mf.btnAutoSteer.Text = "M";
+
+
             Properties.Settings.Default.Save();
-            Properties.Vehicle.Default.Save();            
+            Properties.Vehicle.Default.Save();
 
             //back to FormGPS
-            DialogResult = DialogResult.OK;
             Close();
-            this.Dispose();
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            { DialogResult = DialogResult.Cancel; Close(); }
+            Close();
         }
 
         private void FormDisplaySettings_Load(object sender, EventArgs e)
@@ -183,7 +186,7 @@ namespace AgOpenGPS
 
         private void NudMinFixStepDistance_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
@@ -212,16 +215,16 @@ namespace AgOpenGPS
             mf.timerSim.Interval = (int)((1.0 / (double)mf.fixUpdateHz) * 1000.0);
         }
 
-        private void tboxTinkerUID_Click(object sender, EventArgs e)
+        private void TboxTinkerUID_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnCancel.Focus();
             }
         }
 
-        private void hsbarFusion_ValueChanged(object sender, EventArgs e)
+        private void HsbarFusion_ValueChanged(object sender, EventArgs e)
         {
             lblFusion.Text = (hsbarFusion.Value).ToString();
             lblFusionIMU.Text = (50 - hsbarFusion.Value).ToString();

@@ -53,12 +53,8 @@ namespace AgOpenGPS
         //USer tally string
         public string WorkedUserHectares { get { return (workedAreaTotalUser * Glm.m2ha).ToString("N2"); } }
 
-        public string WorkedUserHectares2 { get { return (workedAreaTotalUser * Glm.m2ha).ToString("N2"); } }
-
         //user tally string
         public string WorkedUserAcres { get { return (workedAreaTotalUser * Glm.m2ac).ToString("N2"); } }
-
-        public string WorkedUserAcres2 { get { return (workedAreaTotalUser * Glm.m2ac).ToString("N2"); } }
 
         //String of Area worked
         public string WorkedAcres

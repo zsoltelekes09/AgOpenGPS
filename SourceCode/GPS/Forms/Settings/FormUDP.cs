@@ -14,7 +14,7 @@ namespace AgOpenGPS
         public FormUDP(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
             groupBox4.Text = gStr.gsAgOpenGPSServer;
             label11.Text = gStr.gsAllmodulessendto;
@@ -47,7 +47,14 @@ namespace AgOpenGPS
             Properties.Settings.Default.setUDP_isInterAppOn = cboxIsInterAppOn.Checked;
 
             Properties.Settings.Default.Save();
+            if (cboxIsUDPOn.Checked) mf.StartUDPServer();
+            else mf.StopUDPServer();
 
+            Close();
+        }
+
+        private void BtnSerialCancel_Click(object sender, EventArgs e)
+        {
             Close();
         }
 
@@ -128,10 +135,11 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
+
 
         //private void tboxRateMachineIP_Validating(object sender, CancelEventArgs e)
         //{

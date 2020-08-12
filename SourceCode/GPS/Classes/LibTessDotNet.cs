@@ -37,85 +37,24 @@ using System.Diagnostics;
 
 namespace AgOpenGPS
 {
-    /// <summary>
-    /// The winding rule determines how the different contours are combined together.
-    /// See OpenGL Programming Guide (section "Winding Numbers and Winding Rules") for description of the winding rules.
-    /// http://www.glprogramming.com/red/chapter11.html
-    /// </summary>
-    public enum WindingRule
-    {
-        EvenOdd,
-        NonZero,
-        Positive,
-        Negative,
-        AbsGeqTwo
-    }
-
-    /// <summary>
-    /// The element type determines the contents of <see cref="Tess.Elements"/>.
-    /// </summary>
-    public enum ElementType
-    {
-        /// <summary>
-        /// Each element in <see cref="Tess.Elements"/> is a polygon defined as 'polySize' number of vertex indices.
-        /// If a polygon has less than 'polySize' vertices, the remaining indices are stored as <see cref="Tess.Undef"/>.
-        /// </summary>
-        Polygons,
-        /// <summary>
-        /// Each element in <see cref="Tess.Elements"/> is polygon defined as 'polySize' number of vertex indices,
-        /// followed by 'polySize' indices to neighbour polygons, that is each element is 'polySize' * 2 indices.
-        /// If a polygon has less than 'polySize' vertices, the remaining indices are stored as <see cref="Tess.Undef"/>.
-        /// If a polygon edge is a boundary, that is, not connected to another polygon, the neighbour index is <see cref="Tess.Undef"/>.
-        /// </summary>
-        ConnectedPolygons,
-        /// <summary>
-        /// Each element in <see cref="Tess.Elements"/> is [base index, count] pair defining a range of vertices for a contour.
-        /// The first value is index to first vertex in contour and the second value is number of vertices in the contour.
-        /// </summary>
-        BoundaryContours
-    }
-
-    public enum ContourOrientation
-    {
-        Original,
-        Clockwise,
-        CounterClockwise
-    }
-
-    public delegate object CombineCallback(Vec3 position, object[] data, double[] weights);
-
     public partial class Tess
     {
         private readonly IPool _pool;
         private Mesh _mesh;
-        private Vec3 _normal;
         private Vec3 _sUnit;
         private Vec3 _tUnit;
 
         private double _bminX, _bminY, _bmaxX, _bmaxY;
 
-        private WindingRule _windingRule;
-
         private Dict<ActiveRegion> _dict;
         private PriorityQueue<MeshUtils.Vertex> _pq;
         private MeshUtils.Vertex _event;
 
-        private CombineCallback _combineCallback;
 
-        /// <summary>
-        /// The value used to fill indices of incomplete polygons 
-        /// and to mark boundary edges in <see cref="ElementType.ConnectedPolygons"/> mode.
-        /// </summary>
         public const int Undef = ~0;
 
-        public double SUnitX = 1;
-        public double SUnitY = 0;
         public double SentinelCoord = 4e30f;
 
-        /// <summary>
-        /// Normal of the tessellated mesh. The normal is the main axis of sweep that has been used.
-        /// </summary>
-        public Vec3 Normal { get { return _normal; } }
 
         /// <summary>
         /// Vertices of the tessellated mesh.
@@ -126,152 +65,42 @@ namespace AgOpenGPS
         /// </summary>
         public int VertexCount { get; private set; }
 
-        /// <summary>
-        /// Indices of the tessellated mesh. See <see cref="ElementType"/> for details on data layout.
-        /// </summary>
         public int[] Elements { get; private set; }
         /// <summary>
         /// Number of elements in the tessellated mesh.
         /// </summary>
         public int ElementCount { get; private set; }
 
-        public Tess(IPool pool, IList<Vec3> vertices, Vec3 normal = new Vec3(), ContourOrientation forceOrientation = ContourOrientation.Clockwise)
+        public Tess(IList<Vec3> vertices)
         {
-            _normal = Vec3.Zero;
             _bminX = _bminY = _bmaxX = _bmaxY = 0;
 
-            _windingRule = WindingRule.EvenOdd;
-            _pool = pool;
-            if (_pool == null)
-            {
-                _pool = new NullPool();
-            }
-            _mesh = null;
+            _pool = new DefaultPool();
 
+            _mesh = null;
             Vertices = null;
             VertexCount = 0;
             Elements = null;
             ElementCount = 0;
-            AddContourInternal(vertices, forceOrientation);
-            Tessellate(normal);
-        }
-
-        private void ComputeNormal(ref Vec3 norm)
-        {
-            var v = _mesh._vHead._next;
-
-            var minVal = new double[3] { v._coords.easting, v._coords.northing, v._coords.heading};
-            var minVert = new MeshUtils.Vertex[3] { v, v, v };
-            var maxVal = new double[3] { v._coords.easting, v._coords.northing, v._coords.heading};
-            var maxVert = new MeshUtils.Vertex[3] { v, v, v };
-
-            for (; v != _mesh._vHead; v = v._next)
-            {
-                if (v._coords.easting < minVal[0]) { minVal[0] = v._coords.easting; minVert[0] = v; }
-                if (v._coords.northing < minVal[1]) { minVal[1] = v._coords.northing; minVert[1] = v; }
-                if (v._coords.heading< minVal[2]) { minVal[2] = v._coords.heading; minVert[2] = v; }
-                if (v._coords.easting > maxVal[0]) { maxVal[0] = v._coords.easting; maxVert[0] = v; }
-                if (v._coords.northing > maxVal[1]) { maxVal[1] = v._coords.northing; maxVert[1] = v; }
-                if (v._coords.heading> maxVal[2]) { maxVal[2] = v._coords.heading; maxVert[2] = v; }
-            }
-
-            // Find two vertices separated by at least 1/sqrt(3) of the maximum
-            // distance between any two vertices
-            int i = 0;
-            if (maxVal[1] - minVal[1] > maxVal[0] - minVal[0]) { i = 1; }
-            if (maxVal[2] - minVal[2] > maxVal[i] - minVal[i]) { i = 2; }
-            if (minVal[i] >= maxVal[i])
-            {
-                // All vertices are the same -- normal doesn't matter
-                norm = new Vec3(0, 0, 1);
-                return;
-            }
-
-            // Look for a third vertex which forms the triangle with maximum area
-            // (Length of normal == twice the triangle area)
-            double maxLen2 = 0, tLen2;
-            var v1 = minVert[i];
-            var v2 = maxVert[i];
-            Vec3 tNorm;
-            Vec3 d1 = v1._coords - v2._coords;
-            for (v = _mesh._vHead._next; v != _mesh._vHead; v = v._next)
-            {
-                Vec3 d2 = v._coords - v2._coords;
-                tNorm.easting = d1.northing * d2.heading- d1.heading* d2.northing;
-                tNorm.northing = d1.heading* d2.easting - d1.easting * d2.heading;
-                tNorm.heading= d1.easting * d2.northing - d1.northing * d2.easting;
-                tLen2 = tNorm.easting * tNorm.easting + tNorm.northing * tNorm.northing + tNorm.heading* tNorm.heading;
-                if (tLen2 > maxLen2)
-                {
-                    maxLen2 = tLen2;
-                    norm = tNorm;
-                }
-            }
-
-            if (maxLen2 <= 0.0f)
-            {
-                // All points lie on a single line -- any decent normal will do
-                norm = Vec3.Zero;
-                i = Vec3.LongAxis(ref d1);
-                norm[i] = 1;
-            }
-        }
-
-        private void CheckOrientation()
-        {
-            // When we compute the normal automatically, we choose the orientation
-            // so that the sum of the signed areas of all contours is non-negative.
-            double area = 0.0f;
-            for (var f = _mesh._fHead._next; f != _mesh._fHead; f = f._next)
-            {
-                if (f._anEdge._winding <= 0)
-                {
-                    continue;
-                }
-                area += MeshUtils.FaceArea(f);
-            }
-            if (area < 0.0f)
-            {
-                // Reverse the orientation by flipping all the t-coordinates
-                for (var v = _mesh._vHead._next; v != _mesh._vHead; v = v._next)
-                {
-                    v._t = -v._t;
-                }
-                Vec3.Neg(ref _tUnit);
-            }
+            AddContourInternal(vertices);
+            Tessellate();
         }
 
         private void ProjectPolygon()
         {
-            var norm = _normal;
+            _sUnit[2] = 0;
+            _sUnit[0] = 1;
+            _sUnit[1] = 0;
 
-            bool computedNormal = false;
-            if (norm.easting == 0.0f && norm.northing == 0.0f && norm.heading== 0.0f)
-            {
-                ComputeNormal(ref norm);
-                _normal = norm;
-                computedNormal = true;
-            }
-
-            int i = Vec3.LongAxis(ref norm);
-
-            _sUnit[i] = 0;
-            _sUnit[(i + 1) % 3] = SUnitX;
-            _sUnit[(i + 2) % 3] = SUnitY;
-
-            _tUnit[i] = 0;
-            _tUnit[(i + 1) % 3] = norm[i] > 0.0f ? -SUnitY : SUnitY;
-            _tUnit[(i + 2) % 3] = norm[i] > 0.0f ? SUnitX : -SUnitX;
+            _tUnit[2] = 0;
+            _tUnit[0] = -0;
+            _tUnit[1] = 1;
 
             // Project the vertices onto the sweep plane
             for (var v = _mesh._vHead._next; v != _mesh._vHead; v = v._next)
             {
                 Vec3.Dot(ref v._coords, ref _sUnit, out v._s);
                 Vec3.Dot(ref v._coords, ref _tUnit, out v._t);
-            }
-            if (computedNormal)
-            {
-                CheckOrientation();
             }
 
             // Compute ST bounds.
@@ -390,62 +219,8 @@ namespace AgOpenGPS
             }
         }
 
-        /// <summary>
-        /// DiscardExterior zaps (ie. sets to null) all faces
-        /// which are not marked "inside" the polygon.  Since further mesh operations
-        /// on NULL faces are not allowed, the main purpose is to clean up the
-        /// mesh so that exterior loops are not represented in the data structure.
-        /// </summary>
 
-        /// <summary>
-        /// SetWindingNumber( value, keepOnlyBoundary ) resets the
-        /// winding numbers on all edges so that regions marked "inside" the
-        /// polygon have a winding number of "value", and regions outside
-        /// have a winding number of 0.
-        /// 
-        /// If keepOnlyBoundary is TRUE, it also deletes all edges which do not
-        /// separate an interior region from an exterior one.
-        /// </summary>
-        private void SetWindingNumber(int value, bool keepOnlyBoundary)
-        {
-            MeshUtils.Edge e, eNext;
-
-            for (e = _mesh._eHead._next; e != _mesh._eHead; e = eNext)
-            {
-                eNext = e._next;
-                if (e.Rface._inside != e._Lface._inside)
-                {
-
-                    /* This is a boundary edge (one side is interior, one is exterior). */
-                    e._winding = (e._Lface._inside) ? value : -value;
-                }
-                else
-                {
-
-                    /* Both regions are interior, or both are exterior. */
-                    if (!keepOnlyBoundary)
-                    {
-                        e._winding = 0;
-                    }
-                    else
-                    {
-                        _mesh.Delete(_pool, e);
-                    }
-                }
-            }
-
-        }
-
-        private int GetNeighbourFace(MeshUtils.Edge edge)
-        {
-            if (edge.Rface == null)
-                return Undef;
-            if (!edge.Rface._inside)
-                return Undef;
-            return edge.Rface._n;
-        }
-
-        private void OutputPolymesh(ElementType elementType, int polySize)
+        private void OutputPolymesh(int polySize)
         {
             MeshUtils.Vertex v;
             MeshUtils.Face f;
@@ -453,17 +228,6 @@ namespace AgOpenGPS
             int maxFaceCount = 0;
             int maxVertexCount = 0;
             int faceVerts, i;
-
-            if (polySize < 3)
-            {
-                polySize = 3;
-            }
-            // Assume that the input data is triangles now.
-            // Try to merge as many polygons as possible
-            if (polySize > 3)
-            {
-                _mesh.MergeConvexFaces(_pool, polySize);
-            }
 
             // Mark unused
             for (v = _mesh._vHead._next; v != _mesh._vHead; v = v._next)
@@ -496,15 +260,11 @@ namespace AgOpenGPS
                 }
                 while (edge != f._anEdge);
 
-                Debug.Assert(faceVerts <= polySize);
-
                 f._n = maxFaceCount;
                 ++maxFaceCount;
             }
 
             ElementCount = maxFaceCount;
-            if (elementType == ElementType.ConnectedPolygons)
-                maxFaceCount *= 2;
             Elements = new int[maxFaceCount * polySize];
 
             VertexCount = maxVertexCount;
@@ -548,75 +308,9 @@ namespace AgOpenGPS
                 {
                     Elements[elementIndex++] = Undef;
                 }
-
-                // Store polygon connectivity
-                if (elementType == ElementType.ConnectedPolygons)
-                {
-                    edge = f._anEdge;
-                    do
-                    {
-                        Elements[elementIndex++] = GetNeighbourFace(edge);
-                        edge = edge._Lnext;
-                    } while (edge != f._anEdge);
-                    // Fill unused.
-                    for (i = faceVerts; i < polySize; ++i)
-                    {
-                        Elements[elementIndex++] = Undef;
-                    }
-                }
             }
         }
 
-        private void OutputContours()
-        {
-            MeshUtils.Face f;
-            MeshUtils.Edge edge, start;
-            VertexCount = 0;
-            ElementCount = 0;
-
-            for (f = _mesh._fHead._next; f != _mesh._fHead; f = f._next)
-            {
-                if (!f._inside) continue;
-
-                start = edge = f._anEdge;
-                do
-                {
-                    ++VertexCount;
-                    edge = edge._Lnext;
-                }
-                while (edge != start);
-
-                ++ElementCount;
-            }
-
-            Elements = new int[ElementCount * 2];
-            Vertices = new Vec3[VertexCount];
-
-            int vertIndex = 0;
-            int elementIndex = 0;
-
-            int startVert = 0;
-
-            for (f = _mesh._fHead._next; f != _mesh._fHead; f = f._next)
-            {
-                if (!f._inside) continue;
-
-                int vertCount = 0;
-                start = edge = f._anEdge;
-                do
-                {
-                    Vertices[vertIndex] = edge._Org._coords;
-                    ++vertIndex;
-                    ++vertCount;
-                    edge = edge._Lnext;
-                } while (edge != start);
-
-                Elements[elementIndex++] = startVert;
-                Elements[elementIndex++] = vertCount;
-
-                startVert += vertCount;
-            }
-        }
 
         private double SignedArea(IList<Vec3> vertices)
         {
@@ -634,30 +328,15 @@ namespace AgOpenGPS
             return 0.5f * area;
         }
 
-        /// <summary>
-        /// Adds a closed contour to be tessellated.
-        /// </summary>
-        /// <param name="vertices"> Vertices of the contour. </param>
-        /// <param name="forceOrientation">
-        /// Orientation of the contour.
-        /// <see cref="ContourOrientation.Original"/> keeps the orientation of the input vertices.
-        /// <see cref="ContourOrientation.Clockwise"/> and <see cref="ContourOrientation.CounterClockwise"/> 
-        /// force the vertices to have a specified orientation.
-        /// </param>
-
-        public void AddContourInternal(IList<Vec3> vertices, ContourOrientation forceOrientation = ContourOrientation.Clockwise)
+        public void AddContourInternal(IList<Vec3> vertices)
         {
             if (_mesh == null)
             {
                 _mesh = _pool.Get<Mesh>();
             }
 
-            bool reverse = false;
-            if (forceOrientation != ContourOrientation.Original)
-            {
-                var area = SignedArea(vertices);
-                reverse = (forceOrientation == ContourOrientation.Clockwise && area < 0.0f) || (forceOrientation == ContourOrientation.CounterClockwise && area > 0.0f);
-            }
+            bool reverse = SignedArea(vertices) < 0.0f;
+
 
             MeshUtils.Edge e = null;
             for (int i = 0; i < vertices.Count; ++i)
@@ -688,23 +367,10 @@ namespace AgOpenGPS
             }
         }
 
-        /// <summary>
-        /// Tessellates the input contours.
-        /// </summary>
-        /// <param name="windingRule"> Winding rule used for tessellation. See <see cref="WindingRule"/> for details. </param>
-        /// <param name="elementType"> Tessellation output type. See <see cref="ElementType"/> for details. </param>
-        /// <param name="polySize"> Number of vertices per polygon if output is polygons. </param>
-        /// <param name="combineCallback"> Interpolator used to determine the data payload of generated vertices. </param>
-        /// <param name="normal"> Normal of the input contours. If set to zero, the normal will be calculated during tessellation. </param>
-        public void Tessellate(Vec3 normal = new Vec3(), WindingRule windingRule = WindingRule.Positive, ElementType elementType = ElementType.Polygons, int polySize = 3,
-            CombineCallback combineCallback = null)
+        public void Tessellate()
         {
-            _normal = normal;
             Vertices = null;
             Elements = null;
-
-            _windingRule = windingRule;
-            _combineCallback = combineCallback;
 
             if (_mesh == null)
             {
@@ -718,32 +384,13 @@ namespace AgOpenGPS
             // ComputeInterior computes the planar arrangement specified
             // by the given contours, and further subdivides this arrangement
             // into regions.  Each region is marked "inside" if it belongs
-            // to the polygon, according to the rule given by windingRule.
+            // to the polygon.
             // Each interior region is guaranteed be monotone.
             ComputeInterior();
 
-            // If the user wants only the boundary contours, we throw away all edges
-            // except those which separate the interior from the exterior.
-            // Otherwise we tessellate all the regions marked "inside".
-            if (elementType == ElementType.BoundaryContours)
-            {
-                SetWindingNumber(1, true);
-            }
-            else
-            {
-                TessellateInterior();
-            }
+            TessellateInterior();
 
-            _mesh.Check();
-
-            if (elementType == ElementType.BoundaryContours)
-            {
-                OutputContours();
-            }
-            else
-            {
-                OutputPolymesh(elementType, polySize);
-            }
+            OutputPolymesh(3);
 
             _pool.Return(_mesh);
             _mesh = null;
@@ -871,19 +518,6 @@ namespace AgOpenGPS
             return reg;
         }
 
-        private ActiveRegion TopRightRegion(ActiveRegion reg)
-        {
-            var dst = reg._eUp.Dst;
-
-            // Find the region above the uppermost edge with the same destination
-            do
-            {
-                reg = RegionAbove(reg);
-            } while (reg._eUp.Dst == dst);
-
-            return reg;
-        }
-
         private ActiveRegion AddRegionBelow(ActiveRegion regAbove, MeshUtils.Edge eNewUp)
         {
             var regNew = _pool.Get<ActiveRegion>();
@@ -902,7 +536,7 @@ namespace AgOpenGPS
         private void ComputeWinding(ActiveRegion reg)
         {
             reg._windingNumber = RegionAbove(reg)._windingNumber + reg._eUp._winding;
-            reg._inside = Geom.IsWindingInside(_windingRule, reg._windingNumber);
+            reg._inside = reg._windingNumber > 0;
         }
 
         private void FinishRegion(ActiveRegion reg)
@@ -992,7 +626,7 @@ namespace AgOpenGPS
                 }
                 // Compute the winding number and "inside" flag for the new regions
                 reg._windingNumber = regPrev._windingNumber - e._winding;
-                reg._inside = Geom.IsWindingInside(_windingRule, reg._windingNumber);
+                reg._inside = reg._windingNumber > 0;
 
                 // Check for two outgoing edges with same slope -- process these
                 // before any intersection tests (see example in tessComputeInterior).
@@ -1022,34 +656,6 @@ namespace AgOpenGPS
             _mesh.Splice(_pool, e1, e2);
         }
 
-        private void VertexWeights(MeshUtils.Vertex isect, MeshUtils.Vertex org, MeshUtils.Vertex dst, out double w0, out double w1)
-        {
-            var t1 = Geom.VertL1dist(org, isect);
-            var t2 = Geom.VertL1dist(dst, isect);
-
-            w0 = (t2 / (t1 + t2)) / 2.0f;
-            w1 = (t1 / (t1 + t2)) / 2.0f;
-
-            isect._coords.easting += w0 * org._coords.easting + w1 * dst._coords.easting;
-            isect._coords.northing += w0 * org._coords.northing + w1 * dst._coords.northing;
-            isect._coords.heading+= w0 * org._coords.heading + w1 * dst._coords.heading;
-        }
-
-        private void GetIntersectData(MeshUtils.Vertex isect, MeshUtils.Vertex orgUp, MeshUtils.Vertex dstUp, MeshUtils.Vertex orgLo, MeshUtils.Vertex dstLo)
-        {
-            isect._coords = Vec3.Zero;
-            VertexWeights(isect, orgUp, dstUp, out double w0, out double w1);
-            VertexWeights(isect, orgLo, dstLo, out double w2, out double w3);
-
-            if (_combineCallback != null)
-            {
-                isect._data = _combineCallback(
-                    isect._coords,
-                    new object[] { orgUp._data, dstUp._data, orgLo._data, dstLo._data },
-                    new double[] { w0, w1, w2, w3 }
-                );
-            }
-        }
 
         private bool CheckForRightSplice(ActiveRegion regUp)
         {
@@ -1161,138 +767,7 @@ namespace AgOpenGPS
                 return false;
             }
 
-            if (Geom.VertLeq(orgUp, orgLo))
-            {
-                if (Geom.EdgeSign(dstLo, orgUp, orgLo) > 0.0f)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (Geom.EdgeSign(dstUp, orgLo, orgUp) < 0.0f)
-                {
-                    return false;
-                }
-            }
-
-            // At this point the edges intersect, at least marginally
-
-            var isect = _pool.Get<MeshUtils.Vertex>();
-            Geom.EdgeIntersect(dstUp, orgUp, dstLo, orgLo, isect);
-            // The following properties are guaranteed:
-            Debug.Assert(Math.Min(orgUp._t, dstUp._t) <= isect._t);
-            Debug.Assert(isect._t <= Math.Max(orgLo._t, dstLo._t));
-            Debug.Assert(Math.Min(dstLo._s, dstUp._s) <= isect._s);
-            Debug.Assert(isect._s <= Math.Max(orgLo._s, orgUp._s));
-
-            if (Geom.VertLeq(isect, _event))
-            {
-                // The intersection point lies slightly to the left of the sweep line,
-                // so move it until it's slightly to the right of the sweep line.
-                // (If we had perfect numerical precision, this would never happen
-                // in the first place). The easiest and safest thing to do is
-                // replace the intersection by tess._event.
-                isect._s = _event._s;
-                isect._t = _event._t;
-            }
-            // Similarly, if the computed intersection lies to the right of the
-            // rightmost origin (which should rarely happen), it can cause
-            // unbelievable inefficiency on sufficiently degenerate inputs.
-            // (If you have the test program, try running test54.d with the
-            // "X zoom" option turned on).
-            var orgMin = Geom.VertLeq(orgUp, orgLo) ? orgUp : orgLo;
-            if (Geom.VertLeq(orgMin, isect))
-            {
-                isect._s = orgMin._s;
-                isect._t = orgMin._t;
-            }
-
-            if (Geom.VertEq(isect, orgUp) || Geom.VertEq(isect, orgLo))
-            {
-                // Easy case -- intersection at one of the right endpoints
-                CheckForRightSplice(regUp);
-                _pool.Return(isect);
-                return false;
-            }
-
-            if ((!Geom.VertEq(dstUp, _event)
-                && Geom.EdgeSign(dstUp, _event, isect) >= 0.0f)
-                || (!Geom.VertEq(dstLo, _event)
-                && Geom.EdgeSign(dstLo, _event, isect) <= 0.0f))
-            {
-                // Very unusual -- the new upper or lower edge would pass on the
-                // wrong side of the sweep event, or through it. This can happen
-                // due to very small numerical errors in the intersection calculation.
-                if (dstLo == _event)
-                {
-                    // Splice dstLo into eUp, and process the new region(s)
-                    _mesh.SplitEdge(_pool, eUp._Sym);
-                    _mesh.Splice(_pool, eLo._Sym, eUp);
-                    regUp = TopLeftRegion(regUp);
-                    eUp = RegionBelow(regUp)._eUp;
-                    FinishLeftRegions(RegionBelow(regUp), regLo);
-                    AddRightEdges(regUp, eUp.Oprev, eUp, eUp, true);
-                    _pool.Return(isect);
-                    return true;
-                }
-                if (dstUp == _event)
-                {
-                    /* Splice dstUp into eLo, and process the new region(s) */
-                    _mesh.SplitEdge(_pool, eLo._Sym);
-                    _mesh.Splice(_pool, eUp._Lnext, eLo.Oprev);
-                    regLo = regUp;
-                    regUp = TopRightRegion(regUp);
-                    var e = RegionBelow(regUp)._eUp.Rprev;
-                    regLo._eUp = eLo.Oprev;
-                    eLo = FinishLeftRegions(regLo, null);
-                    AddRightEdges(regUp, eLo._Onext, eUp.Rprev, e, true);
-                    _pool.Return(isect);
-                    return true;
-                }
-                // Special case: called from ConnectRightVertex. If either
-                // edge passes on the wrong side of tess._event, split it
-                // (and wait for ConnectRightVertex to splice it appropriately).
-                if (Geom.EdgeSign(dstUp, _event, isect) >= 0.0f)
-                {
-                    RegionAbove(regUp)._dirty = regUp._dirty = true;
-                    _mesh.SplitEdge(_pool, eUp._Sym);
-                    eUp._Org._s = _event._s;
-                    eUp._Org._t = _event._t;
-                }
-                if (Geom.EdgeSign(dstLo, _event, isect) <= 0.0f)
-                {
-                    regUp._dirty = regLo._dirty = true;
-                    _mesh.SplitEdge(_pool, eLo._Sym);
-                    eLo._Org._s = _event._s;
-                    eLo._Org._t = _event._t;
-                }
-                // leave the rest for ConnectRightVertex
-                _pool.Return(isect);
-                return false;
-            }
-
-            // General case -- split both edges, splice into new vertex.
-            // When we do the splice operation, the order of the arguments is
-            // arbitrary as far as correctness goes. However, when the operation
-            // creates a new face, the work done is proportional to the size of
-            // the new face.  We expect the faces in the processed part of
-            // the mesh (ie. eUp._Lface) to be smaller than the faces in the
-            // unprocessed original contours (which will be eLo._Oprev._Lface).
-            _mesh.SplitEdge(_pool, eUp._Sym);
-            _mesh.SplitEdge(_pool, eLo._Sym);
-            _mesh.Splice(_pool, eLo.Oprev, eUp);
-            eUp._Org._s = isect._s;
-            eUp._Org._t = isect._t;
-            _pool.Return(isect);
-            eUp._Org._pqHandle = _pq.Insert(eUp._Org);
-            if (eUp._Org._pqHandle._handle == PQHandle.Invalid)
-            {
-                throw new InvalidOperationException("PQHandle should not be invalid");
-            }
-            GetIntersectData(eUp._Org, orgUp, dstUp, orgLo, dstLo);
-            RegionAbove(regUp)._dirty = regUp._dirty = regLo._dirty = true;
-            return false;
+            throw new InvalidOperationException("should not be invalid");
         }
 
         private void WalkDirtyRegions(ActiveRegion regUp)
@@ -1621,7 +1096,6 @@ namespace AgOpenGPS
             _dict = null;
         }
 
-        /// <summary>
         private void RemoveDegenerateEdges()
         {
             MeshUtils.Edge eHead = _mesh._eHead, e, eNext, eLnext;
@@ -1758,7 +1232,6 @@ namespace AgOpenGPS
             DonePriorityQ();
 
             RemoveDegenerateFaces();
-            _mesh.Check();
         }
     }
 
@@ -1831,23 +1304,6 @@ namespace AgOpenGPS
 
     internal static class Geom
     {
-        public static bool IsWindingInside(WindingRule rule, int n)
-        {
-            switch (rule)
-            {
-                case WindingRule.EvenOdd:
-                    return (n & 1) == 1;
-                case WindingRule.NonZero:
-                    return n != 0;
-                case WindingRule.Positive:
-                    return n > 0;
-                case WindingRule.Negative:
-                    return n < 0;
-                case WindingRule.AbsGeqTwo:
-                    return n >= 2 || n <= -2;
-            }
-            throw new Exception("Wrong winding rule");
-        }
 
         public static bool VertCCW(MeshUtils.Vertex u, MeshUtils.Vertex v, MeshUtils.Vertex w)
         {
@@ -2386,166 +1842,6 @@ namespace AgOpenGPS
             return eNew;
         }
 
-        /// <summary>
-        /// Destroys a face and removes it from the global face list. All edges of
-        /// fZap will have a NULL pointer as their left face. Any edges which
-        /// also have a NULL pointer as their right face are deleted entirely
-        /// (along with any isolated vertices this produces).
-        /// An entire mesh can be deleted by zapping its faces, one at a time,
-        /// in any order. Zapped faces cannot be used in further mesh operations!
-        /// </summary>
-        public void ZapFace(IPool pool, MeshUtils.Face fZap)
-        {
-            var eStart = fZap._anEdge;
-
-            // walk around face, deleting edges whose right face is also NULL
-            var eNext = eStart._Lnext;
-            MeshUtils.Edge e, eSym;
-            do
-            {
-                e = eNext;
-                eNext = e._Lnext;
-
-                e._Lface = null;
-                if (e.Rface == null)
-                {
-                    // delete the edge -- see TESSmeshDelete above
-
-                    if (e._Onext == e)
-                    {
-                        MeshUtils.KillVertex(pool, e._Org, null);
-                    }
-                    else
-                    {
-                        // Make sure that e._Org points to a valid half-edge
-                        e._Org._anEdge = e._Onext;
-                        MeshUtils.Splice(e, e.Oprev);
-                    }
-                    eSym = e._Sym;
-                    if (eSym._Onext == eSym)
-                    {
-                        MeshUtils.KillVertex(pool, eSym._Org, null);
-                    }
-                    else
-                    {
-                        // Make sure that eSym._Org points to a valid half-edge
-                        eSym._Org._anEdge = eSym._Onext;
-                        MeshUtils.Splice(eSym, eSym.Oprev);
-                    }
-                    MeshUtils.KillEdge(pool, e);
-                }
-            } while (e != eStart);
-
-            /* delete from circular doubly-linked list */
-            var fPrev = fZap._prev;
-            var fNext = fZap._next;
-            fNext._prev = fPrev;
-            fPrev._next = fNext;
-
-            pool.Return(fZap);
-        }
-
-        public void MergeConvexFaces(IPool pool, int maxVertsPerFace)
-        {
-            for (var f = _fHead._next; f != _fHead; f = f._next)
-            {
-                // Skip faces which are outside the result
-                if (!f._inside)
-                {
-                    continue;
-                }
-
-                var eCur = f._anEdge;
-                var vStart = eCur._Org;
-
-                while (true)
-                {
-                    var eNext = eCur._Lnext;
-                    var eSym = eCur._Sym;
-
-                    if (eSym != null && eSym._Lface != null && eSym._Lface._inside)
-                    {
-                        // Try to merge the neighbour faces if the resulting polygons
-                        // does not exceed maximum number of vertices.
-                        int curNv = f.VertsCount;
-                        int symNv = eSym._Lface.VertsCount;
-                        if ((curNv + symNv - 2) <= maxVertsPerFace)
-                        {
-                            // Merge if the resulting poly is convex.
-                            if (Geom.VertCCW(eCur.Lprev._Org, eCur._Org, eSym._Lnext._Lnext._Org) &&
-                                Geom.VertCCW(eSym.Lprev._Org, eSym._Org, eCur._Lnext._Lnext._Org))
-                            {
-                                eNext = eSym._Lnext;
-                                Delete(pool, eSym);
-                                eCur = null;
-                            }
-                        }
-                    }
-
-                    if (eCur != null && eCur._Lnext._Org == vStart)
-                        break;
-
-                    // Continue to next edge.
-                    eCur = eNext;
-                }
-            }
-        }
-
-        [Conditional("DEBUG")]
-        public void Check()
-        {
-            MeshUtils.Edge e;
-            MeshUtils.Face f;
-            MeshUtils.Face fPrev;
-            for (fPrev = _fHead; (f = fPrev._next) != _fHead; fPrev = f)
-            {
-                e = f._anEdge;
-                do
-                {
-                    Debug.Assert(e._Sym != e);
-                    Debug.Assert(e._Sym._Sym == e);
-                    Debug.Assert(e._Lnext._Onext._Sym == e);
-                    Debug.Assert(e._Onext._Sym._Lnext == e);
-                    Debug.Assert(e._Lface == f);
-                    e = e._Lnext;
-                } while (e != f._anEdge);
-            }
-            Debug.Assert(f._prev == fPrev && f._anEdge == null);
-            MeshUtils.Vertex v;
-            MeshUtils.Vertex vPrev;
-            for (vPrev = _vHead; (v = vPrev._next) != _vHead; vPrev = v)
-            {
-                Debug.Assert(v._prev == vPrev);
-                e = v._anEdge;
-                do
-                {
-                    Debug.Assert(e._Sym != e);
-                    Debug.Assert(e._Sym._Sym == e);
-                    Debug.Assert(e._Lnext._Onext._Sym == e);
-                    Debug.Assert(e._Onext._Sym._Lnext == e);
-                    Debug.Assert(e._Org == v);
-                    e = e._Onext;
-                } while (e != v._anEdge);
-            }
-            Debug.Assert(v._prev == vPrev && v._anEdge == null);
-
-            MeshUtils.Edge ePrev;
-            for (ePrev = _eHead; (e = ePrev._next) != _eHead; ePrev = e)
-            {
-                Debug.Assert(e._Sym._next == ePrev._Sym);
-                Debug.Assert(e._Sym != e);
-                Debug.Assert(e._Sym._Sym == e);
-                Debug.Assert(e._Org != null);
-                Debug.Assert(e.Dst != null);
-                Debug.Assert(e._Lnext._Onext._Sym == e);
-                Debug.Assert(e._Onext._Sym._Lnext == e);
-            }
-            Debug.Assert(e._Sym._next == ePrev._Sym
-                && e._Sym == _eHeadSym
-                && e._Sym._Sym == e
-                && e._Org == null && e.Dst == null
-                && e._Lface == null && e.Rface == null);
-        }
     }
 
     public interface ITypePool
@@ -2574,15 +1870,6 @@ namespace AgOpenGPS
         {
             lock (_pool)
             {
-#if DEBUG
-                foreach (var other in _pool)
-                {
-                    if (other == obj)
-                    {
-                        throw new InvalidOperationException("object already pooled");
-                    }
-                }
-#endif
                 _pool.Enqueue(obj as T);
             }
         }
@@ -3110,6 +2397,7 @@ namespace AgOpenGPS
             }
         }
 
+
         public void Init()
         {
             for (int i = _size; i >= 1; --i)
@@ -3230,8 +2518,6 @@ namespace AgOpenGPS
         private int _size, _max;
         private bool _initialized;
 
-        public bool Empty { get { return _size == 0 && _heap.Empty; } }
-
         public PriorityQueue(int initialSize, PriorityHeap<TValue>.LessOrEqual leq)
         {
             _leq = leq;
@@ -3314,15 +2600,6 @@ namespace AgOpenGPS
                     _order[j] = piv;
                 }
             }
-
-#if DEBUG
-            p = 0;
-            r = _size - 1;
-            for (i = p; i < r; ++i)
-            {
-                Debug.Assert(_leq(_keys[_order[i + 1]], _keys[_order[i]]), "Wrong sort");
-            }
-#endif
 
             _max = _size;
             _initialized = true;

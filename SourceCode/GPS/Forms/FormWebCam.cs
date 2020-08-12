@@ -6,8 +6,9 @@ namespace AgOpenGPS
 {
     public partial class FormWebCam : Form
     {
-        public FormWebCam()
+        public FormWebCam(Form callingForm)
         {
+            Owner = callingForm;
             InitializeComponent();
         }
 

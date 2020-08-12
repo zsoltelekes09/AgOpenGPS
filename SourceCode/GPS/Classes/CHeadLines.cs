@@ -127,10 +127,8 @@ namespace AgOpenGPS
 
         public void PreCalcHeadArea()
         {
-            Tess tess = new Tess(new DefaultPool(), HeadLine, new Vec3(0, 0, 1));
-
+            Tess tess = new Tess(HeadLine);
             HeadArea.Clear();
-
             for (int i = 0; i < tess.ElementCount; i++)
             {
                 for (int k = 0; k < 3; k++)

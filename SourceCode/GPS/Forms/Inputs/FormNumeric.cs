@@ -14,8 +14,9 @@ namespace AgOpenGPS
 
         public double ReturnValue { get; set; }
 
-        public FormNumeric(double _min, double _max, double currentValue)
+        public FormNumeric(double _min, double _max, double currentValue,Form callingForm)
         {
+            Owner = callingForm;
             max = _max;
             min = _min;
             InitializeComponent();

@@ -143,7 +143,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "FormFilePicker";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormFilePicker_Load);
             this.ResumeLayout(false);
 

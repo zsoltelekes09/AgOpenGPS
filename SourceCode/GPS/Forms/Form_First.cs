@@ -6,8 +6,9 @@ namespace AgOpenGPS
 {
     public partial class Form_First : Form
     {
-        public Form_First()
+        public Form_First(Form callingForm)
         {
+            Owner = callingForm;
             InitializeComponent();
         }
 
@@ -50,7 +51,8 @@ namespace AgOpenGPS
         {
             Properties.Settings.Default.setDisplay_isTermsOn = true;
             Properties.Settings.Default.Save();
-            Close();
+
+            Environment.Exit(0);
         }
     }
 }

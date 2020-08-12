@@ -287,7 +287,7 @@ namespace AgOpenGPS
             area = Math.Abs(area / 2);
 
 
-            Tess tess = new Tess(new DefaultPool(), bndLine, new Vec3(0, 0, 1));
+            Tess tess = new Tess(bndLine);
             bndArea.Clear();
             for (int i = 0; i < tess.ElementCount; i++)
             {

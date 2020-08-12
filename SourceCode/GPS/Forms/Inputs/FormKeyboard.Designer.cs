@@ -62,7 +62,6 @@
             this.Location = new System.Drawing.Point(250, 250);
             this.Name = "FormKeyboard";
             this.Text = "Keyboard";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormKeyboard_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

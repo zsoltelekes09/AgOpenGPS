@@ -15,7 +15,7 @@ namespace AgOpenGPS
         public FormDrivePicker(Form callingForm, string _fileList)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
 

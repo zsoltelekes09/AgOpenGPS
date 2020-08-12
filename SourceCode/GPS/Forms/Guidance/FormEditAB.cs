@@ -12,7 +12,7 @@ namespace AgOpenGPS
         public FormEditAB(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
 
@@ -35,7 +35,7 @@ namespace AgOpenGPS
 
         private void NudMinTurnRadius_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
@@ -133,9 +133,9 @@ namespace AgOpenGPS
         {
             tboxHeading.Text = "";
 
-            using (var form = new FormNumeric(0, 360, Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 5)))
+            using (var form = new FormNumeric(0, 360, Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 5), this))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     tboxHeading.Text = ((double)form.ReturnValue).ToString("N3");

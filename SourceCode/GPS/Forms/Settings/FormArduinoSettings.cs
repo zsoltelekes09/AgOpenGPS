@@ -16,7 +16,7 @@ namespace AgOpenGPS
         public FormArduinoSettings(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             //Language keys
@@ -187,45 +187,45 @@ namespace AgOpenGPS
             if (chkInvertWAS.Checked) sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
             if (chkInvertRoll.Checked) sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
             if (chkInvertSteer.Checked) sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
             if (cboxConv.Text == "Single") sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
             if (cboxMotorDrive.Text == "Cytron") sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
             if (cboxSteerEnable.Text == "Switch") sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
             if (cboxMMAAxis.Text == "X Axis") sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
             if (cboxEncoder.Checked) sett |= set;
             else sett &= reset;
 
@@ -239,10 +239,10 @@ namespace AgOpenGPS
             if (chkBNOInstalled.Checked) sett |= set;
             else sett &= reset;
 
-            set = (set << 1);
-            reset = (reset << 1);
-            reset = (reset + 1);
-            if (cboxSteerInvertRelays.Checked) sett = sett | set;
+            set <<= 1;
+            reset <<= 1;
+            reset += 1;
+            if (cboxSteerInvertRelays.Checked) sett |= set;
             else sett &= reset;
 
 
@@ -317,19 +317,19 @@ namespace AgOpenGPS
 
         private void NudMaxSpeed_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
         private void NudMinSpeed_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
         private void NudMaxCounts_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
@@ -360,19 +360,19 @@ namespace AgOpenGPS
 
         private void NudRaiseTime_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
         private void NudLowerTime_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
 
         private void NudAckerman_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnCancel.Focus();
         }
     }

@@ -375,7 +375,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Color Picker";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormColorPicker_Load);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);

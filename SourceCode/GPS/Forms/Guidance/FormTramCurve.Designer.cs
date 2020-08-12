@@ -467,7 +467,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Curve Tramlines";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormTram_Load);
             ((System.ComponentModel.ISupportInitialize)(this.nudSnapAdj)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudEqWidth)).EndInit();

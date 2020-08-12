@@ -17,7 +17,7 @@ namespace AgOpenGPS
 
         public FormYouTurn(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             //winform initialization
             InitializeComponent();
@@ -814,7 +814,7 @@ namespace AgOpenGPS
             {
                 using (var form = new FormYouTurnRecord(mf))
                 {
-                    form.Show();
+                    form.Show(this);
                 }
                 Close();
             }

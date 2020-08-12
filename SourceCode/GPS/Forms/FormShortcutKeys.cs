@@ -5,8 +5,9 @@ namespace AgOpenGPS
 {
     public partial class FormShortcutKeys : Form
     {
-        public FormShortcutKeys()
+        public FormShortcutKeys(Form callingForm)
         {
+            Owner = callingForm;
             InitializeComponent();
         }
     }

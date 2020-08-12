@@ -130,7 +130,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Enter a Value";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormNumeric_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

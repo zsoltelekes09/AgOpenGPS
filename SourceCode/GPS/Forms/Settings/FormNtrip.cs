@@ -16,7 +16,7 @@ namespace AgOpenGPS
 
         public FormNtrip(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             this.groupBox2.Text = gStr.gsNetworking;
@@ -179,6 +179,8 @@ namespace AgOpenGPS
             Properties.Settings.Default.setNTRIP_isTCP = checkBoxusetcp.Checked;
 
             Properties.Settings.Default.Save();
+
+            mf.UpdateNtripButton();
             Close();
         }
 
@@ -264,7 +266,7 @@ namespace AgOpenGPS
             {
                 string syte = "http://monitor.use-snip.com/?hostUrl=" + tboxCasterIP.Text + "&port=" + nudCasterPort.Value.ToString();
                 var form = new FormSource(this, DataList, mf.pn.latitude, mf.pn.longitude, syte);
-                form.ShowDialog();
+                form.ShowDialog(this);
             }
             else
             {
@@ -278,31 +280,31 @@ namespace AgOpenGPS
 
         private void NudCasterPort_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnSerialCancel.Focus();
         }
 
         private void NudGGAInterval_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnSerialCancel.Focus();
         }
 
         private void NudLatitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnSerialCancel.Focus();
         }
 
         private void NudLongitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnSerialCancel.Focus();
         }
 
         private void NudSendToUDPPort_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnSerialCancel.Focus();
         }
 
@@ -310,7 +312,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
@@ -319,7 +321,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
@@ -328,7 +330,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
@@ -337,7 +339,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
@@ -354,6 +356,11 @@ namespace AgOpenGPS
             if (tboxUserPassword.PasswordChar == '*') tboxUserPassword.PasswordChar = '\0';
             else tboxUserPassword.PasswordChar = '*';
             tboxUserPassword.Invalidate();
+        }
+
+        private void BtnSerialCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

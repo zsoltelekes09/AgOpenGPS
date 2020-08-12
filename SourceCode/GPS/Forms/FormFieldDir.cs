@@ -14,7 +14,7 @@ namespace AgOpenGPS
         public FormFieldDir(Form _callingForm)
         {
             //get copy of the calling main form
-            mf = _callingForm as FormGPS;
+            Owner = mf = _callingForm as FormGPS;
 
             InitializeComponent();
 
@@ -166,7 +166,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
@@ -175,7 +175,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }
@@ -184,7 +184,7 @@ namespace AgOpenGPS
         {
             if (mf.isKeyboardOn)
             {
-                mf.KeyboardToText((TextBox)sender);
+                mf.KeyboardToText((TextBox)sender, this);
                 btnSerialCancel.Focus();
             }
         }

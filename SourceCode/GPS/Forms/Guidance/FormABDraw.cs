@@ -94,7 +94,7 @@ namespace AgOpenGPS
 
         private void NudDistance_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnSelectABLine.Focus();
         }
 
@@ -168,7 +168,7 @@ namespace AgOpenGPS
         public FormABDraw(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
             //lblPick.Text = gStr.gsSelectALine;
@@ -726,6 +726,9 @@ namespace AgOpenGPS
                     mf.btnCurve.Image = Properties.Resources.CurveOff;
                 }
             }
+
+            mf.ABLine.moveDistance = 0;
+            mf.curve.moveDistance = 0;
 
             Close();
         }

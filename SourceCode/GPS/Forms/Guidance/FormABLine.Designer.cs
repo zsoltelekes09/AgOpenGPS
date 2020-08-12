@@ -313,7 +313,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(732, 360);
+            this.ClientSize = new System.Drawing.Size(728, 356);
             this.ControlBox = false;
             this.Controls.Add(this.cboxHeading);
             this.Controls.Add(this.btnCancel);
@@ -341,7 +341,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "AB Line";
-            this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormABLine_FormClosing);
             this.Load += new System.EventHandler(this.FormABLine_Load);
             this.ResumeLayout(false);

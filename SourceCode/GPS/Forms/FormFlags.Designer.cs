@@ -346,7 +346,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Flags";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormFlags_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

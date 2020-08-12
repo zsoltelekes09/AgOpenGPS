@@ -14,7 +14,7 @@ namespace AgOpenGPS
         public FormJob(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
 
@@ -72,7 +72,7 @@ namespace AgOpenGPS
 
             using (var form = new FormTouchPick(mf))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(this);
 
                 //returns full field.txt file dir name
                 if (result == DialogResult.Yes)
@@ -93,13 +93,13 @@ namespace AgOpenGPS
 
             using (var form = new FormFilePicker(mf))
             {
-                var result = form.ShowDialog();
+                var result = form.ShowDialog(mf);
 
                 //returns full field.txt file dir name
                 if (result == DialogResult.Yes)
                 {
                     mf.FileOpenField(mf.filePickerFileAndDirectory);
-                    Close();
+                    //Close();
                 }
                 else
                 {
@@ -247,7 +247,7 @@ namespace AgOpenGPS
                 {
                     using (var form = new FormDrivePicker(mf, infieldList))
                     {
-                        var result = form.ShowDialog();
+                        var result = form.ShowDialog(this);
 
                         //returns full field.txt file dir name
                         if (result == DialogResult.Yes)

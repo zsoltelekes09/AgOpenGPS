@@ -13,7 +13,7 @@ namespace AgOpenGPS
         public FormCommSet(Form callingForm)
         {
             //get copy of the calling main form
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
             btnOpenSerial.Text = gStr.gsConnect;
             btnOpenSerialArduino.Text = gStr.gsConnect;
@@ -289,6 +289,7 @@ namespace AgOpenGPS
         private void BtnSerialOK_Click(object sender, EventArgs e)
         {
             //save
+            mf.fixUpdateTime = 1 / (double)mf.fixUpdateHz;
             DialogResult = DialogResult.OK;
             Close();
         }

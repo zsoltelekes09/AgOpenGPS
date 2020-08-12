@@ -996,7 +996,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "GPS Data";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.FormGPSData_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

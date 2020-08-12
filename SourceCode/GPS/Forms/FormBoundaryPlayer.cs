@@ -9,9 +9,10 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         //constructor
-        public FormBoundaryPlayer(Form callingForm)
+        public FormBoundaryPlayer(FormGPS AgOpenGPS, Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = callingForm;
+            mf = AgOpenGPS;
 
             InitializeComponent();
 
@@ -52,6 +53,8 @@ namespace AgOpenGPS
 
 
             mf.bnd.bndBeingMadePts.Clear();
+            Hide();
+            Owner.Show();
             Close();
         }
 
@@ -159,7 +162,7 @@ namespace AgOpenGPS
 
         private void NudOffset_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender);
+            mf.KeypadToNUD((NumericUpDown)sender, this);
             btnPausePlay.Focus();
             mf.bnd.createBndOffset = (double)nudOffset.Value;
         }

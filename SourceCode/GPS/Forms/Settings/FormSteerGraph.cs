@@ -16,7 +16,7 @@ namespace AgOpenGPS
 
         public FormSteerGraph(Form callingForm)
         {
-            mf = callingForm as FormGPS;
+            Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
             this.label5.Text = gStr.gsSetPoint;
