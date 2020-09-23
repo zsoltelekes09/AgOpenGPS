@@ -353,7 +353,6 @@ MigrationBackup/
 .ionide/
 
 Application/
-AgOpenGPS/
 Installer/
 Program/
 /ProgramV4
