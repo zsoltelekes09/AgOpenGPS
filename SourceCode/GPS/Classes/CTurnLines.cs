@@ -11,105 +11,48 @@ namespace AgOpenGPS
 
         //the list of constants and multiples of the boundary
         public List<Vec2> calcList = new List<Vec2>();
-
         public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
-        public void CalculateTurnHeadings()
+        public void FixTurnLine(double totalHeadWidth, ref List<Vec3> curBnd)
         {
-            //to calc heading based on next and previous points to give an average heading.
-            int cnt = turnLine.Count;
-            Vec3[] arr = new Vec3[cnt];
-            cnt--;
-            turnLine.CopyTo(arr);
-            turnLine.Clear();
-
-            //first point needs last, first, second points
-            Vec3 pt3 = arr[0];
-            pt3.heading = Math.Atan2(arr[1].easting - arr[cnt].easting, arr[1].northing - arr[cnt].northing);
-            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-            turnLine.Add(pt3);
-
-            //middle points
-            for (int i = 1; i < cnt; i++)
-            {
-                pt3 = arr[i];
-                pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                turnLine.Add(pt3);
-            }
-
-            //last and first point
-            pt3 = arr[cnt];
-            pt3.heading = Math.Atan2(arr[0].easting - arr[cnt - 1].easting, arr[0].northing - arr[cnt - 1].northing);
-            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-            turnLine.Add(pt3);
-        }
-
-        public void FixTurnLine(double totalHeadWidth, List<Vec3> curBnd, double spacing)
-        {
-            //count the points from the boundary
-            int lineCount = turnLine.Count;
             double distance;
-
-            //int headCount = mf.bndArr[inTurnNum].bndLine.Count;
-            int bndCount = curBnd.Count;
-
-            //remove the points too close to boundary
-            for (int i = 0; i < bndCount; i++)
+            for (int i = 0; i < turnLine.Count; i++)
             {
-                for (int j = 0; j < lineCount; j++)
+                for (int k = 0; k < curBnd.Count; k++)
                 {
-                    //make sure distance between headland and boundary is not less then width
-                    distance = Glm.Distance(curBnd[i], turnLine[j]);
-                    if (distance < (totalHeadWidth * 0.96))
+                    //remove the points too close to boundary
+                    distance = Glm.Distance(curBnd[k], turnLine[i]);
+                    if (distance < totalHeadWidth - 0.001)
                     {
-                        turnLine.RemoveAt(j);
-                        lineCount = turnLine.Count;
-                        j = -1;
+                        turnLine.RemoveAt(i);
+                        i--;
+                        break;
                     }
                 }
             }
 
-            //make sure distance isn't too small between points on turnLine
-            bndCount = turnLine.Count;
-
-            for (int i = 0; i < bndCount - 1; i++)
+            for (int i = 0; i < turnLine.Count; i++)
             {
-                distance = Glm.Distance(turnLine[i], turnLine[i + 1]);
-                if (distance < spacing)
-                {
-                    turnLine.RemoveAt(i + 1);
-                    bndCount = turnLine.Count;
-                    i--;
-                }
-            }
-            
-            //make sure distance isn't too big between points on Turn
-            bndCount = turnLine.Count;
-            for (int i = 0; i < bndCount; i++)
-            {
-                int j = i + 1;
-                if (j == bndCount) j = 0;
+                int j = (i == turnLine.Count - 1) ? 0 : i + 1;
+                //make sure distance isn't too small between points on turnLine
                 distance = Glm.Distance(turnLine[i], turnLine[j]);
-                if (distance > (spacing * 1.25))
+                if (distance < 2)
                 {
-                    Vec3 pointB = new Vec3((turnLine[i].easting + turnLine[j].easting) / 2.0, (turnLine[i].northing + turnLine[j].northing) / 2.0, turnLine[i].heading);
-
-                    turnLine.Insert(j, pointB);
-                    bndCount = turnLine.Count;
+                    turnLine.RemoveAt(j);
+                    i--;
+                }
+                else if (distance > 4)//make sure distance isn't too big between points on turnLine
+                {
+                    double northing = turnLine[i].Northing / 2 + turnLine[j].Northing / 2;
+                    double easting = turnLine[i].Easting / 2 + turnLine[j].Easting / 2;
+                    double heading = turnLine[i].Heading / 2 + turnLine[j].Heading / 2;
+                    if (j == 0) turnLine.Add(new Vec3(northing, easting, heading));
+                    turnLine.Insert(j, new Vec3(northing, easting, heading));
                     i--;
                 }
             }
-
-            //make sure headings are correct for calculated points
-
-            //Tate Button contributed this bug fix.
-            if (turnLine.Count > 0)
-            {
-                CalculateTurnHeadings();
-            }
+            turnLine.CalculateHeadings(true);
         }
-
         public void PreCalcTurnLines()
         {
             if (turnLine.Count > 3)
@@ -119,33 +62,29 @@ namespace AgOpenGPS
                 calcList.Clear();
                 Vec2 constantMultiple = new Vec2(0, 0);
 
-                Northingmin = Northingmax = turnLine[0].northing;
-                Eastingmin = Eastingmax = turnLine[0].easting;
+                Northingmin = Northingmax = turnLine[0].Northing;
+                Eastingmin = Eastingmax = turnLine[0].Easting;
 
                 for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    if (Northingmin > turnLine[i].northing) Northingmin = turnLine[i].northing;
-
-                    if (Northingmax < turnLine[i].northing) Northingmax = turnLine[i].northing;
-
-                    if (Eastingmin > turnLine[i].easting) Eastingmin = turnLine[i].easting;
-
-                    if (Eastingmax < turnLine[i].easting) Eastingmax = turnLine[i].easting;
-
+                    if (Northingmin > turnLine[i].Northing) Northingmin = turnLine[i].Northing;
+                    if (Northingmax < turnLine[i].Northing) Northingmax = turnLine[i].Northing;
+                    if (Eastingmin > turnLine[i].Easting) Eastingmin = turnLine[i].Easting;
+                    if (Eastingmax < turnLine[i].Easting) Eastingmax = turnLine[i].Easting;
                     //check for divide by zero
-                    if (Math.Abs(turnLine[i].northing - turnLine[j].northing) < 0.00000000001)
+                    if (Math.Abs(turnLine[i].Northing - turnLine[j].Northing) < double.Epsilon)
                     {
-                        constantMultiple.easting = turnLine[i].easting;
-                        constantMultiple.northing = 0;
+                        constantMultiple.Easting = turnLine[i].Easting;
+                        constantMultiple.Northing = 0;
                         calcList.Add(constantMultiple);
                     }
                     else
                     {
                         //determine constant and multiple and add to list
-                        constantMultiple.easting = turnLine[i].easting - ((turnLine[i].northing * turnLine[j].easting)
-                                        / (turnLine[j].northing - turnLine[i].northing)) + ((turnLine[i].northing * turnLine[i].easting)
-                                            / (turnLine[j].northing - turnLine[i].northing));
-                        constantMultiple.northing = (turnLine[j].easting - turnLine[i].easting) / (turnLine[j].northing - turnLine[i].northing);
+                        constantMultiple.Easting = turnLine[i].Easting - ((turnLine[i].Northing * turnLine[j].Easting)
+                                        / (turnLine[j].Northing - turnLine[i].Northing)) + ((turnLine[i].Northing * turnLine[i].Easting)
+                                            / (turnLine[j].Northing - turnLine[i].Northing));
+                        constantMultiple.Northing = (turnLine[j].Easting - turnLine[i].Easting) / (turnLine[j].Northing - turnLine[i].Northing);
                         calcList.Add(constantMultiple);
                     }
                 }
@@ -158,36 +97,15 @@ namespace AgOpenGPS
             int j = turnLine.Count - 1;
             bool oddNodes = false;
 
-            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
+            if (TestPoint.Northing > Northingmin || TestPoint.Northing < Northingmax || TestPoint.Easting > Eastingmin || TestPoint.Easting < Eastingmax)
             {
                 //test against the constant and multiples list the test point
                 for (int i = 0; i < turnLine.Count; j = i++)
                 {
-                    if ((turnLine[i].northing < TestPoint.northing && turnLine[j].northing >= TestPoint.northing)
-                    || (turnLine[j].northing < TestPoint.northing && turnLine[i].northing >= TestPoint.northing))
+                    if ((turnLine[i].Northing < TestPoint.Northing && turnLine[j].Northing >= TestPoint.Northing)
+                    || (turnLine[j].Northing < TestPoint.Northing && turnLine[i].Northing >= TestPoint.Northing))
                     {
-                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
-                    }
-                }
-            }
-            return oddNodes; //true means inside.
-        }
-
-        public bool IsPointInTurnWorkArea(Vec2 TestPoint)
-        {
-            if (calcList.Count < 3) return false;
-            int j = turnLine.Count - 1;
-            bool oddNodes = false;
-
-            if (TestPoint.northing > Northingmin || TestPoint.northing < Northingmax || TestPoint.easting > Eastingmin || TestPoint.easting < Eastingmax)
-            {
-                //test against the constant and multiples list the test point
-                for (int i = 0; i < turnLine.Count; j = i++)
-                {
-                    if ((turnLine[i].northing < TestPoint.northing && turnLine[j].northing >= TestPoint.northing)
-                    || (turnLine[j].northing < TestPoint.northing && turnLine[i].northing >= TestPoint.northing))
-                    {
-                        oddNodes ^= ((TestPoint.northing * calcList[i].northing) + calcList[i].easting < TestPoint.easting);
+                        oddNodes ^= ((TestPoint.Northing * calcList[i].Northing) + calcList[i].Easting < TestPoint.Easting);
                     }
                 }
             }
@@ -200,7 +118,7 @@ namespace AgOpenGPS
             int ptCount = turnLine.Count;
             if (ptCount < 1) return;
             GL.Begin(PrimitiveType.LineLoop);
-            for (int h = 0; h < ptCount; h++) GL.Vertex3(turnLine[h].easting, turnLine[h].northing, 0);
+            for (int h = 0; h < ptCount; h++) GL.Vertex3(turnLine[h].Easting, turnLine[h].Northing, 0);
             GL.End();
         }
     }

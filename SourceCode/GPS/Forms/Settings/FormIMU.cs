@@ -47,10 +47,6 @@ namespace AgOpenGPS
             tabHeading.Text = gStr.gsHeading;
             tabFix.Text = gStr.gsFix;
             tabRoll.Text = gStr.gsRoll;
-
-            nudMinFixStepDistance.Controls[0].Enabled = false;
-
-
         }
 
         #region EntryExit
@@ -60,8 +56,8 @@ namespace AgOpenGPS
             ////Display ---load the delay slides --------------------------------------------------------------------
             Properties.Settings.Default.setIMU_UID = tboxTinkerUID.Text.Trim();
 
-            mf.minFixStepDist = (double)minFixStepDistance;
-            Properties.Settings.Default.setF_minFixStep = mf.minFixStepDist;
+            
+            Properties.Settings.Default.setF_minFixStep = mf.minFixStepDist = minFixStepDistance;
 
             Properties.Settings.Default.setIMU_isHeadingCorrectionFromAutoSteer = rbtnHeadingCorrAutoSteer.Checked;
             mf.ahrs.isHeadingCorrectionFromAutoSteer =  rbtnHeadingCorrAutoSteer.Checked;
@@ -107,17 +103,8 @@ namespace AgOpenGPS
 
         private void FormDisplaySettings_Load(object sender, EventArgs e)
         {
-            cboxNMEAHz.Text = Properties.Settings.Default.setPort_NMEAHz.ToString();
-            
-            if (mf.timerSim.Enabled)
-            {
-                cboxNMEAHz.Text = "10";
-                cboxNMEAHz.Enabled = false;
-            }
-
-            minFixStepDistance = Properties.Settings.Default.setF_minFixStep;
-            if (nudMinFixStepDistance.CheckValue(ref minFixStepDistance)) nudMinFixStepDistance.BackColor = System.Drawing.Color.OrangeRed;
-            nudMinFixStepDistance.Value = (decimal)minFixStepDistance;
+            TboxFixStepDistance.Text = (minFixStepDistance = Properties.Settings.Default.setF_minFixStep).ToString("0.0#");
+            TboxFixStepDistance.CheckValue(ref minFixStepDistance, 0.1, 5);
 
             tboxTinkerUID.Text = Properties.Settings.Default.setIMU_UID;
 
@@ -179,17 +166,6 @@ namespace AgOpenGPS
             }
         }
 
-        private void NudMinFixStepDistance_ValueChanged(object sender, EventArgs e)
-        {
-            minFixStepDistance = (double)nudMinFixStepDistance.Value;
-        }
-
-        private void NudMinFixStepDistance_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
         private void RbtnGGA_CheckedChanged(object sender, EventArgs e)
         {
             var checkedButton = groupBox4.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked);
@@ -206,15 +182,6 @@ namespace AgOpenGPS
             mf.headingFromSource = checkedButton.Text;
         }
 
-        private void CboxNMEAHz_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Properties.Settings.Default.setPort_NMEAHz = Convert.ToInt32(cboxNMEAHz.SelectedItem);
-            Properties.Settings.Default.Save();
-            mf.fixUpdateHz = Properties.Settings.Default.setPort_NMEAHz;
-
-            mf.timerSim.Interval = (int)((1.0 / (double)mf.fixUpdateHz) * 1000.0);
-        }
-
         private void TboxTinkerUID_Click(object sender, EventArgs e)
         {
             if (mf.isKeyboardOn)
@@ -228,7 +195,19 @@ namespace AgOpenGPS
         {
             lblFusion.Text = (hsbarFusion.Value).ToString();
             lblFusionIMU.Text = (50 - hsbarFusion.Value).ToString();
+        }
 
+        private void TboxFixStepDistance_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0.1, 5, minFixStepDistance, this, false, 2))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxFixStepDistance.Text = (minFixStepDistance = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                }
+            }
+            btnCancel.Focus();
         }
     }
 }

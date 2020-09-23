@@ -37,5 +37,11 @@ namespace AgOpenGPS
             DialogResult = DialogResult.Yes;
             Close();
         }
+
+        private void FormSaveOrNot_Activated(object sender, EventArgs e)
+        {
+            Left = Owner.Left + Owner.Width / 2 - Width / 2;
+            Top = Owner.Top + Owner.Height / 2 - Height / 2;
+        }
     }
 }

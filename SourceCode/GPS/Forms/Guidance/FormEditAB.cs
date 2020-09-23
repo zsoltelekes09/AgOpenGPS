@@ -6,10 +6,10 @@ namespace AgOpenGPS
     public partial class FormEditAB : Form
     {
         private readonly FormGPS mf;
+        readonly bool CurveMode;
+        private double snapAdj;
 
-        private double snapAdj = 0;
-
-        public FormEditAB(Form callingForm)
+        public FormEditAB(Form callingForm, bool mode)
         {
             //get copy of the calling main form
             Owner = mf = callingForm as FormGPS;
@@ -18,158 +18,154 @@ namespace AgOpenGPS
 
             this.Text = gStr.gsEditABLine;
             label2.Text = gStr.gsABHeading;
-            nudMinTurnRadius.Controls[0].Enabled = false;
-        }
+            label5.Text = gStr.gsOffset;
 
-        private void FormEditAB_Load(object sender, EventArgs e)
-        {
-            snapAdj = Properties.Settings.Default.setAS_snapDistance * 0.01;
-            nudMinTurnRadius.Value = Properties.Settings.Default.setAS_snapDistance;
+            snapAdj = Math.Round(mf.Guidance.WidthMinusOverlap / 2 * mf.m2MetImp, mf.decimals);
 
-            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
             btnCancel.Focus();
-            mf.ABLine.isEditing = true;
-            mf.layoutPanelRight.Enabled = true;
-            label3.Text = "\u00BD";
-        }
-
-        private void NudMinTurnRadius_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudMinTurnRadius_ValueChanged(object sender, EventArgs e)
-        {
-            snapAdj = (double)nudMinTurnRadius.Value * 0.01;
-        }
-
-        private void BtnAdjRight_Click(object sender, EventArgs e)
-        {
-            mf.ABLine.MoveABLine(snapAdj);
-        }
-
-        private void BtnAdjLeft_Click(object sender, EventArgs e)
-        {
-            mf.ABLine.MoveABLine(-snapAdj);
+            CurveMode = mode;
+            if (CurveMode)
+            {
+                btnBPoint.Visible = false;
+                label2.Visible = false;
+                mf.CurveLines.isEditing = true;
+                mf.CurveLines.CurrentEditLine = mf.CurveLines.CurrentLine;
+            }
+            else
+            {
+                tboxHeading.Visible = true;
+                btnBPoint.Visible = true;
+                label2.Visible = true;
+                mf.ABLines.isEditing = true;
+                mf.ABLines.CurrentEditLine = mf.ABLines.CurrentLine;
+                if (mf.ABLines.CurrentEditLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentEditLine > -1) tboxHeading.Text = Glm.ToDegrees(mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].Heading).ToString("0.00##");
+            }
         }
 
         private void BntOk_Click(object sender, EventArgs e)
         {
-            mf.ABLine.isEditing = false;
-
-            //index to last one. 
-            int idx = mf.ABLine.numABLineSelected - 1;
-
-            if (idx >= 0)
+            if (CurveMode)
             {
-
-                mf.ABLine.lineArr[idx].heading = mf.ABLine.abHeading;
-                //calculate the new points for the reference line and points
-                mf.ABLine.lineArr[idx].origin.easting = mf.ABLine.refPoint1.easting;
-                mf.ABLine.lineArr[idx].origin.northing = mf.ABLine.refPoint1.northing;
-
-                //sin x cos z for endpoints, opposite for additional lines
-                mf.ABLine.lineArr[idx].ref1.easting = mf.ABLine.lineArr[idx].origin.easting - (Math.Sin(mf.ABLine.lineArr[idx].heading) *   1600.0);
-                mf.ABLine.lineArr[idx].ref1.northing = mf.ABLine.lineArr[idx].origin.northing - (Math.Cos(mf.ABLine.lineArr[idx].heading) * 1600.0);
-                mf.ABLine.lineArr[idx].ref2.easting = mf.ABLine.lineArr[idx].origin.easting + (Math.Sin(mf.ABLine.lineArr[idx].heading) *   1600.0);
-                mf.ABLine.lineArr[idx].ref2.northing = mf.ABLine.lineArr[idx].origin.northing + (Math.Cos(mf.ABLine.lineArr[idx].heading) * 1600.0);
+                mf.CurveLines.isEditing = false;
+                mf.CurveLines.CurrentEditLine = -1;
+                mf.FileSaveCurveLines();
             }
-
-            mf.FileSaveABLines();
-            mf.ABLine.moveDistance = 0;
-
-            mf.layoutPanelRight.Enabled = true;
+            else
+            {
+                mf.ABLines.isEditing = false;
+                mf.ABLines.CurrentEditLine = -1;
+                mf.FileSaveABLines();
+            }
             Close();
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            mf.ABLine.isEditing = false;
-            int last = mf.ABLine.numABLineSelected;
-            mf.FileLoadABLines();
-
-            mf.ABLine.numABLineSelected = last;
-            mf.ABLine.refPoint1 = mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].origin;
-            mf.ABLine.abHeading = mf.ABLine.lineArr[mf.ABLine.numABLineSelected - 1].heading;
-            mf.ABLine.SetABLineByHeading();
-            mf.ABLine.isABLineSet = true;
-            mf.ABLine.isABLineLoaded = true;
-            mf.ABLine.moveDistance = 0;
-
-            mf.layoutPanelRight.Enabled = true;
+            if (CurveMode)
+            {
+                int last = mf.CurveLines.CurrentLine;
+                mf.FileLoadCurveLines();
+                mf.CurveLines.isEditing = false;
+                mf.CurveLines.CurrentLine = last;
+                mf.CurveLines.CurrentEditLine = -1;
+            }
+            else
+            {
+                int last = mf.ABLines.CurrentLine;
+                mf.FileLoadABLines();
+                mf.ABLines.isEditing = false;
+                mf.ABLines.CurrentLine = last;
+                mf.ABLines.CurrentEditLine = -1;
+            }
             Close();
         }
 
         private void BtnSwapAB_Click(object sender, EventArgs e)
         {
-            mf.ABLine.abHeading = (mf.ABLine.abHeading + Math.PI) % Glm.twoPI;
+            if (CurveMode)
+            {
+                mf.CurveLines.SwapAB();
+                if (mf.tram.displayMode > 0) mf.CurveLines.BuildTram();
+            }
+            else
+            {
+                mf.ABLines.SwapAB();
+                if (mf.tram.displayMode > 0) mf.ABLines.BuildTram();
+                tboxHeading.Text = Glm.ToDegrees(mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].Heading).ToString("0.00##");
+                if (mf.tram.displayMode > 0) mf.ABLines.BuildTram();
+            }
 
-            mf.ABLine.refABLineP1.easting = mf.ABLine.refPoint1.easting - (Math.Sin(mf.ABLine.abHeading) *   1600.0);
-            mf.ABLine.refABLineP1.northing = mf.ABLine.refPoint1.northing - (Math.Cos(mf.ABLine.abHeading) * 1600.0);
-            mf.ABLine.refABLineP2.easting = mf.ABLine.refPoint1.easting + (Math.Sin(mf.ABLine.abHeading) *   1600.0);
-            mf.ABLine.refABLineP2.northing = mf.ABLine.refPoint1.northing + (Math.Cos(mf.ABLine.abHeading) * 1600.0);
-
-            mf.ABLine.refPoint2.easting = mf.ABLine.refABLineP2.easting;
-            mf.ABLine.refPoint2.northing = mf.ABLine.refABLineP2.northing;
-
-            if (mf.tram.displayMode > 0) mf.ABLine.BuildTram();
-
-            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
         }
 
         private void BtnBPoint_Click(object sender, EventArgs e)
         {
-            mf.ABLine.SetABLineByBPoint();
-            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
-
-            //update the default
-            //if (mf.ABLine.tramPassEvery == 0) mf.mc.machineData[mf.mc.rdTramLine] = 0;
-
-            tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 3).ToString("N3");
+            if (mf.ABLines.CurrentEditLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentEditLine > -1)
+            {
+                mf.ABLines.SetABLineBPoint(true);
+                tboxHeading.Text = Glm.ToDegrees(mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].Heading).ToString("0.00##");
+            }
         }
 
         private void TboxHeading_Enter(object sender, EventArgs e)
         {
-            tboxHeading.Text = "";
+            if (mf.ABLines.CurrentEditLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentEditLine > -1)
+            {
+                using (var form = new FormNumeric(0, 360, Math.Round(Glm.ToDegrees(mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].Heading), 4), this, false,6))
+                {
+                    var result = form.ShowDialog(this);
+                    if (result == DialogResult.OK)
+                    {
+                        tboxHeading.Text = form.ReturnValue.ToString("0.00##");
+                        mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].Heading = Math.Round(Glm.ToRadians(form.ReturnValue),6);
+                        mf.ABLines.SetABLineBPoint(false);
+                    }
+                }
+            }
+            btnCancel.Focus();
+        }
 
-            using (var form = new FormNumeric(0, 360, Math.Round(Glm.ToDegrees(mf.ABLine.abHeading), 5), this))
+        private void TboxSnapAdj_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(Math.Round(0.1 * mf.m2MetImp, mf.decimals), Math.Round(50 * mf.m2MetImp,mf.decimals), snapAdj, this, mf.isMetric, mf.decimals))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    tboxHeading.Text = ((double)form.ReturnValue).ToString("N3");
-                    mf.ABLine.abHeading = Glm.ToRadians((double)form.ReturnValue);
-                    mf.ABLine.SetABLineByHeading();
+                    
+                    TboxSnapAdj.Text = (snapAdj = Math.Round(form.ReturnValue, mf.decimals)).ToString();
                 }
             }
-
             btnCancel.Focus();
-
         }
 
         private void BtnContourPriority_Click(object sender, EventArgs e)
         {
-            if (mf.ABLine.isABLineSet)
-            {
-                mf.ABLine.SnapABLine();
-            }
+            if (CurveMode) mf.CurveLines.MoveLine(mf.CurveLines.distanceFromRefLine);
+            else mf.ABLines.MoveLine(mf.ABLines.distanceFromRefLine);
         }
 
         private void BtnRightHalfWidth_Click(object sender, EventArgs e)
         {
-            double dist = mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap;
-
-            mf.ABLine.MoveABLine(dist * 0.5);
-
+            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
+            else mf.ABLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
         }
 
         private void BtnLeftHalfWidth_Click(object sender, EventArgs e)
         {
-            double dist = mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap;
+            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
+            else mf.ABLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
+        }
 
-            mf.ABLine.MoveABLine(-dist*0.5);
+        private void BtnAdjRight_Click(object sender, EventArgs e)
+        {
+            if (CurveMode) mf.CurveLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? 0.1 : -0.11);
+            else mf.ABLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? 0.1 : -0.1);
+        }
 
+        private void BtnAdjLeft_Click(object sender, EventArgs e)
+        {
+            if (CurveMode) mf.CurveLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? -0.1 : 0.1);
+            else mf.ABLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? -0.1 : 0.1);
         }
     }
 }

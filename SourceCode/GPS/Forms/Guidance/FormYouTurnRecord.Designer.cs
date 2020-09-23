@@ -35,14 +35,15 @@
             // 
             // btnStop
             // 
-            this.btnStop.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnStop.BackColor = System.Drawing.SystemColors.Control;
+            this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnStop.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnStop.Image = global::AgOpenGPS.Properties.Resources.boundaryStop;
             this.btnStop.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnStop.Location = new System.Drawing.Point(38, 28);
+            this.btnStop.Location = new System.Drawing.Point(10, 10);
             this.btnStop.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(101, 88);
+            this.btnStop.Size = new System.Drawing.Size(90, 90);
             this.btnStop.TabIndex = 142;
             this.btnStop.Text = "Done";
             this.btnStop.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -51,14 +52,15 @@
             // 
             // btnRecord
             // 
-            this.btnRecord.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnRecord.BackColor = System.Drawing.SystemColors.Control;
+            this.btnRecord.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRecord.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRecord.Image = global::AgOpenGPS.Properties.Resources.BoundaryRecord;
             this.btnRecord.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnRecord.Location = new System.Drawing.Point(204, 28);
+            this.btnRecord.Location = new System.Drawing.Point(170, 10);
             this.btnRecord.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.btnRecord.Name = "btnRecord";
-            this.btnRecord.Size = new System.Drawing.Size(101, 88);
+            this.btnRecord.Size = new System.Drawing.Size(90, 90);
             this.btnRecord.TabIndex = 141;
             this.btnRecord.Text = "Record";
             this.btnRecord.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -67,12 +69,13 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.label1.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(34, 143);
+            this.label1.Location = new System.Drawing.Point(10, 110);
             this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(237, 19);
+            this.label1.Size = new System.Drawing.Size(250, 30);
             this.label1.TabIndex = 143;
             this.label1.Text = "Turn RIGHT while recording";
             // 
@@ -80,7 +83,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(329, 180);
+            this.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.ClientSize = new System.Drawing.Size(270, 150);
             this.ControlBox = false;
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnStop);
@@ -95,7 +99,6 @@
             this.Text = "YouTurn Recorder";
             this.Load += new System.EventHandler(this.FormYouTurnRecord_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

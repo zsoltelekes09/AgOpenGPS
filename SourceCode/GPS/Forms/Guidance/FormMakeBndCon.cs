@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
@@ -6,6 +7,7 @@ namespace AgOpenGPS
     {
         //access to the main GPS form and all its variables
         private readonly FormGPS mf;
+        private double passes = 1, spacing = 0;
 
         public FormMakeBndCon(Form _mf)
         {
@@ -15,15 +17,14 @@ namespace AgOpenGPS
             lblHz.Text = gStr.gsPass;
             label1.Text = gStr.gsSpacing;
 
-            this.Text = gStr.gsMakeBoundaryContours;
-
-            nudPass.Controls[0].Enabled = false;
-            nudSpacing.Controls[0].Enabled = false;
+            Text = gStr.gsMakeBoundaryContours;
+            TboxPasses.Text = passes.ToString();
+            TboxSpacing.Text = spacing.ToString();
         }
 
         private void BtnOk_Click(object sender, System.EventArgs e)
         {
-            mf.ct.BuildBoundaryContours((int)nudPass.Value, (int)nudSpacing.Value);
+            mf.ct.BuildBoundaryContours(passes, Math.Round(spacing * mf.metImp2m * 0.01,2));
             Close();
         }
 
@@ -32,21 +33,29 @@ namespace AgOpenGPS
             Close();
         }
 
-        private void NudPass_Enter(object sender, System.EventArgs e)
+        private void TboxPasses_Enter(object sender, System.EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            using (var form = new FormNumeric(1, 10, passes, this, true,0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxPasses.Text = (passes = form.ReturnValue).ToString();
+                }
+            }
             btnCancel.Focus();
-
         }
 
-        private void NudSpacing_Enter(object sender, System.EventArgs e)
+        private void TboxSpacing_Enter(object sender, System.EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void FormMakeBndCon_Load(object sender, System.EventArgs e)
-        {
+            using (var form = new FormNumeric(0, Math.Round(50 * mf.m2MetImp, mf.decimals), spacing, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxSpacing.Text = (spacing = Math.Round(form.ReturnValue * mf.m2MetImp, mf.decimals)).ToString();
+                }
+            }
             btnCancel.Focus();
         }
     }

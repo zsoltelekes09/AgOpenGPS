@@ -142,6 +142,7 @@
             this.Name = "FormSaveOrNot";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Activated += new System.EventHandler(this.FormSaveOrNot_Activated);
             this.ResumeLayout(false);
             this.PerformLayout();
 

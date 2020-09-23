@@ -13,7 +13,7 @@ namespace AgOpenGPS
 
         private bool isInit = false;
         private double fovy = 0.7;
-        private double camDistanceFactor = -4;
+        private double camDistanceFactor = -3;
 
         private bool isMapping = true;
         int mouseX = 0, mouseY = 0;
@@ -30,7 +30,6 @@ namespace AgOpenGPS
             GL.ClearColor(0.27f, 0.4f, 0.7f, 1.0f);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.CullFace(CullFaceMode.Back);
-            SetZoom();
             NMEAWatchdog.Enabled = true;
         }
 
@@ -190,7 +189,7 @@ namespace AgOpenGPS
                     GL.LoadIdentity();
 
                     //position the camera
-                    camera.SetWorldCam(pivotAxlePos.easting + offX, pivotAxlePos.northing + offY, camHeading);
+                    camera.SetWorldCam(pivotAxlePos.Easting + offX, pivotAxlePos.Northing + offY, camHeading);
 
                     //the bounding box of the camera for cullling.
                     CalcFrustum();
@@ -210,9 +209,6 @@ namespace AgOpenGPS
                     GL.Enable(EnableCap.Blend);
                     //draw patches of sections
 
-                    //check if in frustum or not
-                    bool isDraw;
-
                     //initialize the steps for mipmap of triangles (skipping detail while zooming out)
                     int mipmap = 0;
                     if (camera.camSetDistance < -800) mipmap = 2;
@@ -220,97 +216,12 @@ namespace AgOpenGPS
                     if (camera.camSetDistance < -2400) mipmap = 8;
                     if (camera.camSetDistance < -5000) mipmap = 16;
 
-                    //for every new chunk of patch
-                    foreach (var triList in PatchDrawList)
-                    {
-                        isDraw = true;
-                        int count2 = triList.Count;
-                        for (int k = 1; k < count2; k += 3)
-                        {
-                            //determine if point is in frustum or not, if < 0, its outside so abort, z always is 0                            
-                            if (frustum[0] * triList[k].easting + frustum[1] * triList[k].northing + frustum[3] <= 0)
-                                continue;//right
-                            if (frustum[4] * triList[k].easting + frustum[5] * triList[k].northing + frustum[7] <= 0)
-                                continue;//left
-                            if (frustum[16] * triList[k].easting + frustum[17] * triList[k].northing + frustum[19] <= 0)
-                                continue;//bottom
-                            if (frustum[20] * triList[k].easting + frustum[21] * triList[k].northing + frustum[23] <= 0)
-                                continue;//top
-                            if (frustum[8] * triList[k].easting + frustum[9] * triList[k].northing + frustum[11] <= 0)
-                                continue;//far
-                            if (frustum[12] * triList[k].easting + frustum[13] * triList[k].northing + frustum[15] <= 0)
-                                continue;//near
 
-                            //point is in frustum so draw the entire patch. The downside of triangle strips.
-                            isDraw = true;
-                            break;
-                        }
-
-                        if (isDraw)
-                        {
-                            count2 = triList.Count;
-                            if (count2 < 4) continue;
-                            //draw the triangle in each triangle strip
-                            GL.Begin(PrimitiveType.TriangleStrip);
-
-                            if (isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
-                            else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
-
-                            //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                            if (count2 >= (mipmap + 2))
-                            {
-                                int step = mipmap;
-                                for (int k = 1; k < count2; k += step)
-                                {
-                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                    if (count2 - k <= (mipmap + 2)) step = 0;//too small to mipmap it
-                                }
-                            }
-                            else { for (int k = 1; k < count2; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
-                            GL.End();
-                        }
-                    }
-
-                    for (int i = 0; i < Tools.Count; i++)
-                    {
-                        // the follow up to sections patches
-                        int patchCount = 0;
-
-                        for (int j = 0; j <= Tools[i].numOfSections; j++)
-                        {
-                            if (Tools[i].Sections[j].IsMappingOn && (patchCount = Tools[i].Sections[j].triangleList.Count) > 0)
-                            {
-                                if (isDay) GL.Color4((byte)Tools[i].Sections[j].triangleList[0].easting, (byte)Tools[i].Sections[j].triangleList[0].northing, (byte)Tools[i].Sections[j].triangleList[0].heading, (byte)152);
-                                else GL.Color4((byte)Tools[i].Sections[j].triangleList[0].easting, (byte)Tools[i].Sections[j].triangleList[0].northing, (byte)Tools[i].Sections[j].triangleList[0].heading, (byte)(152 * 0.5));
-
-                                //draw the triangle in each triangle strip
-                                GL.Begin(PrimitiveType.TriangleStrip);
-
-                                for (int k = 1; k < patchCount; k++)
-                                    GL.Vertex3(Tools[i].Sections[j].triangleList[k].easting, Tools[i].Sections[j].triangleList[k].northing, 0);
-
-                                GL.Vertex3(Tools[i].Sections[j].leftPoint.easting, Tools[i].Sections[j].leftPoint.northing, 0);
-                                GL.Vertex3(Tools[i].Sections[j].rightPoint.easting, Tools[i].Sections[j].rightPoint.northing, 0);
-
-                                GL.End();
-                            }
-                        }
-                    }
+                    DrawPatchList(mipmap);
+                    DrawSectionsPatchList(true);
 
                     GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
                     GL.Color3(1, 1, 1);
-
-                    //draw contour line if button on 
-                    if (ct.isContourBtnOn)
-                    {
-                        ct.DrawContourLine();
-                    }
-                    else// draw the current and reference AB Lines or CurveAB Ref and line
-                    {
-                        if (ABLine.isABLineSet | ABLine.isABLineBeingSet) ABLine.DrawABLines();
-                        if (curve.isBtnCurveOn) curve.DrawCurve();
-                    }
 
                     //if (recPath.isRecordOn)
                     recPath.DrawRecordedLine();
@@ -319,7 +230,6 @@ namespace AgOpenGPS
                     //draw Boundaries
                     bnd.DrawBoundaryLines();
 
-
                     if (isAutoLoadFields && (mc.isOutOfBounds || !isJobStarted))
                     {
                         for (int i = 0; i < Fields.Count; i++)
@@ -327,12 +237,17 @@ namespace AgOpenGPS
                             GL.LineWidth(1);
                             GL.Color3(0.825f, 0.22f, 0.90f);
                             GL.Begin(PrimitiveType.LineLoop);
+
+                            if (Fields[i].Northingmin - pn.utmNorth > worldGrid.NorthingMax || Fields[i].Northingmax - pn.utmNorth < worldGrid.NorthingMin) continue;
+                            if (Fields[i].Eastingmin - pn.utmEast > worldGrid.EastingMax || Fields[i].Eastingmax - pn.utmEast < worldGrid.EastingMin) continue;
+
                             for (int h = 0; h < Fields[i].Boundary.Count; h++)
                             {
-                                double east = Fields[i].Boundary[h].easting - pn.utmEast;
-                                double north = Fields[i].Boundary[h].northing - pn.utmNorth;
+                                double east = Fields[i].Boundary[h].Easting - pn.utmEast;
+                                double north = Fields[i].Boundary[h].Northing - pn.utmNorth;
                                 double east2 = (Math.Cos(-pn.convergenceAngle) * east) - (Math.Sin(-pn.convergenceAngle) * north);
                                 double north2 = (Math.Sin(-pn.convergenceAngle) * east) + (Math.Cos(-pn.convergenceAngle) * north);
+
                                 GL.Vertex3(east2, north2, 0);
                             }
                             GL.End();
@@ -343,7 +258,7 @@ namespace AgOpenGPS
                     //draw the turnLines
                     if (yt.isYouTurnBtnOn || isUTurnAlwaysOn)
                     {
-                        if (!ABLine.isEditing && !curve.isEditing && !ct.isContourBtnOn)
+                        if (!ABLines.isEditing && !CurveLines.isEditing && !ct.isContourBtnOn)
                         {
                             turn.DrawTurnLines();
                         }
@@ -351,42 +266,53 @@ namespace AgOpenGPS
 
                     if (mc.isOutOfBounds) gf.DrawGeoFenceLines();
 
-                    if (hd.isOn)
+                    if (hd.BtnHeadLand)
                     {
                         for (int i = 0; i < bnd.bndArr.Count; i++)
                         {
-                            if (hd.headArr[i].HeadLine.Count > 0) hd.headArr[i].DrawHeadLine(ABLine.lineWidth);
+                            if (hd.headArr[i].HeadLine.Count > 0)
+                            {
+                                if (bnd.bndArr[i].Eastingmin > worldGrid.EastingMax || bnd.bndArr[i].Eastingmax < worldGrid.EastingMin) continue;
+                                if (bnd.bndArr[i].Northingmin > worldGrid.NorthingMax || bnd.bndArr[i].Northingmax < worldGrid.NorthingMin) continue;
+                                hd.headArr[i].DrawHeadLine(ABLines.lineWidth);
+                            }
                         }
                     }
+
+                    //draw contour line if button on 
+                    if (ct.isContourBtnOn) ct.DrawContourLine();
+                    else if (ABLines.BtnABLineOn) ABLines.DrawABLines();
+                    else if (CurveLines.BtnCurveLineOn) CurveLines.DrawCurve();
+
+                    
+
+
 
                     if (flagPts.Count > 0) DrawFlags();
 
                     //Direct line to flag if flag selected
-                    if (flagNumberPicked > 0)
+                    if (flagNumberPicked > 0 && flagNumberPicked < 255)
                     {
-                        GL.LineWidth(ABLine.lineWidth);
-                        GL.Enable(EnableCap.LineStipple);
-                        GL.LineStipple(1, 0x0707);
-                        GL.Begin(PrimitiveType.Lines);
-                        GL.Color3(0.930f, 0.72f, 0.32f);
-                        GL.Vertex3(pivotAxlePos.easting, pivotAxlePos.northing, 0);
-                        GL.Vertex3(flagPts[flagNumberPicked - 1].easting, flagPts[flagNumberPicked - 1].northing, 0);
-                        GL.End();
-                        GL.Disable(EnableCap.LineStipple);
+                        if (flagPts[flagNumberPicked - 1].Easting < worldGrid.EastingMax || flagPts[flagNumberPicked - 1].Easting > worldGrid.EastingMin && flagPts[flagNumberPicked - 1].Northing < worldGrid.NorthingMax || flagPts[flagNumberPicked - 1].Northing > worldGrid.NorthingMin)
+                        {
+                            GL.LineWidth(ABLines.lineWidth);
+                            GL.Enable(EnableCap.LineStipple);
+                            GL.LineStipple(1, 0x0707);
+                            GL.Begin(PrimitiveType.Lines);
+                            GL.Color3(0.930f, 0.72f, 0.32f);
+                            GL.Vertex3(pivotAxlePos.Easting, pivotAxlePos.Northing, 0);
+                            GL.Vertex3(flagPts[flagNumberPicked - 1].Easting, flagPts[flagNumberPicked - 1].Northing, 0);
+                            GL.End();
+                            GL.Disable(EnableCap.LineStipple);
+                        }
                     }
 
-                    //if (flagDubinsList.Count > 1)
-                    //{
-                    //    //GL.LineWidth(2);
-                    //    GL.PointSize(2);
-                    //    GL.Color3(0.298f, 0.96f, 0.2960f);
-                    //    GL.Begin(PrimitiveType.Points);
-                    //    for (int h = 0; h < flagDubinsList.Count; h++)
-                    //        GL.Vertex3(flagDubinsList[h].easting, flagDubinsList[h].northing, 0);
-                    //    GL.End();
-                    //}
 
-
+                    //Quick fix for drawing the vehicle if all boundaries are off the plane
+                    GL.Begin(PrimitiveType.LineLoop);
+                    GL.Vertex3(0, 0, -100000);
+                    GL.Vertex3(0, 1, -100000);
+                    GL.End();
 
                     vehicle.DrawVehicle();
 
@@ -432,7 +358,7 @@ namespace AgOpenGPS
 
                     if (isSpeedoOn) DrawSpeedo();
 
-                    if (vehicle.isHydLiftOn) DrawLiftIndicator();
+                    if (vehicle.BtnHydLiftOn) DrawLiftIndicator();
 
                     if (isRTK)
                     {
@@ -460,14 +386,66 @@ namespace AgOpenGPS
                     if (LeftMouseDownOnOpenGL) MakeFlagMark();
 
                     //draw the zoom window
-                    if (isJobStarted && oglZoom.Width != 400)
+                    if (isJobStarted && zoomUpdateCounter == true && oglZoom.Width != 400)
                     {
-                        if (zoomUpdateCounter == true)
-                        {
-                            zoomUpdateCounter = false;
-                            oglZoom.Refresh();
-                        }
+                        zoomUpdateCounter = false;
+                        oglZoom.Refresh();
                     }
+
+                    //if a minute has elapsed save the field in case of crash and to be able to resume            
+                    if (MinuteCounter > 60 && recvCounter < 134)
+                    {
+                        NMEAWatchdog.Enabled = false;
+
+                        //save nmea log file
+                        if (isLogNMEA) FileSaveNMEA();
+
+                        //don't save if no gps
+                        if (isJobStarted)
+                        {
+                            //auto save the field patches, contours accumulated so far
+                            FileSaveSections();
+                            FileSaveContour();
+
+                            //NMEA log file
+                            if (isLogElevation) FileSaveElevation();
+                            //FileSaveFieldKML();
+                        }
+
+                        if (isAutoDayNight && ++TenMinuteCounter > 10)
+                        {
+                            TenMinuteCounter = 0;
+                            isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
+
+                            if (isDayTime != isDay)
+                            {
+                                isDay = !isDayTime;
+                                SwapDayNightMode();
+                            }
+
+                            if (sunrise.Date != DateTime.Today)
+                            {
+                                IsBetweenSunriseSunset(pn.latitude, pn.longitude);
+
+                                //set display accordingly
+                                isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
+
+                            }
+                        }
+
+                        //if its the next day, calc sunrise sunset for next day
+                        MinuteCounter = 0;
+
+                        //set saving flag off
+                        isSavingFile = false;
+
+                        //go see if data ready for draw and position updates
+                        NMEAWatchdog.Enabled = true;
+
+                    }
+                    //this is the end of the "frame". Now we wait for next NMEA sentence with a valid fix. 
+
+
                 }
             }
         }
@@ -488,7 +466,7 @@ namespace AgOpenGPS
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             GL.Viewport(0, 0, 750, 300);
-            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.06f, 2.5f, 480f, 520f);
+            Matrix4 mat = Matrix4.CreatePerspectiveFieldOfView(0.06f, 2.5f, 480f, 1520f);
             GL.LoadMatrix(ref mat);
             GL.MatrixMode(MatrixMode.Modelview);
         }
@@ -502,336 +480,272 @@ namespace AgOpenGPS
             bool isDraw;
 
             CalculateSectionLookAhead();
-
+            hd.isToolUp = true;
             for (int i = 0; i < Tools.Count; i++)
             {
-                GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
-                GL.LoadIdentity();// Reset The View
-
-                //back the camera up
-                GL.Translate(0, 0, -500);
-
-                //rotate camera so heading matched fix heading in the world
-                GL.Rotate(Glm.ToDegrees(Tools[i].ToolPos.heading), 0, 0, 1);
-
-                //translate to that spot in the world 
-                GL.Translate(-Tools[i].ToolPos.easting - Math.Sin(Tools[i].ToolPos.heading) * 14, -Tools[i].ToolPos.northing - Math.Cos(Tools[i].ToolPos.heading) * 14, 0);
-
-                if (hd.isOn && vehicle.isHydLiftOn) GL.Enable(EnableCap.Blend);
-                else GL.Disable(EnableCap.Blend);
-
-                GL.Color3((byte)0, (byte)255, (byte)0);
-
-                if (hd.isOn && hd.headArr[0].HeadLine.Count > 0) hd.headArr[0].DrawHeadBackBuffer();
-                else if (bnd.bndArr.Count > 0) bnd.bndArr[0].DrawBoundaryBackBuffer();
-
-                GL.Color3((byte)0, (byte)0, (byte)0);
-                for (int k = 1; k < bnd.bndArr.Count; k++)
+                if (Tools[i].Sections.Count > 0)
                 {
-                    if (hd.isOn && hd.headArr[k].HeadLine.Count > 0) hd.headArr[k].DrawHeadBackBuffer();
-                    else bnd.bndArr[k].DrawBoundaryBackBuffer();
-                }
+                    GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
+                    GL.LoadIdentity();// Reset The View
 
-                //patch color
-                GL.Color4(0.0f, 0.1f, 0.0f, 0.1f);
+                    //back the camera up
+                    GL.Translate(0, 0, -500);
 
-                //for every new chunk of patch
-                foreach (var triList in PatchDrawList)
-                {
-                    isDraw = false;
-                    int count2 = triList.Count;
-                    for (int l = 1; l < count2; l += 3)
+                    //rotate camera so heading matched fix heading in the world
+                    GL.Rotate(Glm.ToDegrees(Tools[i].ToolPos.Heading), 0, 0, 1);
+
+                    //translate to that spot in the world 
+                    GL.Translate(-Tools[i].ToolPos.Easting - Math.Sin(Tools[i].ToolPos.Heading) * 14, -Tools[i].ToolPos.Northing - Math.Cos(Tools[i].ToolPos.Heading) * 14, 0);
+
+                    if (hd.BtnHeadLand && vehicle.BtnHydLiftOn) GL.Enable(EnableCap.Blend);
+                    else GL.Disable(EnableCap.Blend);
+
+                    GL.Color3((byte)0, (byte)255, (byte)0);
+
+                    if (hd.BtnHeadLand && hd.headArr.Count > 0 && hd.headArr[0].HeadLine.Count > 0) hd.headArr[0].DrawHeadBackBuffer();
+                    else if (bnd.bndArr.Count > 0) bnd.bndArr[0].DrawBoundaryBackBuffer();
+
+                    GL.Color3((byte)0, (byte)0, (byte)0);
+                    for (int k = 1; k < bnd.bndArr.Count; k++)
                     {
-                        if (triList[l].easting > pivotAxlePos.easting + 50)
-                            continue;
-                        if (triList[l].easting < pivotAxlePos.easting - 50)
-                            continue;
-                        if (triList[l].northing > pivotAxlePos.northing + 50)
-                            continue;
-                        if (triList[l].northing < pivotAxlePos.northing - 50)
-                            continue;
-                        //point is in frustum so draw the entire patch
-                        isDraw = true;
-                        break;
+                        if (hd.BtnHeadLand && hd.headArr[k].HeadLine.Count > 0) hd.headArr[k].DrawHeadBackBuffer();
+                        else bnd.bndArr[k].DrawBoundaryBackBuffer();
                     }
 
-                    if (isDraw)
-                    {
-                        //draw the triangles in each triangle strip
-                        GL.Begin(PrimitiveType.TriangleStrip);
-                        for (int l = 1; l < count2; l++) GL.Vertex3(triList[l].easting, triList[l].northing, 0);
-                        GL.End();
-                    }
-                }
+                    //patch color
+                    GL.Color4(0.0f, 0.1f, 0.0f, 0.1f);
 
-                for (int j = 0; j < Tools.Count; j++)
-                {
-                    // the follow up to sections patches
-                    int patchCount = 0;
-                    if (Tools[j].numOfSections > 0)
+                    //for every new chunk of patch
+                    foreach (var triList in PatchDrawList)
                     {
-                        for (int k = 0; k <= Tools[j].numOfSections; k++)
+                        isDraw = false;
+                        int count2 = triList.Count;
+                        for (int l = 1; l < count2; l += 3)
                         {
-                            if (Tools[j].Sections[k].IsMappingOn && (patchCount = Tools[j].Sections[k].triangleList.Count) > 0)
-                            {
-                                //draw the triangle in each triangle strip
-                                GL.Begin(PrimitiveType.TriangleStrip);
+                            if (triList[l].Easting > pivotAxlePos.Easting + 50)
+                                continue;
+                            if (triList[l].Easting < pivotAxlePos.Easting - 50)
+                                continue;
+                            if (triList[l].Northing > pivotAxlePos.Northing + 50)
+                                continue;
+                            if (triList[l].Northing < pivotAxlePos.Northing - 50)
+                                continue;
+                            //point is in frustum so draw the entire patch
+                            isDraw = true;
+                            break;
+                        }
 
-                                for (int l = 1; l < patchCount; l++)
-                                    GL.Vertex3(Tools[j].Sections[k].triangleList[l].easting, Tools[j].Sections[k].triangleList[l].northing, 0);
-
-                                GL.Vertex3(Tools[j].Sections[k].leftPoint.easting, Tools[j].Sections[k].leftPoint.northing, 0);
-                                GL.Vertex3(Tools[j].Sections[k].rightPoint.easting, Tools[j].Sections[k].rightPoint.northing, 0);
-
-                                GL.End();
-                            }
+                        if (isDraw)
+                        {
+                            //draw the triangles in each triangle strip
+                            GL.Begin(PrimitiveType.TriangleStrip);
+                            for (int l = 1; l < count2; l++) GL.Vertex3(triList[l].Easting, triList[l].Northing, 0);
+                            GL.End();
                         }
                     }
-                }
-                double MaxForwardPixels = 0;
-                for (int k = 0; k <= Tools[i].numOfSections; k++)
-                {
-                    if (Tools[i].Sections[k].positionForward > MaxForwardPixels)
-                        MaxForwardPixels = Tools[i].Sections[k].positionForward;
-                }
 
+                    DrawSectionsPatchList(false);
 
+                    GL.Color3(1.0f, 0.0f, 0.0f);
+                    tram.DrawTram(true);
 
-                //finish it up - we need to read the ram of video card
-                GL.Flush();
-
-                //determine farthest ahead lookahead - is the height of the readpixel line
-                rpHeight = (int)Math.Round(Math.Min(Math.Max(Math.Max((hd.isOn && vehicle.isHydLiftOn ? Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft) : 0), Math.Max(Tools[i].lookAheadDistanceOnPixelsRight, Tools[i].lookAheadDistanceOnPixelsLeft)) + 1, 2), 200), MidpointRounding.AwayFromZero);
-                rpHeight2 = (int)Math.Round(Math.Min(Math.Max(Math.Min(Tools[i].lookAheadDistanceOffPixelsRight, Tools[i].lookAheadDistanceOffPixelsLeft), 1), 198), MidpointRounding.AwayFromZero);
-
-
-                byte[] GreenPixels = new byte[(Tools[i].rpWidth * (rpHeight - rpHeight2 + (int)(MaxForwardPixels*10)))];
-
-                //read the whole block of pixels up to max lookahead, one read only
-                GL.ReadPixels(Tools[i].rpXPosition, 10 + rpHeight2, Tools[i].rpWidth, rpHeight - rpHeight2 + (int)(MaxForwardPixels * 10), OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
-
-                //Paint to context for troubleshooting
-                //oglBack.BringToFront();
-                //oglBack.SwapBuffers();
-
-                //is applied area coming up?
-                totalPixs = 0;
-
-                //assume all sections are on and super can be on, if not set false to turn off.
-                bool isSuperSectionAllowedOn = true;
-
-                //determine if in or out of headland, do hydraulics if on
-                if (hd.isOn && vehicle.isHydLiftOn)
-                {
-                    //calculate the slope
-                    double m = (vehicle.hydLiftLookAheadDistanceRight - vehicle.hydLiftLookAheadDistanceLeft) / Tools[i].rpWidth;
-
-                    totalPixs = 0;
-                    for (int pos = 0; pos < Tools[i].rpWidth; pos++)
+                    double MaxForwardPixels = 0;
+                    for (int k = 0; k < Tools[i].Sections.Count; k++)
                     {
-                        int height = (int)(vehicle.hydLiftLookAheadDistanceLeft + (m * pos)) - 1;
-                        for (int a = pos; a < height * Tools[i].rpWidth; a += Tools[i].rpWidth)
+                        if (Tools[i].Sections[k].positionForward > MaxForwardPixels)
+                            MaxForwardPixels = Tools[i].Sections[k].positionForward;
+                    }
+
+
+                    //finish it up - we need to read the ram of video card
+                    GL.Flush();
+
+                    //determine farthest ahead lookahead - is the height of the readpixel line
+                    rpHeight = (int)Math.Round(Math.Min(Math.Max(Math.Max((hd.BtnHeadLand && vehicle.BtnHydLiftOn ? Math.Max(vehicle.hydLiftLookAheadDistanceRight, vehicle.hydLiftLookAheadDistanceLeft) : 0), Math.Max(Tools[i].lookAheadDistanceOnPixelsRight, Tools[i].lookAheadDistanceOnPixelsLeft)) + 1, 2), 200), MidpointRounding.AwayFromZero);
+                    rpHeight2 = (int)Math.Round(Math.Min(Math.Max(Math.Min(Tools[i].lookAheadDistanceOffPixelsRight, Tools[i].lookAheadDistanceOffPixelsLeft), 1), 198), MidpointRounding.AwayFromZero);
+
+
+                    byte[] GreenPixels = new byte[(Tools[i].rpWidth * (rpHeight - rpHeight2 + (int)(MaxForwardPixels * 10)))];
+
+                    //read the whole block of pixels up to max lookahead, one read only
+                    GL.ReadPixels(Tools[i].rpXPosition, 10 + rpHeight2, Tools[i].rpWidth, rpHeight - rpHeight2 + (int)(MaxForwardPixels * 10), OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, GreenPixels);
+                    if (DrawBackBuffer)
+                    {
+                        //Paint to context for troubleshooting
+                        oglBack.BringToFront();
+                        oglBack.SwapBuffers();
+                    }
+                    else oglBack.SendToBack();
+
+                    //is applied area coming up?
+                    totalPixs = 0;
+
+                    //assume all sections are on and super can be on, if not set false to turn off.
+                    bool isSuperSectionAllowedOn = true;
+
+                    //determine if in or out of headland, do hydraulics if on
+                    if (hd.BtnHeadLand && vehicle.BtnHydLiftOn)
+                    {
+                        //calculate the slope
+                        double m = (vehicle.hydLiftLookAheadDistanceRight - vehicle.hydLiftLookAheadDistanceLeft) / Tools[i].rpWidth;
+
+                        totalPixs = 0;
+                        for (int pos = 0; pos < Tools[i].rpWidth; pos++)
                         {
-                            if (a >= 0)
+                            int height = (int)(vehicle.hydLiftLookAheadDistanceLeft + (m * pos)) - 1;
+                            for (int a = pos; a < height * Tools[i].rpWidth; a += Tools[i].rpWidth)
                             {
-                                if (GreenPixels[a] > 0)
+                                if (a >= 0 && a < GreenPixels.Length)
                                 {
-                                    totalPixs++;
-                                    mc.machineData[mc.mdHydLift] = 1;
-                                    hd.isToolUp = false;
-                                    goto GetOutTool;
+                                    if (GreenPixels[a] == 255)
+                                    {
+                                        totalPixs++;
+                                        hd.isToolUp = false;
+                                        goto GetOutTool;
+                                    }
                                 }
                             }
                         }
-                    }
-                    GetOutTool:
+                        GetOutTool:
 
-                    if (totalPixs == 0)
-                    {
-                        mc.machineData[mc.mdHydLift] = 2;
-                        hd.isToolUp = true;
-                    }
-                }
-
-                ///////////////////////////////////////////   Section control   ///////////////////////////////////////////
-
-                for (int j = 0; j < Tools[i].numOfSections; j++)
-                {
-                    // Manual on, force the section On and exit loop so digital is also overidden
-                    if (Tools[i].Sections[j].BtnSectionState == btnStates.On)
-                    {
-                        if (j + 1 < Tools[i].numOfSections)
+                        if (totalPixs == 0)
                         {
-                            if (Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft && Tools[i].Sections[j].positionForward == Tools[i].Sections[j + 1].positionForward)
-                            {
-                                isSuperSectionAllowedOn &= true;
-                            }
-                            else isSuperSectionAllowedOn = false;
+                            hd.isToolUp = hd.isToolUp & true;
                         }
-                        Tools[i].Sections[j].SectionOnRequest = true;
                     }
-                    else if (Tools[i].Sections[j].BtnSectionState == btnStates.Off || !Tools[i].Sections[j].IsAllowedOn)
+
+                    ///////////////////////////////////////////   Section control   ///////////////////////////////////////////
+
+                    for (int j = 0; j < Tools[i].numOfSections; j++)
                     {
-                        Tools[i].Sections[j].SectionOnRequest = false;
-                        Tools[i].Sections[j].SectionOverlapTimer = 0;
-                        isSuperSectionAllowedOn = false;
-                    }
-                    else if (Tools[i].Sections[j].BtnSectionState == btnStates.Auto)
-                    {
-                        if (Tools[i].Sections[j].speedPixels < Tools[i].SlowSpeedCutoff)
+                        // Manual on, force the section On and exit loop so digital is also overidden
+                        if (Tools[i].Sections[j].BtnSectionState == btnStates.On && autoBtnState != 0)
+                        {
+                            if (j + 1 < Tools[i].numOfSections)
+                            {
+                                if (Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft && Tools[i].Sections[j].positionForward == Tools[i].Sections[j + 1].positionForward)
+                                {
+                                    isSuperSectionAllowedOn &= true;
+                                }
+                                else isSuperSectionAllowedOn = false;
+                            }
+                            Tools[i].Sections[j].SectionOnRequest = true;
+                        }
+                        else if (Tools[i].Sections[j].BtnSectionState == btnStates.Off || autoBtnState == 0)
                         {
                             Tools[i].Sections[j].SectionOnRequest = false;
                             Tools[i].Sections[j].SectionOverlapTimer = 0;
                             isSuperSectionAllowedOn = false;
                         }
-                        else
+                        else if (Tools[i].Sections[j].BtnSectionState == btnStates.Auto)
                         {
-                            int endHeight = 1, startHeight = 1;
-                            mOn = (Tools[i].lookAheadDistanceOnPixelsRight - Tools[i].lookAheadDistanceOnPixelsLeft) / Tools[i].rpWidth;
-                            mOff = (Tools[i].lookAheadDistanceOffPixelsRight - Tools[i].lookAheadDistanceOffPixelsLeft) / Tools[i].rpWidth;
-
-                            //determine if headland is in read pixel buffer left middle and right. 
-                            start = Tools[i].Sections[j].rpSectionPosition - Tools[i].Sections[0].rpSectionPosition;
-                            end = start + Tools[i].Sections[j].rpSectionWidth;
-                            tagged = 0;
-                            totalPixs = 0;
-
-                            for (int pos = start; pos < end; pos++)
+                            if (Tools[i].Sections[j].speedPixels < Tools[i].SlowSpeedCutoff)
                             {
-                                startHeight = (int)(Tools[i].Sections[j].positionForward * 10 + (Tools[i].lookAheadDistanceOffPixelsLeft - rpHeight2) + (mOff * pos)) * Tools[i].rpWidth + pos;
-                                endHeight = (int)Math.Round(Tools[i].Sections[j].positionForward * 10 + (Tools[i].lookAheadDistanceOnPixelsLeft - rpHeight2) + (mOn * pos), MidpointRounding.AwayFromZero) * Tools[i].rpWidth + pos;
-                                for (int a = startHeight; a < endHeight; a += Tools[i].rpWidth)
-                                {
-                                    if (a >= 0 && a < GreenPixels.Length)
-                                    {
-                                        totalPixs++;
-                                        if (GreenPixels[a] == 255 || (bnd.bndArr.Count == 0 && GreenPixels[a] == 0))
-                                        {
-                                            ++tagged;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (tagged != 0 && (tagged * 100) / totalPixs > Tools[i].toolMinUnappliedPixels)
-                            {
-                                Tools[i].Sections[j].IsSectionRequiredOn = true;
+                                Tools[i].Sections[j].SectionOnRequest = false;
+                                Tools[i].Sections[j].SectionOverlapTimer = 0;
+                                isSuperSectionAllowedOn = false;
                             }
                             else
                             {
-                                Tools[i].Sections[j].IsSectionRequiredOn = false;
+                                int endHeight = 1, startHeight = 1;
+                                mOn = (Tools[i].lookAheadDistanceOnPixelsRight - Tools[i].lookAheadDistanceOnPixelsLeft) / Tools[i].rpWidth;
+                                mOff = (Tools[i].lookAheadDistanceOffPixelsRight - Tools[i].lookAheadDistanceOffPixelsLeft) / Tools[i].rpWidth;
+
+                                //determine if headland is in read pixel buffer left middle and right. 
+                                start = Tools[i].Sections[j].rpSectionPosition - Tools[i].Sections[0].rpSectionPosition;
+                                end = start + Tools[i].Sections[j].rpSectionWidth;
+                                tagged = 0;
+                                totalPixs = 0;
+
+                                for (int pos = start; pos < end; pos++)
+                                {
+                                    startHeight = (int)(Tools[i].Sections[j].positionForward * 10 + (Tools[i].lookAheadDistanceOffPixelsLeft - rpHeight2) + (mOff * pos)) * Tools[i].rpWidth + pos;
+                                    endHeight = (int)Math.Round(Tools[i].Sections[j].positionForward * 10 + (Tools[i].lookAheadDistanceOnPixelsLeft - rpHeight2) + (mOn * pos), MidpointRounding.AwayFromZero) * Tools[i].rpWidth + pos;
+                                    for (int a = startHeight; a < endHeight; a += Tools[i].rpWidth)
+                                    {
+                                        if (a >= 0 && a < GreenPixels.Length)
+                                        {
+                                            totalPixs++;
+                                            if (GreenPixels[a] == 255 || (bnd.bndArr.Count == 0 && GreenPixels[a] == 0))
+                                            {
+                                                ++tagged;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (tagged != 0 && (tagged * 100) / totalPixs > Tools[i].toolMinUnappliedPixels)
+                                {
+                                    Tools[i].Sections[j].IsSectionRequiredOn = true;
+                                }
+                                else
+                                {
+                                    Tools[i].Sections[j].IsSectionRequiredOn = false;
+                                }
+
+                                Tools[i].Sections[j].SectionOnRequest = Tools[i].Sections[j].IsSectionRequiredOn ? true : false;
+
+                                if ((j + 1 < Tools[i].numOfSections) && Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft)
+                                {
+
+                                    isSuperSectionAllowedOn &= (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
+                                }
+                                else isSuperSectionAllowedOn = false;
                             }
+                        }
+                    }
+                    if (isSuperSectionAllowedOn)
+                    {
+                        for (int j = 0; j < Tools[i].numOfSections; j++)
+                        {
+                            Tools[i].Sections[j].SectionOnRequest = false;
+                            Tools[i].Sections[j].SectionOverlapTimer = 0;
+                            Tools[i].Sections[j].MappingOffTimer = 0;
+                            Tools[i].Sections[j].MappingOnTimer = 0;
+                        }
 
-                            Tools[i].Sections[j].SectionOnRequest = Tools[i].Sections[j].IsSectionRequiredOn ? true : false;
+                        //turn on super section
+                        Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = true;
+                        Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 1;
+                    }
+                    else if (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn)
+                    {
+                        Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = false;
+                        Tools[i].Sections[Tools[i].numOfSections].SectionOverlapTimer = 0;
+                        Tools[i].Sections[Tools[i].numOfSections].MappingOffTimer = 0;
+                        Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 0;
 
-                            if ((j + 1 < Tools[i].numOfSections) && Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft)
-                            {
-
-                                isSuperSectionAllowedOn &= (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
-
-                            }
-                            else isSuperSectionAllowedOn = false;
+                        for (int j = 0; j < Tools[i].numOfSections; j++)//set the timers back
+                        {
+                            Tools[i].Sections[j].MappingOffTimer = (int)(HzTime * Tools[i].MappingOffDelay + 1);
+                            Tools[i].Sections[j].SectionOverlapTimer = (int)((double)HzTime * Tools[i].TurnOffDelay + 1);
+                            Tools[i].Sections[j].MappingOnTimer = 1;
                         }
                     }
                 }
-                if (isSuperSectionAllowedOn)
-                {
-                    for (int j = 0; j < Tools[i].numOfSections; j++)
-                    {
-                        Tools[i].Sections[j].SectionOnRequest = false;
-                        Tools[i].Sections[j].SectionOverlapTimer = 0;
-                        Tools[i].Sections[j].MappingOffTimer = 0;
-                        Tools[i].Sections[j].MappingOnTimer = 0;
-                    }
+            }
 
-                    //turn on super section
-                    Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = true;
-                    Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 1;
-                }
-                else if (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn)
+            if (hd.BtnHeadLand && vehicle.BtnHydLiftOn)
+            {
+                if (hd.isToolUp && mc.Send_HydraulicLift[3] != 0x02)
                 {
-                    Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = false;
-                    Tools[i].Sections[Tools[i].numOfSections].SectionOverlapTimer = 0;
-                    Tools[i].Sections[Tools[i].numOfSections].MappingOffTimer = 0;
-                    Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 0;
-
-                    for (int j = 0; j < Tools[i].numOfSections; j++)//set the timers back
-                    {
-                        Tools[i].Sections[j].MappingOffTimer = (int)(fixUpdateHz * Tools[i].MappingOffDelay + 1);
-                        Tools[i].Sections[j].SectionOverlapTimer = (int)((double)fixUpdateHz * Tools[i].TurnOffDelay + 1);
-                        Tools[i].Sections[j].MappingOnTimer = 1;
-                    }
+                    mc.Send_HydraulicLift[3] = 0x02;
+                    SendData(mc.Send_HydraulicLift, false);
                 }
+                else if (!hd.isToolUp && mc.Send_HydraulicLift[3] != 0x01)
+                {
+                    mc.Send_HydraulicLift[3] = 0x01;
+                    SendData(mc.Send_HydraulicLift, false);
+                }
+            }
+            else if(mc.Send_HydraulicLift[3] != 0x00)
+            {
+                mc.Send_HydraulicLift[3] = 0x00;
+                SendData(mc.Send_HydraulicLift, false);
             }
 
             //Determine if sections want to be on or off
             ProcessSectionOnOffRequests();
-
-            //send the byte out to section machines
-            BuildMachineByte();
-
-            //send the machine out to port
-            SendOutUSBMachinePort(mc.machineData, CModuleComm.pgnSentenceLength);
-
-            ////send machine data to autosteer if checked
-            if (mc.isMachineDataSentToAutoSteer)
-                SendOutUSBAutoSteerPort(mc.machineData, CModuleComm.pgnSentenceLength);
-
-            //draw the section control window off screen buffer
-            oglMain.Refresh();
-
-            //if a minute has elapsed save the field in case of crash and to be able to resume            
-            if (MinuteCounter > 60 && recvCounter < 134)
-            {
-                NMEAWatchdog.Enabled = false;
-
-                //save nmea log file
-                if (isLogNMEA) FileSaveNMEA();
-
-                //don't save if no gps
-                if (isJobStarted)
-                {
-                    //auto save the field patches, contours accumulated so far
-                    FileSaveSections();
-                    FileSaveContour();
-
-                    //NMEA log file
-                    if (isLogElevation) FileSaveElevation();
-                    //FileSaveFieldKML();
-                }
-
-                if (isAutoDayNight && ++TenMinuteCounter > 10)
-                {
-                    TenMinuteCounter = 0;
-                    isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
-
-                    if (isDayTime != isDay)
-                    {
-                        isDay = !isDayTime;
-                        SwapDayNightMode();
-                    }
-
-                    if (sunrise.Date != DateTime.Today)
-                    {
-                        IsBetweenSunriseSunset(pn.latitude, pn.longitude);
-
-                        //set display accordingly
-                        isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
-
-                    }
-                }
-
-                //if its the next day, calc sunrise sunset for next day
-                MinuteCounter = 0;
-
-                //set saving flag off
-                isSavingFile = false;
-
-                //go see if data ready for draw and position updates
-                NMEAWatchdog.Enabled = true;
-
-            }
-            //this is the end of the "frame". Now we wait for next NMEA sentence with a valid fix. 
         }
 
         private void oglZoom_Load(object sender, EventArgs e)
@@ -883,119 +797,77 @@ namespace AgOpenGPS
                     else GL.Color3(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B);
 
                     CalcFrustum();
-                    int mipmap = 8;
 
-                    //for every new chunk of patch
-                    foreach (var triList in PatchDrawList)
+                    DrawPatchList(8);
+
+                    if (isDay) GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)152);
+                    else GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)(152 * 0.5));
+
+                    DrawSectionsPatchList(false);
+
+
+                    //draw the ABLine
+                    if (ABLines.BtnABLineOn)
                     {
-                        bool isDraw = false;
-                        int count2 = triList.Count;
-                        for (int k = 1; k < count2; k += 3)
+                        if (ABLines.CurrentLine < ABLines.ABLines.Count && ABLines.CurrentLine > -1)
                         {
-                            //determine if point is in frustum or not, if < 0, its outside so abort, z always is 0                            
-                            if (frustum[0] * triList[k].easting + frustum[1] * triList[k].northing + frustum[3] <= 0)
-                                continue;//right
-                            if (frustum[4] * triList[k].easting + frustum[5] * triList[k].northing + frustum[7] <= 0)
-                                continue;//left
-                            if (frustum[16] * triList[k].easting + frustum[17] * triList[k].northing + frustum[19] <= 0)
-                                continue;//bottom
-                            if (frustum[20] * triList[k].easting + frustum[21] * triList[k].northing + frustum[23] <= 0)
-                                continue;//top
-                            if (frustum[8] * triList[k].easting + frustum[9] * triList[k].northing + frustum[11] <= 0)
-                                continue;//far
-                            if (frustum[12] * triList[k].easting + frustum[13] * triList[k].northing + frustum[15] <= 0)
-                                continue;//near
+                            //Draw reference AB line
+                            GL.LineWidth(1);
+                            GL.Enable(EnableCap.LineStipple);
+                            GL.LineStipple(1, 0x00F0);
 
-                            //point is in frustum so draw the entire patch. The downside of triangle strips.
-                            isDraw = true;
-                            break;
-                        }
+                            GL.Color3(0.9f, 0.2f, 0.2f);
+                            GL.Begin(PrimitiveType.Lines);
 
-                        if (isDraw)
-                        {
-                            count2 = triList.Count;
-                            //draw the triangle in each triangle strip
-                            GL.Begin(PrimitiveType.TriangleStrip);
+                            double cosHeading = Math.Cos(-ABLines.ABLines[ABLines.CurrentLine].Heading);
+                            double sinHeading = Math.Sin(-ABLines.ABLines[ABLines.CurrentLine].Heading);
 
-                            if (isDay) GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)152);
-                            else GL.Color4((byte)triList[0].easting, (byte)triList[0].northing, (byte)triList[0].heading, (byte)(152 * 0.5));
+                            GL.Vertex3(ABLines.ABLines[ABLines.CurrentLine].ref1.Easting + sinHeading * maxCrossFieldLength, ABLines.ABLines[ABLines.CurrentLine].ref1.Northing - cosHeading * maxCrossFieldLength, 0);
 
-                            //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                            if (count2 >= (mipmap + 2))
+                            if (double.IsNaN(ABLines.ABLines[ABLines.CurrentLine].ref2.Easting))
                             {
-                                int step = mipmap;
-                                for (int k = 1; k < count2; k += step)
-                                {
-                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                    GL.Vertex3(triList[k].easting, triList[k].northing, 0); k++;
-                                    if (count2 - k <= (mipmap + 2)) step = 0;//too small to mipmap it
-                                }
+                                GL.Vertex3(ABLines.ABLines[ABLines.CurrentLine].ref1.Easting - sinHeading * maxCrossFieldLength, ABLines.ABLines[ABLines.CurrentLine].ref1.Northing + cosHeading * maxCrossFieldLength, 0);
                             }
-                            else { for (int k = 1; k < count2; k++) GL.Vertex3(triList[k].easting, triList[k].northing, 0); }
+                            else
+                            {
+                                GL.Vertex3(ABLines.ABLines[ABLines.CurrentLine].ref2.Easting - sinHeading * maxCrossFieldLength, ABLines.ABLines[ABLines.CurrentLine].ref2.Northing + cosHeading * maxCrossFieldLength, 0);
+                            }
+
+
+
+
+                            GL.End();
+                            GL.Disable(EnableCap.LineStipple);
+
+                            //raw current AB Line
+                            GL.Begin(PrimitiveType.Lines);
+                            GL.Color3(0.9f, 0.20f, 0.90f);
+
+                            double Offset = Guidance.WidthMinusOverlap * ABLines.HowManyPathsAway;
+
+                            if (ABLines.isABSameAsVehicleHeading) Offset -= Guidance.GuidanceOffset;
+                            else Offset += Guidance.GuidanceOffset;
+
+                            GL.Vertex2(ABLines.ABLines[ABLines.CurrentLine].ref1.Easting + cosHeading * Offset + sinHeading * 4000, ABLines.ABLines[ABLines.CurrentLine].ref1.Northing + sinHeading * Offset - cosHeading * 4000);
+                            if (ABLines.ABLines[ABLines.CurrentLine].UsePoint) GL.Vertex2(ABLines.ABLines[ABLines.CurrentLine].ref2.Easting + cosHeading * Offset - sinHeading * 4000, ABLines.ABLines[ABLines.CurrentLine].ref2.Northing + sinHeading * Offset + cosHeading * 4000);
+                            else GL.Vertex2(ABLines.ABLines[ABLines.CurrentLine].ref1.Easting + cosHeading * Offset - sinHeading * 4000, ABLines.ABLines[ABLines.CurrentLine].ref1.Northing + sinHeading * Offset + cosHeading * 4000);
+
+
+
                             GL.End();
                         }
                     }
 
-                    for (int i = 0; i < Tools.Count; i++)
-                    {
-                        // the follow up to sections patches
-                        int patchCount = 0;
-
-                        if (isDay) GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)152);
-                        else GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)(152 * 0.5));
-
-                        for (int j = 0; j <= Tools[i].numOfSections; j++)
-                        {
-                            
-                            if (Tools[i].Sections[j].IsMappingOn && (patchCount = Tools[i].Sections[j].triangleList.Count) > 0)
-                            {
-                                //draw the triangle in each triangle strip
-                                GL.Begin(PrimitiveType.TriangleStrip);
-
-                                for (int k = 1; k < patchCount; k++)
-                                    GL.Vertex3(Tools[i].Sections[j].triangleList[k].easting, Tools[i].Sections[j].triangleList[k].northing, 0);
-
-                                GL.Vertex3(Tools[i].Sections[j].leftPoint.easting, Tools[i].Sections[j].leftPoint.northing, 0);
-                                GL.Vertex3(Tools[i].Sections[j].rightPoint.easting, Tools[i].Sections[j].rightPoint.northing, 0);
-
-                                GL.End();
-                            }
-                        }
-                    }
-
-                    //draw the ABLine
-                    if ((ABLine.isABLineSet | ABLine.isABLineBeingSet) && ABLine.isBtnABLineOn)
-                    {
-                        //Draw reference AB line
-                        GL.LineWidth(1);
-                        GL.Enable(EnableCap.LineStipple);
-                        GL.LineStipple(1, 0x00F0);
-
-                        GL.Begin(PrimitiveType.Lines);
-                        GL.Color3(0.9f, 0.2f, 0.2f);
-                        GL.Vertex3(ABLine.refABLineP1.easting, ABLine.refABLineP1.northing, 0);
-                        GL.Vertex3(ABLine.refABLineP2.easting, ABLine.refABLineP2.northing, 0);
-                        GL.End();
-                        GL.Disable(EnableCap.LineStipple);
-
-                        //raw current AB Line
-                        GL.Begin(PrimitiveType.Lines);
-                        GL.Color3(0.9f, 0.20f, 0.90f);
-                        GL.Vertex3(ABLine.currentABLineP1.easting, ABLine.currentABLineP1.northing, 0.0);
-                        GL.Vertex3(ABLine.currentABLineP2.easting, ABLine.currentABLineP2.northing, 0.0);
-                        GL.End();
-                    }
-
                     //draw curve if there is one
-                    if (curve.isCurveSet && curve.isBtnCurveOn)
+                    if (CurveLines.BtnCurveLineOn)
                     {
-                        int ptC = curve.curList.Count;
-                        if (ptC > 0)
+                        int ptC = CurveLines.curList.Count;
+                        if (ptC > 2)
                         {
                             GL.LineWidth(2);
                             GL.Color3(0.925f, 0.2f, 0.90f);
                             GL.Begin(PrimitiveType.LineStrip);
-                            for (int h = 0; h < ptC; h++) GL.Vertex3(curve.curList[h].easting, curve.curList[h].northing, 0);
+                            for (int h = 0; h < ptC; h++) GL.Vertex3(CurveLines.curList[h].Easting, CurveLines.curList[h].Northing, 0);
                             GL.End();
                         }
                     }
@@ -1006,7 +878,7 @@ namespace AgOpenGPS
                     GL.PointSize(8.0f);
                     GL.Begin(PrimitiveType.Points);
                     GL.Color3(0.95f, 0.90f, 0.0f);
-                    GL.Vertex3(pivotAxlePos.easting, pivotAxlePos.northing, 0.0);
+                    GL.Vertex3(pivotAxlePos.Easting, pivotAxlePos.Northing, 0.0);
                     GL.End();
 
                     GL.PointSize(1.0f);
@@ -1108,10 +980,6 @@ namespace AgOpenGPS
             GL.Enable(EnableCap.Texture2D);
 
             GL.BindTexture(TextureTarget.Texture2D, texture[11]);        // Select Our Texture
-            if (mc.steerSwitchValue == 0)
-                GL.Color4(0.052f, 0.970f, 0.03f, 0.7);
-            else
-                GL.Color4(0.9752f, 0.0f, 0.03f, 0.7);
 
 
             GL.Translate(center, bottomSide, 0);
@@ -1186,17 +1054,20 @@ namespace AgOpenGPS
             int flagCnt = flagPts.Count;
             for (int f = 0; f < flagCnt; f++)
             {
+                if (flagPts[f].Easting > worldGrid.EastingMax || flagPts[f].Easting < worldGrid.EastingMin) continue;
+                if (flagPts[f].Northing > worldGrid.NorthingMax || flagPts[f].Northing < worldGrid.NorthingMin) continue;
+
                 GL.PointSize(8.0f);
                 GL.Begin(PrimitiveType.Points);
                 if (flagPts[f].color == 0) GL.Color3((byte)255, (byte)0, (byte)flagPts[f].ID);
                 if (flagPts[f].color == 1) GL.Color3((byte)0, (byte)255, (byte)flagPts[f].ID);
                 if (flagPts[f].color == 2) GL.Color3((byte)255, (byte)255, (byte)flagPts[f].ID);
-                GL.Vertex3(flagPts[f].easting, flagPts[f].northing, 0);
+                GL.Vertex3(flagPts[f].Easting, flagPts[f].Northing, 0);
                 GL.End();
 
-                font.DrawText3D(flagPts[f].easting, flagPts[f].northing, "&" + flagPts[f].notes);
+                font.DrawText3D(flagPts[f].Easting, flagPts[f].Northing, "&" + flagPts[f].notes);
                 //else
-                //    font.DrawText3D(flagPts[f].easting, flagPts[f].northing, "&");
+                //    font.DrawText3D(flagPts[f].Easting, flagPts[f].Northing, "&");
             }
 
             if (flagNumberPicked != 0)
@@ -1206,18 +1077,18 @@ namespace AgOpenGPS
                 GL.LineWidth(4);
                 GL.Color3(0.980f, 0.0f, 0.980f);
                 GL.Begin(PrimitiveType.LineStrip);
-                GL.Vertex3(flagPts[flagNumberPicked - 1].easting, flagPts[flagNumberPicked - 1].northing + offSet, 0);
-                GL.Vertex3(flagPts[flagNumberPicked - 1].easting - offSet, flagPts[flagNumberPicked - 1].northing, 0);
-                GL.Vertex3(flagPts[flagNumberPicked - 1].easting, flagPts[flagNumberPicked - 1].northing - offSet, 0);
-                GL.Vertex3(flagPts[flagNumberPicked - 1].easting + offSet, flagPts[flagNumberPicked - 1].northing, 0);
-                GL.Vertex3(flagPts[flagNumberPicked - 1].easting, flagPts[flagNumberPicked - 1].northing + offSet, 0);
+                GL.Vertex3(flagPts[flagNumberPicked - 1].Easting, flagPts[flagNumberPicked - 1].Northing + offSet, 0);
+                GL.Vertex3(flagPts[flagNumberPicked - 1].Easting - offSet, flagPts[flagNumberPicked - 1].Northing, 0);
+                GL.Vertex3(flagPts[flagNumberPicked - 1].Easting, flagPts[flagNumberPicked - 1].Northing - offSet, 0);
+                GL.Vertex3(flagPts[flagNumberPicked - 1].Easting + offSet, flagPts[flagNumberPicked - 1].Northing, 0);
+                GL.Vertex3(flagPts[flagNumberPicked - 1].Easting, flagPts[flagNumberPicked - 1].Northing + offSet, 0);
                 GL.End();
 
                 //draw the flag with a black dot inside
                 //GL.PointSize(4.0f);
                 //GL.Color3(0, 0, 0);
                 //GL.Begin(PrimitiveType.Points);
-                //GL.Vertex3(flagPts[flagNumberPicked - 1].easting, flagPts[flagNumberPicked - 1].northing, 0);
+                //GL.Vertex3(flagPts[flagNumberPicked - 1].Easting, flagPts[flagNumberPicked - 1].Northing, 0);
                 //GL.End();
             }
         }
@@ -1338,7 +1209,7 @@ namespace AgOpenGPS
 
             GL.Disable(EnableCap.DepthTest);
 
-            if (ct.isContourBtnOn || ABLine.isBtnABLineOn || curve.isBtnCurveOn)
+            if (ct.isContourBtnOn || ABLines.BtnABLineOn || CurveLines.BtnCurveLineOn)
             {
                 double dist = distanceDisplay * 0.1;
 
@@ -1365,78 +1236,6 @@ namespace AgOpenGPS
                     font.DrawText(center, 36, hede, size);
                 }
             }
-            //if (ct.isContourBtnOn)
-            //{
-            //    string dist;
-            //    lblDistanceOffLine.Visible = true;
-            //    //lblDelta.Visible = true;
-            //    if (ct.distanceFromCurrentLine == 32000) ct.distanceFromCurrentLine = 0;
-
-            //    DrawLightBar(oglMain.Width, oglMain.Height, ct.distanceFromCurrentLine * 0.1);
-
-            //    if ((ct.distanceFromCurrentLine) < 0.0)
-            //    {
-            //        lblDistanceOffLine.ForeColor = Color.Green;
-            //        if (isMetric) dist = ((int)Math.Abs(ct.distanceFromCurrentLine * 0.1)) + " ->";
-            //        else dist = ((int)Math.Abs(ct.distanceFromCurrentLine / 2.54 * 0.1)) + " ->";
-            //        lblDistanceOffLine.Text = dist;
-            //    }
-            //    else
-            //    {
-            //        lblDistanceOffLine.ForeColor = Color.Red;
-            //        if (isMetric) dist = "<- " + ((int)Math.Abs(ct.distanceFromCurrentLine * 0.1));
-            //        else dist = "<- " + ((int)Math.Abs(ct.distanceFromCurrentLine / 2.54 * 0.1));
-            //        lblDistanceOffLine.Text = dist;
-            //    }
-            //}
-
-            //else if (ABLine.isABLineSet | ABLine.isABLineBeingSet)
-            //{
-            //    string dist;
-            //    lblDistanceOffLine.Visible = true;
-            //    //lblDelta.Visible = true;
-            //    DrawLightBar(oglMain.Width, oglMain.Height, ABLine.distanceFromCurrentLine * 0.1);
-            //    if ((ABLine.distanceFromCurrentLine) < 0.0)
-            //    {
-            //        // --->
-            //        lblDistanceOffLine.ForeColor = Color.Green;
-            //        if (isMetric) dist = ((int)Math.Abs(ABLine.distanceFromCurrentLine * 0.1)) + " ->";
-            //        else dist = ((int)Math.Abs(ABLine.distanceFromCurrentLine / 2.54 * 0.1)) + " ->";
-            //        lblDistanceOffLine.Text = dist;
-            //    }
-            //    else
-            //    {
-            //        // <----
-            //        lblDistanceOffLine.ForeColor = Color.Red;
-            //        if (isMetric) dist = "<- " + ((int)Math.Abs(ABLine.distanceFromCurrentLine * 0.1));
-            //        else dist = "<- " + ((int)Math.Abs(ABLine.distanceFromCurrentLine / 2.54 * 0.1));
-            //        lblDistanceOffLine.Text = dist;
-            //    }
-            //}
-
-            //else if (curve.isBtnCurveOn)
-            //{
-            //    string dist;
-            //    lblDistanceOffLine.Visible = true;
-            //    //lblDelta.Visible = true;
-            //    if (curve.distanceFromCurrentLine == 32000) curve.distanceFromCurrentLine = 0;
-
-            //    DrawLightBar(oglMain.Width, oglMain.Height, curve.distanceFromCurrentLine * 0.1);
-            //    if ((curve.distanceFromCurrentLine) < 0.0)
-            //    {
-            //        lblDistanceOffLine.ForeColor = Color.Green;
-            //        if (isMetric) dist = ((int)Math.Abs(curve.distanceFromCurrentLine * 0.1)) + " ->";
-            //        else dist = ((int)Math.Abs(curve.distanceFromCurrentLine / 2.54 * 0.1)) + " ->";
-            //        lblDistanceOffLine.Text = dist;
-            //    }
-            //    else
-            //    {
-            //        lblDistanceOffLine.ForeColor = Color.Red;
-            //        if (isMetric) dist = "<- " + ((int)Math.Abs(curve.distanceFromCurrentLine * 0.1));
-            //        else dist = "<- " + ((int)Math.Abs(curve.distanceFromCurrentLine / 2.54 * 0.1));
-            //        lblDistanceOffLine.Text = dist;
-            //    }
-            //}
         }
 
         private void DrawRollBar()
@@ -1652,6 +1451,7 @@ namespace AgOpenGPS
             GL.Disable(EnableCap.Texture2D);
             GL.PopMatrix();
         }
+
         private void DrawLiftIndicator()
         {
             GL.PushMatrix();
@@ -1661,7 +1461,7 @@ namespace AgOpenGPS
 
             GL.Translate(oglMain.Width / 2 - 35, oglMain.Height/2, 0);
 
-            if (mc.machineData[mc.mdHydLift] == 2)
+            if (mc.Send_HydraulicLift[3] == 2)
             {
                 GL.Color3(0.0f, 0.950f, 0.0f);
             }
@@ -1741,7 +1541,7 @@ namespace AgOpenGPS
             font.DrawText(-oglMain.Width / 4, 150, "Lost RTK", 2.0);
         }
 
-        private void CalcFrustum()
+        public void CalcFrustum()
         {
             float[] proj = new float[16];							// For Grabbing The PROJECTION Matrix
             float[] modl = new float[16];							// For Grabbing The MODELVIEW Matrix
@@ -1810,7 +1610,7 @@ namespace AgOpenGPS
             frustum[23] = clip[15] - clip[13];
         }
 
-        public double maxFieldX, maxFieldY, minFieldX, minFieldY, fieldCenterX, fieldCenterY, maxFieldDistance, maxCrossFieldLength;
+        public double maxFieldX = 0, maxFieldY = 0, minFieldX = 0, minFieldY = 0, fieldCenterX, fieldCenterY, maxFieldDistance = 1500, maxCrossFieldLength;
 
         //determine mins maxs of patches and whole field.
         public void CalculateMinMax()
@@ -1834,8 +1634,8 @@ namespace AgOpenGPS
                     int count2 = triList.Count;
                     for (int k = 1; k < count2; k += 3)
                     {
-                        double x = triList[k].easting;
-                        double y = triList[k].northing;
+                        double x = triList[k].Easting;
+                        double y = triList[k].Northing;
 
                         //also tally the max/min of field x and z
                         if (minFieldX > x) minFieldX = x;
@@ -1847,13 +1647,13 @@ namespace AgOpenGPS
                 for (int i = 0; i < Tools.Count; i++)
                 {
                     // the follow up to sections patches
-                    for (int j = 0; j <= Tools[i].numOfSections; j++)
+                    for (int j = 0; j < Tools[i].Sections.Count; j++)
                     {
                         int patchCount = Tools[i].Sections[j].triangleList.Count;
                         for (int k = 1; k < patchCount; k++)
                         {
-                            double x = Tools[i].Sections[j].triangleList[k].easting;
-                            double y = Tools[i].Sections[j].triangleList[k].northing;
+                            double x = Tools[i].Sections[j].triangleList[k].Easting;
+                            double y = Tools[i].Sections[j].triangleList[k].Northing;
 
                             //also tally the max/min of field x and z
                             if (minFieldX > x) minFieldX = x;
@@ -1877,12 +1677,10 @@ namespace AgOpenGPS
 
                 maxCrossFieldLength = Math.Sqrt(dist * dist + dist2 * dist2) * 1.05;
 
-                if (dist > dist2) maxFieldDistance = (dist);
-                else maxFieldDistance = (dist2);
+                maxFieldDistance = (dist > dist2) ? (dist) : (dist2);
 
                 if (maxFieldDistance < 100) maxFieldDistance = 100;
                 if (maxFieldDistance > 19900) maxFieldDistance = 19900;
-                //lblMax.Text = ((int)maxFieldDistance).ToString();
 
                 fieldCenterX = (maxFieldX + minFieldX) / 2.0;
                 fieldCenterY = (maxFieldY + minFieldY) / 2.0;

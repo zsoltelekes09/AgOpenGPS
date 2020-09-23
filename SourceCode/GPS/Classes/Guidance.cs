@@ -1,11 +1,11 @@
 ﻿
 namespace AgOpenGPS
 {
-    public class Guidance
+    public class CGuidance
     {
         public double GuidanceWidth, GuidanceOverlap, GuidanceOffset, WidthMinusOverlap;
 
-        public Guidance()
+        public CGuidance()
         {
             GuidanceWidth = Properties.Vehicle.Default.GuidanceWidth;
             GuidanceOverlap = Properties.Vehicle.Default.GuidanceOverlap;

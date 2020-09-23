@@ -14,7 +14,6 @@ using System.Media;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Resources;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -70,7 +69,7 @@ namespace AgOpenGPS
 
         public int pbarSteer, pbarMachine, pbarUDP;
 
-        public double nudNumber = 0;
+        public double BoundarySpacing = 2;
 
         //used by filePicker Form to return picked file and directory
         public string filePickerFileAndDirectory;
@@ -78,7 +77,12 @@ namespace AgOpenGPS
         //the autoManual drive button. Assume in Auto
         public bool isInAutoDrive = true;
 
-        public Guidance Guidance;
+        //the trackbar angle for TestAutoSteer
+        public bool TestAutoSteer;
+        public int TestAutoSteerAngle = 0;
+        public int TotalSections = 0;
+
+        public CGuidance Guidance = new CGuidance();
 
         /// <summary>
         /// create the scene camera
@@ -98,7 +102,7 @@ namespace AgOpenGPS
         /// <summary>
         /// AB Line object
         /// </summary>
-        public CABLine ABLine;
+        public CABLine ABLines;
 
         /// <summary>
         /// TramLine class for boundary and settings
@@ -118,7 +122,7 @@ namespace AgOpenGPS
         /// <summary>
         /// ABCurve instance
         /// </summary>
-        public CABCurve curve;
+        public CABCurve CurveLines;
 
         /// <summary>
         /// Auto Headland YouTurn
@@ -166,16 +170,6 @@ namespace AgOpenGPS
         public CSim sim;
 
         /// <summary>
-        /// Resource manager for gloabal strings
-        /// </summary>
-        public ResourceManager _rm;
-
-        /// <summary>
-        /// AutoSteer class of properties
-        /// </summary>
-        public CAutoSteer ast;
-
-        /// <summary>
         /// Heading, Roll, Pitch, GPS, Properties
         /// </summary>
         public CAHRS ahrs;
@@ -201,7 +195,7 @@ namespace AgOpenGPS
         public CFont font;
         public bool LeftMouseDownOnOpenGL { get; set; }
         public double FrameTime { get; set; } = 0;
-        public double HzTime { get; set; } = 5;
+        public double HzTime { get; set; } = 8;
         public SoundPlayer SndBoundaryAlarm { get; set; }
         public int MinuteCounter { get; set; } = 1;
         public int TenMinuteCounter { get; set; } = 1;
@@ -216,20 +210,11 @@ namespace AgOpenGPS
             //winform initialization
             InitializeComponent();
 
-            //ControlExtension.Draggable(panelSnap, true);
             ControlExtension.Draggable(oglZoom, true);
-            //ControlExtension.Draggable(panelSim, true);
-
-
-
-            //UpdateGuiText();
-
+            ControlExtension.Draggable(oglBack, true);
 
             //build the gesture structures
             SetupStructSizes();
-
-
-            Guidance = new Guidance();
 
             //create the world grid
             worldGrid = new CWorldGrid(this);
@@ -237,19 +222,17 @@ namespace AgOpenGPS
             //our vehicle made with gl object and pointer of mainform
             vehicle = new CVehicle(this);
 
-
-
             //our NMEA parser
             pn = new CNMEA(this);
 
             //create the ABLine instance
-            ABLine = new CABLine(this);
+            ABLines = new CABLine(this);
 
             //new instance of contour mode
             ct = new CContour(this);
 
             //new instance of contour mode
-            curve = new CABCurve(this);
+            CurveLines = new CABCurve(this);
 
             //instance of tram
             tram = new CTram(this);
@@ -270,16 +253,13 @@ namespace AgOpenGPS
             gf = new CGeoFence(this);
 
             //headland object
-            hd = new CHead(this);
+            hd = new CHead();
 
             //headland entry/exit sequences
             seq = new CSequence(this);
 
             //nmea simulator built in.
             sim = new CSim(this);
-
-            //all the autosteer objects
-            ast = new CAutoSteer(this);
 
             //all the attitude, heading, roll, pitch reference system
             ahrs = new CAHRS(this);
@@ -292,12 +272,6 @@ namespace AgOpenGPS
 
             //The grid for obstacle avoidance
             mazeGrid = new CMazeGrid(this);
-
-            //start the stopwatch
-            //swFrame.Start();
-
-            //resource for gloabal language strings
-            _rm = new ResourceManager("AgOpenGPS.gStr", Assembly.GetExecutingAssembly());
 
             // Add Message Event handler for Form decoupling from client socket thread
             updateRTCM_DataEvent = new UpdateRTCM_Data(OnAddMessage);
@@ -387,19 +361,23 @@ namespace AgOpenGPS
             {
                 if (camera.zoomValue <= 20) camera.zoomValue += camera.zoomValue * 0.02;
                 else camera.zoomValue += camera.zoomValue * 0.01;
-                if (camera.zoomValue > 120) camera.zoomValue = 120;
+                if (camera.zoomValue > 220) camera.zoomValue = 220;
                 camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
-                SetZoom();
             }
             else
             {
                 if (camera.zoomValue <= 20)
-                { if ((camera.zoomValue -= camera.zoomValue * 0.02) < 6.0) camera.zoomValue = 6.0; }
-                else { if ((camera.zoomValue -= camera.zoomValue * 0.01) < 6.0) camera.zoomValue = 6.0; }
+                {
+                    if ((camera.zoomValue -= camera.zoomValue * 0.02) < 6.0) camera.zoomValue = 6.0; 
+                }
+                else
+                { 
+                    if ((camera.zoomValue -= camera.zoomValue * 0.01) < 6.0) camera.zoomValue = 6.0;
+                }
 
                 camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
-                SetZoom();
             }
+            SetZoom();
         }
 
         //Initialize items before the form Loads or is visible
@@ -408,7 +386,6 @@ namespace AgOpenGPS
             MouseWheel += ZoomByMouseWheel;
 
             //remembered window position
-
 
             if (Settings.Default.setWindow_Maximized)
             {
@@ -421,23 +398,18 @@ namespace AgOpenGPS
                 Location = Settings.Default.setWindow_Location;
                 Size = Settings.Default.setWindow_Size;
             }
-            if (Properties.Settings.Default.setDisplay_isStartFullScreen)
+            if (Settings.Default.setDisplay_isStartFullScreen)
             {
                 this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.None;
                 this.WindowState = FormWindowState.Maximized;
-                btnFullScreen.BackgroundImage = Properties.Resources.WindowNormal;
+                btnFullScreen.BackgroundImage = Resources.WindowNormal;
                 isFullScreen = true;
             }
             else
             {
                 isFullScreen = false;
             }
-
-            //clear the flags
-            flagPts.Clear();
-            btnFlag.Enabled = false;
-
 
             vehicleFileName = Vehicle.Default.setVehicle_vehicleName;
             toolFileName = Vehicle.Default.setVehicle_toolName;
@@ -455,14 +427,8 @@ namespace AgOpenGPS
 
             if (Settings.Default.setDisplay_isTermsOn)
             {
-                using (var form = new Form_First(this))
-                {
-                    var result = form.ShowDialog(this);
-                    if (result != DialogResult.OK)
-                    {
-                        //Close();
-                    }
-                }
+                Form form = new Form_First(this);
+                form.ShowDialog(this);
             }
 
 
@@ -471,10 +437,6 @@ namespace AgOpenGPS
 
             //Calculate total width and each section width
             LoadTools();
-
-
-
-
         }
 
         //form is closing so tidy up and save settings
@@ -497,7 +459,7 @@ namespace AgOpenGPS
                         FileSaveEverythingBeforeClosingField();
 
                         //shutdown and reset all module data
-                        mc.ResetAllModuleCommValues();
+                        mc.ResetAllModuleCommValues(true);
                         break;
 
                     //Ignore and return
@@ -885,24 +847,9 @@ namespace AgOpenGPS
         {
             if (!yt.isYouTurnTriggered)
             {
-                //is it turning right already?
-                if (yt.isYouTurnRight)
-                {
-                    yt.isYouTurnRight = false;
-                    yt.isLastYouTurnRight = !yt.isLastYouTurnRight;
-                    yt.ResetCreatedYouTurn();
-                }
-                else
-                {
-                    //make it turn the other way
-                    yt.isYouTurnRight = true;
-                    yt.isLastYouTurnRight = !yt.isLastYouTurnRight;
-                    yt.ResetCreatedYouTurn();
-                }
-            }
-            else
-            {
-                if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
+                yt.isYouTurnRight = !yt.isYouTurnRight;
+                yt.isLastYouTurnRight = !yt.isLastYouTurnRight;
+                yt.ResetCreatedYouTurn();
             }
         }
 
@@ -918,82 +865,6 @@ namespace AgOpenGPS
                 if (result == DialogResult.Yes) return 2;      //Save As
                 return 3;  // oops something is really busted
             }
-        }
-
-        private void BtnTestIsMapping_Click(object sender, EventArgs e)
-        {
-            isMapping = !isMapping;
-            //if (isMapping) btnTestIsMapping.Text = "Mapping";
-            //else btnTestIsMapping.Text = "No Map";
-        }
-
-        public void CloseHeadland()
-        {
-            btnHeadlandOnOff.Image = (hd.isOn = hd.headArr.Count > 0) ? Resources.HeadlandOn : Resources.HeadlandOff;
-        }
-
-        private void OptionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Form f = Application.OpenForms["FormDisplayOptions"];
-
-            if (f != null)
-            {
-                f.Focus();
-                return;
-            }
-
-            Form form = new FormDisplayOptions(this);
-            form.Show(this);
-        }
-
-        private void ColorsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (var form = new FormColor(this))
-            {
-                var result = form.ShowDialog(this);
-                if (result == DialogResult.OK)
-                {
-                }
-            }
-        }
-
-        private void StripSectionColor_Click(object sender, EventArgs e)
-        {
-            using (var form = new FormColorPicker(this, sectionColorDay))
-            {
-                var result = form.ShowDialog(this);
-                if (result == DialogResult.OK)
-                {
-                    sectionColorDay = form.UseThisColor;
-                }
-            }
-
-            Settings.Default.setDisplay_colorSectionsDay = sectionColorDay;
-            Settings.Default.Save();
-
-            stripSectionColor.BackColor = sectionColorDay;
-        }
-
-        private void KeyboardToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            isKeyboardOn = !isKeyboardOn;
-            keyboardToolStripMenuItem1.Checked = isKeyboardOn;
-            Settings.Default.setDisplay_isKeyboardOn = isKeyboardOn;
-            Settings.Default.Save();
-        }
-
-        public void KeypadToNUD(NumericUpDown sender, Form Ownerform)
-        {
-            sender.BackColor = Color.Red;
-            using (var form = new FormNumeric((double)sender.Minimum, (double)sender.Maximum, (double)sender.Value, Ownerform))
-            {
-                var result = form.ShowDialog(Ownerform);
-                if (result == DialogResult.OK)
-                {
-                    sender.Value = (decimal)form.ReturnValue;
-                }
-            }
-            sender.BackColor = Color.AliceBlue;
         }
 
         public void KeyboardToText(TextBox sender, Form callingForm)
@@ -1016,6 +887,7 @@ namespace AgOpenGPS
         {
             for (int i = Tools.Count - 1; i >= Vehicle.Default.ToolSettings.Count; i--)
             {
+                TotalSections -= Tools[i].numOfSections;
                 Tools[i].RemoveSections();
                 Tools.RemoveAt(i);
             }
@@ -1031,6 +903,8 @@ namespace AgOpenGPS
                     Tools[i].SetToolSettings(i);
                 }
             }
+
+            LineUpManualBtns();
         }
 
         //request a new job
@@ -1044,167 +918,106 @@ namespace AgOpenGPS
             }
             isJobStarted = true;
 
-            btnManualSection.Enabled = true;
-            btnAutoSection.Enabled = true;
-
-            autoBtnState = btnStates.Off;
-            btnSection_Update();
-
-
-            btnABLine.Enabled = true;
-            btnContour.Enabled = true;
-            btnCurve.Enabled = true;
-            btnMakeLinesFromBoundary.Enabled = true;
-            btnCycleLines.Enabled = true;
-
-            ABLine.abHeading = 0.00;
-            btnAutoSteer.Enabled = true;
-
-            DisableYouTurnButtons();
-            btnFlag.Enabled = true;
-
-            btnContourPriority.Image = Properties.Resources.Snap2;
-
-            if (recPath.isRecordOn)
-            {
-                recPath.isRecordOn = false;
-            }
-
-            LineUpManualBtns();
-
             //update the menu
-            menustripLanguage.Enabled = false;
             layoutPanelRight.Enabled = true;
-            //boundaryToolStripBtn.Enabled = true;
             toolStripBtnDropDownBoundaryTools.Enabled = true;
         }
 
         //close the current job
         public void JobClose()
         {
-            //reset field offsets
-            pn.fixOffset.easting = 0;
-            pn.fixOffset.northing = 0;
-
-            //turn off headland
-            hd.isOn = false;
-            btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
-
-            //make sure hydraulic lift is off
-            mc.machineData[mc.mdHydLift] = 0;
-            vehicle.isHydLiftOn = false;
-            btnHydLift.Image = Properties.Resources.HydraulicLiftOff;
-
             //zoom gone
             oglZoom.SendToBack();
 
-            //clean all the lines
-            bnd.bndArr?.Clear();
-            gf.geoFenceArr?.Clear();
-            turn.turnArr?.Clear();
-            hd.headArr?.Clear();
+            isJobStarted = false;
 
             layoutPanelRight.Enabled = false;
             toolStripBtnDropDownBoundaryTools.Enabled = false;
 
-            menustripLanguage.Enabled = true;
-            isJobStarted = false;
+            //CurveLine
+            btnCurve.Image = Resources.CurveOff;
+            CurveLines.BtnCurveLineOn = false;
+            CurveLines.Lines.Clear();
+            CurveLines.CurrentLine = -1;
+            CurveLines.isOkToAddPoints = false;
 
-            //reset the lat lon start pos
+            //ABLine
+            btnABLine.Image = Resources.ABLineOff;
+            ABLines.BtnABLineOn = false;
+            ABLines.ABLines.Clear();
+            ABLines.CurrentLine = -1;
+
+            //TramLines
+            tram.displayMode = 0;
+            tram.TramList.Clear();
+
+
+            //turn off headland
+            btnHeadlandOnOff.Image = Resources.HeadlandOff;
+            hd.BtnHeadLand = false;
+            btnHydLift.Image = Resources.HydraulicLiftOff;
+            vehicle.BtnHydLiftOn = false;
+
+
+
             pn.latStart = 0;
             pn.lonStart = 0;
 
-            //fix auto button
-            btnManualSection.Enabled = false;
-            btnAutoSection.Enabled = false;
+            bnd.bndArr.Clear();
+            gf.geoFenceArr.Clear();
+            turn.turnArr.Clear();
+            hd.headArr.Clear();
+
 
             autoBtnState = btnStates.Off;
             btnSection_Update();
 
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j <= Tools[i].numOfSections; j++)
+                for (int j = 0; j< Tools[i].Sections.Count; j++)
                 {
                     //clear the section lists
-                    Tools[i].Sections[j].triangleList?.Clear();
+                    Tools[i].Sections[j].triangleList.Clear();
                 }
             }
 
             //clear the flags
             flagPts.Clear();
-            btnFlag.Enabled = false;
 
-            //ABLine
-            btnABLine.Enabled = false;
-            btnABLine.Image = Properties.Resources.ABLineOff;
-            ABLine.isBtnABLineOn = false;
-            ABLine.DeleteAB();
-            ABLine.lineArr?.Clear();
-            ABLine.numABLineSelected = 0;
-            ABLine.tramArr?.Clear();
-            ABLine.tramList?.Clear();
 
-            //curve line
-            btnCurve.Enabled = false;
-            btnCurve.Image = Properties.Resources.CurveOff;
-            curve.isBtnCurveOn = false;
-            curve.isCurveSet = false;
-            curve.ResetCurveLine();
-            curve.curveArr?.Clear();
-            curve.numCurveLineSelected = 0;
-            curve.tramArr?.Clear();
-            curve.tramList?.Clear();
-
-            //clean up tram
-            tram.displayMode = 0;
-            tram.outArr?.Clear();
 
             //clear out contour and Lists
-            btnContour.Enabled = false;
-            //btnContourPriority.Enabled = false;
-            btnContourPriority.Image = Properties.Resources.Snap2;
+            btnContourPriority.Image = Resources.Snap2;
             ct.ResetContour();
+
             ct.isContourBtnOn = false;
-            btnContour.Image = Properties.Resources.ContourOff;
+            btnContour.Image = Resources.ContourOff;
             ct.isContourOn = false;
 
-            btnMakeLinesFromBoundary.Enabled = false;
-            btnCycleLines.Enabled = false;
-
             //AutoSteer
-            btnAutoSteer.Enabled = false;
             isAutoSteerBtnOn = false;
-            btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
+            btnAutoSteer.Image = Resources.AutoSteerOff;
 
             //auto YouTurn shutdown
-            yt.isYouTurnBtnOn = false;
-            btnAutoYouTurn.Image = Properties.Resources.YouTurnNo;
-            btnAutoYouTurn.Enabled = false;
-            yt.ResetYouTurn();
-            DisableYouTurnButtons();
+            YouTurnButtons(false);
 
             //reset acre and distance counters
             fd.workedAreaTotal = 0;
 
-            //reset boundaries
-            bnd.bndArr.Clear();
-
-            //reset turn lines
-            turn.turnArr.Clear();
 
             //reset GUI areas
             fd.UpdateFieldBoundaryGUIAreas();
 
             ////turn off path record
-            recPath.recList?.Clear();
+            recPath.recList.Clear();
             if (recPath.isRecordOn)
             {
                 recPath.isRecordOn = false;
-                recordPathMenu.Image = Properties.Resources.BoundaryRecord;
+                recordPathMenu.Image = Resources.BoundaryRecord;
             }
 
             //reset all Port Module values
-            mc.ResetAllModuleCommValues();
+            mc.ResetAllModuleCommValues(true);
         }
 
         //bring up field dialog for new/open/resume
@@ -1226,18 +1039,6 @@ namespace AgOpenGPS
 
                 Text = "AgOpenGPS - " + currentFieldDirectory;
 
-                if (isJobStarted)
-                {
-                    layoutPanelRight.Enabled = true;
-                    //boundaryToolStripBtn.Enabled = true;
-                    toolStripBtnDropDownBoundaryTools.Enabled = true;
-                }
-                else
-                {
-                    layoutPanelRight.Enabled = false;
-                    //boundaryToolStripBtn.Enabled = false;
-                    toolStripBtnDropDownBoundaryTools.Enabled = false;
-                }
             }
 
             //close the current job and ask how to or if to save
@@ -1252,9 +1053,6 @@ namespace AgOpenGPS
                         Settings.Default.setF_CurrentDir = currentFieldDirectory;
                         Settings.Default.Save();
                         FileSaveEverythingBeforeClosingField();
-                        layoutPanelRight.Enabled = false;
-                        //boundaryToolStripBtn.Enabled = false;
-                        toolStripBtnDropDownBoundaryTools.Enabled = false;
                         break;
 
                     //Ignore and return
@@ -1267,9 +1065,6 @@ namespace AgOpenGPS
                         Settings.Default.setF_CurrentDir = currentFieldDirectory;
                         Settings.Default.Save();
                         FileSaveEverythingBeforeClosingField();
-                        layoutPanelRight.Enabled = false;
-                        //boundaryToolStripBtn.Enabled = false;
-                        toolStripBtnDropDownBoundaryTools.Enabled = false;
 
                         //ask for a directory name
                         using (var form2 = new FormSaveAs(this))
@@ -1280,7 +1075,6 @@ namespace AgOpenGPS
                         break;
                 }
             }
-            //update GUI areas
         }
 
         //Does the logic to process section on off requests
@@ -1288,21 +1082,33 @@ namespace AgOpenGPS
         {
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j <= Tools[i].numOfSections; j++)
+                for (int j = 0; j< Tools[i].Sections.Count; j++)
                 {
                     //SECTIONS - 
                     if (Tools[i].Sections[j].SectionOnRequest)
                     {
+                        if (!Tools[i].Sections[j].IsSectionOn)
+                        {
+                            mc.Send_Sections[3] = (byte)i;
+                            mc.Send_Sections[4] = (byte)j;
+                            mc.Send_Sections[5] = 0x01;
+                            SendData(mc.Send_Sections, false);
+                        }
                         Tools[i].Sections[j].IsSectionOn = true;
-                        Tools[i].Sections[j].SectionOverlapTimer = (int)(fixUpdateHz * Tools[i].TurnOffDelay + 1);
+                        Tools[i].Sections[j].SectionOverlapTimer = (int)(HzTime * Tools[i].TurnOffDelay + 1);
 
-                        if (Tools[i].Sections[j].MappingOnTimer == 0) Tools[i].Sections[j].MappingOnTimer = (int)(fixUpdateHz * Tools[i].MappingOnDelay + 1);
+                        if (Tools[i].Sections[j].MappingOnTimer == 0) Tools[i].Sections[j].MappingOnTimer = (int)(HzTime * Tools[i].MappingOnDelay + 1);
                     }
                     else
                     {
                         if (Tools[i].Sections[j].SectionOverlapTimer > 0) Tools[i].Sections[j].SectionOverlapTimer--;
                         if (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].SectionOverlapTimer == 0)
                         {
+                            mc.Send_Sections[3] = (byte)i;
+                            mc.Send_Sections[4] = (byte)j;
+                            mc.Send_Sections[5] = 0x00;
+                            SendData(mc.Send_Sections, false);
+
                             Tools[i].Sections[j].IsSectionOn = false;
                         }
                     }
@@ -1319,7 +1125,7 @@ namespace AgOpenGPS
 
                     if (Tools[i].Sections[j].IsSectionOn)
                     {
-                        Tools[i].Sections[j].MappingOffTimer = (int)(Tools[i].MappingOffDelay * fixUpdateHz + 1);
+                        Tools[i].Sections[j].MappingOffTimer = (int)(Tools[i].MappingOffDelay * HzTime + 1);
                     }
                     else
                     {
@@ -1334,8 +1140,6 @@ namespace AgOpenGPS
                         }
                     }
                 }
-
-
             }
         }
 
@@ -1349,41 +1153,27 @@ namespace AgOpenGPS
                     break;
 
                 case 1: //Manual button
-                    if (action == 0) //turn auto off
-                    {
-                        autoBtnState = btnStates.Off;
-                        btnSection_Update();
-                    }
-                    else
-                    {
-                        autoBtnState = btnStates.On;
-                        btnSection_Update();
-                    }
+                    if (action == 0) autoBtnState = btnStates.Off;
+                    else autoBtnState = btnStates.On;
+                    btnSection_Update();
                     break;
 
                 case 2: //Auto Button
-                    if (action == 0) //turn auto off
-                    {
-                        autoBtnState = btnStates.Off;
-                        btnSection_Update();
-                    }
-                    else
-                    {
-                        autoBtnState = btnStates.Auto;
-                        btnSection_Update();
-                    }
+                    if (action == 0) autoBtnState = btnStates.Off;
+                    else autoBtnState = btnStates.Auto;
+                    btnSection_Update();
                     break;
 
                 case 3: //Machine 1
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos3, gStr.gsTurnOff);
-                        mc.machineData[mc.mdUTurn] &= 0b11111110;
+                        mc.Send_Uturn[3] &= 0b11111110;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos3, gStr.gsTurnOn);
-                        mc.machineData[mc.mdUTurn] |= 0b00000001;
+                        mc.Send_Uturn[3] |= 0b00000001;
                     }
                     break;
 
@@ -1391,12 +1181,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos4, gStr.gsTurnOff);
-                        mc.machineData[mc.mdUTurn] &= 0b11111101;
+                        mc.Send_Uturn[3] &= 0b11111101;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos4, gStr.gsTurnOn);
-                        mc.machineData[mc.mdUTurn] |= 0b00000010;
+                        mc.Send_Uturn[3] |= 0b00000010;
                     }
                     break;
 
@@ -1404,12 +1194,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos5, gStr.gsTurnOff);
-                        mc.machineData[mc.mdUTurn] &= 0b11111011;
+                        mc.Send_Uturn[3] &= 0b11111011;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos5, gStr.gsTurnOn);
-                        mc.machineData[mc.mdUTurn] |= 0b00000100;
+                        mc.Send_Uturn[3] |= 0b00000100;
                     }
                     break;
 
@@ -1417,12 +1207,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos6, gStr.gsTurnOff);
-                        mc.machineData[mc.mdUTurn] &= 0b11110111;
+                        mc.Send_Uturn[3] &= 0b11110111;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos6, gStr.gsTurnOn);
-                        mc.machineData[mc.mdUTurn] |= 0b00001000;
+                        mc.Send_Uturn[3] |= 0b00001000;
                     }
                     break;
 
@@ -1430,12 +1220,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos7, gStr.gsTurnOff);
-                        mc.machineData[mc.mdUTurn] &= 0b11101111;
+                        mc.Send_Uturn[3] &= 0b11101111;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos7, gStr.gsTurnOn);
-                        mc.machineData[mc.mdUTurn] |= 0b00010000;
+                        mc.Send_Uturn[3] |= 0b00010000;
                     }
                     break;
 
@@ -1443,18 +1233,15 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos8, gStr.gsTurnOff);
-                        mc.machineData[mc.mdUTurn] &= 0b11011111;
+                        mc.Send_Uturn[3] &= 0b11011111;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos8, gStr.gsTurnOn);
-                        mc.machineData[mc.mdUTurn] |= 0b00100000;
+                        mc.Send_Uturn[3] |= 0b00100000;
                     }
                     break;
             }
-
-            //load the autosteer youturn byte also.
-            //mc.autoSteerData[mc.sdYouTurnByte] = mc.machineControlData[mc.cnYouTurn];
         }
 
         //take the distance from object and convert to camera data
@@ -1482,7 +1269,7 @@ namespace AgOpenGPS
         }
 
         //All the files that need to be saved when closing field or app
-        private void FileSaveEverythingBeforeClosingField()
+        public void FileSaveEverythingBeforeClosingField()
         {
             //turn off contour line if on
             if (ct.isContourOn) ct.StopContourLine(pivotAxlePos);
@@ -1491,7 +1278,7 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j <= Tools[i].numOfSections; j++)
+                for (int j = 0; j < Tools[i].Sections.Count; j++)
                 {
                     if (Tools[i].Sections[j].IsMappingOn) Tools[i].Sections[j].TurnMappingOff();
                     Tools[i].Sections[j].SectionOnRequest = false;
@@ -1507,6 +1294,96 @@ namespace AgOpenGPS
 
             JobClose();
             Text = "AgOpenGPS";
+        }
+
+        public void DrawPatchList(int mipmap)
+        {
+            //for every new chunk of patch
+            foreach (var triList in PatchDrawList)
+            {
+                bool isDraw = true;
+                int count2 = triList.Count;
+                for (int k = 1; k < count2; k += 3)
+                {
+                    //determine if point is in frustum or not, if < 0, its outside so abort, z always is 0                            
+                    if (frustum[0] * triList[k].Easting + frustum[1] * triList[k].Northing + frustum[3] <= 0)
+                        continue;//right
+                    if (frustum[4] * triList[k].Easting + frustum[5] * triList[k].Northing + frustum[7] <= 0)
+                        continue;//left
+                    if (frustum[16] * triList[k].Easting + frustum[17] * triList[k].Northing + frustum[19] <= 0)
+                        continue;//bottom
+                    if (frustum[20] * triList[k].Easting + frustum[21] * triList[k].Northing + frustum[23] <= 0)
+                        continue;//top
+                    if (frustum[8] * triList[k].Easting + frustum[9] * triList[k].Northing + frustum[11] <= 0)
+                        continue;//far
+                    if (frustum[12] * triList[k].Easting + frustum[13] * triList[k].Northing + frustum[15] <= 0)
+                        continue;//near
+
+                    //point is in frustum so draw the entire patch. The downside of triangle strips.
+                    isDraw = true;
+                    break;
+                }
+
+                if (isDraw)
+                {
+                    count2 = triList.Count;
+                    if (count2 < 4) continue;
+                    //draw the triangle in each triangle strip
+                    GL.Begin(PrimitiveType.TriangleStrip);
+
+                    if (isDay) GL.Color4((byte)triList[0].Northing, (byte)triList[0].Easting, (byte)triList[0].Heading, (byte)152);
+                    else GL.Color4((byte)triList[0].Northing, (byte)triList[0].Easting, (byte)triList[0].Heading, (byte)(152 * 0.5));
+
+                    //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
+                    if (count2 >= (mipmap + 2))
+                    {
+                        int step = mipmap;
+                        for (int k = 1; k < count2; k += step)
+                        {
+                            GL.Vertex3(triList[k].Easting, triList[k].Northing, 0); k++;
+                            GL.Vertex3(triList[k].Easting, triList[k].Northing, 0); k++;
+                            if (count2 - k <= (mipmap + 2)) step = 0;//too small to mipmap it
+                        }
+                    }
+                    else { for (int k = 1; k < count2; k++) GL.Vertex3(triList[k].Easting, triList[k].Northing, 0); }
+                    GL.End();
+                }
+            }
+        }
+
+        public void DrawSectionsPatchList(bool color)
+        {
+            // the follow up to sections patches
+            int patchCount;
+
+            for (int i = 0; i < Tools.Count; i++)
+            {
+                for (int j = 0; j < Tools[i].Sections.Count; j++)
+                {
+                    // the follow up to sections patches
+                    if (Tools[i].Sections[j].IsMappingOn && (patchCount = Tools[i].Sections[j].triangleList.Count) > 0)
+                    {
+                        if (color)
+                        {
+                            if (isDay) GL.Color4((byte)Tools[i].Sections[j].triangleList[0].Northing, (byte)Tools[i].Sections[j].triangleList[0].Easting, (byte)Tools[i].Sections[j].triangleList[0].Heading, (byte)152);
+                            else GL.Color4((byte)Tools[i].Sections[j].triangleList[0].Northing, (byte)Tools[i].Sections[j].triangleList[0].Easting, (byte)Tools[i].Sections[j].triangleList[0].Heading, (byte)(152 * 0.5));
+                        }
+                        //draw the triangle in each triangle strip
+                        GL.Begin(PrimitiveType.TriangleStrip);
+
+                        for (int k = 1; k < patchCount; k++)
+                        {
+                            GL.Vertex3(Tools[i].Sections[j].triangleList[k].Easting, Tools[i].Sections[j].triangleList[k].Northing, 0);
+                        }
+                        if (Tools[i].Sections[j].IsMappingOn)
+                        {
+                            GL.Vertex3(Tools[i].Sections[j].leftPoint.Easting, Tools[i].Sections[j].leftPoint.Northing, 0);
+                            GL.Vertex3(Tools[i].Sections[j].rightPoint.Easting, Tools[i].Sections[j].rightPoint.Northing, 0);
+                        }
+                        GL.End();
+                    }
+                }
+            }
         }
 
         //an error log called by all try catches

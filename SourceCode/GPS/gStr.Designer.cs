@@ -484,11 +484,38 @@ namespace AgOpenGPS {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Boundary Not Set or No Guidance line set.
+        /// </summary>
+        public static string gsBoundaryNotSetOrNoGuidanceLineSet {
+            get {
+                return ResourceManager.GetString("gsBoundaryNotSetOrNoGuidanceLineSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Boundary Too Small To Create a Headland.
+        /// </summary>
+        public static string gsBoundaryTooSmallToCreateAHeadland {
+            get {
+                return ResourceManager.GetString("gsBoundaryTooSmallToCreateAHeadland", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bounds.
         /// </summary>
         public static string gsBounds {
             get {
                 return ResourceManager.GetString("gsBounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Building Map, Please Wait.
+        /// </summary>
+        public static string gsBuildingMapWait {
+            get {
+                return ResourceManager.GetString("gsBuildingMapWait", resourceCulture);
             }
         }
         
@@ -573,6 +600,50 @@ namespace AgOpenGPS {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Click Button Again to Stop.
+        /// </summary>
+        public static string gsClickButtonAgainToStop {
+            get {
+                return ResourceManager.GetString("gsClickButtonAgainToStop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click new points make more lines.
+        /// </summary>
+        public static string gsClicknewpointsmakemorelines {
+            get {
+                return ResourceManager.GetString("gsClicknewpointsmakemorelines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click Start to Resume.
+        /// </summary>
+        public static string gsClickStartToResume {
+            get {
+                return ResourceManager.GetString("gsClickStartToResume", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clone From.
+        /// </summary>
+        public static string gsCloneFrom {
+            get {
+                return ResourceManager.GetString("gsCloneFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close Field.
+        /// </summary>
+        public static string gsCloseField {
+            get {
+                return ResourceManager.GetString("gsCloseField", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Close Field First.

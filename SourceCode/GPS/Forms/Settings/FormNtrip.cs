@@ -13,6 +13,8 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf;
+        private int udpport = 0, casterport = 0, ggainterval = 0;
+        private double latitude, longitude;
 
         public FormNtrip(Form callingForm)
         {
@@ -42,12 +44,6 @@ namespace AgOpenGPS
 
             this.Text = gStr.gsNTRIPClientSettings;
 
-            //turn off the little arrows
-            nudCasterPort.Controls[0].Enabled = false;
-            nudGGAInterval.Controls[0].Enabled = false;
-            nudLatitude.Controls[0].Enabled = false;
-            nudLongitude.Controls[0].Enabled = false;
-            nudSendToUDPPort.Controls[0].Enabled = false;
         }
 
         private void FormNtrip_Load(object sender, EventArgs e)
@@ -61,8 +57,8 @@ namespace AgOpenGPS
             tboxEnterURL.Text = Properties.Settings.Default.setNTRIP_casterURL;
 
             tboxCasterIP.Text = Properties.Settings.Default.setNTRIP_casterIP;
-            nudCasterPort.Value = Properties.Settings.Default.setNTRIP_casterPort;
-            nudSendToUDPPort.Value = Properties.Settings.Default.setNTRIP_sendToUDPPort;
+
+
 
             cboxIsNTRIPOn.Checked = Properties.Settings.Default.setNTRIP_isOn;
 
@@ -70,14 +66,17 @@ namespace AgOpenGPS
             tboxUserPassword.Text = Properties.Settings.Default.setNTRIP_userPassword;
             tboxMount.Text = Properties.Settings.Default.setNTRIP_mount;
 
-            nudGGAInterval.Value = Properties.Settings.Default.setNTRIP_sendGGAInterval;
 
-            nudSendToUDPPort.Value = Properties.Settings.Default.setNTRIP_sendToUDPPort;
+            TboxGGAInterval.Text = (ggainterval = Properties.Settings.Default.setNTRIP_sendGGAInterval).ToString();
+            TboxUDPPort.Text = (udpport = Properties.Settings.Default.setNTRIP_sendToUDPPort).ToString();
+            TboxCasterPort.Text = (casterport = Properties.Settings.Default.setNTRIP_casterPort).ToString();
 
-            nudLatitude.Value = (decimal)Properties.Settings.Default.setNTRIP_manualLat;
-            nudLongitude.Value = (decimal)Properties.Settings.Default.setNTRIP_manualLon;
-            tboxCurrentLat.Text = mf.pn.latitude.ToString();
-            tboxCurrentLon.Text = mf.pn.longitude.ToString();
+
+            TboxLatitude.Text = (latitude = Properties.Settings.Default.setNTRIP_manualLat).ToString("N7");
+            TboxLongitude.Text = (longitude = Properties.Settings.Default.setNTRIP_manualLon).ToString("N7");
+
+            tboxCurrentLat.Text = mf.pn.latitude.ToString("N7");
+            tboxCurrentLon.Text = mf.pn.longitude.ToString("N7");
 
             checkBoxusetcp.Checked = Properties.Settings.Default.setNTRIP_isTCP;
 
@@ -160,18 +159,17 @@ namespace AgOpenGPS
         private void BtnSerialOK_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.setNTRIP_casterIP = tboxCasterIP.Text;
-            Properties.Settings.Default.setNTRIP_casterPort = (int)nudCasterPort.Value;
-            Properties.Settings.Default.setNTRIP_sendToUDPPort = (int)nudSendToUDPPort.Value;
+            Properties.Settings.Default.setNTRIP_casterPort = casterport;
 
             Properties.Settings.Default.setNTRIP_isOn = cboxIsNTRIPOn.Checked;
             Properties.Settings.Default.setNTRIP_userName = tboxUserName.Text;
             Properties.Settings.Default.setNTRIP_userPassword = tboxUserPassword.Text;
             Properties.Settings.Default.setNTRIP_mount = tboxMount.Text;
 
-            Properties.Settings.Default.setNTRIP_sendGGAInterval = (int)nudGGAInterval.Value;
-            Properties.Settings.Default.setNTRIP_sendToUDPPort = (int)nudSendToUDPPort.Value;
-            Properties.Settings.Default.setNTRIP_manualLat = (double)nudLatitude.Value;
-            Properties.Settings.Default.setNTRIP_manualLon = (double)nudLongitude.Value;
+            Properties.Settings.Default.setNTRIP_sendGGAInterval = ggainterval;
+            Properties.Settings.Default.setNTRIP_sendToUDPPort = udpport;
+            Properties.Settings.Default.setNTRIP_manualLat = latitude;
+            Properties.Settings.Default.setNTRIP_manualLon = longitude;
 
             Properties.Settings.Default.setNTRIP_casterURL = tboxEnterURL.Text;
             Properties.Settings.Default.setNTRIP_isGGAManual = cboxGGAManual.Text == "Use Manual Fix";
@@ -186,14 +184,14 @@ namespace AgOpenGPS
 
         private void BtnSetManualPosition_Click(object sender, EventArgs e)
         {
-            nudLatitude.Value = (decimal)mf.pn.latitude;
-            nudLongitude.Value = (decimal)mf.pn.longitude;
+            TboxLatitude.Text = (latitude = Math.Round(mf.pn.latitude,7)).ToString("N7");
+            TboxLongitude.Text = (longitude = Math.Round(mf.pn.longitude,7)).ToString("N7");
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            tboxCurrentLat.Text = mf.pn.latitude.ToString();
-            tboxCurrentLon.Text = mf.pn.longitude.ToString();
+            tboxCurrentLat.Text = mf.pn.latitude.ToString("N7");
+            tboxCurrentLon.Text = mf.pn.longitude.ToString("N7");
         }
 
         public List<string> DataList { get; set; } = new List<string>();
@@ -201,10 +199,9 @@ namespace AgOpenGPS
         private void BtnGetSourceTable_Click(object sender, EventArgs e)
         {
             IPAddress casterIP = IPAddress.Parse(tboxCasterIP.Text.Trim()); //Select correct Address
-            int casterPort = (int)nudCasterPort.Value; //Select correct port (usually 80)
 
             Socket sckt;
-            DataList?.Clear();
+            DataList.Clear();
 
             try
             {
@@ -212,7 +209,7 @@ namespace AgOpenGPS
                 {
                     Blocking = true
                 };
-                sckt.Connect(new IPEndPoint(casterIP, casterPort));
+                sckt.Connect(new IPEndPoint(casterIP, casterport));
 
                 string msg = "GET / HTTP/1.0\r\n" + "User-Agent: NTRIP iter.dk\r\n" +
                                     "Accept: */*\r\nConnection: close\r\n" + "\r\n";
@@ -264,7 +261,7 @@ namespace AgOpenGPS
 
             if (DataList.Count > 0)
             {
-                string syte = "http://monitor.use-snip.com/?hostUrl=" + tboxCasterIP.Text + "&port=" + nudCasterPort.Value.ToString();
+                string syte = "http://monitor.use-snip.com/?hostUrl=" + tboxCasterIP.Text + "&port=" + casterport.ToString();
                 var form = new FormSource(this, DataList, mf.pn.latitude, mf.pn.longitude, syte);
                 form.ShowDialog(this);
             }
@@ -276,36 +273,6 @@ namespace AgOpenGPS
 
             // Console.WriteLine(page);
             // Process.Start(syte);
-        }
-
-        private void NudCasterPort_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnSerialCancel.Focus();
-        }
-
-        private void NudGGAInterval_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnSerialCancel.Focus();
-        }
-
-        private void NudLatitude_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnSerialCancel.Focus();
-        }
-
-        private void NudLongitude_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnSerialCancel.Focus();
-        }
-
-        private void NudSendToUDPPort_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnSerialCancel.Focus();
         }
 
         private void TboxEnterURL_Click(object sender, EventArgs e)
@@ -361,6 +328,72 @@ namespace AgOpenGPS
         private void BtnSerialCancel_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void TboxUDPPort_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, 65535, udpport, this, true,0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxUDPPort.Text = (udpport = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnSerialCancel.Focus();
+        }
+
+        private void TboxLatitude_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(-90, 90, latitude, this, false,7))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxLatitude.Text = (latitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                }
+            }
+            btnSerialCancel.Focus();
+        }
+
+        private void TboxLongitude_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(-180, 180, longitude, this, false, 7))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxLatitude.Text = (longitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                }
+            }
+            btnSerialCancel.Focus();
+        }
+
+        private void TboxGGAInterval_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, 600, ggainterval, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxGGAInterval.Text = (ggainterval = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnSerialCancel.Focus();
+        }
+
+        private void TboxCasterPort_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, 65535, casterport, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxCasterPort.Text = (casterport = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnSerialCancel.Focus();
+
         }
     }
 }

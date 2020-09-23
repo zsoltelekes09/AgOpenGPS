@@ -40,9 +40,6 @@ namespace AgOpenGPS
             Properties.Settings.Default.setIP_autoSteerIP = tboxAutoSteerIP.Text;
             Properties.Settings.Default.setIP_autoSteerPort = (int)nudAutoSteerPort.Value;
 
-            //Properties.Settings.Default.setIP_rateMachineIP = tboxRateMachineIP.Text;
-            //Properties.Settings.Default.setIP_rateMachinePort = (int)nudRateMachinePort.Value;
-
             Properties.Settings.Default.setUDP_isOn = cboxIsUDPOn.Checked;
             Properties.Settings.Default.setUDP_isInterAppOn = cboxIsInterAppOn.Checked;
 
@@ -70,9 +67,6 @@ namespace AgOpenGPS
 
             tboxAutoSteerIP.Text = Properties.Settings.Default.setIP_autoSteerIP;
             nudAutoSteerPort.Value = Properties.Settings.Default.setIP_autoSteerPort;
-
-            //tboxRateMachineIP.Text = Properties.Settings.Default.setIP_rateMachineIP;
-            //nudRateMachinePort.Value = Properties.Settings.Default.setIP_rateMachinePort;
 
             cboxIsUDPOn.Checked = Properties.Settings.Default.setUDP_isOn;
             cboxIsInterAppOn.Checked = Properties.Settings.Default.setUDP_isInterAppOn;

@@ -66,27 +66,6 @@ namespace AgOpenGPS
             }
         }
 
-        private void BtnJobTouch_Click(object sender, EventArgs e)
-        {
-            mf.filePickerFileAndDirectory = "";
-
-            using (var form = new FormTouchPick(mf))
-            {
-                var result = form.ShowDialog(this);
-
-                //returns full field.txt file dir name
-                if (result == DialogResult.Yes)
-                {
-                    mf.FileOpenField(mf.filePickerFileAndDirectory);
-                    Close();
-                }
-                else
-                {
-                    return;
-                }
-            }
-        }
-
         private void BtnJobOpen_Click(object sender, EventArgs e)
         {
             mf.filePickerFileAndDirectory = "";
@@ -197,8 +176,8 @@ namespace AgOpenGPS
                                             line = reader.ReadLine();
                                             string[] words = line.Split(',');
                                             Vec2 vecPt = new Vec2(
-                                            double.Parse(words[0], CultureInfo.InvariantCulture) + eastingOffset,
-                                            double.Parse(words[1], CultureInfo.InvariantCulture) + northingOffset);
+                                            double.Parse(words[1], CultureInfo.InvariantCulture) + northingOffset,
+                                                double.Parse(words[0], CultureInfo.InvariantCulture) + eastingOffset);
 
                                             linePoints[i] = vecPt;
                                         }
@@ -210,12 +189,12 @@ namespace AgOpenGPS
 
                                         for (int i = 0; i < linePoints.Length; i++)
                                         {
-                                            if ((linePoints[i].northing < y && linePoints[j].northing >= y
-                                            || linePoints[j].northing < y && linePoints[i].northing >= y)
-                                            && (linePoints[i].easting <= x || linePoints[j].easting <= x))
+                                            if ((linePoints[i].Northing < y && linePoints[j].Northing >= y
+                                            || linePoints[j].Northing < y && linePoints[i].Northing >= y)
+                                            && (linePoints[i].Easting <= x || linePoints[j].Easting <= x))
                                             {
-                                                oddNodes ^= (linePoints[i].easting + (y - linePoints[i].northing) /
-                                                (linePoints[j].northing - linePoints[i].northing) * (linePoints[j].easting - linePoints[i].easting) < x);
+                                                oddNodes ^= (linePoints[i].Easting + (y - linePoints[i].Northing) /
+                                                (linePoints[j].Northing - linePoints[i].Northing) * (linePoints[j].Easting - linePoints[i].Easting) < x);
                                             }
                                             j = i;
                                         }

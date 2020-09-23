@@ -14,11 +14,11 @@ namespace AgOpenGPS
         public StringBuilder sbFix = new StringBuilder();
 
         // autosteer variables for sending serial
-        public Int16 guidanceLineDistanceOff, guidanceLineSteerAngle, distanceDisplay;
+        public Int16 guidanceLineDistanceOff, guidanceLineSteerAngle, distanceDisplay, distanceFromCurrentLine;
 
         //how many fix updates per sec
-        public int fixUpdateHz = 5;
-        public double fixUpdateTime = 0.2;
+        public int fixUpdateHz = 8;
+        public double fixUpdateTime = 0.125;
 
         //for heading or Atan2 as camera
         public string headingFromSource, headingFromSourceBak;
@@ -32,19 +32,19 @@ namespace AgOpenGPS
 
         //a distance between previous and current fix
         public double treeSpacingCounter = 0.0;
-        public bool treeTrigger = false;
+        public byte treeTrigger = 0x00;
 
         //how far travelled since last section was added, section points
         double sectionTriggerStepDistance = 0;
         public Vec2 prevSectionPos = new Vec2(0, 0);
 
 
-        private bool NotLoadedField = true;
+        public bool NotLoadedField = true;
 
         public Vec2 prevBoundaryPos = new Vec2(0, 0);
 
         //are we still getting valid data from GPS, resets to 0 in NMEA OGI block, watchdog 
-        public int recvCounter = 134;
+        public int recvCounter = 0;
 
         //Everything is so wonky at the start
         int startCounter = 0;
@@ -94,8 +94,9 @@ namespace AgOpenGPS
                 nowHz = ((double)System.Diagnostics.Stopwatch.Frequency) / (double)swHz.ElapsedTicks;
 
                 //simple comp filter
-                if (nowHz < 20) HzTime = 0.97 * HzTime + 0.03 * nowHz;
-                //HzTime = Math.Round(HzTime, 0);
+                if (nowHz < 20) HzTime = 0.95 * HzTime + 0.05 * nowHz;
+                fixUpdateTime = 1.0 / (double)HzTime;
+
 
                 swHz.Reset();
                 swHz.Start();
@@ -122,78 +123,64 @@ namespace AgOpenGPS
         private void UpdateFixPosition()
         {
             startCounter++;
-            totalFixSteps = fixUpdateHz * 6;
+            totalFixSteps = (int)HzTime * 6;
 
             if (!isGPSPositionInitialized)
-            { 
+            {
                 InitializeFirstFewGPSPositions();
-                return;            
+                return;
             }
 
-        #region Step Fix
 
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = Glm.Distance(pn.fix, stepFixPts[0]);
 
-            if (distanceCurrentStepFix > minFixStepDist / totalFixSteps)
-            {
-                for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
 
-                //**** heading of the vec3 structure is used for distance in Step fix!!!!!
-                stepFixPts[0].heading = distanceCurrentStepFix;
-                stepFixPts[0].easting = pn.fix.easting;
-                stepFixPts[0].northing = pn.fix.northing;
+            #region Heading
 
-                if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser -= 3000; ;//userDistance can be reset
-
-                CalculatePositionHeading();
-            }
-
-            //test if travelled far enough for new boundary point
-            if (Glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryPoint();
-
-            //tree spacing
-            if (vehicle.treeSpacing != 0 && Tools[0].Sections[0].IsSectionOn && (treeSpacingCounter += (distanceCurrentStepFix * 100)) > vehicle.treeSpacing)
-            {
-                treeTrigger = !treeTrigger;
-                treeSpacingCounter %= vehicle.treeSpacing;//keep the distance below spacing
-            }
-
-            //test if travelled far enough for new Section point, To prevent drawing high numbers of triangles
-            if (isJobStarted && Glm.Distance(pn.fix, prevSectionPos) > sectionTriggerStepDistance)
-            {
-                AddSectionOrContourPathPoints();
-                //grab fix and elevation
-                if (isLogElevation) sbFix.Append(pn.fix.easting.ToString("N2") + "," + pn.fix.northing.ToString("N2") + ","
-                                                    + pn.altitude.ToString("N2") + ","
-                                                    + pn.latitude + "," + pn.longitude + "\r\n");
-            }
-
-        #endregion fix
-
-        #region Heading
             if ((pn.HeadingForced != 9999 && (headingFromSource == "GPS" || headingFromSource == "Dual")) || timerSim.Enabled)
             {
+                stepFixPts[0].Heading = distanceCurrentStepFix;
+                stepFixPts[0].Easting = pn.fix.Easting;
+                stepFixPts[0].Northing = pn.fix.Northing;
+                if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser %= 3000; ;//userDistance can be reset
+
                 fixHeading = Glm.ToRadians(pn.HeadingForced);
                 camHeading = pn.HeadingForced;
                 gpsHeading = Glm.ToRadians(pn.HeadingForced);
             }
             else
             {
+
+
+                if (distanceCurrentStepFix > minFixStepDist / totalFixSteps)
+                {
+                    for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
+
+                    //**** heading of the vec3 structure is used for distance in Step fix!!!!!
+                    stepFixPts[0].Heading = distanceCurrentStepFix;
+                    stepFixPts[0].Easting = pn.fix.Easting;
+                    stepFixPts[0].Northing = pn.fix.Northing;
+
+                    if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser %= 3000; ;//userDistance can be reset
+
+                }
+
+
                 fixStepDist = 0;
                 for (currentStepFix = 0; currentStepFix < totalFixSteps - 1; currentStepFix++)
                 {
-                    fixStepDist += stepFixPts[currentStepFix].heading;
+                    fixStepDist += stepFixPts[currentStepFix].Heading;
                     if (fixStepDist >= minFixStepDist)//combined points > minFixStepDist, so now we can change heading?//no need to fuse headings of all points?????
                     {
-                        gpsHeading = Math.Atan2(pn.fix.easting - stepFixPts[currentStepFix + 1].easting, pn.fix.northing - stepFixPts[currentStepFix + 1].northing);
+                        gpsHeading = Math.Atan2(pn.fix.Easting - stepFixPts[currentStepFix + 1].Easting, pn.fix.Northing - stepFixPts[currentStepFix + 1].Northing);
                         if (gpsHeading < 0) gpsHeading += Glm.twoPI;
                         fixHeading = gpsHeading;
 
                         //determine fix positions and heading in degrees for glRotate opengl methods.
                         int camStep = (currentStepFix + 1) * 2;
                         if (camStep > (totalFixSteps - 1)) camStep = (totalFixSteps - 1);
-                        camHeading = Math.Atan2(pn.fix.easting - stepFixPts[camStep].easting, pn.fix.northing - stepFixPts[camStep].northing);
+                        camHeading = Math.Atan2(pn.fix.Easting - stepFixPts[camStep].Easting, pn.fix.Northing - stepFixPts[camStep].Northing);
                         if (camHeading < 0) camHeading += Glm.twoPI;
 
 
@@ -202,9 +189,9 @@ namespace AgOpenGPS
                     }
                 }
             }
-        #endregion Heading
+            #endregion Heading
 
-        #region Heading Correction
+            #region Heading Correction
 
             //an IMU with heading correction, add the correction
             if (ahrs.isHeadingCorrectionFromBrick | ahrs.isHeadingCorrectionFromAutoSteer) //| ahrs.isHeadingCorrectionFromExtUDP
@@ -229,12 +216,12 @@ namespace AgOpenGPS
                 if (Math.Abs(gyroDelta) < 0.18)
                 {
                     //a bit of delta and add to correction to current gyro
-                    gyroCorrection += (gyroDelta * (0.25 / fixUpdateHz)) % Glm.twoPI;
+                    gyroCorrection += (gyroDelta * (0.25 / HzTime)) % Glm.twoPI;
                 }
                 else
                 {
                     //a bit of delta and add to correction to current gyro
-                    gyroCorrection += (gyroDelta * (2.0 / fixUpdateHz)) % Glm.twoPI;
+                    gyroCorrection += (gyroDelta * (2.0 / HzTime)) % Glm.twoPI;
                 }
 
                 //determine the Corrected heading based on gyro and GPS
@@ -244,17 +231,17 @@ namespace AgOpenGPS
                 fixHeading = gyroCorrected;
             }
 
-        #endregion Heading Correction
+            #endregion Heading Correction
 
-        #region Antenna Offset
+            #region Antenna Offset
             if (vehicle.antennaOffset != 0)
             {
-                pn.fix.easting = (Math.Cos(-fixHeading) * vehicle.antennaOffset) + pn.fix.easting;
-                pn.fix.northing = (Math.Sin(-fixHeading) * vehicle.antennaOffset) + pn.fix.northing;
+                pn.fix.Easting = (Math.Cos(-fixHeading) * vehicle.antennaOffset) + pn.fix.Easting;
+                pn.fix.Northing = (Math.Sin(-fixHeading) * vehicle.antennaOffset) + pn.fix.Northing;
             }
-       #endregion
+            #endregion
 
-        #region Roll
+            #region Roll
 
             rollUsed = 0;
 
@@ -269,13 +256,102 @@ namespace AgOpenGPS
 
                 // roll to left is positive  **** important!!
                 // not any more - April 30, 2019 - roll to right is positive Now! Still Important
-                pn.fix.easting = (Math.Cos(-fixHeading) * rollCorrectionDistance) + pn.fix.easting;
-                pn.fix.northing = (Math.Sin(-fixHeading) * rollCorrectionDistance) + pn.fix.northing;
+                pn.fix.Easting = (Math.Cos(-fixHeading) * rollCorrectionDistance) + pn.fix.Easting;
+                pn.fix.Northing = (Math.Sin(-fixHeading) * rollCorrectionDistance) + pn.fix.Northing;
             }
 
-        #endregion Roll
+            #endregion Roll
 
-        #region AutoSteer
+
+            #region Step Fix
+
+            CalculatePositionHeading();
+
+
+            //test if travelled far enough for new boundary point
+            if (Glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryPoint();
+
+            //tree spacing
+            if (vehicle.treeSpacing != 0 && (Tools[0].Sections[0].IsSectionOn || Tools[0].Sections[Tools[0].numOfSections].IsSectionOn) && (treeSpacingCounter += (distanceCurrentStepFix * 200)) > vehicle.treeSpacing)
+            {
+                treeSpacingCounter %= vehicle.treeSpacing;//keep the distance below spacing
+                mc.Send_Treeplant[3] = (treeTrigger ^= 0x01);
+                SendData(mc.Send_Treeplant, false);
+            }
+            else if (vehicle.treeSpacing == 0 && mc.Send_Treeplant[3] == 0x01)
+            {
+                mc.Send_Treeplant[3] = 0;
+                SendData(mc.Send_Treeplant, false);
+            }
+
+            //test if travelled far enough for new Section point, To prevent drawing high numbers of triangles
+            if (isJobStarted && Glm.Distance(pn.fix, prevSectionPos) > sectionTriggerStepDistance)
+            {
+                //save the north & east as previous
+                prevSectionPos.Northing = pn.fix.Northing;
+                prevSectionPos.Easting = pn.fix.Easting;
+
+                if (recPath.isRecordOn)
+                {
+                    //keep minimum speed of 1.0
+                    double speed = pn.speed;
+                    if (pn.speed < 1.0) speed = 1.0;
+                    bool autoBtn = (autoBtnState == btnStates.Auto);
+
+                    CRecPathPt pt = new CRecPathPt(steerAxlePos.Easting, steerAxlePos.Northing, steerAxlePos.Heading, pn.speed, autoBtn);
+                    recPath.recList.Add(pt);
+                }
+
+                if (CurveLines.isOkToAddPoints && CurveLines.CurrentEditLine < CurveLines.Lines.Count && CurveLines.CurrentEditLine > -1)
+                {
+                    Vec3 pt = new Vec3(pivotAxlePos.Northing, pivotAxlePos.Easting, pivotAxlePos.Heading);
+                    CurveLines.Lines[CurveLines.CurrentEditLine].curvePts.Add(pt);
+                }
+
+
+                // if non zero, at least one section is on.
+                int sectionCounter = 0;
+
+                for (int i = 0; i < Tools.Count; i++)
+                {
+                    //send the current and previous GPS fore/aft corrected fix to each section
+                    for (int j = 0; j < Tools[i].Sections.Count; j++)
+                    {
+                        if (Tools[i].Sections[j].IsMappingOn)
+                        {
+                            Tools[i].Sections[j].AddMappingPoint();
+                            sectionCounter++;
+                        }
+                    }
+                }
+
+
+
+                //Build contour line if close enough to a patch
+                if (ct.isContourBtnOn) ct.BuildContourGuidanceLine(pivotAxlePos);
+
+                //add point if no autosteer and section enabled?
+                if ((!ct.isContourBtnOn && isAutoSteerBtnOn) || sectionCounter == 0)
+                {
+                    if (ct.isContourOn) ct.StopContourLine(steerAxlePos);
+                }
+                else
+                {
+                    ct.AddPoint(pivotAxlePos, ct.isContourOn);
+                }
+
+
+
+                //grab fix and elevation
+                if (isLogElevation) sbFix.Append(pn.fix.Easting.ToString("N2") + "," + pn.fix.Northing.ToString("N2") + ","
+                                                    + pn.altitude.ToString("N2") + ","
+                                                    + pn.latitude + "," + pn.longitude + "\r\n");
+            }
+
+            #endregion fix
+
+
+            #region AutoSteer
 
             //preset the values
             guidanceLineDistanceOff = 32000;
@@ -286,32 +362,44 @@ namespace AgOpenGPS
             }
             else
             {
-                if (curve.isCurveSet)
+                if (ABLines.BtnABLineOn)//ref curent to points??
                 {
-                    //do the calcs for AB Curve
-                    curve.GetCurrentCurveLine(pivotAxlePos, steerAxlePos);
-                }
-
-                if (ABLine.isABLineSet)
-                {
-                    ABLine.GetCurrentABLine(pivotAxlePos, steerAxlePos);
+                    ABLines.GetCurrentABLine(pivotAxlePos, steerAxlePos);
                     if (yt.isRecordingCustomYouTurn)
                     {
                         //save reference of first point
                         if (yt.youFileList.Count == 0)
                         {
-                            Vec2 start = new Vec2(steerAxlePos.easting, steerAxlePos.northing);
+                            Vec2 start = new Vec2(steerAxlePos.Northing, steerAxlePos.Easting);
                             yt.youFileList.Add(start);
                         }
                         else
                         {
                             //keep adding points
-                            Vec2 point = new Vec2(steerAxlePos.easting - yt.youFileList[0].easting, steerAxlePos.northing - yt.youFileList[0].northing);
+                            Vec2 point = new Vec2(steerAxlePos.Northing - yt.youFileList[0].Northing, steerAxlePos.Easting - yt.youFileList[0].Easting);
                             yt.youFileList.Add(point);
                         }
                     }
                 }
+                else if (CurveLines.BtnCurveLineOn)
+                {
+                    //do the calcs for AB Curve
+                    CurveLines.GetCurrentCurveLine(pivotAxlePos, steerAxlePos);
+                }
             }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             // autosteer at full speed of updates
             if (!isAutoSteerBtnOn) //32020 means auto steer is off
@@ -322,59 +410,36 @@ namespace AgOpenGPS
             //if the whole path driving driving process is green
             if (recPath.isDrivingRecordedPath) recPath.UpdatePosition();
 
-            // If Drive button enabled be normal, or just fool the autosteer and fill values
-            if (!ast.isInFreeDriveMode)
+
+            //sidehill draft compensation
+            if (rollUsed != 0)
             {
-                //sidehill draft compensation
-                if (rollUsed != 0)
-                {
-                    guidanceLineSteerAngle = (Int16)(guidanceLineSteerAngle +
-                        ((-rollUsed) * ((double)mc.autoSteerSettings[mc.ssKd] / 50)) * 500);
-                }
-
-                //fill up0 the appropriate arrays with new values
-                //mc.machineControlData[mc.cnSpeed] = mc.autoSteerData[mc.sdSpeedHi];
-
-                mc.autoSteerData[mc.sdSpeedHi] = unchecked((byte)((int)(pn.speed * 200 + 32768) >> 8));
-                mc.autoSteerData[mc.sdSpeedLo] = unchecked((byte)(pn.speed * 200.0 + 32768));
-
-                mc.autoSteerData[mc.sdDistanceHi] = unchecked((byte)(guidanceLineDistanceOff >> 8));
-                mc.autoSteerData[mc.sdDistanceLo] = unchecked((byte)(guidanceLineDistanceOff));
-
-                mc.autoSteerData[mc.sdSteerAngleHi] = unchecked((byte)(guidanceLineSteerAngle >> 8));
-                mc.autoSteerData[mc.sdSteerAngleLo] = unchecked((byte)(guidanceLineSteerAngle));
+                guidanceLineSteerAngle = (Int16)(guidanceLineSteerAngle +
+                    ((-rollUsed) * ((double)mc.Config_AutoSteer[mc.ssKd] / 50)) * 500);
             }
 
+            pn.speed.LimitToRange(-163, 163);
+
+            if (TestAutoSteer) //fool the autosteer and fill values
+            {
+                mc.Send_AutoSteer[3] = unchecked((byte)(4 * 200 >> 8));
+                mc.Send_AutoSteer[4] = unchecked((byte)(4 * 200));//4 km/h
+                mc.Send_AutoSteer[5] = 0;
+                mc.Send_AutoSteer[6] = 0;
+                mc.Send_AutoSteer[7] = unchecked((byte)((TestAutoSteerAngle * 100) >> 8));
+                mc.Send_AutoSteer[8] = unchecked((byte)(TestAutoSteerAngle * 100));
+            }
             else
             {
-                //fill up the auto steer array with free drive values
-                //mc.autoSteerData[mc.sdSpeedHi] = unchecked((byte)(pn.speed * 4.0 + 40));
-
-                mc.autoSteerData[mc.sdSpeedHi] = unchecked((byte)((int)(pn.speed * 200 + 32768) >> 8));
-                mc.autoSteerData[mc.sdSpeedLo] = unchecked((byte)(pn.speed * 200.0 + 32768));
-
-                //make steer module think everything is normal
-                guidanceLineDistanceOff = 0;
-                mc.autoSteerData[mc.sdDistanceHi] = unchecked((byte)(0));
-                mc.autoSteerData[mc.sdDistanceLo] = unchecked((byte)0);
-
-                guidanceLineSteerAngle = (Int16)(ast.driveFreeSteerAngle * 100);
-                mc.autoSteerData[mc.sdSteerAngleHi] = unchecked((byte)(guidanceLineSteerAngle >> 8));
-                mc.autoSteerData[mc.sdSteerAngleLo] = unchecked((byte)(guidanceLineSteerAngle));
+                mc.Send_AutoSteer[3] = unchecked((byte)((int)(pn.speed * 200) >> 8));
+                mc.Send_AutoSteer[4] = unchecked((byte)(pn.speed * 200.0));
+                mc.Send_AutoSteer[5] = unchecked((byte)(guidanceLineDistanceOff >> 8));
+                mc.Send_AutoSteer[6] = unchecked((byte)(guidanceLineDistanceOff));
+                mc.Send_AutoSteer[7] = unchecked((byte)(guidanceLineSteerAngle >> 8));
+                mc.Send_AutoSteer[8] = unchecked((byte)(guidanceLineSteerAngle));
             }
 
-            //out serial to autosteer module  //indivdual classes load the distance and heading deltas 
-            SendOutUSBAutoSteerPort(mc.autoSteerData, CModuleComm.pgnSentenceLength);
-
-            //send out to network
-            if (Properties.Settings.Default.setUDP_isOn)
-            {
-                //send autosteer since it never is logic controlled
-                SendUDPMessage(mc.autoSteerData);
-
-                //machine control
-                SendUDPMessage(mc.machineData);
-            }
+            SendData(mc.Send_AutoSteer, false);
 
             //for average cross track error
             if (guidanceLineDistanceOff < 29000)
@@ -386,9 +451,9 @@ namespace AgOpenGPS
                 crossTrackError = 0;
             }
 
-        #endregion
+            #endregion
 
-        #region Youturn
+            #region Youturn
 
             //reset the fault distance to an appropriate weird number
             //-2222 means it fell out of the loop completely
@@ -397,7 +462,7 @@ namespace AgOpenGPS
             distancePivotToTurnLine = -4444;
 
             //always force out of bounds and change only if in bounds after proven so
-            mc.isOutOfBounds = true;
+            //mc.isOutOfBounds = true;
 
             //if an outer boundary is set, then apply critical stop logic
             if (bnd.bndArr.Count > 0)
@@ -407,7 +472,12 @@ namespace AgOpenGPS
                 {
                     NotLoadedField = true;
                     //reset critical stop for bounds violation
-                    mc.isOutOfBounds = false;
+                    if (mc.isOutOfBounds)
+                    {
+                        mc.Send_Uturn[3] |= 0x80;
+                        mc.isOutOfBounds = false;
+                        SendData(mc.Send_Uturn, false);
+                    }
 
                     //do the auto youturn logic if everything is on.
                     if (yt.isYouTurnBtnOn && isAutoSteerBtnOn)
@@ -430,12 +500,12 @@ namespace AgOpenGPS
                                 {
                                     if (yt.isUsingDubinsTurn)
                                     {
-                                        if (ABLine.isABLineSet) yt.BuildABLineDubinsYouTurn(yt.isYouTurnRight);
+                                        if (ABLines.BtnABLineOn) yt.BuildABLineDubinsYouTurn(yt.isYouTurnRight);
                                         else yt.BuildCurveDubinsYouTurn(yt.isYouTurnRight, pivotAxlePos);
                                     }
                                     else
                                     {
-                                        if (ABLine.isABLineSet) yt.BuildABLinePatternYouTurn(yt.isYouTurnRight);
+                                        if (ABLines.BtnABLineOn) yt.BuildABLinePatternYouTurn(yt.isYouTurnRight);
                                         else yt.BuildCurvePatternYouTurn(yt.isYouTurnRight, pivotAxlePos);
                                     }
                                 }
@@ -461,12 +531,27 @@ namespace AgOpenGPS
                                 }
                             }
                         }
-                    } // end of isInWorkingArea
+                    }
+                    else
+                    {
+                        //now check to make sure we are not in an inner turn boundary - drive thru is ok
+                        if (distanceFromCurrentLine > 1300 && !yt.isYouTurnTriggered)
+                        {
+                            yt.ResetCreatedYouTurn();
+                        }
+                    }// end of isInWorkingArea
+
                 }
                 // here is stop logic for out of bounds - in an inner or out the outer turn border.
                 else
                 {
-                    mc.isOutOfBounds = true;
+                    if (!mc.isOutOfBounds)
+                    {
+                        mc.Send_Uturn[3] &= 0x7F;
+                        mc.isOutOfBounds = true;
+                        SendData(mc.Send_Uturn, false);
+                    }
+
                     if (yt.isYouTurnBtnOn)
                     {
                         yt.ResetCreatedYouTurn();
@@ -477,130 +562,32 @@ namespace AgOpenGPS
             }
             else
             {
-                mc.isOutOfBounds = false;
+                if (mc.isOutOfBounds)
+                {
+                    mc.Send_Uturn[3] |= 0x80;
+                    mc.isOutOfBounds = false;
+                    SendData(mc.Send_Uturn, false);
+                }
                 CheckInsideOtherBoundary();
             }
 
+            #endregion
 
-
-        #endregion
-            /*
-        #region Remote Switches
-
-            //MTZ8302 Feb 2020
-            if (mc.ss[mc.swHeaderLo] == 0xF9)
-            {
-                if (isJobStarted)
-                {
-                    //MainSW was used
-                    if (mc.ss[mc.swMain] != mc.ssP[mc.swMain])
-                    {
-                        //Main SW pressed
-                        if ((mc.ss[mc.swMain] & 1) == 1)
-                        {
-                            autoBtnState = btnStates.On;
-                            btnSection_Update();
-                        }
-                        else if ((mc.ss[mc.swMain] & 2) == 2)
-                        {
-                            autoBtnState = btnStates.Auto;
-                            btnSection_Update();
-                        }
-                        else
-                        {
-                            autoBtnState = btnStates.Off;
-                            btnSection_Update();
-                        }
-                        mc.ssP[mc.swMain] = mc.ss[mc.swMain];
-                    }
-
-                    // Lo Switches have changed Section 1-8
-                    if (mc.ss[mc.swONLo] != mc.ssP[mc.swONLo] || mc.ss[mc.swOFFLo] != mc.ssP[mc.swOFFLo])
-                    {
-                        int i = 0;
-                        for (int j = 1; j < 129; j *= 2)
-                        {
-                            if (tool.numOfSections > i && (mc.ss[mc.swONLo] & j) == j)
-                            {
-                                if (section[i].BtnSectionState != btnStates.On)
-                                {
-                                    section[i].BtnSectionState = btnStates.On;
-                                    ManualBtnUpdate(i);
-                                }
-                            }
-                            else if (tool.numOfSections > i && autoBtnState == btnStates.Auto && (mc.ss[mc.swOFFLo] & j) == j)
-                            {
-                                if (section[i].BtnSectionState != btnStates.Auto)
-                                {
-                                    section[i].BtnSectionState = btnStates.Auto;
-                                    ManualBtnUpdate(i);
-                                }
-                            }
-                            else if (section[i].BtnSectionState != btnStates.Off)
-                            {
-                                section[i].BtnSectionState = btnStates.Off;
-                                ManualBtnUpdate(i);
-                            }
-                            i++;
-                        }
-                        mc.ssP[mc.swONLo] = mc.ss[mc.swONLo];
-                        mc.ssP[mc.swOFFLo] = mc.ss[mc.swOFFLo];
-                    }
-
-                    // Hi Switches have changed Section 9-16
-                    if (mc.ss[mc.swONHi] != mc.ssP[mc.swONHi] || mc.ss[mc.swOFFHi] != mc.ssP[mc.swOFFHi])
-                    {
-                        int i = 8;
-                        for (int j = 1; j < 129; j *= 2)
-                        {
-                            if (tool.numOfSections > i && (mc.ss[mc.swONHi] & j) == j)
-                            {
-                                if (section[i].BtnSectionState != btnStates.On)
-                                {
-                                    section[i].BtnSectionState = btnStates.On;
-                                    ManualBtnUpdate(i);
-                                }
-                            }
-                            else if (tool.numOfSections > i && autoBtnState == btnStates.Auto && (mc.ss[mc.swOFFHi] & j) == j)
-                            {
-                                if (section[i].BtnSectionState != btnStates.Auto)
-                                {
-                                    section[i].BtnSectionState = btnStates.Auto;
-                                    ManualBtnUpdate(i);
-                                }
-                            }
-                            else if (section[i].BtnSectionState != btnStates.Off)
-                            {
-                                section[i].BtnSectionState = btnStates.Off;
-                                ManualBtnUpdate(i);
-                            }
-                            i++;
-                        }
-                        mc.ssP[mc.swONHi] = mc.ss[mc.swONHi];
-                        mc.ssP[mc.swOFFHi] = mc.ss[mc.swOFFHi];
-                    }
-
-                    mc.ss[mc.swHeaderLo] = 0;
-                }
-            }
-
-            // end adds by MTZ8302 ------------------------------------------------------------------------------------
-        #endregion
-            */
-
-            //update Back then Main window
+            //update Back
             oglBack.Refresh();
 
             //end of UppdateFixPosition
-            swFrame.Stop();
 
+            swFrame.Stop();
             //stop the timer and calc how long it took to do calcs and draw
             FrameTime = (double)swFrame.ElapsedTicks / (double)System.Diagnostics.Stopwatch.Frequency * 1000;
+
+            //Update Main window
+            oglMain.Refresh();
         }
 
         private void CheckInsideOtherBoundary()
         {
-
             if (isAutoLoadFields && NotLoadedField)
             {
                 double x = pn.actualEasting;
@@ -608,7 +595,6 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < Fields.Count; i++)
                 {
-                    string test = currentFieldDirectory;
                     if (Fields[i].Dir != currentFieldDirectory || isJobStarted == false)
                     {
                         int j = Fields[i].Boundary.Count - 1;
@@ -617,12 +603,12 @@ namespace AgOpenGPS
 
                         for (int k = 0; k < Fields[i].Boundary.Count; k++)
                         {
-                            if ((Fields[i].Boundary[k].northing < y && Fields[i].Boundary[j].northing >= y
-                            || Fields[i].Boundary[j].northing < y && Fields[i].Boundary[k].northing >= y)
-                            && (Fields[i].Boundary[k].easting <= x || Fields[i].Boundary[j].easting <= x))
+                            if ((Fields[i].Boundary[k].Northing < y && Fields[i].Boundary[j].Northing >= y
+                            || Fields[i].Boundary[j].Northing < y && Fields[i].Boundary[k].Northing >= y)
+                            && (Fields[i].Boundary[k].Easting <= x || Fields[i].Boundary[j].Easting <= x))
                             {
-                                oddNodes ^= (Fields[i].Boundary[k].easting + (y - Fields[i].Boundary[k].northing) /
-                                (Fields[i].Boundary[j].northing - Fields[i].Boundary[k].northing) * (Fields[i].Boundary[j].easting - Fields[i].Boundary[k].easting) < x);
+                                oddNodes ^= (Fields[i].Boundary[k].Easting + (y - Fields[i].Boundary[k].Northing) /
+                                (Fields[i].Boundary[j].Northing - Fields[i].Boundary[k].Northing) * (Fields[i].Boundary[j].Easting - Fields[i].Boundary[k].Easting) < x);
                             }
                             j = k;
                         }
@@ -630,6 +616,7 @@ namespace AgOpenGPS
                         if (oddNodes)
                         {
                             NotLoadedField = false;
+                            FileSaveEverythingBeforeClosingField();
                             FileOpenField(fieldsDirectory + Fields[i].Dir + "\\Field.txt");
                             break;
                         }
@@ -650,22 +637,22 @@ namespace AgOpenGPS
             {
 
                 //translate world to the pivot axle
-                pivotAxlePos.easting = pn.fix.easting - (Math.Sin(fixHeading) * vehicle.antennaPivot);
-                pivotAxlePos.northing = pn.fix.northing - (Math.Cos(fixHeading) * vehicle.antennaPivot);
-                pivotAxlePos.heading = fixHeading;
-                steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * vehicle.wheelbase);
-                steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * vehicle.wheelbase);
-                steerAxlePos.heading = fixHeading;
+                pivotAxlePos.Easting = pn.fix.Easting - (Math.Sin(fixHeading) * vehicle.antennaPivot);
+                pivotAxlePos.Northing = pn.fix.Northing - (Math.Cos(fixHeading) * vehicle.antennaPivot);
+                pivotAxlePos.Heading = fixHeading;
+                steerAxlePos.Easting = pivotAxlePos.Easting + (Math.Sin(fixHeading) * vehicle.wheelbase);
+                steerAxlePos.Northing = pivotAxlePos.Northing + (Math.Cos(fixHeading) * vehicle.wheelbase);
+                steerAxlePos.Heading = fixHeading;
             }
             else
             {
                 //translate world to the pivot axle
-                pivotAxlePos.easting = pn.fix.easting - (Math.Sin(fixHeading) * -vehicle.antennaPivot);
-                pivotAxlePos.northing = pn.fix.northing - (Math.Cos(fixHeading) * -vehicle.antennaPivot);
-                pivotAxlePos.heading = fixHeading;
-                steerAxlePos.easting = pivotAxlePos.easting + (Math.Sin(fixHeading) * -vehicle.wheelbase);
-                steerAxlePos.northing = pivotAxlePos.northing + (Math.Cos(fixHeading) * -vehicle.wheelbase);
-                steerAxlePos.heading = fixHeading;
+                pivotAxlePos.Easting = pn.fix.Easting - (Math.Sin(fixHeading) * -vehicle.antennaPivot);
+                pivotAxlePos.Northing = pn.fix.Northing - (Math.Cos(fixHeading) * -vehicle.antennaPivot);
+                pivotAxlePos.Heading = fixHeading;
+                steerAxlePos.Easting = pivotAxlePos.Easting + (Math.Sin(fixHeading) * -vehicle.wheelbase);
+                steerAxlePos.Northing = pivotAxlePos.Northing + (Math.Cos(fixHeading) * -vehicle.wheelbase);
+                steerAxlePos.Heading = fixHeading;
             }
 
             sectionTriggerStepDistance = 10000;
@@ -673,8 +660,8 @@ namespace AgOpenGPS
             for (int i = 0; i < Tools.Count; i++)
             {
                 //determine where the rigid vehicle hitch ends
-                Tools[i].HitchPos.easting = pn.fix.easting + (Math.Sin(fixHeading) * (Tools[i].HitchLength - vehicle.antennaPivot));
-                Tools[i].HitchPos.northing = pn.fix.northing + (Math.Cos(fixHeading) * (Tools[i].HitchLength - vehicle.antennaPivot));
+                Tools[i].HitchPos.Easting = pn.fix.Easting + (Math.Sin(fixHeading) * (Tools[i].HitchLength - vehicle.antennaPivot));
+                Tools[i].HitchPos.Northing = pn.fix.Northing + (Math.Cos(fixHeading) * (Tools[i].HitchLength - vehicle.antennaPivot));
 
                 //tool attached via a trailing hitch
                 if (Tools[i].isToolTrailing)
@@ -686,68 +673,68 @@ namespace AgOpenGPS
                         if (distanceCurrentStepFix != 0)
                         {
                             double t = (Tools[i].toolTankTrailingHitchLength) / distanceCurrentStepFix;
-                            Tools[i].TankPos.easting = Tools[i].HitchPos.easting + t * (Tools[i].HitchPos.easting - Tools[i].TankPos.easting);
-                            Tools[i].TankPos.northing = Tools[i].HitchPos.northing + t * (Tools[i].HitchPos.northing - Tools[i].TankPos.northing);
-                            Tools[i].TankPos.heading = Math.Atan2(Tools[i].HitchPos.easting - Tools[i].TankPos.easting, Tools[i].HitchPos.northing - Tools[i].TankPos.northing);
+                            Tools[i].TankPos.Easting = Tools[i].HitchPos.Easting + t * (Tools[i].HitchPos.Easting - Tools[i].TankPos.Easting);
+                            Tools[i].TankPos.Northing = Tools[i].HitchPos.Northing + t * (Tools[i].HitchPos.Northing - Tools[i].TankPos.Northing);
+                            Tools[i].TankPos.Heading = Math.Atan2(Tools[i].HitchPos.Easting - Tools[i].TankPos.Easting, Tools[i].HitchPos.Northing - Tools[i].TankPos.Northing);
                         }
 
                         ////the tool is seriously jacknifed or just starting out so just spring it back.
-                        over = Math.Abs(Math.PI - Math.Abs(Math.Abs(Tools[i].TankPos.heading - fixHeading) - Math.PI));
+                        over = Math.Abs(Math.PI - Math.Abs(Math.Abs(Tools[i].TankPos.Heading - fixHeading) - Math.PI));
 
                         if (over < 2.0 && startCounter > 50)
                         {
-                            Tools[i].TankPos.easting = Tools[i].HitchPos.easting + (Math.Sin(Tools[i].TankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
-                            Tools[i].TankPos.northing = Tools[i].HitchPos.northing + (Math.Cos(Tools[i].TankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
+                            Tools[i].TankPos.Easting = Tools[i].HitchPos.Easting + (Math.Sin(Tools[i].TankPos.Heading) * (Tools[i].toolTankTrailingHitchLength));
+                            Tools[i].TankPos.Northing = Tools[i].HitchPos.Northing + (Math.Cos(Tools[i].TankPos.Heading) * (Tools[i].toolTankTrailingHitchLength));
                         }
 
                         //criteria for a forced reset to put tool directly behind vehicle
                         if (over > 2.0 | startCounter < 51)
                         {
-                            Tools[i].TankPos.heading = fixHeading;
-                            Tools[i].TankPos.easting = Tools[i].HitchPos.easting + (Math.Sin(Tools[i].TankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
-                            Tools[i].TankPos.northing = Tools[i].HitchPos.northing + (Math.Cos(Tools[i].TankPos.heading) * (Tools[i].toolTankTrailingHitchLength));
+                            Tools[i].TankPos.Heading = fixHeading;
+                            Tools[i].TankPos.Easting = Tools[i].HitchPos.Easting + (Math.Sin(Tools[i].TankPos.Heading) * (Tools[i].toolTankTrailingHitchLength));
+                            Tools[i].TankPos.Northing = Tools[i].HitchPos.Northing + (Math.Cos(Tools[i].TankPos.Heading) * (Tools[i].toolTankTrailingHitchLength));
                         }
                     }
                     else
                     {
-                        Tools[i].TankPos.heading = fixHeading;
-                        Tools[i].TankPos.easting = Tools[i].HitchPos.easting;
-                        Tools[i].TankPos.northing = Tools[i].HitchPos.northing;
+                        Tools[i].TankPos.Heading = fixHeading;
+                        Tools[i].TankPos.Easting = Tools[i].HitchPos.Easting;
+                        Tools[i].TankPos.Northing = Tools[i].HitchPos.Northing;
                     }
 
                     //Torriem rules!!!!! Oh yes, this is all his. Thank-you
                     if (distanceCurrentStepFix != 0)
                     {
                         double t = (Tools[i].toolTrailingHitchLength) / distanceCurrentStepFix;
-                        Tools[i].ToolPos.easting = Tools[i].TankPos.easting + t * (Tools[i].TankPos.easting - Tools[i].ToolPos.easting);
-                        Tools[i].ToolPos.northing = Tools[i].TankPos.northing + t * (Tools[i].TankPos.northing - Tools[i].ToolPos.northing);
-                        Tools[i].ToolPos.heading = Math.Atan2(Tools[i].TankPos.easting - Tools[i].ToolPos.easting, Tools[i].TankPos.northing - Tools[i].ToolPos.northing);
+                        Tools[i].ToolPos.Easting = Tools[i].TankPos.Easting + t * (Tools[i].TankPos.Easting - Tools[i].ToolPos.Easting);
+                        Tools[i].ToolPos.Northing = Tools[i].TankPos.Northing + t * (Tools[i].TankPos.Northing - Tools[i].ToolPos.Northing);
+                        Tools[i].ToolPos.Heading = Math.Atan2(Tools[i].TankPos.Easting - Tools[i].ToolPos.Easting, Tools[i].TankPos.Northing - Tools[i].ToolPos.Northing);
                     }
 
                     ////the tool is seriously jacknifed or just starting out so just spring it back.
-                    over = Math.Abs(Math.PI - Math.Abs(Math.Abs(Tools[i].ToolPos.heading - Tools[i].TankPos.heading) - Math.PI));
+                    over = Math.Abs(Math.PI - Math.Abs(Math.Abs(Tools[i].ToolPos.Heading - Tools[i].TankPos.Heading) - Math.PI));
 
                     if (over < 1.9 && startCounter > 50)
                     {
-                        Tools[i].ToolPos.easting = Tools[i].TankPos.easting + (Math.Sin(Tools[i].ToolPos.heading) * (Tools[i].toolTrailingHitchLength));
-                        Tools[i].ToolPos.northing = Tools[i].TankPos.northing + (Math.Cos(Tools[i].ToolPos.heading) * (Tools[i].toolTrailingHitchLength));
+                        Tools[i].ToolPos.Easting = Tools[i].TankPos.Easting + (Math.Sin(Tools[i].ToolPos.Heading) * (Tools[i].toolTrailingHitchLength));
+                        Tools[i].ToolPos.Northing = Tools[i].TankPos.Northing + (Math.Cos(Tools[i].ToolPos.Heading) * (Tools[i].toolTrailingHitchLength));
                     }
 
                     //criteria for a forced reset to put tool directly behind vehicle
                     if (over > 1.9 | startCounter < 51)
                     {
-                        Tools[i].ToolPos.heading = Tools[i].TankPos.heading;
-                        Tools[i].ToolPos.easting = Tools[i].TankPos.easting + (Math.Sin(Tools[i].ToolPos.heading) * (Tools[i].toolTrailingHitchLength));
-                        Tools[i].ToolPos.northing = Tools[i].TankPos.northing + (Math.Cos(Tools[i].ToolPos.heading) * (Tools[i].toolTrailingHitchLength));
+                        Tools[i].ToolPos.Heading = Tools[i].TankPos.Heading;
+                        Tools[i].ToolPos.Easting = Tools[i].TankPos.Easting + (Math.Sin(Tools[i].ToolPos.Heading) * (Tools[i].toolTrailingHitchLength));
+                        Tools[i].ToolPos.Northing = Tools[i].TankPos.Northing + (Math.Cos(Tools[i].ToolPos.Heading) * (Tools[i].toolTrailingHitchLength));
                     }
                 }
 
                 //rigidly connected to vehicle
                 else
                 {
-                    Tools[i].ToolPos.heading = fixHeading;
-                    Tools[i].ToolPos.easting = Tools[i].HitchPos.easting;
-                    Tools[i].ToolPos.northing = Tools[i].HitchPos.northing;
+                    Tools[i].ToolPos.Heading = fixHeading;
+                    Tools[i].ToolPos.Easting = Tools[i].HitchPos.Easting;
+                    Tools[i].ToolPos.Northing = Tools[i].HitchPos.Northing;
                 }
 
                 #endregion
@@ -766,12 +753,12 @@ namespace AgOpenGPS
                 sectionTriggerStepDistance = Math.Min(distance * twist * twist, sectionTriggerStepDistance);
 
                 //finally fixed distance for making a curve line
-                if (!curve.isOkToAddPoints) sectionTriggerStepDistance += 0.2;
+                if (!CurveLines.isOkToAddPoints) sectionTriggerStepDistance += 0.2;
                 else sectionTriggerStepDistance = 1.0;
 
                 //precalc the sin and cos of heading * -1
-                Tools[i].sinSectionHeading = Math.Sin(-Tools[i].ToolPos.heading);
-                Tools[i].cosSectionHeading = Math.Cos(-Tools[i].ToolPos.heading);
+                Tools[i].sinSectionHeading = Math.Sin(-Tools[i].ToolPos.Heading);
+                Tools[i].cosSectionHeading = Math.Cos(-Tools[i].ToolPos.Heading);
             }
         }
 
@@ -779,102 +766,31 @@ namespace AgOpenGPS
         public void AddBoundaryPoint()
         {
             //save the north & east as previous
-            prevBoundaryPos.easting = pn.fix.easting;
-            prevBoundaryPos.northing = pn.fix.northing;
+            prevBoundaryPos.Easting = pn.fix.Easting;
+            prevBoundaryPos.Northing = pn.fix.Northing;
 
             //build the boundary line
 
             if (bnd.isOkToAddPoints)
             {
                 Vec3 point = new Vec3(
-                    pivotAxlePos.easting + (Math.Sin(pivotAxlePos.heading - Glm.PIBy2) * (bnd.isDrawRightSide ? - bnd.createBndOffset : + bnd.createBndOffset)),
-                    pivotAxlePos.northing + (Math.Cos(pivotAxlePos.heading - Glm.PIBy2) * (bnd.isDrawRightSide ? - bnd.createBndOffset : + bnd.createBndOffset)),
-                    pivotAxlePos.heading);
+                    pivotAxlePos.Northing + (Math.Sin(pivotAxlePos.Heading) * (bnd.isDrawRightSide ? -bnd.createBndOffset : bnd.createBndOffset)),
+                    pivotAxlePos.Easting + (Math.Cos(pivotAxlePos.Heading) * (bnd.isDrawRightSide ? bnd.createBndOffset : -bnd.createBndOffset)),
+                    pivotAxlePos.Heading);
                 bnd.bndBeingMadePts.Add(point);
             }
-        }
-
-        //add the points for section, contour line points, Area Calc feature
-        private void AddSectionOrContourPathPoints()
-        {
-
-            if (recPath.isRecordOn)
-            {
-                //keep minimum speed of 1.0
-                double speed = pn.speed;
-                if (pn.speed < 1.0) speed = 1.0;
-                bool autoBtn = (autoBtnState == btnStates.Auto);
-
-                CRecPathPt pt = new CRecPathPt(steerAxlePos.easting, steerAxlePos.northing, steerAxlePos.heading, pn.speed, autoBtn);
-                recPath.recList.Add(pt);
-            }
-
-            if (curve.isOkToAddPoints)
-            {
-                Vec3 pt = new Vec3(pivotAxlePos.easting, pivotAxlePos.northing, pivotAxlePos.heading);
-                curve.refList.Add(pt);
-            }
-
-            //save the north & east as previous
-            prevSectionPos.northing = pn.fix.northing;
-            prevSectionPos.easting = pn.fix.easting;
-
-            // if non zero, at least one section is on.
-            int sectionCounter = 0;
-
-            for (int i = 0; i < Tools.Count; i++)
-            {
-                //send the current and previous GPS fore/aft corrected fix to each section
-                for (int j = 0; j <= Tools[i].numOfSections; j++)
-                {
-                    if (Tools[i].Sections[j].IsMappingOn)
-                    {
-                        Tools[i].Sections[j].AddMappingPoint();
-                        sectionCounter++;
-                    }
-                }
-            }
-
-            if ((ABLine.isBtnABLineOn && !ct.isContourBtnOn && ABLine.isABLineSet && isAutoSteerBtnOn) ||
-                        (!ct.isContourBtnOn && curve.isBtnCurveOn && curve.isCurveSet && isAutoSteerBtnOn))
-            {
-                //no contour recorded
-                if (ct.isContourOn) { ct.StopContourLine(steerAxlePos); }
-            }
-            else
-            {
-                //Contour Base Track.... At least One section on, turn on if not
-                if (sectionCounter != 0)
-                {
-                    //keep the line going, everything is on for recording path
-                    if (ct.isContourOn) ct.AddPoint(pivotAxlePos);
-                    else
-                    {
-                        ct.StartContourLine(pivotAxlePos);
-                        ct.AddPoint(pivotAxlePos);
-                    }
-                }
-
-                //All sections OFF so if on, turn off
-                else { if (ct.isContourOn) { ct.StopContourLine(pivotAxlePos); } }
-
-                //Build contour line if close enough to a patch
-                if (ct.isContourBtnOn) ct.BuildContourGuidanceLine(pivotAxlePos);
-            }
-
         }
 
         //calculate the extreme tool left, right velocities, each section lookahead, and whether or not its going backwards
         public void CalculateSectionLookAhead()
         {
             //calculate left side of section 1
-            Vec3 left = new Vec3();
-            Vec3 right = left;
+            Vec2 right, left = new Vec2();
 
             //speed max for section kmh*0.277 to m/s * 10 cm per pixel * 1.7 max speed
             double meterPerSecPerPixel = Math.Abs(pn.speed) * 4.5;
-            Vec3 lastLeftPoint = new Vec3();
-            Vec3 lastRightPoint = new Vec3();
+            Vec2 lastLeftPoint = new Vec2();
+            Vec2 lastRightPoint = new Vec2();
 
             for (int i = 0; i < Tools.Count; i++)
             {
@@ -889,11 +805,11 @@ namespace AgOpenGPS
 
                         if (j > 0 && Tools[i].Sections[j - 1].positionRight == Tools[i].Sections[j].positionLeft && Tools[i].Sections[j - 1].positionForward == Tools[i].Sections[j].positionForward)
                         {
-                            Tools[i].Sections[j].leftPoint = Tools[i].Sections[j-1].rightPoint;
+                            Tools[i].Sections[j].leftPoint = Tools[i].Sections[j - 1].rightPoint;
                         }
                         else
                         {
-                            Tools[i].Sections[j].leftPoint = new Vec3(Tools[i].cosSectionHeading * Tools[i].Sections[j].positionLeft + Tools[i].ToolPos.easting - Tools[i].sinSectionHeading * Tools[i].Sections[j].positionForward, Tools[i].sinSectionHeading * Tools[i].Sections[j].positionLeft + Tools[i].ToolPos.northing + Tools[i].cosSectionHeading * Tools[i].Sections[j].positionForward, 0);
+                            Tools[i].Sections[j].leftPoint = new Vec2(Tools[i].sinSectionHeading * Tools[i].Sections[j].positionLeft + Tools[i].ToolPos.Northing + Tools[i].cosSectionHeading * Tools[i].Sections[j].positionForward, Tools[i].cosSectionHeading * Tools[i].Sections[j].positionLeft + Tools[i].ToolPos.Easting - Tools[i].sinSectionHeading * Tools[i].Sections[j].positionForward);
                         }
                         left = Tools[i].Sections[j].leftPoint - lastLeftPoint;
 
@@ -904,7 +820,7 @@ namespace AgOpenGPS
 
 
                         lastRightPoint = Tools[i].Sections[j].rightPoint;
-                        Tools[i].Sections[j].rightPoint = new Vec3(Tools[i].cosSectionHeading * Tools[i].Sections[j].positionRight + Tools[i].ToolPos.easting - Tools[i].sinSectionHeading * Tools[i].Sections[j].positionForward, Tools[i].sinSectionHeading * Tools[i].Sections[j].positionRight + Tools[i].ToolPos.northing + Tools[i].cosSectionHeading * Tools[i].Sections[j].positionForward, 0);
+                        Tools[i].Sections[j].rightPoint = new Vec2(Tools[i].sinSectionHeading * Tools[i].Sections[j].positionRight + Tools[i].ToolPos.Northing + Tools[i].cosSectionHeading * Tools[i].Sections[j].positionForward, Tools[i].cosSectionHeading * Tools[i].Sections[j].positionRight + Tools[i].ToolPos.Easting - Tools[i].sinSectionHeading * Tools[i].Sections[j].positionForward);
 
                         //now we have left and right for this section
                         right = Tools[i].Sections[j].rightPoint - lastRightPoint;
@@ -914,14 +830,14 @@ namespace AgOpenGPS
                         if (rightSpeed > meterPerSecPerPixel) rightSpeed = meterPerSecPerPixel;
 
                         //Is section outer going forward or backward
-                        double head = left.HeadingXZ();
-                        if (Math.PI - Math.Abs(Math.Abs(head - Tools[i].ToolPos.heading) - Math.PI) > Glm.PIBy2)
+                        double head = Math.Atan2(left.Easting, left.Northing);
+                        if (Math.PI - Math.Abs(Math.Abs(head - Tools[i].ToolPos.Heading) - Math.PI) > Glm.PIBy2)
                         {
                             if (leftSpeed > 0) leftSpeed *= -1;
                         }
 
-                        head = right.HeadingXZ();
-                        if (Math.PI - Math.Abs(Math.Abs(head - Tools[i].ToolPos.heading) - Math.PI) > Glm.PIBy2)
+                        head = Math.Atan2(right.Easting, right.Northing);
+                        if (Math.PI - Math.Abs(Math.Abs(head - Tools[i].ToolPos.Heading) - Math.PI) > Glm.PIBy2)
                         {
                             if (rightSpeed > 0) rightSpeed *= -1;
                         }
@@ -957,44 +873,42 @@ namespace AgOpenGPS
         private void InitializeFirstFewGPSPositions()
         {
             //reduce the huge utm coordinates
-            pn.utmEast = (int)(pn.fix.easting);
-            pn.utmNorth = (int)(pn.fix.northing);
-            pn.fix.easting = (int)pn.fix.easting - pn.utmEast;
-            pn.fix.northing = (int)pn.fix.northing - pn.utmNorth;
+            pn.utmEast = (int)(pn.fix.Easting);
+            pn.utmNorth = (int)(pn.fix.Northing);
+            pn.fix.Easting = (int)pn.fix.Easting - pn.utmEast;
+            pn.fix.Northing = (int)pn.fix.Northing - pn.utmNorth;
 
             //calculate the central meridian of current zone
             pn.centralMeridian = -177 + ((pn.zone - 1) * 6);
 
-                //Azimuth Error - utm declination
-                pn.convergenceAngle = Math.Atan(Math.Sin(Glm.ToRadians(pn.latitude)) * Math.Tan(Glm.ToRadians(pn.longitude - pn.centralMeridian)));
+            //Azimuth Error - utm declination
+            pn.convergenceAngle = Math.Atan(Math.Sin(Glm.ToRadians(pn.latitude)) * Math.Tan(Glm.ToRadians(pn.longitude - pn.centralMeridian)));
 
             //Draw a grid once we know where in the world we are.
-            worldGrid.CreateWorldGrid(0, 0);
+            worldGrid.CheckWorldGrid(pn.fix.Northing, pn.fix.Easting);
 
             //in radians
-            fixHeading = Math.Atan2(pn.fix.easting - stepFixPts[totalFixSteps - 1].easting, pn.fix.northing - stepFixPts[totalFixSteps - 1].northing);
-            if (fixHeading < 0) fixHeading += Glm.twoPI;
+            fixHeading = 0;
 
-
-            for (int i = 0; i < Tools.Count; i++) Tools[i].ToolPos.heading = fixHeading;
+            for (int i = 0; i < Tools.Count; i++) Tools[i].ToolPos.Heading = fixHeading;
 
             //send out initial zero settings
             //set up the modules
-            mc.ResetAllModuleCommValues();
+            mc.ResetAllModuleCommValues(true);
 
-                    //SendSteerSettingsOutAutoSteerPort();
-                    //SendArduinoSettingsOutToAutoSteerPort();
+            //SendSteerSettingsOutAutoSteerPort();
+            //SendArduinoSettingsOutToAutoSteerPort();
 
             IsBetweenSunriseSunset(pn.latitude, pn.longitude);
 
             //set display accordingly
             isDayTime = (DateTime.Now.Ticks < sunset.Ticks && DateTime.Now.Ticks > sunrise.Ticks);
 
-                if (isAutoDayNight)
-                {
-                    isDay = !isDayTime;
-                    SwapDayNightMode();
-                }
+            if (isAutoDayNight)
+            {
+                isDay = !isDayTime;
+                SwapDayNightMode();
+            }
             isGPSPositionInitialized = true;
             return;
         }
@@ -1029,11 +943,60 @@ namespace AgOpenGPS
             {
                 return true;
             }
-        }       
+        }
 
-        // intense math section....   the lat long converted to utm   *********************************************************
-            #region utm Calculations
-        private double sm_a = 6378137.0;
+        public void FindCrossingPoints(ref List<Vec4> Crossings, ref List<Vec2> Tram, double Northing, double Easting, double Northing2, double Easting2, int Index)
+        {
+            if (Tram.Count > 2)
+            {
+                int k = Tram.Count - 2;
+                for (int j = -2; j < Tram.Count - 2; k = j)
+                {
+                    j += 2;
+                    if (DoLinesIntersect(Northing, Easting, Northing2, Easting2, Tram[j].Northing, Tram[j].Easting, Tram[k].Northing - Tram[j].Northing, Tram[k].Easting - Tram[j].Easting, out double t))
+                    {
+                        Crossings.Add(new Vec4(Northing + (t * Northing2), Easting + (t * Easting2), t, Index));
+                    }
+                }
+            }
+        }
+
+        public void FindCrossingPoints(ref List<Vec4> Crossings, ref List<Vec3> Bound, double Northing, double Easting, double Northing2, double Easting2, int Index)
+        {
+            if (Bound.Count > 2)
+            {
+                int k = Bound.Count - 2;
+                for (int j = -2; j < Bound.Count - 2; k = j)
+                {
+                    j += 2;
+                    if (DoLinesIntersect(Northing, Easting, Northing2, Easting2, Bound[j].Northing, Bound[j].Easting, Bound[k].Northing - Bound[j].Northing, Bound[k].Easting - Bound[j].Easting, out double t))
+                    {
+                        Crossings.Add(new Vec4(Northing + (t * Northing2), Easting + (t * Easting2), t, Index));
+                    }
+                }
+            }
+        }
+
+        public bool DoLinesIntersect(double Northing, double Easting, double Northing2, double Easting2, double Northing3, double Easting3, double Northing4, double Easting4, out double t)
+        {
+            t = -1;
+            double s = (-Easting2 * (Northing - Northing3) + Northing2 * (Easting - Easting3)) / (-Northing4 * Easting2 + Northing2 * Easting4);
+            if (s >= 0 && s <= 1)
+            {
+                t = (Northing4 * (Easting - Easting3) - Easting4 * (Northing - Northing3)) / (-Northing4 * Easting2 + Northing2 * Easting4);
+                if (t >= 0 && t <= 1)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+
+// intense math section....   the lat long converted to utm   *********************************************************
+#region utm Calculations
+private double sm_a = 6378137.0;
         private double sm_b = 6356752.314;
         private double UTMScaleFactor2 = 1.0004001600640256102440976390556;
 

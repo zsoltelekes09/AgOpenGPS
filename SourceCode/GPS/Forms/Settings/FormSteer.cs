@@ -46,31 +46,28 @@ namespace AgOpenGPS
 
         private void FormSteer_Load(object sender, EventArgs e)
         {
-            hsbarSteerAngleSensorZero.Value = Properties.Settings.Default.setAS_steerAngleOffset - 127;
+            hsbarSteerAngleSensorZero.Value = Properties.Vehicle.Default.setAS_steerAngleOffset - 127;
             lblSteerAngleSensorZero.Text = hsbarSteerAngleSensorZero.Value.ToString();
 
-            hsbarCountsPerDegree.Value = Properties.Settings.Default.setAS_countsPerDegree;
+            hsbarCountsPerDegree.Value = Properties.Vehicle.Default.setAS_countsPerDegree;
             lblCountsPerDegree.Text = hsbarCountsPerDegree.Value.ToString();
 
-            hsbarMinPWM.Value = Properties.Settings.Default.setAS_minSteerPWM;
+            hsbarMinPWM.Value = Properties.Vehicle.Default.setAS_minSteerPWM;
             lblMinPWM.Text = hsbarMinPWM.Value.ToString();
 
-            hsbarProportionalGain.Value = Properties.Settings.Default.setAS_Kp;
+            hsbarProportionalGain.Value = Properties.Vehicle.Default.setAS_Kp;
             lblProportionalGain.Text = hsbarProportionalGain.Value.ToString();
 
-            //hsbarOutputGain.Value = Properties.Settings.Default.setAS_Ko;
-            //lblOutputGain.Text = hsbarOutputGain.Value.ToString();
-
-            hsbarSidehillDraftGain.Value = Properties.Settings.Default.setAS_Kd;
+            hsbarSidehillDraftGain.Value = Properties.Vehicle.Default.setAS_Kd;
             lblSidehillDraftGain.Text = hsbarSidehillDraftGain.Value.ToString();
 
             hsbarLowSteerPWM.ValueChanged -= HsbarLowSteerPWM_ValueChanged;
             hsbarHighSteerPWM.ValueChanged -= HsbarMinPWM_ValueChanged;
 
-            hsbarLowSteerPWM.Value = Properties.Settings.Default.setAS_lowSteerPWM;
-            lblLowSteerPWM.Text = (mf.mc.autoSteerSettings[mf.mc.ssLowPWM]).ToString();
+            hsbarLowSteerPWM.Value = Properties.Vehicle.Default.setAS_lowSteerPWM;
+            lblLowSteerPWM.Text = (mf.mc.Config_AutoSteer[mf.mc.ssLowPWM]).ToString();
 
-            hsbarHighSteerPWM.Value = Properties.Settings.Default.setAS_highSteerPWM;
+            hsbarHighSteerPWM.Value = Properties.Vehicle.Default.setAS_highSteerPWM;
             lblHighSteerPWM.Text = hsbarHighSteerPWM.Value.ToString();
 
             hsbarLowSteerPWM.ValueChanged += HsbarLowSteerPWM_ValueChanged;
@@ -106,11 +103,11 @@ namespace AgOpenGPS
 
             //make sure free drive is off
             btnFreeDrive.BackColor = Color.Red;
-            mf.ast.isInFreeDriveMode = false;
+            mf.TestAutoSteer = false;
             btnSteerAngleDown.Enabled = false;
             btnSteerAngleUp.Enabled = false;
             //hSBarFreeDrive.Value = 0;
-            mf.ast.driveFreeSteerAngle = 0;
+            mf.TestAutoSteerAngle = 0;
 
             if (mf.isStanleyUsed) btnStanley.Text = "Stanley";
             else btnStanley.Text = "Pure P";
@@ -120,8 +117,7 @@ namespace AgOpenGPS
 
         private void FormSteer_FormClosing(object sender, FormClosingEventArgs e)
         {
-            mf.ast.isInFreeDriveMode = false;
-            Properties.Settings.Default.Save();
+            mf.TestAutoSteer = false;
             Properties.Vehicle.Default.Save();
         }
 
@@ -172,9 +168,9 @@ namespace AgOpenGPS
 
         private void HsbarCountsPerDegree_ValueChanged(object sender, EventArgs e)
         {
-            mf.mc.autoSteerSettings[mf.mc.ssCountsPerDegree] = unchecked((byte)hsbarCountsPerDegree.Value);
-            lblCountsPerDegree.Text = (mf.mc.autoSteerSettings[mf.mc.ssCountsPerDegree]).ToString();
-            Properties.Settings.Default.setAS_countsPerDegree = mf.mc.autoSteerSettings[mf.mc.ssCountsPerDegree];
+            mf.mc.Config_AutoSteer[mf.mc.ssCountsPerDegree] = unchecked((byte)hsbarCountsPerDegree.Value);
+            lblCountsPerDegree.Text = (mf.mc.Config_AutoSteer[mf.mc.ssCountsPerDegree]).ToString();
+            Properties.Vehicle.Default.setAS_countsPerDegree = mf.mc.Config_AutoSteer[mf.mc.ssCountsPerDegree];
             toSend = true;
         }
 
@@ -188,8 +184,8 @@ namespace AgOpenGPS
         private void HsbarSteerAngleSensorZero_ValueChanged(object sender, EventArgs e)
         {
             lblSteerAngleSensorZero.Text = hsbarSteerAngleSensorZero.Value.ToString();
-            mf.mc.autoSteerSettings[mf.mc.ssSteerOffset] = unchecked((byte)(127 + hsbarSteerAngleSensorZero.Value));
-            Properties.Settings.Default.setAS_steerAngleOffset = mf.mc.autoSteerSettings[mf.mc.ssSteerOffset];
+            mf.mc.Config_AutoSteer[mf.mc.ssSteerOffset] = unchecked((byte)(127 + hsbarSteerAngleSensorZero.Value));
+            Properties.Vehicle.Default.setAS_steerAngleOffset = mf.mc.Config_AutoSteer[mf.mc.ssSteerOffset];
             toSend = true;
         }
 
@@ -197,51 +193,43 @@ namespace AgOpenGPS
 
         private void HsbarMinPWM_ValueChanged(object sender, EventArgs e)
         {
-            mf.mc.autoSteerSettings[mf.mc.ssMinPWM] = unchecked((byte)hsbarMinPWM.Value);
-            lblMinPWM.Text = (mf.mc.autoSteerSettings[mf.mc.ssMinPWM]).ToString();
-            Properties.Settings.Default.setAS_minSteerPWM = mf.mc.autoSteerSettings[mf.mc.ssMinPWM];
+            mf.mc.Config_AutoSteer[mf.mc.ssMinPWM] = unchecked((byte)hsbarMinPWM.Value);
+            lblMinPWM.Text = (mf.mc.Config_AutoSteer[mf.mc.ssMinPWM]).ToString();
+            Properties.Vehicle.Default.setAS_minSteerPWM = mf.mc.Config_AutoSteer[mf.mc.ssMinPWM];
             toSend = true;
         }
 
         private void HsbarProportionalGain_ValueChanged(object sender, EventArgs e)
         {
-            mf.mc.autoSteerSettings[mf.mc.ssKp] = unchecked((byte)hsbarProportionalGain.Value);
-            lblProportionalGain.Text = (mf.mc.autoSteerSettings[mf.mc.ssKp]).ToString();
-            Properties.Settings.Default.setAS_Kp = mf.mc.autoSteerSettings[mf.mc.ssKp];
+            mf.mc.Config_AutoSteer[mf.mc.ssKp] = unchecked((byte)hsbarProportionalGain.Value);
+            lblProportionalGain.Text = (mf.mc.Config_AutoSteer[mf.mc.ssKp]).ToString();
+            Properties.Vehicle.Default.setAS_Kp = mf.mc.Config_AutoSteer[mf.mc.ssKp];
             toSend = true;
         }
 
-        //private void hsbarOutputGain_ValueChanged(object sender, EventArgs e)
-        //{
-        //    mf.mc.autoSteerSettings[mf.mc.ssKo] = unchecked((byte)hsbarOutputGain.Value);
-        //    lblOutputGain.Text = (mf.mc.autoSteerSettings[mf.mc.ssKo]).ToString();
-        //    Properties.Settings.Default.setAS_Ko = mf.mc.autoSteerSettings[mf.mc.ssKo];
-        //    toSend = true;
-        //}
-
         private void HsbarSidehillDraftGain_ValueChanged(object sender, EventArgs e)
         {
-            mf.mc.autoSteerSettings[mf.mc.ssKd] = unchecked((byte)hsbarSidehillDraftGain.Value);
-            lblSidehillDraftGain.Text = (mf.mc.autoSteerSettings[mf.mc.ssKd]).ToString();
-            Properties.Settings.Default.setAS_Kd = mf.mc.autoSteerSettings[mf.mc.ssKd];
+            mf.mc.Config_AutoSteer[mf.mc.ssKd] = unchecked((byte)hsbarSidehillDraftGain.Value);
+            lblSidehillDraftGain.Text = (mf.mc.Config_AutoSteer[mf.mc.ssKd]).ToString();
+            Properties.Vehicle.Default.setAS_Kd = mf.mc.Config_AutoSteer[mf.mc.ssKd];
             toSend = true;
         }
 
         private void HsbarLowSteerPWM_ValueChanged(object sender, EventArgs e)
         {
             if (hsbarLowSteerPWM.Value > hsbarHighSteerPWM.Value) hsbarHighSteerPWM.Value = hsbarLowSteerPWM.Value;
-            mf.mc.autoSteerSettings[mf.mc.ssLowPWM] = unchecked((byte)hsbarLowSteerPWM.Value);
-            lblLowSteerPWM.Text = (mf.mc.autoSteerSettings[mf.mc.ssLowPWM]).ToString();
-            Properties.Settings.Default.setAS_lowSteerPWM = mf.mc.autoSteerSettings[mf.mc.ssLowPWM];
+            mf.mc.Config_AutoSteer[mf.mc.ssLowPWM] = unchecked((byte)hsbarLowSteerPWM.Value);
+            lblLowSteerPWM.Text = (mf.mc.Config_AutoSteer[mf.mc.ssLowPWM]).ToString();
+            Properties.Vehicle.Default.setAS_lowSteerPWM = mf.mc.Config_AutoSteer[mf.mc.ssLowPWM];
             toSend = true;
         }
 
         private void HsbarHighSteerPWM_ValueChanged(object sender, EventArgs e)
         {
             if (hsbarLowSteerPWM.Value > hsbarHighSteerPWM.Value) hsbarLowSteerPWM.Value = hsbarHighSteerPWM.Value;
-            mf.mc.autoSteerSettings[mf.mc.ssHighPWM] = unchecked((byte)hsbarHighSteerPWM.Value);
-            lblHighSteerPWM.Text = (mf.mc.autoSteerSettings[mf.mc.ssHighPWM]).ToString();
-            Properties.Settings.Default.setAS_highSteerPWM = mf.mc.autoSteerSettings[mf.mc.ssHighPWM];
+            mf.mc.Config_AutoSteer[mf.mc.ssHighPWM] = unchecked((byte)hsbarHighSteerPWM.Value);
+            lblHighSteerPWM.Text = (mf.mc.Config_AutoSteer[mf.mc.ssHighPWM]).ToString();
+            Properties.Vehicle.Default.setAS_highSteerPWM = mf.mc.Config_AutoSteer[mf.mc.ssHighPWM];
             toSend = true;
         }
 
@@ -254,47 +242,37 @@ namespace AgOpenGPS
 
         private void BtnFreeDrive_Click(object sender, EventArgs e)
         {
-            if (mf.ast.isInFreeDriveMode)
+            if (mf.TestAutoSteer)
             {
                 //turn OFF free drive mode
                 btnFreeDrive.BackColor = Color.Red;
-                mf.ast.isInFreeDriveMode = false;
+                mf.TestAutoSteer = false;
                 btnSteerAngleDown.Enabled = false;
                 btnSteerAngleUp.Enabled = false;
                 //hSBarFreeDrive.Value = 0;
-                mf.ast.driveFreeSteerAngle = 0;
+                mf.TestAutoSteerAngle = 0;
             }
             else
             {
                 //turn ON free drive mode
                 btnFreeDrive.BackColor = Color.LimeGreen;
-                mf.ast.isInFreeDriveMode = true;
+                mf.TestAutoSteer = true;
                 btnSteerAngleDown.Enabled = true;
                 btnSteerAngleUp.Enabled = true;
                 //hSBarFreeDrive.Value = 0;
-                mf.ast.driveFreeSteerAngle = 0;
+                mf.TestAutoSteerAngle = 0;
                 lblSteerAngle.Text = "0";
             }
         }
 
         private void BtnFreeDriveZero_Click(object sender, EventArgs e)
         {
-            if (mf.ast.driveFreeSteerAngle == 0)
-                mf.ast.driveFreeSteerAngle = 5;
-            else mf.ast.driveFreeSteerAngle = 0;
+            if (mf.TestAutoSteerAngle == 0)
+                mf.TestAutoSteerAngle = 5;
+            else mf.TestAutoSteerAngle = 0;
             //hSBarFreeDrive.Value = mf.ast.driveFreeSteerAngle;
         }
 
-        private void BtnExit_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
-        private void BtnMax_Click(object sender, EventArgs e)
-        {
-            if (Height < 600) Height = 650;
-            else Height = 400;
-        }
 
         private void BtnChart_Click(object sender, EventArgs e)
         {
@@ -326,9 +304,8 @@ namespace AgOpenGPS
             counter++;
             if (toSend && counter > 6)
             {
-                Properties.Settings.Default.Save();
                 Properties.Vehicle.Default.Save();
-                mf.SendSteerSettingsOutAutoSteerPort();
+                mf.SendData(mf.mc.Config_AutoSteer, true);
                 toSend = false;
                 counter = 0;
             }
@@ -351,23 +328,16 @@ namespace AgOpenGPS
             else lblMinPWM.ForeColor = Color.Black;
         }
 
-        private void BtnCancel_Click(object sender, EventArgs e)
-        {
-            Properties.Settings.Default.Save();
-            Properties.Vehicle.Default.Save();
-            mf.SendSteerSettingsOutAutoSteerPort();
-        }
-
         private void BtnSteerAngleUp_MouseDown(object sender, MouseEventArgs e)
         {
-            mf.ast.driveFreeSteerAngle++;
-            if (mf.ast.driveFreeSteerAngle > 40) mf.ast.driveFreeSteerAngle = 40;
+            mf.TestAutoSteerAngle++;
+            if (mf.TestAutoSteerAngle > 40) mf.TestAutoSteerAngle = 40;
         }
 
         private void BtnSteerAngleDown_MouseDown(object sender, MouseEventArgs e)
         {
-            mf.ast.driveFreeSteerAngle--;
-            if (mf.ast.driveFreeSteerAngle < -40) mf.ast.driveFreeSteerAngle = -40;
+            mf.TestAutoSteerAngle--;
+            if (mf.TestAutoSteerAngle < -40) mf.TestAutoSteerAngle = -40;
         }
     }
 }

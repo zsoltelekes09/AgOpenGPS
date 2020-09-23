@@ -145,13 +145,97 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public double set_youToolWidths {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte setAS_Ko {
             get {
-                return ((double)(this["set_youToolWidths"]));
+                return ((byte)(this["setAS_Ko"]));
             }
             set {
-                this["set_youToolWidths"] = value;
+                this["setAS_Ko"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte setAS_Kp {
+            get {
+                return ((byte)(this["setAS_Kp"]));
+            }
+            set {
+                this["setAS_Kp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public byte setAS_lowSteerPWM {
+            get {
+                return ((byte)(this["setAS_lowSteerPWM"]));
+            }
+            set {
+                this["setAS_lowSteerPWM"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte setAS_Kd {
+            get {
+                return ((byte)(this["setAS_Kd"]));
+            }
+            set {
+                this["setAS_Kd"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127")]
+        public byte setAS_steerAngleOffset {
+            get {
+                return ((byte)(this["setAS_steerAngleOffset"]));
+            }
+            set {
+                this["setAS_steerAngleOffset"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte setAS_minSteerPWM {
+            get {
+                return ((byte)(this["setAS_minSteerPWM"]));
+            }
+            set {
+                this["setAS_minSteerPWM"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public byte setAS_highSteerPWM {
+            get {
+                return ((byte)(this["setAS_highSteerPWM"]));
+            }
+            set {
+                this["setAS_highSteerPWM"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public byte setAS_countsPerDegree {
+            get {
+                return ((byte)(this["setAS_countsPerDegree"]));
+            }
+            set {
+                this["setAS_countsPerDegree"] = value;
             }
         }
         
@@ -615,7 +699,7 @@ namespace AgOpenGPS.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Collections.Generic.List<ToolSettings> ToolSettings {
             get {
-                if ((this["ToolSettings"]) == null) (this["ToolSettings"]) = new System.Collections.Generic.List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -6.25, -3.05, 4 }, new double[] { 3.05, 6.25, 4 }, new double[] { -3.9, -0.7, 0 }, new double[] { 0.7, 3.9, 0 } } } };
+                if ((this["ToolSettings"]) == null) (this["ToolSettings"]) = new System.Collections.Generic.List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -4.415, -1.415, 0 }, new double[] { -1.5, 1.5, 4 }, new double[] { 1.415, 4.415, 0 } } } };
                 return ((global::System.Collections.Generic.List<ToolSettings>)(this["ToolSettings"]));
             }
             set {
@@ -625,7 +709,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("9")]
+        [global::System.Configuration.DefaultSettingValueAttribute("8.83")]
         public double GuidanceWidth {
             get {
                 return ((double)(this["GuidanceWidth"]));
@@ -637,7 +721,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.085")]
         public double GuidanceOverlap {
             get {
                 return ((double)(this["GuidanceOverlap"]));
@@ -656,6 +740,54 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["GuidanceOffset"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool setF_IsWorkSwitchManual {
+            get {
+                return ((bool)(this["setF_IsWorkSwitchManual"]));
+            }
+            set {
+                this["setF_IsWorkSwitchManual"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool setF_IsWorkSwitchEnabled {
+            get {
+                return ((bool)(this["setF_IsWorkSwitchEnabled"]));
+            }
+            set {
+                this["setF_IsWorkSwitchEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool setF_IsWorkSwitchActiveLow {
+            get {
+                return ((bool)(this["setF_IsWorkSwitchActiveLow"]));
+            }
+            set {
+                this["setF_IsWorkSwitchActiveLow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"if ((this[""ToolSettings""]) == null) (this[""ToolSettings""]) = new System.Collections.Generic.List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -6.25, -3.05, 4 }, new double[] { 3.05, 6.25, 4 }, new double[] { -3.9, -0.7, 0 }, new double[] { 0.7, 3.9, 0 } } } };")]
+        public string Setting {
+            get {
+                return ((string)(this["Setting"]));
+            }
+            set {
+                this["Setting"] = value;
             }
         }
     }

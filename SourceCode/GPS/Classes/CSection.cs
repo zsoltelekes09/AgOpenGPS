@@ -18,7 +18,6 @@ namespace AgOpenGPS
 
         //is this section on or off
         public bool IsSectionOn = false;
-        public bool IsAllowedOn = false;
         public bool IsSectionRequiredOn = false;
         public bool SectionOnRequest = false;
         public int SectionOverlapTimer = 0;
@@ -51,8 +50,8 @@ namespace AgOpenGPS
         public int rpSectionPosition = 0;
 
         //points in world space that start and end of section are in
-        public Vec3 leftPoint;
-        public Vec3 rightPoint;
+        public Vec2 leftPoint;
+        public Vec2 rightPoint;
 
         //whether or not this section is in boundary, headland
         public int numTriangles = 0;
@@ -84,11 +83,11 @@ namespace AgOpenGPS
                 triangleList.Add(colur);
 
                 //left side of triangle
-                Vec3 point = new Vec3(leftPoint.easting, leftPoint.northing, 0);
+                Vec3 point = new Vec3(leftPoint.Northing, leftPoint.Easting, 0);
                 triangleList.Add(point);
 
                 //Right side of triangle
-                point = new Vec3(rightPoint.easting, rightPoint.northing, 0);
+                point = new Vec3(rightPoint.Northing, rightPoint.Easting, 0);
                 triangleList.Add(point);
             }
         }
@@ -119,13 +118,13 @@ namespace AgOpenGPS
         {
             //add two triangles for next step.
             //left side
-            Vec3 point = new Vec3(leftPoint.easting,leftPoint.northing, 0);
+            Vec3 point = new Vec3(leftPoint.Northing, leftPoint.Easting, 0);
 
             //add the point to List
             triangleList.Add(point);
 
             //Right side
-            Vec3 point2 = new Vec3(rightPoint.easting, rightPoint.northing, 0);
+            Vec3 point2 = new Vec3(rightPoint.Northing, rightPoint.Easting, 0);
 
             //add the point to the list
             triangleList.Add(point2);
@@ -142,18 +141,18 @@ namespace AgOpenGPS
             {
                 //calculate area of these 2 new triangles - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
                 {
-                    double temp = (triangleList[c].easting * (triangleList[c - 1].northing - triangleList[c - 2].northing))
-                              + (triangleList[c - 1].easting * (triangleList[c - 2].northing - triangleList[c].northing))
-                                  + (triangleList[c - 2].easting * (triangleList[c].northing - triangleList[c - 1].northing));
+                    double temp = (triangleList[c].Easting * (triangleList[c - 1].Northing - triangleList[c - 2].Northing))
+                              + (triangleList[c - 1].Easting * (triangleList[c - 2].Northing - triangleList[c].Northing))
+                                  + (triangleList[c - 2].Easting * (triangleList[c].Northing - triangleList[c - 1].Northing));
 
                     temp = Math.Abs(temp / 2.0);
                     mf.fd.workedAreaTotal += temp;
                     mf.fd.workedAreaTotalUser += temp;
 
                     //temp = 0;
-                    temp = (triangleList[c - 1].easting * (triangleList[c - 2].northing - triangleList[c - 3].northing))
-                              + (triangleList[c - 2].easting * (triangleList[c - 3].northing - triangleList[c - 1].northing))
-                                  + (triangleList[c - 3].easting * (triangleList[c - 1].northing - triangleList[c - 2].northing));
+                    temp = (triangleList[c - 1].Easting * (triangleList[c - 2].Northing - triangleList[c - 3].Northing))
+                              + (triangleList[c - 2].Easting * (triangleList[c - 3].Northing - triangleList[c - 1].Northing))
+                                  + (triangleList[c - 3].Easting * (triangleList[c - 1].Northing - triangleList[c - 2].Northing));
 
                     temp = Math.Abs(temp / 2.0);
                     mf.fd.workedAreaTotal += temp;

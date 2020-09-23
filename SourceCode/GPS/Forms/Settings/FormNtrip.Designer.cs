@@ -32,14 +32,12 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.cboxIsNTRIPOn = new System.Windows.Forms.CheckBox();
             this.tboxCasterIP = new System.Windows.Forms.TextBox();
-            this.nudCasterPort = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.tboxHostName = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
             this.tboxThisIP = new System.Windows.Forms.TextBox();
-            this.nudSendToUDPPort = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
             this.btnSerialCancel = new System.Windows.Forms.Button();
             this.btnSerialOK = new System.Windows.Forms.Button();
@@ -50,14 +48,11 @@
             this.label12 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.tboxMount = new System.Windows.Forms.TextBox();
-            this.nudGGAInterval = new System.Windows.Forms.NumericUpDown();
             this.label15 = new System.Windows.Forms.Label();
             this.tboxEnterURL = new System.Windows.Forms.TextBox();
             this.btnGetIP = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.nudLatitude = new System.Windows.Forms.NumericUpDown();
-            this.nudLongitude = new System.Windows.Forms.NumericUpDown();
             this.tboxCurrentLat = new System.Windows.Forms.TextBox();
             this.tboxCurrentLon = new System.Windows.Forms.TextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -76,12 +71,12 @@
             this.btnPassPassword = new System.Windows.Forms.Button();
             this.cboxHTTP = new System.Windows.Forms.ComboBox();
             this.label20 = new System.Windows.Forms.Label();
+            this.TboxUDPPort = new System.Windows.Forms.TextBox();
+            this.TboxCasterPort = new System.Windows.Forms.TextBox();
+            this.TboxGGAInterval = new System.Windows.Forms.TextBox();
+            this.TboxLatitude = new System.Windows.Forms.TextBox();
+            this.TboxLongitude = new System.Windows.Forms.TextBox();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudCasterPort)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSendToUDPPort)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudGGAInterval)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLatitude)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLongitude)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox2
@@ -122,31 +117,6 @@
             this.tboxCasterIP.TabIndex = 79;
             this.tboxCasterIP.Text = "192.168.188.255";
             this.tboxCasterIP.Validating += new System.ComponentModel.CancelEventHandler(this.TboxCasterIP_Validating);
-            // 
-            // nudCasterPort
-            // 
-            this.nudCasterPort.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudCasterPort.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudCasterPort.Location = new System.Drawing.Point(62, 309);
-            this.nudCasterPort.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.nudCasterPort.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudCasterPort.Name = "nudCasterPort";
-            this.nudCasterPort.Size = new System.Drawing.Size(122, 52);
-            this.nudCasterPort.TabIndex = 80;
-            this.nudCasterPort.Value = new decimal(new int[] {
-            8888,
-            0,
-            0,
-            0});
-            this.nudCasterPort.Enter += new System.EventHandler(this.NudCasterPort_Enter);
             // 
             // label6
             // 
@@ -207,26 +177,6 @@
             this.tboxThisIP.Size = new System.Drawing.Size(221, 30);
             this.tboxThisIP.TabIndex = 73;
             this.tboxThisIP.Text = "192.168.1.255";
-            // 
-            // nudSendToUDPPort
-            // 
-            this.nudSendToUDPPort.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudSendToUDPPort.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudSendToUDPPort.Location = new System.Drawing.Point(836, 77);
-            this.nudSendToUDPPort.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.nudSendToUDPPort.Name = "nudSendToUDPPort";
-            this.nudSendToUDPPort.Size = new System.Drawing.Size(121, 52);
-            this.nudSendToUDPPort.TabIndex = 74;
-            this.nudSendToUDPPort.Value = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-            this.nudSendToUDPPort.Enter += new System.EventHandler(this.NudSendToUDPPort_Enter);
             // 
             // label10
             // 
@@ -340,26 +290,6 @@
             this.tboxMount.TabIndex = 104;
             this.tboxMount.Click += new System.EventHandler(this.TboxMount_Click);
             // 
-            // nudGGAInterval
-            // 
-            this.nudGGAInterval.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudGGAInterval.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudGGAInterval.Location = new System.Drawing.Point(30, 545);
-            this.nudGGAInterval.Maximum = new decimal(new int[] {
-            600,
-            0,
-            0,
-            0});
-            this.nudGGAInterval.Name = "nudGGAInterval";
-            this.nudGGAInterval.Size = new System.Drawing.Size(133, 52);
-            this.nudGGAInterval.TabIndex = 106;
-            this.nudGGAInterval.Value = new decimal(new int[] {
-            333,
-            0,
-            0,
-            0});
-            this.nudGGAInterval.Enter += new System.EventHandler(this.NudGGAInterval_Enter);
-            // 
             // label15
             // 
             this.label15.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -411,68 +341,6 @@
             this.label8.Size = new System.Drawing.Size(59, 29);
             this.label8.TabIndex = 116;
             this.label8.Text = "Lon:";
-            // 
-            // nudLatitude
-            // 
-            this.nudLatitude.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudLatitude.DecimalPlaces = 7;
-            this.nudLatitude.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudLatitude.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.nudLatitude.Location = new System.Drawing.Point(450, 197);
-            this.nudLatitude.Maximum = new decimal(new int[] {
-            90,
-            0,
-            0,
-            0});
-            this.nudLatitude.Minimum = new decimal(new int[] {
-            90,
-            0,
-            0,
-            -2147483648});
-            this.nudLatitude.Name = "nudLatitude";
-            this.nudLatitude.Size = new System.Drawing.Size(224, 46);
-            this.nudLatitude.TabIndex = 118;
-            this.nudLatitude.Value = new decimal(new int[] {
-            881234567,
-            0,
-            0,
-            -2147024896});
-            this.nudLatitude.Enter += new System.EventHandler(this.NudLatitude_Enter);
-            // 
-            // nudLongitude
-            // 
-            this.nudLongitude.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudLongitude.DecimalPlaces = 7;
-            this.nudLongitude.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudLongitude.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            131072});
-            this.nudLongitude.Location = new System.Drawing.Point(450, 272);
-            this.nudLongitude.Maximum = new decimal(new int[] {
-            180,
-            0,
-            0,
-            0});
-            this.nudLongitude.Minimum = new decimal(new int[] {
-            180,
-            0,
-            0,
-            -2147483648});
-            this.nudLongitude.Name = "nudLongitude";
-            this.nudLongitude.Size = new System.Drawing.Size(224, 46);
-            this.nudLongitude.TabIndex = 117;
-            this.nudLongitude.Value = new decimal(new int[] {
-            1781234567,
-            0,
-            0,
-            -2147024896});
-            this.nudLongitude.Enter += new System.EventHandler(this.NudLongitude_Enter);
             // 
             // tboxCurrentLat
             // 
@@ -664,6 +532,86 @@
             this.label20.TabIndex = 136;
             this.label20.Text = "HTTP:";
             // 
+            // TboxUDPPort
+            // 
+            this.TboxUDPPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxUDPPort.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxUDPPort.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxUDPPort.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxUDPPort.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxUDPPort.Location = new System.Drawing.Point(836, 77);
+            this.TboxUDPPort.MaxLength = 10;
+            this.TboxUDPPort.Name = "TboxUDPPort";
+            this.TboxUDPPort.Size = new System.Drawing.Size(121, 50);
+            this.TboxUDPPort.TabIndex = 474;
+            this.TboxUDPPort.Text = "9999";
+            this.TboxUDPPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxUDPPort.Enter += new System.EventHandler(this.TboxUDPPort_Enter);
+            // 
+            // TboxCasterPort
+            // 
+            this.TboxCasterPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxCasterPort.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxCasterPort.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxCasterPort.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxCasterPort.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxCasterPort.Location = new System.Drawing.Point(62, 309);
+            this.TboxCasterPort.MaxLength = 10;
+            this.TboxCasterPort.Name = "TboxCasterPort";
+            this.TboxCasterPort.Size = new System.Drawing.Size(121, 50);
+            this.TboxCasterPort.TabIndex = 475;
+            this.TboxCasterPort.Text = "8888";
+            this.TboxCasterPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxCasterPort.Enter += new System.EventHandler(this.TboxCasterPort_Enter);
+            // 
+            // TboxGGAInterval
+            // 
+            this.TboxGGAInterval.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxGGAInterval.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxGGAInterval.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxGGAInterval.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxGGAInterval.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxGGAInterval.Location = new System.Drawing.Point(30, 545);
+            this.TboxGGAInterval.MaxLength = 10;
+            this.TboxGGAInterval.Name = "TboxGGAInterval";
+            this.TboxGGAInterval.Size = new System.Drawing.Size(121, 50);
+            this.TboxGGAInterval.TabIndex = 476;
+            this.TboxGGAInterval.Text = "333";
+            this.TboxGGAInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxGGAInterval.Enter += new System.EventHandler(this.TboxGGAInterval_Enter);
+            // 
+            // TboxLatitude
+            // 
+            this.TboxLatitude.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxLatitude.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxLatitude.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxLatitude.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLatitude.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxLatitude.Location = new System.Drawing.Point(450, 197);
+            this.TboxLatitude.MaxLength = 10;
+            this.TboxLatitude.Name = "TboxLatitude";
+            this.TboxLatitude.Size = new System.Drawing.Size(250, 50);
+            this.TboxLatitude.TabIndex = 477;
+            this.TboxLatitude.Text = "-88.1234567";
+            this.TboxLatitude.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxLatitude.Enter += new System.EventHandler(this.TboxLatitude_Enter);
+            // 
+            // TboxLongitude
+            // 
+            this.TboxLongitude.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxLongitude.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxLongitude.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxLongitude.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLongitude.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxLongitude.Location = new System.Drawing.Point(450, 272);
+            this.TboxLongitude.MaxLength = 10;
+            this.TboxLongitude.Name = "TboxLongitude";
+            this.TboxLongitude.Size = new System.Drawing.Size(250, 50);
+            this.TboxLongitude.TabIndex = 478;
+            this.TboxLongitude.Text = "-178.1234567";
+            this.TboxLongitude.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxLongitude.Enter += new System.EventHandler(this.TboxLongitude_Enter);
+            // 
             // FormNtrip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -671,6 +619,11 @@
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(1010, 609);
             this.ControlBox = false;
+            this.Controls.Add(this.TboxLongitude);
+            this.Controls.Add(this.TboxLatitude);
+            this.Controls.Add(this.TboxGGAInterval);
+            this.Controls.Add(this.TboxCasterPort);
+            this.Controls.Add(this.TboxUDPPort);
             this.Controls.Add(this.label20);
             this.Controls.Add(this.cboxHTTP);
             this.Controls.Add(this.btnPassPassword);
@@ -688,12 +641,9 @@
             this.Controls.Add(this.btnSetManualPosition);
             this.Controls.Add(this.tboxCurrentLon);
             this.Controls.Add(this.tboxCurrentLat);
-            this.Controls.Add(this.nudLatitude);
-            this.Controls.Add(this.nudLongitude);
             this.Controls.Add(this.btnGetIP);
             this.Controls.Add(this.tboxEnterURL);
             this.Controls.Add(this.label15);
-            this.Controls.Add(this.nudGGAInterval);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.tboxMount);
             this.Controls.Add(this.label12);
@@ -702,7 +652,6 @@
             this.Controls.Add(this.tboxUserName);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.tboxCasterIP);
-            this.Controls.Add(this.nudCasterPort);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.tboxHostName);
@@ -710,7 +659,6 @@
             this.Controls.Add(this.label14);
             this.Controls.Add(this.tboxThisIP);
             this.Controls.Add(this.btnSerialCancel);
-            this.Controls.Add(this.nudSendToUDPPort);
             this.Controls.Add(this.btnSerialOK);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label8);
@@ -725,11 +673,6 @@
             this.Text = "NTRIP Client Settings";
             this.Load += new System.EventHandler(this.FormNtrip_Load);
             this.groupBox2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudCasterPort)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSendToUDPPort)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudGGAInterval)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLatitude)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLongitude)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -740,14 +683,12 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox cboxIsNTRIPOn;
         private System.Windows.Forms.TextBox tboxCasterIP;
-        private System.Windows.Forms.NumericUpDown nudCasterPort;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox tboxHostName;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox tboxThisIP;
-        private System.Windows.Forms.NumericUpDown nudSendToUDPPort;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button btnSerialCancel;
         private System.Windows.Forms.Button btnSerialOK;
@@ -757,14 +698,11 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.NumericUpDown nudGGAInterval;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox tboxEnterURL;
         private System.Windows.Forms.Button btnGetIP;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.NumericUpDown nudLatitude;
-        private System.Windows.Forms.NumericUpDown nudLongitude;
         private System.Windows.Forms.TextBox tboxCurrentLat;
         private System.Windows.Forms.TextBox tboxCurrentLon;
         private System.Windows.Forms.Timer timer1;
@@ -784,5 +722,10 @@
         private System.Windows.Forms.Button btnPassPassword;
         private System.Windows.Forms.ComboBox cboxHTTP;
         private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox TboxUDPPort;
+        private System.Windows.Forms.TextBox TboxCasterPort;
+        private System.Windows.Forms.TextBox TboxGGAInterval;
+        private System.Windows.Forms.TextBox TboxLatitude;
+        private System.Windows.Forms.TextBox TboxLongitude;
     }
 }

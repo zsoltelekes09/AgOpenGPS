@@ -10,8 +10,8 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf;
-
-
+        private byte ackerman = 0, maxpulsecounts = 0;
+        private double minspeed = 0, maxspeed = 0, raisetime = 0, lowertime = 0;
         //constructor
         public FormArduinoSettings(Form callingForm)
         {
@@ -47,17 +47,6 @@ namespace AgOpenGPS
             label11.Text = gStr.gsLowerTime;
             cboxIsHydOn.Text = gStr.gsEnableHydraulics;
             tabMachine.Text = gStr.gsMachine;
-
-             nudMaxSpeed.Controls[0].Enabled = false;
-             nudMinSpeed.Controls[0].Enabled = false;
-            nudMaxCounts.Controls[0].Enabled = false;
-            nudRaiseTime.Controls[0].Enabled = false;
-            nudLowerTime.Controls[0].Enabled = false;
-             nudAckerman.Controls[0].Enabled = false;
-
-
-            //select the page as per calling menu or button from mainGPS form
-            //tabControl1.SelectedIndex = page;
         }
 
         //do any field initializing for form here
@@ -119,10 +108,10 @@ namespace AgOpenGPS
                     break;
             }
 
-            nudMaxSpeed.Value = (decimal)(Properties.Vehicle.Default.setArdSteer_maxSpeed);
-            nudMinSpeed.Value = (decimal)(Properties.Vehicle.Default.setArdSteer_minSpeed);
-            nudMaxCounts.Value = (decimal)Properties.Vehicle.Default.setArdSteer_maxPulseCounts;
-            nudAckerman.Value = (decimal)Properties.Vehicle.Default.setArdSteer_ackermanFix;
+            TboxMinSpeed.Text = Math.Round(minspeed = Properties.Vehicle.Default.setArdSteer_minSpeed / 5 / mf.cutoffMetricImperial,2).ToString("0.0");
+            TboxMaxSpeed.Text = Math.Round(maxspeed = Properties.Vehicle.Default.setArdSteer_maxSpeed / 5 / mf.cutoffMetricImperial,2).ToString("0.0");
+            TboxAckerman.Text = (ackerman = Properties.Vehicle.Default.setArdSteer_ackermanFix).ToString();
+            TboxMaxSensorCounts.Text = (maxpulsecounts = Properties.Vehicle.Default.setArdSteer_maxPulseCounts).ToString();
 
 
             //Machine --------------------------------------------------------------------------------------------
@@ -132,25 +121,20 @@ namespace AgOpenGPS
             else cboxMachInvertRelays.Checked = true;
 
 
-            nudRaiseTime.Value = (decimal)Properties.Vehicle.Default.setArdMac_hydRaiseTime;
-            nudLowerTime.Value = (decimal)Properties.Vehicle.Default.setArdMac_hydLowerTime;
+            raisetime = Properties.Vehicle.Default.setArdMac_hydRaiseTime;
+            TboxRaiseTime.Text = (raisetime /= 10).ToString();
+            lowertime = Properties.Vehicle.Default.setArdMac_hydLowerTime;
+            TboxLowerTime.Text = (lowertime /= 10).ToString();
             cboxIsHydOn.Checked = Properties.Vehicle.Default.setArdMac_isHydEnabled > 0;
 
             cboxIsSendMachineControlToAutoSteer.Checked = Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer;
-
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
         {
             SaveSettings();
-            //mf.SendArduinoSettingsOutToAutoSteerPort();
             DialogResult = DialogResult.OK;
             Close();
-        }
-
-        private void BtnCancel_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void SaveSettings()
@@ -180,123 +164,63 @@ namespace AgOpenGPS
 
 
 
-            int set = 1;
-            int reset = 2046;
             int sett = 0;
 
-            if (chkInvertWAS.Checked) sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (chkInvertRoll.Checked) sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (chkInvertSteer.Checked) sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (cboxConv.Text == "Single") sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (cboxMotorDrive.Text == "Cytron") sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (cboxSteerEnable.Text == "Switch") sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (cboxMMAAxis.Text == "X Axis") sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (cboxEncoder.Checked) sett |= set;
-            else sett &= reset;
+            if (chkInvertWAS.Checked) sett |= 1;
+            if (chkInvertRoll.Checked) sett |= 2;
+            if (chkInvertSteer.Checked) sett |= 4;
+            if (cboxConv.Text == "Single") sett |= 8;
+            if (cboxMotorDrive.Text == "Cytron") sett |= 16;
+            if (cboxSteerEnable.Text == "Switch") sett |= 32;
+            if (cboxMMAAxis.Text == "X Axis") sett |= 64;
+            if (cboxEncoder.Checked) sett |= 128;
 
             Properties.Vehicle.Default.setArdSteer_setting0 = (byte)sett;
 
-            //set1
-            set = 1;
-            reset = 2046;
             sett = 0;
 
-            if (chkBNOInstalled.Checked) sett |= set;
-            else sett &= reset;
-
-            set <<= 1;
-            reset <<= 1;
-            reset += 1;
-            if (cboxSteerInvertRelays.Checked) sett |= set;
-            else sett &= reset;
+            if (chkBNOInstalled.Checked) sett |= 1;
+            if (cboxSteerInvertRelays.Checked) sett |= 2;
 
 
             Properties.Vehicle.Default.setArdSteer_setting1 = (byte)sett;
 
-            Properties.Vehicle.Default.setArdSteer_maxSpeed = (byte)nudMaxSpeed.Value;
-            Properties.Vehicle.Default.setArdSteer_minSpeed = (byte)nudMinSpeed.Value;
-            Properties.Vehicle.Default.setArdSteer_maxPulseCounts = (byte)nudMaxCounts.Value;
-            Properties.Vehicle.Default.setArdSteer_ackermanFix = (byte)nudAckerman.Value;
+            Properties.Vehicle.Default.setArdSteer_minSpeed = (byte)Math.Round(minspeed * 5 * mf.cutoffMetricImperial, 2);
+            Properties.Vehicle.Default.setArdSteer_maxSpeed = (byte)Math.Round(maxspeed * 5 * mf.cutoffMetricImperial, 2);
+            
+            Properties.Vehicle.Default.setArdSteer_maxPulseCounts = maxpulsecounts;
+            Properties.Vehicle.Default.setArdSteer_ackermanFix = ackerman;
 
             mf.mc.isMachineDataSentToAutoSteer = cboxIsSendMachineControlToAutoSteer.Checked;
             Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer = mf.mc.isMachineDataSentToAutoSteer;
 
             Properties.Vehicle.Default.Save();
 
-            mf.mc.ardSteerConfig[mf.mc.arSet0] = Properties.Vehicle.Default.setArdSteer_setting0;
-            mf.mc.ardSteerConfig[mf.mc.arSet1] = Properties.Vehicle.Default.setArdSteer_setting1;
-            mf.mc.ardSteerConfig[mf.mc.arMaxSpd] = Properties.Vehicle.Default.setArdSteer_maxSpeed;
-            mf.mc.ardSteerConfig[mf.mc.arMinSpd] = Properties.Vehicle.Default.setArdSteer_minSpeed;
-            mf.mc.ardSteerConfig[mf.mc.arAckermanFix] = Properties.Vehicle.Default.setArdSteer_ackermanFix;
+            mf.mc.Config_ardSteer[mf.mc.arSet0] = Properties.Vehicle.Default.setArdSteer_setting0;
+            mf.mc.Config_ardSteer[mf.mc.arSet1] = Properties.Vehicle.Default.setArdSteer_setting1;
+            mf.mc.Config_ardSteer[mf.mc.arMaxSpd] = Properties.Vehicle.Default.setArdSteer_maxSpeed;
+            mf.mc.Config_ardSteer[mf.mc.arMinSpd] = Properties.Vehicle.Default.setArdSteer_minSpeed;
+            mf.mc.Config_ardSteer[mf.mc.arAckermanFix] = Properties.Vehicle.Default.setArdSteer_ackermanFix;
 
             byte inc = (byte)(Properties.Vehicle.Default.setArdSteer_inclinometer << 6);            
-            mf.mc.ardSteerConfig[mf.mc.arIncMaxPulse] = (byte)(inc + (byte)Properties.Vehicle.Default.setArdSteer_maxPulseCounts);
+            mf.mc.Config_ardSteer[mf.mc.arIncMaxPulse] = (byte)(inc + (byte)Properties.Vehicle.Default.setArdSteer_maxPulseCounts);
 
             //Machine ---------------------------------------------------------------------------------------------------
 
-            //set1
-            set = 1;
-            reset = 2046;
             sett = 0;
-
-            if (cboxMachInvertRelays.Checked) sett |= set;
-            else sett &= reset;
+            if (cboxMachInvertRelays.Checked) sett |= 1;
 
             Properties.Vehicle.Default.setArdMac_setting0 = (byte)sett;
-            mf.mc.ardMachineConfig[mf.mc.amSet0] = (byte)sett;
+            mf.mc.Config_ardMachine[mf.mc.amSet0] = (byte)sett;
 
-            Properties.Vehicle.Default.setArdMac_hydRaiseTime = (byte)nudRaiseTime.Value;
-            mf.mc.ardMachineConfig[mf.mc.amRaiseTime] = (byte)nudRaiseTime.Value;
+            Properties.Vehicle.Default.setArdMac_hydRaiseTime = (byte)(raisetime * 10);
+            mf.mc.Config_ardMachine[mf.mc.amRaiseTime] = (byte)(raisetime * 10);
 
-            Properties.Vehicle.Default.setArdMac_hydLowerTime = (byte)nudLowerTime.Value;
-            mf.mc.ardMachineConfig[mf.mc.amLowerTime] = (byte)nudLowerTime.Value;
+            Properties.Vehicle.Default.setArdMac_hydLowerTime = (byte)(lowertime * 10);
+            mf.mc.Config_ardMachine[mf.mc.amLowerTime] = (byte)(lowertime * 10);
 
-            if (cboxIsHydOn.Checked) Properties.Vehicle.Default.setArdMac_isHydEnabled = (byte)1;
-            else Properties.Vehicle.Default.setArdMac_isHydEnabled = (byte)0;
-            mf.mc.ardMachineConfig[mf.mc.amEnableHyd] = Properties.Vehicle.Default.setArdMac_isHydEnabled;
-        }
-
-        private void BtnSendToMachineArduino_Click(object sender, EventArgs e)
-        {
-            SaveSettings();
-            
-            mf.TimedMessageBox(1000, gStr.gsMachinePort, gStr.gsModuleConfiguration);
-            mf.SendArduinoSettingsOutMachinePort();
+            Properties.Vehicle.Default.setArdMac_isHydEnabled = (byte)(cboxIsHydOn.Checked ? 1 : 0);
+            mf.mc.Config_ardMachine[mf.mc.amEnableHyd] = Properties.Vehicle.Default.setArdMac_isHydEnabled;
         }
 
         private void BtnSendToSteerArduino_Click(object sender, EventArgs e)
@@ -305,32 +229,14 @@ namespace AgOpenGPS
 
             if (tabcArduino.SelectedTab.Name == "tabAutoSteer")
             {
-                mf.TimedMessageBox(1000, gStr.gsAutoSteerPort, gStr.gsModuleConfiguration);
-                mf.SendArduinoSettingsOutToAutoSteerPort();
+                //mf.TimedMessageBox(1000, gStr.gsAutoSteerPort, gStr.gsModuleConfiguration);
+                mf.SendData(mf.mc.Config_ardSteer, true);
             }
             else if (tabcArduino.SelectedTab.Name == "tabMachine")
             {
-                mf.TimedMessageBox(1000, gStr.gsMachinePort, gStr.gsModuleConfiguration);
-                mf.SendArduinoSettingsOutMachinePort();
+                mf.SendData(mf.mc.Config_ardMachine, false);
+                //mf.TimedMessageBox(1000, gStr.gsMachinePort, gStr.gsModuleConfiguration);
             }
-        }
-
-        private void NudMaxSpeed_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudMinSpeed_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudMaxCounts_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
@@ -358,21 +264,81 @@ namespace AgOpenGPS
             lblRecd.Text = mf.checksumRecd.ToString();
         }
 
-        private void NudRaiseTime_Enter(object sender, EventArgs e)
+        private void TboxMinSpeed_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            using (var form = new FormNumeric(0, Math.Round(50 / mf.cutoffMetricImperial, mf.decimals), minspeed, this, false, 1, 0.2M))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxMinSpeed.Text = (minspeed = Math.Round(form.ReturnValue,2)).ToString("0.0");
+                }
+            }
             btnCancel.Focus();
         }
 
-        private void NudLowerTime_Enter(object sender, EventArgs e)
+        private void TboxLowerTime_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            using (var form = new FormNumeric(1, 20, lowertime, this, false, 1))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxLowerTime.Text = (lowertime = Math.Round(form.ReturnValue, 2)).ToString("0.0");
+                }
+            }
             btnCancel.Focus();
         }
 
-        private void NudAckerman_Enter(object sender, EventArgs e)
+        private void TboxRaiseTime_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            using (var form = new FormNumeric(1, 20, raisetime, this, false,1))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxRaiseTime.Text = (raisetime = Math.Round(form.ReturnValue, 2)).ToString("0.0");
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxMaxSpeed_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, Math.Round(50 / mf.cutoffMetricImperial, mf.decimals), maxspeed, this, false, 1, 0.2M))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxMaxSpeed.Text = (maxspeed = Math.Round(form.ReturnValue, 2)).ToString("0.0");
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxAckerman_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(50, 200, ackerman, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxAckerman.Text = (ackerman = (byte)form.ReturnValue).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxMaxSensorCounts_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(1, 60, maxpulsecounts, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxMaxSensorCounts.Text = (maxpulsecounts = (byte)form.ReturnValue).ToString();
+                }
+            }
             btnCancel.Focus();
         }
     }

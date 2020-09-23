@@ -45,16 +45,6 @@ namespace AgOpenGPS
             //rotate the camera down to look at fix
             GL.Rotate(camPitch, 1.0, 0.0, 0.0);
 
-            ////draw the guide
-            //GL.Begin(PrimitiveType.Triangles);
-            //GL.Color3(0.98f, 0.0f, 0.0f);
-            //GL.Vertex3(0.0f, -2.0f, 0.0f);
-            //GL.Color3(0.0f, 0.98f, 0.0f);
-            //GL.Vertex3(-2.0f, -3.0f, 0.0f);
-            //GL.Color3(0.98f, 0.98f, 0.0f);
-            //GL.Vertex3(2.0f, -3.0f, 0.0f);
-            //GL.End();						// Done Drawing Reticle
-
             //following game style or N fixed cam
             if (camFollowing)
             {

@@ -1,6 +1,7 @@
 ﻿//Please, if you use this, share the improvements
 
 using OpenTK.Graphics.OpenGL;
+using System;
 using System.Drawing;
 
 namespace AgOpenGPS
@@ -10,16 +11,9 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         //Z
-        public double northingMax;
+        public double NorthingMin, NorthingMax;
 
-        public double northingMin;
-
-        //X
-        public double eastingMax;
-
-        public double eastingMin;
-
-        private double texZoomE = 20, texZoomN = 20;
+        public double EastingMin, EastingMax;
 
         public CWorldGrid(FormGPS _f)
         {
@@ -35,22 +29,13 @@ namespace AgOpenGPS
             GL.BindTexture(TextureTarget.Texture2D, mf.texture[1]);
             GL.Begin(PrimitiveType.TriangleStrip);
             GL.TexCoord2(0, 0);
-            GL.Vertex3(eastingMin, northingMax, 0.0);
-            GL.TexCoord2(texZoomE, 0.0);
-            GL.Vertex3(eastingMax, northingMax, 0.0);
-            GL.TexCoord2(0.0, texZoomN);
-            GL.Vertex3(eastingMin, northingMin, 0.0);
-            GL.TexCoord2(texZoomE, texZoomN);
-            GL.Vertex3(eastingMax, northingMin, 0.0);
-
-            //GL.TexCoord2(0, 0);
-            //GL.Vertex3(eastingMin,  -200.0, northingMax);
-            //GL.TexCoord2(texZoomE, 0.0);
-            //GL.Vertex3(eastingMax, -200.0, northingMax);
-            //GL.TexCoord2(0.0, texZoomN);
-            //GL.Vertex3(eastingMin, -200.0, northingMin);
-            //GL.TexCoord2(texZoomE, texZoomN);
-            //GL.Vertex3(eastingMax, -200.0, northingMin);
+            GL.Vertex3(EastingMin, NorthingMax, 0.0);
+            GL.TexCoord2(20, 0.0);
+            GL.Vertex3(EastingMax, NorthingMax, 0.0);
+            GL.TexCoord2(0.0, 20);
+            GL.Vertex3(EastingMin, NorthingMin, 0.0);
+            GL.TexCoord2(20, 20);
+            GL.Vertex3(EastingMax, NorthingMin, 0.0);
 
             GL.End();
             GL.Disable(EnableCap.Texture2D);
@@ -61,59 +46,33 @@ namespace AgOpenGPS
             GL.Color3(0, 0, 0);
             GL.LineWidth(1);
             GL.Begin(PrimitiveType.Lines);
-            for (double num = 0; num < eastingMax; num += _gridZoom)
+            for (double num = Math.Floor(EastingMin / _gridZoom) * _gridZoom; num < EastingMax; num += _gridZoom)
             {
-                GL.Vertex3(num, northingMax, 0.1);
-                GL.Vertex3(num, northingMin, 0.1);
+                if (num < EastingMin) continue;
+
+                GL.Vertex3(num, NorthingMax, 0.1);
+                GL.Vertex3(num, NorthingMin, 0.1);
             }
-            for (double num = -_gridZoom; num > eastingMin; num -= _gridZoom)
+
+            for (double num2 = Math.Floor(NorthingMin / _gridZoom) * _gridZoom; num2 < NorthingMax; num2 += _gridZoom)
             {
-                GL.Vertex3(num, northingMax, 0.1);
-                GL.Vertex3(num, northingMin, 0.1);
-            }
-            for (double num2 = 0; num2 < northingMax; num2 += _gridZoom)
-            {
-                GL.Vertex3(eastingMax, num2, 0.1);
-                GL.Vertex3(eastingMin, num2, 0.1);
-            }
-            for (double num2 = - _gridZoom; num2 > northingMin; num2 -= _gridZoom)
-            {
-                GL.Vertex3(eastingMax, num2, 0.1);
-                GL.Vertex3(eastingMin, num2, 0.1);
+                if (num2 < NorthingMin) continue;
+
+                GL.Vertex3(EastingMax, num2, 0.1);
+                GL.Vertex3(EastingMin, num2, 0.1);
             }
             GL.End();
         }
 
-        public void CreateWorldGrid(double northing, double easting)
+        public void CheckWorldGrid(double northing, double easting)
         {
-            northingMax = northing + 2000.0;
-            northingMin = northing - 2000.0;
-            eastingMax = easting +   2000.0;
-            eastingMin = easting -   2000.0;
-        }
+            double n = Math.Floor(northing / 200.0 + 0.5) * 200.0;
+            double e = Math.Floor(easting / 200.0 + 0.5) * 200.0;
 
-        public void CheckZoomWorldGrid(double northing, double easting)
-        {
-            if (northingMax - northing < 1500.0)
-            {
-                northingMax = northing + 2000.0;
-                texZoomN = (double)(int)((northingMax - northingMin) / 1000.0);
-            }
-            if (northing - northingMin < 1500.0)
-            {
-                northingMin = northing - 2000.0;
-                texZoomN = (double)(int)((northingMax - northingMin) / 1000.0);
-            }
-            if (eastingMax - easting < 1500.0)
-            {
-                eastingMax = easting + 2000.0;
-                texZoomE = (double)(int)((eastingMax - eastingMin) / 1000.0);
-            }
-            if (easting - eastingMin < 1500.0)
-            {
-                eastingMin = easting - 2000.0;
-                texZoomE = (double)(int)((eastingMax - eastingMin) / 1000.0);
-            }
+            NorthingMax = n + 20000.0;
+            NorthingMin = n - 20000.0;
+            EastingMax = e + 20000.0;
+            EastingMin = e - 20000.0;
         }
     }
 }

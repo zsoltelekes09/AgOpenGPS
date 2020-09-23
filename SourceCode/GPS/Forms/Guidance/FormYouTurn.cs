@@ -810,7 +810,7 @@ namespace AgOpenGPS
 
         private void BtnYouTurnRecord_Click(object sender, EventArgs e)
         {
-            if (mf.ABLine.isABLineSet)
+            if (mf.ABLines.BtnABLineOn)
             {
                 using (var form = new FormYouTurnRecord(mf))
                 {
@@ -1222,9 +1222,6 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.seq_DistanceEnter = sbEntry.ToString();
             Properties.Vehicle.Default.seq_DistanceExit = sbExit.ToString();
 
-            //save it all
-            Properties.Vehicle.Default.Save();
-            Close();
 
 
 
@@ -1241,86 +1238,78 @@ namespace AgOpenGPS
                 mf.mazeGrid.BuildMazeGridArray();
             }
             mf.yt.ResetCreatedYouTurn();
+
+            //save it all
+            Properties.Vehicle.Default.Save();
+            Close();
         }
 
         private void BtnTurnAllOff_Click(object sender, EventArgs e)
         {
-            mf.mc.machineData[mf.mc.mdUTurn] = 0;
+            mf.mc.Send_Uturn[3] = 0;
             FunctionButtonsOnOff();
-        }
-
-        private bool IsBitSet(byte b, int pos)
-        {
-            return (b & (1 << pos)) != 0;
         }
 
         private void BtnToggle3_Click(object sender, EventArgs e)
         {
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 0))
-                mf.mc.machineData[mf.mc.mdUTurn] &= 0b11111110;
-            else mf.mc.machineData[mf.mc.mdUTurn] |= 0b00000001;
+            mf.mc.Send_Uturn[3] ^= 0x01;
+
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle4_Click(object sender, EventArgs e)
         {
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 1))
-                mf.mc.machineData[mf.mc.mdUTurn] &= 0b11111101;
-            else mf.mc.machineData[mf.mc.mdUTurn] |= 0b00000010;
+            mf.mc.Send_Uturn[3] ^= 0x02;
+
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle5_Click(object sender, EventArgs e)
         {
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 2))
-                mf.mc.machineData[mf.mc.mdUTurn] &= 0b11111011;
-            else mf.mc.machineData[mf.mc.mdUTurn] |= 0b00000100;
+            mf.mc.Send_Uturn[3] ^= 0x04;
+
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle6_Click(object sender, EventArgs e)
         {
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 3))
-                mf.mc.machineData[mf.mc.mdUTurn] &= 0b11110111;
-            else mf.mc.machineData[mf.mc.mdUTurn] |= 0b00001000;
+            mf.mc.Send_Uturn[3] ^= 0x08;
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle7_Click(object sender, EventArgs e)
         {
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 4))
-                mf.mc.machineData[mf.mc.mdUTurn] &= 0b11101111;
-            else mf.mc.machineData[mf.mc.mdUTurn] |= 0b00010000;
+            mf.mc.Send_Uturn[3] ^= 0x10;
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle8_Click(object sender, EventArgs e)
         {
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 5))
-                mf.mc.machineData[mf.mc.mdUTurn] &= 0b11011111;
-            else mf.mc.machineData[mf.mc.mdUTurn] |= 0b00100000;
+            mf.mc.Send_Uturn[3] ^= 0x20;
             FunctionButtonsOnOff();
         }
 
         private void FunctionButtonsOnOff()
         {
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 0)) btnToggle3.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[3] & 0x01) == 0x01) btnToggle3.BackColor = Color.LightGreen;
             else btnToggle3.BackColor = Color.LightSalmon;
 
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 1)) btnToggle4.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[3] & 0x02) == 0x02) btnToggle4.BackColor = Color.LightGreen;
             else btnToggle4.BackColor = Color.LightSalmon;
 
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 2)) btnToggle5.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[3] & 0x04) == 0x04) btnToggle5.BackColor = Color.LightGreen;
             else btnToggle5.BackColor = Color.LightSalmon;
 
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 3)) btnToggle6.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[3] & 0x08) == 0x08) btnToggle6.BackColor = Color.LightGreen;
             else btnToggle6.BackColor = Color.LightSalmon;
 
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 4)) btnToggle7.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[3] & 0x10) == 0x10) btnToggle7.BackColor = Color.LightGreen;
             else btnToggle7.BackColor = Color.LightSalmon;
 
-            if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 5)) btnToggle8.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[3] & 0x20) == 0x20) btnToggle8.BackColor = Color.LightGreen;
             else btnToggle8.BackColor = Color.LightSalmon;
+
+            mf.SendData(mf.mc.Send_Uturn, false);
         }
     }
 }

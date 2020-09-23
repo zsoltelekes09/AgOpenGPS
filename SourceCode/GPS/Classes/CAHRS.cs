@@ -32,7 +32,7 @@ namespace AgOpenGPS
         public int rollZeroX16, pitchZeroX16;
 
         //is the auto steer in auto turn on mode or not
-        public bool isAutoSteerAuto;
+        public bool RemoteAutoSteer;
 
         //the factor for fusion of GPS and IMU
         public double fusionWeight;
@@ -54,7 +54,7 @@ namespace AgOpenGPS
             rollZeroX16 = Properties.Settings.Default.setIMU_rollZeroX16;
             pitchZeroX16 = Properties.Settings.Default.setIMU_pitchZeroX16;
 
-            isAutoSteerAuto = Properties.Settings.Default.setAS_isAutoSteerAutoOn;
+            RemoteAutoSteer = Properties.Settings.Default.setAS_isAutoSteerAutoOn;
 
             fusionWeight = Properties.Settings.Default.setIMU_fusionWeight;
 

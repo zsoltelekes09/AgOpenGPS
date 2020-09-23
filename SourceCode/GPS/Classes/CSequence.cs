@@ -122,24 +122,6 @@ namespace AgOpenGPS
             }
         }
 
-        public void ResetAllSequences()
-        {
-            for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-            {
-                seqEnter[i].function = 0;
-                seqEnter[i].action = 0;
-                seqEnter[i].isTrig = true;
-                seqEnter[i].distance = 0;
-            }
-            for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-            {
-                seqExit[i].function = 0;
-                seqExit[i].action = 0;
-                seqExit[i].isTrig = true;
-                seqExit[i].distance = 0;
-            }
-        }
-
         //reset trig flag to false on all array elements with a function
         public void ResetSequenceEventTriggers()
         {
@@ -155,10 +137,6 @@ namespace AgOpenGPS
         {
             if (isSequenceTriggered)
             {
-                //determine if Section is entry or exit based on trigger point direction
-                //bool isToolHeadingSameAsABHeading;
-
-
                 if (mf.yt.onA <= 0)
                 {
                     whereAmI = 1;
@@ -184,7 +162,6 @@ namespace AgOpenGPS
                     whereAmI = 0;
                     ResetSequenceEventTriggers();
                     mf.distanceToolToTurnLine = -2222;
-                    isSequenceTriggered = false;
                     return;
                 }
 
@@ -205,6 +182,7 @@ namespace AgOpenGPS
 
                                 //send the function and action to perform
                                 mf.DoYouTurnSequenceEvent(mf.seq.seqEnter[i].function, mf.seq.seqEnter[i].action);
+                                mf.SendData(mf.mc.Send_Uturn, false);
                             }
                         }
                         break;
@@ -221,45 +199,13 @@ namespace AgOpenGPS
 
                                 //send the function and action to perform
                                 mf.DoYouTurnSequenceEvent(mf.seq.seqExit[i].function, mf.seq.seqExit[i].action);
+                                mf.SendData(mf.mc.Send_Uturn, false);
                             }
                         }
                         break;
                 }
+
             }
-        }
-
-        public void DoManualEntrySequence()
-        {
-            for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-            {
-                //have we gone past the distance and still haven't done it
-                if (!mf.seq.seqEnter[i].isTrig)
-                {
-                    //it shall only run once
-                    mf.seq.seqEnter[i].isTrig = true;
-
-                    //send the function and action to perform
-                    mf.DoYouTurnSequenceEvent(mf.seq.seqEnter[i].function, mf.seq.seqEnter[i].action);
-                }
-            }
-            mf.seq.ResetSequenceEventTriggers();
-        }
-
-        public void DoManualExitSequence()
-        {
-            for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-            {
-                //have we gone past the distance and still haven't done it
-                if (!mf.seq.seqExit[i].isTrig)
-                {
-                    //it shall only run once
-                    mf.seq.seqExit[i].isTrig = true;
-
-                    //send the function and action to perform
-                    mf.DoYouTurnSequenceEvent(mf.seq.seqExit[i].function, mf.seq.seqExit[i].action);
-                }
-            }
-            mf.seq.ResetSequenceEventTriggers();
         }
     }
 }

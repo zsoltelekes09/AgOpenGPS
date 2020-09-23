@@ -1,12 +1,12 @@
-﻿using System;
+﻿using AgOpenGPS.Properties;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
-using AgOpenGPS.Properties;
 using System.Globalization;
 using System.IO;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Media;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
@@ -19,17 +19,18 @@ namespace AgOpenGPS
         public byte flagColor = 0;
 
         //how many cm off line per big pixel
-        public int lightbarCmPerPixel;
+        public int lightbarCmPerPixel, decimals = 0;
 
         //polygon mode for section drawing
         public bool isDrawPolygons;
 
         //Is it in 2D or 3D, metric or imperial, display lightbar, display grid etc
-        public bool isMetric = true, isLightbarOn = true, isGridOn, isFullScreen;
+        public bool isMetric = true, isLightbarOn = true, isGridOn, isFullScreen, TwoSecondUpdateBool, OneSecondUpdateBool;
         public bool isUTurnAlwaysOn, isAutoLoadFields, isCompassOn, isSpeedoOn, isAutoDayNight, isSideGuideLines = true;
-        public bool isPureDisplayOn = true, isSkyOn = true, isRollMeterOn = false;
-        public bool isDay = true, isDayTime = true;
-        public bool isKeyboardOn = true;
+        public bool isPureDisplayOn = true, DrawBackBuffer = false, isSkyOn = true, isRollMeterOn = false;
+        public bool isDay = true, isDayTime = true, isSimNoisy, isKeyboardOn = true;
+
+        public double metImp2m = 0.01, m2MetImp = 100.0, cutoffMetricImperial = 1;
 
         //master Manual and Auto, 3 states possible
         public enum btnStates { Off, Auto, On }
@@ -45,9 +46,7 @@ namespace AgOpenGPS
         public int[] customColorsList = new int[16];
 
         //sunrise sunset
-        public DateTime dateToday = DateTime.Today;
-        public DateTime sunrise = DateTime.Now;
-        public DateTime sunset = DateTime.Now;
+        public DateTime dateToday = DateTime.Today, sunrise = DateTime.Now, sunset = DateTime.Now;
 
         private void IsBetweenSunriseSunset(double lat, double lon)
         {
@@ -57,6 +56,25 @@ namespace AgOpenGPS
 
         private void LoadSettings()
         {
+            //metric settings
+            if (isMetric = Settings.Default.setMenu_isMetric)
+            {
+                metImp2m = 0.01;
+                m2MetImp = 100.0;
+                cutoffMetricImperial = 1;
+                decimals = 0;
+            }
+            else
+            {
+                metImp2m = Glm.in2m;
+                m2MetImp = Glm.m2in;
+                cutoffMetricImperial = 1.60934;
+                decimals = 3;
+            }
+
+
+
+
             if (Settings.Default.setF_workingDirectory == "Default")
                 baseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\AgOpenGPS\\";
             else baseDirectory = Settings.Default.setF_workingDirectory + "\\AgOpenGPS\\";
@@ -111,13 +129,9 @@ namespace AgOpenGPS
             //grab the current vehicle filename - make sure it exists
             envFileName = Vehicle.Default.setVehicle_envName;
 
-            fixUpdateHz = Settings.Default.setPort_NMEAHz;
+            timerSim.Interval = 94;
 
-            if (timerSim.Enabled) fixUpdateHz = 10;
-
-            fixUpdateTime = 1.0 / (double)fixUpdateHz;
-
-            timerSim.Interval = (int)(fixUpdateTime * 1000.0);
+            fixUpdateTime = 1.0 / (double)HzTime;
 
             //get the abLines directory, if not exist, create
             ablinesDirectory = baseDirectory + "ABLines\\";
@@ -158,9 +172,6 @@ namespace AgOpenGPS
             //which heading source is being used
             headingFromSource = Settings.Default.setGPS_headingFromWhichSource;
 
-
-
-
             //start udp server if required
             if (Settings.Default.setUDP_isInterAppOn) StartLocalUDPServer();
             else if (Settings.Default.setUDP_isOn) StartUDPServer();
@@ -171,9 +182,9 @@ namespace AgOpenGPS
 
 
             //workswitch stuff
-            mc.isWorkSwitchEnabled = Settings.Default.setF_IsWorkSwitchEnabled;
-            mc.isWorkSwitchActiveLow = Settings.Default.setF_IsWorkSwitchActiveLow;
-            mc.isWorkSwitchManual = Settings.Default.setF_IsWorkSwitchManual;
+            mc.isWorkSwitchEnabled = Vehicle.Default.setF_IsWorkSwitchEnabled;
+            mc.isWorkSwitchActiveLow = Vehicle.Default.setF_IsWorkSwitchActiveLow;
+            mc.isWorkSwitchManual = Vehicle.Default.setF_IsWorkSwitchManual;
 
             minFixStepDist = Settings.Default.setF_minFixStep;
 
@@ -211,6 +222,7 @@ namespace AgOpenGPS
             isPureDisplayOn = Settings.Default.setMenu_isPureOn;
             isUTurnAlwaysOn = Settings.Default.setMenu_isUTurnAlwaysOn;
             isAutoLoadFields = Settings.Default.AutoLoadFields;
+            DrawBackBuffer = Settings.Default.DrawBackBuffer;
             //set the language to last used
             SetLanguage((object)Settings.Default.setF_culture, null);
 
@@ -227,10 +239,6 @@ namespace AgOpenGPS
                 timerSim.Enabled = false;
             }
 
-            fixUpdateHz = Properties.Settings.Default.setPort_NMEAHz;
-            if (timerSim.Enabled) fixUpdateHz = 10;
-            fixUpdateTime = 1 / (double)fixUpdateHz;
-
             //set the flag mark button to red dot
             btnFlag.Image = Properties.Resources.FlagRed;
 
@@ -246,9 +254,6 @@ namespace AgOpenGPS
                 customColorsList[i] = int.Parse(words[i], CultureInfo.InvariantCulture);
             }
 
-            //metric settings
-            isMetric = Settings.Default.setMenu_isMetric;
-
             //load up colors
             fieldColorDay = Settings.Default.setDisplay_colorFieldDay;
             sectionColorDay = Settings.Default.setDisplay_colorSectionsDay;
@@ -258,7 +263,7 @@ namespace AgOpenGPS
             nightColor = Settings.Default.setDisplay_colorNightMode;
 
 
-            DisableYouTurnButtons();
+            YouTurnButtons(false);
 
             isLightbarOn = Settings.Default.setMenu_isLightbarOn;
             lightbarToolStripMenuItem.Checked = isLightbarOn;
@@ -282,32 +287,19 @@ namespace AgOpenGPS
             oglZoom.SendToBack();
 
 
-            LineUpManualBtns();
-
             yt.rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;
             cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
 
             if (Properties.Settings.Default.setAS_isAutoSteerAutoOn) btnAutoSteer.Text = "R";
             else btnAutoSteer.Text = "M";
 
-            //panelSim.Location = Settings.Default.setDisplay_panelSimLocation;
 
             FixPanelsAndMenus();
 
-            layoutPanelRight.Enabled = false;
-            //boundaryToolStripBtn.Enabled = false;
-            toolStripBtnDropDownBoundaryTools.Enabled = false;
-
             UpdateNtripButton();
 
-            if (hd.isOn) btnHeadlandOnOff.Image = Properties.Resources.HeadlandOn;
-            else btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
 
             stripSectionColor.BackColor = sectionColorDay;
-
-
-            //update the field data areas
-            fd.UpdateFieldBoundaryGUIAreas();
 
             if (isAutoLoadFields)
             {
@@ -401,7 +393,19 @@ namespace AgOpenGPS
                                             string[] words2 = line.Split(',');
                                             double easting = double.Parse(words2[0], CultureInfo.InvariantCulture);
                                             double northing = double.Parse(words2[1], CultureInfo.InvariantCulture);
-                                            Vec2 vecPt = new Vec2((Math.Cos(convergenceAngle) * easting) - (Math.Sin(convergenceAngle) * northing) + eastingOffset, (Math.Sin(convergenceAngle) * easting) + (Math.Cos(convergenceAngle) * northing) + northingOffset);
+                                            Vec2 vecPt = new Vec2((Math.Sin(convergenceAngle) * easting) + (Math.Cos(convergenceAngle) * northing) + northingOffset, (Math.Cos(convergenceAngle) * easting) - (Math.Sin(convergenceAngle) * northing) + eastingOffset);
+
+                                            if (i == 0)
+                                            {
+                                                Fields[Fields.Count - 1].Northingmin = Fields[Fields.Count - 1].Northingmax = vecPt.Northing;
+                                                Fields[Fields.Count - 1].Eastingmin = Fields[Fields.Count - 1].Eastingmax = vecPt.Easting;
+                                            }
+
+                                            if (Fields[Fields.Count - 1].Northingmin > vecPt.Northing) Fields[Fields.Count - 1].Northingmin = vecPt.Northing;
+                                            if (Fields[Fields.Count - 1].Northingmax < vecPt.Northing) Fields[Fields.Count - 1].Northingmax = vecPt.Northing;
+                                            if (Fields[Fields.Count - 1].Eastingmin > vecPt.Easting) Fields[Fields.Count - 1].Eastingmin = vecPt.Easting;
+                                            if (Fields[Fields.Count - 1].Eastingmax < vecPt.Easting) Fields[Fields.Count - 1].Eastingmax = vecPt.Easting;
+
                                             Fields[Fields.Count - 1].Boundary.Add(vecPt);
                                         }
                                     }
@@ -431,7 +435,6 @@ namespace AgOpenGPS
                         c.ForeColor = Color.Black;
                     }
                 }
-                LineUpManualBtns();
             }
             else //nightmode
             {
@@ -445,9 +448,8 @@ namespace AgOpenGPS
                         c.ForeColor = Color.White;
                     }
                 }
-                LineUpManualBtns();
             }
-
+            LineUpManualBtns();
             Properties.Settings.Default.setDisplay_isDayMode = isDay;
             Properties.Settings.Default.Save();
         }
@@ -562,7 +564,7 @@ namespace AgOpenGPS
                 {
                     Size Size = new System.Drawing.Size(Math.Min((oglMain.Width * 3 / 4) / Tools[i].numOfSections, 120), 30);
 
-                    for (int j = 0; j <= Tools[i].numOfSections; j++)
+                    for (int j = 0; j < Tools[i].Sections.Count; j++)
                     {
                         if (j < Tools[i].numOfSections)
                         {
@@ -605,7 +607,6 @@ namespace AgOpenGPS
                         }
                         else
                         {
-                            if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
                             yt.isYouTurnTriggered = true;
                             yt.BuildManualYouTurn(false, true);
                             return;
@@ -620,7 +621,6 @@ namespace AgOpenGPS
                         }
                         else
                         {
-                            if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
                             yt.isYouTurnTriggered = true;
                             yt.BuildManualYouTurn(true, true);
                             return;
@@ -674,21 +674,12 @@ namespace AgOpenGPS
             }
         }
 
-        public void EnableYouTurnButtons()
+        public void YouTurnButtons(bool Enable)
         {
             yt.ResetYouTurn();
-
             yt.isYouTurnBtnOn = false;
-            btnAutoYouTurn.Enabled = true;
+            btnAutoYouTurn.Enabled = Enable;
             btnAutoYouTurn.Image = Properties.Resources.YouTurnNo;
-        }
-
-        public void DisableYouTurnButtons()
-        {
-            btnAutoYouTurn.Enabled = false;
-            yt.isYouTurnBtnOn = false;
-            btnAutoYouTurn.Image = Properties.Resources.YouTurnNo;
-            yt.ResetYouTurn();
         }
 
         private void ShowNoGPSWarning()
@@ -703,167 +694,126 @@ namespace AgOpenGPS
 
             AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
 
-            AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
-            //the main formgps window
+
+            lblSpeed.Text = Math.Round(avgSpeed / cutoffMetricImperial, 1).ToString();
+
+
             if (isMetric)  //metric or imperial
             {
-                lblSpeed.Text = SpeedKPH;
-                btnContour.Text = XTE; //cross track error
-
+                btnContour.Text = (crossTrackError / 10 + gStr.gsCM); //cross track error
             }
             else  //Imperial Measurements
             {
-                lblSpeed.Text = SpeedMPH;
-                btnContour.Text = InchXTE; //cross track error
+                btnContour.Text = ((int)(crossTrackError / 25.54) + " in"); //cross track errorss
             }
 
-            lblHz.Text = NMEAHz + "Hz " + (int)(FrameTime) + "\r\n" +
-                FixQuality + Math.Round(HzTime, 1, MidpointRounding.AwayFromZero) + " Hz";
+            lblHz.Text = Math.Round(HzTime, 1, MidpointRounding.AwayFromZero) + " Hz " + (int)(FrameTime) + "\r\n" + FixQuality;
+
+            if (OneSecondUpdateBool = !OneSecondUpdateBool)
+            {
+                //counter used for saving field in background
+                MinuteCounter++;
+
+                //Make sure it is off when it should
+                if ((!ABLines.BtnABLineOn && !ct.isContourBtnOn && !CurveLines.BtnCurveLineOn && isAutoSteerBtnOn)
+                    || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn))
+                {
+                    isAutoSteerBtnOn = false;
+                    btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
+                    //if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
+                }
+
+                //do all the NTRIP routines
+                if (isNTRIP_TurnedOn)
+                {
+                    //increment once every second
+                    NtripCounter++;
+
+                    //Thinks is connected but not receiving anything // 30sec maybe a bit much?
+                    if (NTRIP_Watchdog++ > 10 && isNTRIP_Connected) ReconnectRequest();
+
+                    //Once all connected set the timer GGA to NTRIP Settings
+                    if (sendGGAInterval > 0 && NtripCounter == 40) tmr.Interval = sendGGAInterval * 1000;
+
+                    //Have we connection
+                    if (!isNTRIP_Connected && !isNTRIP_Connecting)
+                    {
+                        if (NtripCounter > 20) StartNTRIP();
+                    }
+                    else if (isNTRIP_Connecting)
+                    {
+                        if (NtripCounter > 25)//give it 5 seconds
+                        {
+                            TimedMessageBox(2000, gStr.gsSocketConnectionProblem, gStr.gsNotConnectingToCaster);
+                            ReconnectRequest();
+                        }
+                        if (clientSocket != null && clientSocket.Connected)
+                        {
+                            SendAuthorization();
+                        }
+                    }
+
+                    //update byte counter and up counter
+                    if (NtripCounter > 20) NTRIPStartStopStrip.Text = (isNTRIP_Connecting ? gStr.gsAuthourizing : isNTRIP_Sending ? gStr.gsSendingGGA : (NTRIP_Watchdog > 10 ? gStr.gsWaiting : gStr.gsListening)) + "\n" + string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
+                    else NTRIPStartStopStrip.Text = gStr.gsConnectingIn + "\n" + (Math.Abs(NtripCounter - 21));
+
+                    pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
+                    NTRIPBytesMenu.Text = ((tripBytes) * 0.001).ToString("###,###,###") + " kb";
+
+                    if (sendGGAInterval > 0 && isNTRIP_Sending)
+                    {
+                        isNTRIP_Sending = false;
+                    }
+                }
+
+                //the main formgps window
+                //status strip values
+                if (isMetric)
+                {
+                    distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares;
+                    fieldStatusStripText.Text = fd.WorkedAreaRemainHectares + "\r\n" +
+                                                   fd.WorkedAreaRemainPercentage + "\r\n" +
+                                                   fd.TimeTillFinished + "\r\n" +
+                                                   fd.WorkRateHectares;
+                }
+                else
+                {
+                    distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres;
+                    fieldStatusStripText.Text = fd.WorkedAreaRemainAcres + "\r\n" +
+                           fd.WorkedAreaRemainPercentage + "\r\n" +
+                           fd.TimeTillFinished + "\r\n" +
+                           fd.WorkRateAcres;
+                }
+
+                //statusbar flash red undefined headland
+                if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent) statusStripBottom.BackColor = Color.Tomato;
+                else if (!mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato) statusStripBottom.BackColor = Color.Transparent;
+
+                //check to make sure the grid is on the right place
+                worldGrid.CheckWorldGrid(pn.fix.Northing, pn.fix.Easting);
+
+                //not Metric/Standard units sensitive
+                if (ABLines.BtnABLineOn) btnABLine.Text = "# " + ABLines.HowManyPathsAway.ToString();
+                else btnABLine.Text = "";
+
+                if (CurveLines.BtnCurveLineOn) btnCurve.Text = "# " + CurveLines.HowManyPathsAway.ToString();
+                else btnCurve.Text = "";
+
+                lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
+
+                zoomUpdateCounter = TwoSecondUpdateBool = !TwoSecondUpdateBool;
+            }
 
             HalfSecondUpdate.Enabled = true;
         }
 
-        private void OneSecond_Update(object sender, EventArgs e)
-        {
-            OneSecondUpdate.Enabled = false;
-
-            //counter used for saving field in background
-            MinuteCounter++;
-
-            if (ABLine.isBtnABLineOn && !ct.isContourBtnOn)
-            {
-                btnEditHeadingB.Text = ((int)(ABLine.moveDistance * 100)).ToString();
-            }
-            if (curve.isBtnCurveOn && !ct.isContourBtnOn)
-            {
-                btnEditHeadingB.Text = ((int)(curve.moveDistance * 100)).ToString();
-            }
-
-            //Make sure it is off when it should
-            if ((!ABLine.isBtnABLineOn && !ct.isContourBtnOn && !curve.isBtnCurveOn && isAutoSteerBtnOn)
-                || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn)) btnAutoSteer.PerformClick();
-
-            //do all the NTRIP routines
-            if (isNTRIP_TurnedOn)
-            {
-                //increment once every second
-                NtripCounter++;
-
-                //Thinks is connected but not receiving anything // 30sec maybe a bit much?
-                if (NTRIP_Watchdog++ > 10 && isNTRIP_Connected) ReconnectRequest();
-
-                //Once all connected set the timer GGA to NTRIP Settings
-                if (sendGGAInterval > 0 && NtripCounter == 40) tmr.Interval = sendGGAInterval * 1000;
-
-                //Have we connection
-                if (!isNTRIP_Connected && !isNTRIP_Connecting)
-                {
-                    if (NtripCounter > 20) StartNTRIP();
-                }
-                else if (isNTRIP_Connecting)
-                {
-                    if (NtripCounter > 25)//give it 5 seconds
-                    {
-                        TimedMessageBox(2000, gStr.gsSocketConnectionProblem, gStr.gsNotConnectingToCaster);
-                        ReconnectRequest();
-                    }
-                    if (clientSocket != null && clientSocket.Connected)
-                    {
-                        SendAuthorization();
-                    }
-                }
-
-                //update byte counter and up counter
-                if (NtripCounter > 20) NTRIPStartStopStrip.Text = (isNTRIP_Connecting ? gStr.gsAuthourizing : isNTRIP_Sending ? gStr.gsSendingGGA : (NTRIP_Watchdog > 10 ? gStr.gsWaiting : gStr.gsListening)) + "\n" + string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
-                else NTRIPStartStopStrip.Text = gStr.gsConnectingIn + "\n" + (Math.Abs(NtripCounter - 21));
-
-                pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
-                NTRIPBytesMenu.Text = ((tripBytes) * 0.001).ToString("###,###,###") + " kb";
-
-                if (sendGGAInterval > 0 && isNTRIP_Sending)
-                {
-                    isNTRIP_Sending = false;
-                }
-            }
-
-            //the main formgps window
-            //status strip values
-            if (isMetric)
-            {
-                distanceToolBtn.Text = fd.DistanceUserMeters + "\r\n" + fd.WorkedUserHectares;
-            }
-            else
-            {
-                distanceToolBtn.Text = fd.DistanceUserFeet + "\r\n" + fd.WorkedUserAcres;
-            }
-
-            //statusbar flash red undefined headland
-            if (mc.isOutOfBounds && statusStripBottom.BackColor == Color.Transparent) statusStripBottom.BackColor = Color.Tomato;
-            else if (!mc.isOutOfBounds && statusStripBottom.BackColor == Color.Tomato) statusStripBottom.BackColor = Color.Transparent;
-
-            OneSecondUpdate.Enabled = true;
-        }
-
-        private void ThreeSecond_Update(object sender, EventArgs e)
-        {
-            ThreeSecondUpdate.Enabled = false;
-
-            zoomUpdateCounter = true;
-            //check to make sure the grid is big enough
-            worldGrid.CheckZoomWorldGrid(pn.fix.northing, pn.fix.easting);
-
-            if (isMetric)
-            {
-                fieldStatusStripText.Text = fd.WorkedAreaRemainHectares + "\r\n" +
-                                               fd.WorkedAreaRemainPercentage + "\r\n" +
-                                               fd.TimeTillFinished + "\r\n" +
-                                               fd.WorkRateHectares;
-            }
-            else //imperial
-            {
-                fieldStatusStripText.Text = fd.WorkedAreaRemainAcres + "\r\n" +
-                       fd.WorkedAreaRemainPercentage + "\r\n" +
-                       fd.TimeTillFinished + "\r\n" +
-                       fd.WorkRateAcres;
-            }
-
-            //not Metric/Standard units sensitive
-            if (ABLine.isBtnABLineOn) btnABLine.Text = "# " + PassNumber;
-            else btnABLine.Text = "";
-
-            if (curve.isBtnCurveOn) btnCurve.Text = "# " + CurveNumber;
-            else btnCurve.Text = "";
-
-            lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
-
-
-            ThreeSecondUpdate.Enabled = true;
-        }
-
-
         #region Properties // ---------------------------------------------------------------------
 
-        public string Zone { get { return Convert.ToString(pn.zone); } }
-        public string FixNorthing { get { return Convert.ToString(Math.Round(pn.fix.northing + pn.utmNorth, 2)); } }
-        public string FixEasting { get { return Convert.ToString(Math.Round(pn.fix.easting + pn.utmEast, 2)); } }
-        public string Latitude { get { return Convert.ToString(Math.Round(pn.latitude, 7)); } }
-        public string Longitude { get { return Convert.ToString(Math.Round(pn.longitude, 7)); } }
 
-        public string SatsTracked { get { return Convert.ToString(pn.satellitesTracked); } }
-        public string HDOP { get { return Convert.ToString(pn.hdop); } }
-        public string NMEAHz { get { return Convert.ToString(fixUpdateHz); } }
-        public string PassNumber { get { return Convert.ToString(ABLine.passNumber); } }
-        public string CurveNumber { get { return Convert.ToString(curve.curveNumber); } }
-        public string Heading { get { return Convert.ToString(Math.Round(Glm.ToDegrees(fixHeading), 1)) + "\u00B0"; } }
-        public string GPSHeading { get { return (Math.Round(Glm.ToDegrees(gpsHeading), 1)) + "\u00B0"; } }
-        public string Status { get { if (pn.status == "A") return "Active"; else return "Void"; } }
         public string FixQuality
         {
             get
             {
-                //if (timerSim.Enabled)
-                //    return "Sim: ";
-
                 if (pn.FixQuality == 0) return "Invalid ";
                 else if (pn.FixQuality == 1) return "GPS Single ";
                 else if (pn.FixQuality == 2) return "DGPS ";
@@ -876,7 +826,6 @@ namespace AgOpenGPS
                 else return "Unknown: ";
             }
         }
-
         public string GyroInDegrees
         {
             get
@@ -897,58 +846,6 @@ namespace AgOpenGPS
         }
         public string SetSteerAngle { get { return ((double)(guidanceLineSteerAngle) * 0.01).ToString("N2") + "\u00B0"; } }
         public string ActualSteerAngle { get { return ((double)(actualSteerAngleDisp) * 0.01).ToString("N2") + "\u00B0"; } }
-
-        public string FixHeading { get { return Math.Round(fixHeading, 4).ToString(); } }
-        
-        //public string LookAhead { get { return ((int)(section[0].lookAheadOn)).ToString(); } }
-        public string StepFixNum { get { return (currentStepFix).ToString(); } }
-        public string CurrentStepDistance { get { return Math.Round(distanceCurrentStepFix, 3).ToString(); } }
-        public string TotalStepDistance { get { return Math.Round(fixStepDist, 3).ToString(); } }
-
-        public string AgeDiff { get { return pn.ageDiff.ToString(); } }
-
-        //Metric and Imperial Properties
-        public string SpeedMPH
-        {
-            get
-            {
-                return Convert.ToString(Math.Round(avgSpeed*0.62137, 1));
-            }
-        }
-        public string SpeedKPH
-        {
-            get
-            {
-                return Convert.ToString(Math.Round(avgSpeed, 1));
-            }
-        }
-
-        public string XTE
-        {
-            get
-            {
-                //double spd = 0;
-                //for (int c = 0; c < 20; c++) spd += avgXTE[c];
-                //spd *= 0.1;
-                //return ((int)(spd * 0.05) + " cm");
-                return (crossTrackError/10 + gStr.gsCM);
-            }
-        }
-        public string InchXTE
-        {
-            get
-            {
-                //double spd = 0;
-                //for (int c = 0; c < 20; c++) spd += avgXTE[c];
-                //spd *= 0.1;
-                //return ((int)(spd * 0.019685) + " in");
-                return ((int)(crossTrackError/25.54) + " in");
-            }
-        }
-
-        public string FixOffset { get { return (pn.fixOffset.easting.ToString("N2") + ", " + pn.fixOffset.northing.ToString("N2")); } }
-        public string FixOffsetInch { get { return ((pn.fixOffset.easting*Glm.m2in).ToString("N0")+ ", " + (pn.fixOffset.northing*Glm.m2in).ToString("N0")); } }
-
         public string Altitude { get { return Convert.ToString(Math.Round(pn.altitude,1)); } }
         public string AltitudeFeet { get { return Convert.ToString((Math.Round((pn.altitude * 3.28084),1))); } }
         public string DistPivotM
@@ -968,7 +865,6 @@ namespace AgOpenGPS
                 else return "--";
             }
         }
-
         #endregion properties 
     }//end class
 }//end namespace

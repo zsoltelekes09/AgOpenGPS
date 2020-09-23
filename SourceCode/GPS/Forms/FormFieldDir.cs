@@ -104,7 +104,6 @@ namespace AgOpenGPS
             //get the directory and make sure it exists, create if not
             string dirNewField = mf.fieldsDirectory + mf.currentFieldDirectory + "\\";
 
-            mf.menustripLanguage.Enabled = false;
             //if no template set just make a new file.
                 try
                 {
@@ -125,7 +124,7 @@ namespace AgOpenGPS
                         mf.pn.utmEast = (int)mf.pn.actualEasting;
                         mf.pn.utmNorth = (int)mf.pn.actualNorthing;
 
-                        mf.worldGrid.CreateWorldGrid(0, 0);
+                        mf.worldGrid.CheckWorldGrid(0, 0);
 
                         //calculate the central meridian of current zone
                         mf.pn.centralMeridian = -177 + ((mf.pn.zone - 1) * 6);

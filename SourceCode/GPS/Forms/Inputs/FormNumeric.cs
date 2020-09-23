@@ -10,20 +10,27 @@ namespace AgOpenGPS
     {
         private readonly double max;
         private readonly double min;
-        private bool isFirstKey;
+        private bool isFirstKey, WholeNumbers;
+        private int Decimals = 0;
+        private decimal Divisible = 1;
 
         public double ReturnValue { get; set; }
 
-        public FormNumeric(double _min, double _max, double currentValue,Form callingForm)
+        public FormNumeric(double _min, double _max, double currentValue,Form callingForm, bool wholenumbers, int decimals, decimal divisible = -1)
         {
+            Decimals = decimals;
+
             Owner = callingForm;
             max = _max;
             min = _min;
             InitializeComponent();
-
+            Divisible = divisible;
             Text = gStr.gsEnteraValue;
             //fill in the display
             tboxNumber.Text = currentValue.ToString();
+
+            keypad1.Controls[4].Enabled = !(WholeNumbers = wholenumbers);
+            keypad1.Controls[13].Enabled = _min < 0;
 
             isFirstKey = true;
         }
@@ -47,17 +54,30 @@ namespace AgOpenGPS
             }
 
             //clear the error as user entered new values
-            if(tboxNumber.Text == gStr.gsError)
+            if (tboxNumber.Text == gStr.gsError)
             {
                 tboxNumber.Text = "";
                 lblMin.ForeColor = SystemColors.ControlText;
                 lblMax.ForeColor = SystemColors.ControlText;
             }
 
+            int decSeparator = tboxNumber.Text.IndexOf(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+
             //if its a number just add it
             if (Char.IsNumber(e.KeyChar))
             {
-                tboxNumber.Text += e.KeyChar;
+
+                if (decSeparator < 0 || tboxNumber.Text.Length - decSeparator <= Decimals) tboxNumber.Text += e.KeyChar;
+
+
+
+                if (double.TryParse(tboxNumber.Text, out double value))
+                {
+                    if (value > max)
+                        tboxNumber.Text = max.ToString();
+                    else if (min <= 0 && value < min)
+                        tboxNumber.Text = min.ToString();
+                }
             }
 
             //Backspace key, remove 1 char
@@ -72,21 +92,24 @@ namespace AgOpenGPS
             //decimal point
             else if (e.KeyChar == '.')
             {
-                //does it already have a decimal?
-                if (!tboxNumber.Text.Contains(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator))
+                if (!WholeNumbers)
                 {
-                    tboxNumber.Text += Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-
-                    //if decimal is first char, prefix with a zero
-                    if (tboxNumber.Text.IndexOf(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator) == 0)
+                    //does it already have a decimal?
+                    if (!tboxNumber.Text.Contains(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator))
                     {
-                        tboxNumber.Text = "0" + tboxNumber.Text;
-                    }
+                        tboxNumber.Text += Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-                    //neg sign then added a decimal, insert a 0 
-                    if (tboxNumber.Text.IndexOf("-") == 0 && tboxNumber.Text.IndexOf(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator) == 1)
-                    {
-                        tboxNumber.Text = "-0" + Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                        //if decimal is first char, prefix with a zero
+                        if (tboxNumber.Text.IndexOf(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator) == 0)
+                        {
+                            tboxNumber.Text = "0" + tboxNumber.Text;
+                        }
+
+                        //neg sign then added a decimal, insert a 0 
+                        if (tboxNumber.Text.IndexOf("-") == 0 && tboxNumber.Text.IndexOf(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator) == 1)
+                        {
+                            tboxNumber.Text = "-0" + Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                        }
                     }
                 }
             }
@@ -151,6 +174,19 @@ namespace AgOpenGPS
                     Close();
                 }
             }
+
+            bool Add = (decSeparator < 0 || tboxNumber.Text.Length - decSeparator <= Decimals) ? true : false;
+
+
+
+            byte[] ttt = new byte[] { 14, 15, 5, 6, 7, 8, 9, 10, 11, 12 };
+            for (int i = 0; i < ttt.Length; i++)
+            {
+                decimal tryNumber = decimal.Parse(tboxNumber.Text + i.ToString(), CultureInfo.CurrentCulture);
+
+                keypad1.Controls[ttt[i]].Enabled = Add && (Divisible < 0 || tryNumber % Divisible == 0);
+            }
+
 
             //Show the cursor
             tboxNumber.SelectionStart = tboxNumber.Text.Length;

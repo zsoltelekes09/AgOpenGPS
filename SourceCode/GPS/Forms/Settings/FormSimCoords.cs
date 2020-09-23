@@ -7,6 +7,7 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf;
+        private double latitude = 0, longitude = 0;
 
         public FormSimCoords(Form callingForm)
         {
@@ -23,15 +24,12 @@ namespace AgOpenGPS
             this.btnLoadGPSFix.Text = gStr.gsUseGPS;
 
             this.Text = gStr.gsEnterCoordinatesForSimulator;
-
-            nudLatitude.Controls[0].Enabled = false;
-            nudLongitude.Controls[0].Enabled = false;
         }
 
         private void FormSimCoords_Load(object sender, EventArgs e)
         {
-            nudLatitude.Value = (decimal)Properties.Settings.Default.setGPS_SimLatitude;
-            nudLongitude.Value = (decimal)Properties.Settings.Default.setGPS_SimLongitude;
+            TboxLatitude.Text = (latitude = Math.Round(Properties.Settings.Default.setGPS_SimLatitude, 7)).ToString("N7");
+            TboxLongitude.Text = (longitude = Math.Round(Properties.Settings.Default.setGPS_SimLongitude, 7)).ToString("N7");
 
             lblLatStart.Text = mf.pn.latStart.ToString("N6");
             lblLonStart.Text = mf.pn.lonStart.ToString("N6");
@@ -46,30 +44,25 @@ namespace AgOpenGPS
 
         private void BntOK_Click(object sender, EventArgs e)
         {
-            mf.sim.latitude = (double)nudLatitude.Value;
-            mf.sim.longitude = (double)nudLongitude.Value;
-
+            mf.JobClose();
+            mf.sim.latitude = latitude;
+            mf.sim.longitude = longitude;
             Properties.Settings.Default.setGPS_SimLatitude = mf.sim.latitude;
             Properties.Settings.Default.setGPS_SimLongitude = mf.sim.longitude;
             Properties.Settings.Default.Save();
             Close();
         }
 
-        private void BtnCancel_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
         private void BtnGetFieldFix_Click(object sender, EventArgs e)
         {
-            nudLatitude.Value = (decimal)mf.pn.latStart;
-            nudLongitude.Value = (decimal)mf.pn.lonStart;
+            TboxLatitude.Text = (latitude = Math.Round(mf.pn.latStart, 7)).ToString("N7");
+            TboxLongitude.Text = (longitude = Math.Round(mf.pn.lonStart, 7)).ToString("N7");
         }
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            nudLatitude.Value = (decimal)mf.pn.latitude;
-            nudLongitude.Value = (decimal)mf.pn.longitude;
+            TboxLatitude.Text = (latitude = Math.Round(mf.pn.latitude, 7)).ToString("N7");
+            TboxLongitude.Text = (longitude = Math.Round(mf.pn.longitude, 7)).ToString("N7");
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
@@ -78,16 +71,29 @@ namespace AgOpenGPS
             lblGPSLon.Text = mf.pn.longitude.ToString("N6");
         }
 
-
-        private void NudLongitude_Enter(object sender, EventArgs e)
+        private void TboxLatitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            using (var form = new FormNumeric(-90, 90, latitude, this, false, 7))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxLatitude.Text = (latitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                }
+            }
             btnCancel.Focus();
         }
 
-        private void NudLatitude_Enter(object sender, EventArgs e)
+        private void TboxLongitude_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            using (var form = new FormNumeric(-180, 180, longitude, this, false, 7))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxLongitude.Text = (longitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                }
+            }
             btnCancel.Focus();
         }
     }

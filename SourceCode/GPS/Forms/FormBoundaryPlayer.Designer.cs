@@ -39,19 +39,19 @@
             this.btnAddPoint = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnPausePlay = new System.Windows.Forms.Button();
-            this.nudOffset = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).BeginInit();
+            this.TboxBndOffset = new System.Windows.Forms.TextBox();
+            this.lblOffset = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Tahoma", 18F);
-            this.label1.Location = new System.Drawing.Point(7, 92);
+            this.label1.Font = new System.Drawing.Font("Tahoma", 18.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(10, 100);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 29);
+            this.label1.Size = new System.Drawing.Size(80, 30);
             this.label1.TabIndex = 141;
             this.label1.Text = "Area:";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // timer1
             // 
@@ -61,44 +61,43 @@
             // 
             // lblArea
             // 
-            this.lblArea.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold);
-            this.lblArea.Location = new System.Drawing.Point(83, 92);
+            this.lblArea.Font = new System.Drawing.Font("Tahoma", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblArea.Location = new System.Drawing.Point(100, 100);
             this.lblArea.Name = "lblArea";
-            this.lblArea.Size = new System.Drawing.Size(77, 29);
+            this.lblArea.Size = new System.Drawing.Size(80, 30);
             this.lblArea.TabIndex = 142;
             this.lblArea.Text = "999";
             this.lblArea.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblPoints
             // 
-            this.lblPoints.AutoSize = true;
-            this.lblPoints.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold);
-            this.lblPoints.Location = new System.Drawing.Point(316, 92);
+            this.lblPoints.Font = new System.Drawing.Font("Tahoma", 18.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPoints.Location = new System.Drawing.Point(280, 100);
             this.lblPoints.Name = "lblPoints";
-            this.lblPoints.Size = new System.Drawing.Size(58, 29);
+            this.lblPoints.Size = new System.Drawing.Size(80, 30);
             this.lblPoints.TabIndex = 146;
             this.lblPoints.Text = "999";
             this.lblPoints.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 18F);
-            this.label2.Location = new System.Drawing.Point(234, 92);
+            this.label2.Location = new System.Drawing.Point(190, 100);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(84, 29);
+            this.label2.Size = new System.Drawing.Size(80, 30);
             this.label2.TabIndex = 148;
             this.label2.Text = "Points:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnRestart
             // 
-            this.btnRestart.BackColor = System.Drawing.Color.Transparent;
+            this.btnRestart.BackColor = System.Drawing.SystemColors.Control;
             this.btnRestart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRestart.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
             this.btnRestart.Image = global::AgOpenGPS.Properties.Resources.BoundaryDelete;
-            this.btnRestart.Location = new System.Drawing.Point(12, 12);
+            this.btnRestart.Location = new System.Drawing.Point(10, 10);
             this.btnRestart.Name = "btnRestart";
-            this.btnRestart.Size = new System.Drawing.Size(86, 67);
+            this.btnRestart.Size = new System.Drawing.Size(80, 80);
             this.btnRestart.TabIndex = 147;
             this.btnRestart.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnRestart.UseVisualStyleBackColor = false;
@@ -106,14 +105,14 @@
             // 
             // btnDeleteLast
             // 
-            this.btnDeleteLast.BackColor = System.Drawing.Color.Transparent;
+            this.btnDeleteLast.BackColor = System.Drawing.SystemColors.Control;
             this.btnDeleteLast.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeleteLast.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
             this.btnDeleteLast.Image = global::AgOpenGPS.Properties.Resources.PointDelete;
             this.btnDeleteLast.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnDeleteLast.Location = new System.Drawing.Point(184, 9);
+            this.btnDeleteLast.Location = new System.Drawing.Point(190, 10);
             this.btnDeleteLast.Name = "btnDeleteLast";
-            this.btnDeleteLast.Size = new System.Drawing.Size(89, 70);
+            this.btnDeleteLast.Size = new System.Drawing.Size(80, 80);
             this.btnDeleteLast.TabIndex = 144;
             this.btnDeleteLast.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDeleteLast.UseVisualStyleBackColor = false;
@@ -121,14 +120,14 @@
             // 
             // btnAddPoint
             // 
-            this.btnAddPoint.BackColor = System.Drawing.Color.Transparent;
+            this.btnAddPoint.BackColor = System.Drawing.SystemColors.Control;
             this.btnAddPoint.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddPoint.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
             this.btnAddPoint.Image = global::AgOpenGPS.Properties.Resources.PointAdd;
             this.btnAddPoint.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnAddPoint.Location = new System.Drawing.Point(322, 9);
+            this.btnAddPoint.Location = new System.Drawing.Point(280, 10);
             this.btnAddPoint.Name = "btnAddPoint";
-            this.btnAddPoint.Size = new System.Drawing.Size(89, 70);
+            this.btnAddPoint.Size = new System.Drawing.Size(80, 80);
             this.btnAddPoint.TabIndex = 143;
             this.btnAddPoint.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnAddPoint.UseVisualStyleBackColor = false;
@@ -136,13 +135,13 @@
             // 
             // btnStop
             // 
-            this.btnStop.BackColor = System.Drawing.Color.Transparent;
+            this.btnStop.BackColor = System.Drawing.SystemColors.Control;
             this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnStop.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
             this.btnStop.Image = global::AgOpenGPS.Properties.Resources.OK64;
-            this.btnStop.Location = new System.Drawing.Point(322, 138);
+            this.btnStop.Location = new System.Drawing.Point(280, 140);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(89, 89);
+            this.btnStop.Size = new System.Drawing.Size(80, 80);
             this.btnStop.TabIndex = 140;
             this.btnStop.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnStop.UseVisualStyleBackColor = false;
@@ -150,48 +149,55 @@
             // 
             // btnPausePlay
             // 
-            this.btnPausePlay.BackColor = System.Drawing.Color.Transparent;
+            this.btnPausePlay.BackColor = System.Drawing.SystemColors.Control;
             this.btnPausePlay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPausePlay.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
+            this.btnPausePlay.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnPausePlay.Image = global::AgOpenGPS.Properties.Resources.BoundaryRecord;
             this.btnPausePlay.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnPausePlay.Location = new System.Drawing.Point(184, 138);
+            this.btnPausePlay.Location = new System.Drawing.Point(190, 140);
             this.btnPausePlay.Name = "btnPausePlay";
-            this.btnPausePlay.Size = new System.Drawing.Size(89, 89);
+            this.btnPausePlay.Size = new System.Drawing.Size(80, 80);
             this.btnPausePlay.TabIndex = 139;
             this.btnPausePlay.Text = "Record";
             this.btnPausePlay.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnPausePlay.UseVisualStyleBackColor = false;
             this.btnPausePlay.Click += new System.EventHandler(this.BtnPausePlay_Click);
             // 
-            // nudOffset
+            // TboxBndOffset
             // 
-            this.nudOffset.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudOffset.DecimalPlaces = 2;
-            this.nudOffset.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudOffset.Location = new System.Drawing.Point(12, 156);
-            this.nudOffset.Maximum = new decimal(new int[] {
-            4999,
-            0,
-            0,
-            131072});
-            this.nudOffset.Name = "nudOffset";
-            this.nudOffset.Size = new System.Drawing.Size(130, 52);
-            this.nudOffset.TabIndex = 149;
-            this.nudOffset.Value = new decimal(new int[] {
-            4999,
-            0,
-            0,
-            131072});
-            this.nudOffset.Enter += new System.EventHandler(this.NudOffset_Enter);
+            this.TboxBndOffset.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxBndOffset.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxBndOffset.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxBndOffset.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxBndOffset.Location = new System.Drawing.Point(10, 170);
+            this.TboxBndOffset.MaxLength = 10;
+            this.TboxBndOffset.Name = "TboxBndOffset";
+            this.TboxBndOffset.Size = new System.Drawing.Size(170, 50);
+            this.TboxBndOffset.TabIndex = 476;
+            this.TboxBndOffset.Text = "49.99";
+            this.TboxBndOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxBndOffset.Enter += new System.EventHandler(this.TboxBndOffset_Enter);
+            // 
+            // lblOffset
+            // 
+            this.lblOffset.BackColor = System.Drawing.Color.Transparent;
+            this.lblOffset.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblOffset.Location = new System.Drawing.Point(10, 140);
+            this.lblOffset.Name = "lblOffset";
+            this.lblOffset.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.lblOffset.Size = new System.Drawing.Size(170, 30);
+            this.lblOffset.TabIndex = 477;
+            this.lblOffset.Text = "gsOffset";
+            this.lblOffset.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // FormBoundaryPlayer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(416, 231);
+            this.ClientSize = new System.Drawing.Size(370, 231);
             this.ControlBox = false;
-            this.Controls.Add(this.nudOffset);
+            this.Controls.Add(this.lblOffset);
+            this.Controls.Add(this.TboxBndOffset);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.btnRestart);
             this.Controls.Add(this.lblPoints);
@@ -208,8 +214,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Stop Record Pause Boundary";
-            this.Load += new System.EventHandler(this.FormBoundaryPlayer_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -227,6 +231,7 @@
         private System.Windows.Forms.Label lblPoints;
         private System.Windows.Forms.Button btnRestart;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.NumericUpDown nudOffset;
+        private System.Windows.Forms.TextBox TboxBndOffset;
+        private System.Windows.Forms.Label lblOffset;
     }
 }

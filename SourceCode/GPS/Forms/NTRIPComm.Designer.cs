@@ -75,6 +75,7 @@ namespace AgOpenGPS
             username = Properties.Settings.Default.setNTRIP_userName; //Insert your username!
             password = Properties.Settings.Default.setNTRIP_userPassword; //Insert your password!
             toUDP_Port = Properties.Settings.Default.setNTRIP_sendToUDPPort; //send rtcm to which udp port
+            epNTRIP = new IPEndPoint(epIP, toUDP_Port);
             sendGGAInterval = Properties.Settings.Default.setNTRIP_sendGGAInterval; //how often to send fixes
 
             //if we had a timer already, kill it
@@ -214,8 +215,7 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    SendUDPMessageNTRIP(data, toUDP_Port);
-
+                    SendUDPMessageNTRIP(data);
                 }
                 catch (Exception ex)
                 {
@@ -263,11 +263,7 @@ namespace AgOpenGPS
             // Check if we were sucessfull
             try
             {
-                //sock.EndConnect( ar );
-                if (sock.Connected)
-                    SetupRecieveCallback(sock);
-                //else
-                //    MessageBox.Show("Unable to connect to remote machine", "Connect Failed!");
+                if (sock.Connected) SetupRecieveCallback(sock);
             }
             catch (Exception)
             {

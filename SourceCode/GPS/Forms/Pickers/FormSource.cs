@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -16,11 +10,9 @@ namespace AgOpenGPS
     {
         private readonly FormNtrip nt;
 
-        private List<string> dataList = new List<string>();
-
-        double lat, lon;
-
-        string site;
+        private readonly List<string> dataList = new List<string>();
+        private readonly double lat,lon;
+        readonly string site;
 
         public FormSource(Form callingForm, List<string> _dataList, double _lat, double _lon, string syte)
         {

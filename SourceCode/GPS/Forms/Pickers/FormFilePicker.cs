@@ -31,7 +31,7 @@ namespace AgOpenGPS
 
             string[] dirs = Directory.GetDirectories(mf.fieldsDirectory);
 
-            FileList?.Clear();
+            FileList.Clear();
 
             foreach (string dir in dirs)
             {
@@ -133,9 +133,9 @@ namespace AgOpenGPS
                                         line = reader.ReadLine();
                                         string[] words = line.Split(',');
                                         Vec3 vecPt = new Vec3(
-                                        double.Parse(words[0], CultureInfo.InvariantCulture),
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
-                                        double.Parse(words[2], CultureInfo.InvariantCulture));
+                                            double.Parse(words[0], CultureInfo.InvariantCulture),
+                                            double.Parse(words[2], CultureInfo.InvariantCulture));
 
                                         pointList.Add(vecPt);
                                     }
@@ -148,7 +148,7 @@ namespace AgOpenGPS
 
                                         for (int i = 0; i < ptCount; j = i++)
                                         {
-                                            area += (pointList[j].easting + pointList[i].easting) * (pointList[j].northing - pointList[i].northing);
+                                            area += (pointList[j].Easting + pointList[i].Easting) * (pointList[j].Northing - pointList[i].Northing);
                                         }
                                         if (mf.isMetric)
                                         {

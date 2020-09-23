@@ -5,6 +5,27 @@ VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgOpenGPS", "GPS\AgOpenGPS.csproj", "{73933709-370E-43B3-8563-CC0F48FF587B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Autosteer_4.4.10", "Autosteer_4.4.10", "{67B517BE-3F9B-4069-97E2-5C5191FA58CA}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Desktop\Autosteer_4.4.10\Autosteer.ino = ..\..\..\..\Desktop\Autosteer_4.4.10\Autosteer.ino
+		..\..\..\..\Desktop\Autosteer_4.4.10\Autosteer_4.4.10.ino = ..\..\..\..\Desktop\Autosteer_4.4.10\Autosteer_4.4.10.ino
+		..\..\..\..\Desktop\Autosteer_4.4.10\bNO055_AOG.cpp = ..\..\..\..\Desktop\Autosteer_4.4.10\bNO055_AOG.cpp
+		..\..\..\..\Desktop\Autosteer_4.4.10\bNO055_AOG.h = ..\..\..\..\Desktop\Autosteer_4.4.10\bNO055_AOG.h
+		..\..\..\..\Desktop\Autosteer_4.4.10\enc28j60.cpp = ..\..\..\..\Desktop\Autosteer_4.4.10\enc28j60.cpp
+		..\..\..\..\Desktop\Autosteer_4.4.10\enc28j60.h = ..\..\..\..\Desktop\Autosteer_4.4.10\enc28j60.h
+		..\..\..\..\Desktop\Autosteer_4.4.10\etherCard_AOG.cpp = ..\..\..\..\Desktop\Autosteer_4.4.10\etherCard_AOG.cpp
+		..\..\..\..\Desktop\Autosteer_4.4.10\etherCard_AOG.h = ..\..\..\..\Desktop\Autosteer_4.4.10\etherCard_AOG.h
+		..\..\..\..\Desktop\Autosteer_4.4.10\mMA8452_AOG.cpp = ..\..\..\..\Desktop\Autosteer_4.4.10\mMA8452_AOG.cpp
+		..\..\..\..\Desktop\Autosteer_4.4.10\mMA8452_AOG.h = ..\..\..\..\Desktop\Autosteer_4.4.10\mMA8452_AOG.h
+		..\..\..\..\Desktop\Autosteer_4.4.10\net.h = ..\..\..\..\Desktop\Autosteer_4.4.10\net.h
+		..\..\..\..\Desktop\Autosteer_4.4.10\ParseAndSendData.ino = ..\..\..\..\Desktop\Autosteer_4.4.10\ParseAndSendData.ino
+		..\..\..\..\Desktop\Autosteer_4.4.10\SerialCommunication.ino = ..\..\..\..\Desktop\Autosteer_4.4.10\SerialCommunication.ino
+		..\..\..\..\Desktop\Autosteer_4.4.10\tcpip.cpp = ..\..\..\..\Desktop\Autosteer_4.4.10\tcpip.cpp
+		..\..\..\..\Desktop\Autosteer_4.4.10\udpserver.cpp = ..\..\..\..\Desktop\Autosteer_4.4.10\udpserver.cpp
+		..\..\..\..\Desktop\Autosteer_4.4.10\zADS1015.cpp = ..\..\..\..\Desktop\Autosteer_4.4.10\zADS1015.cpp
+		..\..\..\..\Desktop\Autosteer_4.4.10\zADS1015.h = ..\..\..\..\Desktop\Autosteer_4.4.10\zADS1015.h
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		All|Any CPU = All|Any CPU
@@ -32,11 +53,11 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_ConfirmAddLanguageFile = True
-		RESX_NeutralResourcesLanguage = en-US
-		RESX_SortFileContentOnSave = True
-		RESX_ShowErrorsInErrorList = False
-		SolutionGuid = {31C86FEF-A77A-49A7-9088-8E0D8AD2ACA5}
 		RESX_ResXSortingComparison = Ordinal
+		SolutionGuid = {31C86FEF-A77A-49A7-9088-8E0D8AD2ACA5}
+		RESX_ShowErrorsInErrorList = False
+		RESX_SortFileContentOnSave = True
+		RESX_NeutralResourcesLanguage = en-US
+		RESX_ConfirmAddLanguageFile = True
 	EndGlobalSection
 EndGlobal

@@ -108,7 +108,7 @@ namespace AgOpenGPS
         {
             get
             {
-                if (mf.pn.speed > 2)
+                if (mf.pn.speed > 2 && mf.Guidance.GuidanceWidth > 0)
                 {
                     var timeSpan = TimeSpan.FromHours(((areaBoundaryOuterLessInner - workedAreaTotal) * Glm.m2ha
                         / (mf.Guidance.GuidanceWidth * mf.pn.speed * 0.1)));
@@ -147,8 +147,8 @@ namespace AgOpenGPS
                 areaOuterBoundary = 0;
                 areaBoundaryOuterLessInner = 0;            
             }
-            //if (mf.isMetric) mf.btnManualOffOn.Text = AreaBoundaryLessInnersHectares;
-            //else mf.btnManualOffOn.Text = AreaBoundaryLessInnersAcres;
+            mf.CalculateMinMax();
+            mf.mazeGrid.BuildMazeGridArray();
         }
     }
 }

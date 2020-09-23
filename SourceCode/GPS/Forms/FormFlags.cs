@@ -23,11 +23,11 @@ namespace AgOpenGPS
 
         private void UpdateLabels()
         {
-            lblLatStart.Text = mf.flagPts[mf.flagNumberPicked - 1].latitude.ToString();
-            lblLonStart.Text = mf.flagPts[mf.flagNumberPicked - 1].longitude.ToString();
-            lblEasting.Text = mf.flagPts[mf.flagNumberPicked - 1].easting.ToString("N2");
-            lblNorthing.Text = mf.flagPts[mf.flagNumberPicked - 1].northing.ToString("N2");
-            lblHeading.Text = Glm.ToDegrees(mf.flagPts[mf.flagNumberPicked - 1].heading).ToString("N2");
+            lblLatStart.Text = mf.flagPts[mf.flagNumberPicked - 1].Latitude.ToString();
+            lblLonStart.Text = mf.flagPts[mf.flagNumberPicked - 1].Longitude.ToString();
+            lblEasting.Text = mf.flagPts[mf.flagNumberPicked - 1].Easting.ToString("N2");
+            lblNorthing.Text = mf.flagPts[mf.flagNumberPicked - 1].Northing.ToString("N2");
+            lblHeading.Text = Glm.ToDegrees(mf.flagPts[mf.flagNumberPicked - 1].Heading).ToString("N2");
             lblFlagSelected.Text = mf.flagPts[mf.flagNumberPicked - 1].ID.ToString();
             tboxFlagNotes.Text = mf.flagPts[mf.flagNumberPicked - 1].notes;
         }
@@ -54,7 +54,7 @@ namespace AgOpenGPS
             timer1.Enabled = false;
             mf.flagNumberPicked = 0;
             mf.FileSaveFlags();
-            mf.flagDubinsList?.Clear();
+            mf.flagDubinsList.Clear();
 
             Close();
 
@@ -101,9 +101,9 @@ namespace AgOpenGPS
             Vec3 steerAxlePosRP = mf.pivotAxlePos;
             if (mf.isMetric)
                 lblDistanceToFlag.Text = Glm.Distance(steerAxlePosRP,
-                    mf.flagPts[mf.flagNumberPicked - 1].easting, mf.flagPts[mf.flagNumberPicked - 1].northing).ToString("N2") + " m";
+                    mf.flagPts[mf.flagNumberPicked - 1].Easting, mf.flagPts[mf.flagNumberPicked - 1].Northing).ToString("N2") + " m";
             else lblDistanceToFlag.Text = (Glm.Distance(steerAxlePosRP,
-                mf.flagPts[mf.flagNumberPicked - 1].easting, mf.flagPts[mf.flagNumberPicked - 1].northing) * Glm.m2ft).ToString("N2") + " m";
+                mf.flagPts[mf.flagNumberPicked - 1].Easting, mf.flagPts[mf.flagNumberPicked - 1].Northing) * Glm.m2ft).ToString("N2") + " m";
         
         }
 
@@ -124,17 +124,17 @@ namespace AgOpenGPS
             //bump it back so you can line up to point
             Vec3 goal = new Vec3
             {
-                easting = mf.flagPts[mf.flagNumberPicked - 1].easting - (Math.Sin(mf.flagPts[mf.flagNumberPicked - 1].heading) * 6),
-                northing = mf.flagPts[mf.flagNumberPicked - 1].northing - (Math.Cos(mf.flagPts[mf.flagNumberPicked - 1].heading) * 6),
-                heading = mf.flagPts[mf.flagNumberPicked - 1].heading
+                Easting = mf.flagPts[mf.flagNumberPicked - 1].Easting - (Math.Sin(mf.flagPts[mf.flagNumberPicked - 1].Heading) * 6),
+                Northing = mf.flagPts[mf.flagNumberPicked - 1].Northing - (Math.Cos(mf.flagPts[mf.flagNumberPicked - 1].Heading) * 6),
+                Heading = mf.flagPts[mf.flagNumberPicked - 1].Heading
             };
 
             //bump it forward
             Vec3 pt2 = new Vec3
             {
-                easting = steerAxlePosRP.easting + (Math.Sin(steerAxlePosRP.heading) * 6),
-                northing = steerAxlePosRP.northing + (Math.Cos(steerAxlePosRP.heading) * 6),
-                heading = steerAxlePosRP.heading
+                Easting = steerAxlePosRP.Easting + (Math.Sin(steerAxlePosRP.Heading) * 6),
+                Northing = steerAxlePosRP.Northing + (Math.Cos(steerAxlePosRP.Heading) * 6),
+                Heading = steerAxlePosRP.Heading
             };
 
             //get the dubins path vec3 point coordinates of turn

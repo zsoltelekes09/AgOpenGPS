@@ -31,8 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.btnCancel = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
-            this.nudLongitude = new System.Windows.Forms.NumericUpDown();
-            this.nudLatitude = new System.Windows.Forms.NumericUpDown();
             this.label18 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.btnGetFieldFix = new System.Windows.Forms.Button();
@@ -50,8 +48,8 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLongitude)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLatitude)).BeginInit();
+            this.TboxLatitude = new System.Windows.Forms.TextBox();
+            this.TboxLongitude = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnCancel
@@ -68,7 +66,6 @@
             this.btnCancel.TabIndex = 5;
             this.btnCancel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -86,76 +83,24 @@
             this.bntOK.UseVisualStyleBackColor = true;
             this.bntOK.Click += new System.EventHandler(this.BntOK_Click);
             // 
-            // nudLongitude
-            // 
-            this.nudLongitude.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudLongitude.DecimalPlaces = 7;
-            this.nudLongitude.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudLongitude.Location = new System.Drawing.Point(308, 377);
-            this.nudLongitude.Maximum = new decimal(new int[] {
-            180,
-            0,
-            0,
-            0});
-            this.nudLongitude.Minimum = new decimal(new int[] {
-            180,
-            0,
-            0,
-            -2147483648});
-            this.nudLongitude.Name = "nudLongitude";
-            this.nudLongitude.Size = new System.Drawing.Size(298, 52);
-            this.nudLongitude.TabIndex = 48;
-            this.nudLongitude.Value = new decimal(new int[] {
-            1781234567,
-            0,
-            0,
-            -2147024896});
-            this.nudLongitude.Enter += new System.EventHandler(this.NudLongitude_Enter);
-            // 
-            // nudLatitude
-            // 
-            this.nudLatitude.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudLatitude.DecimalPlaces = 7;
-            this.nudLatitude.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudLatitude.Location = new System.Drawing.Point(12, 377);
-            this.nudLatitude.Maximum = new decimal(new int[] {
-            90,
-            0,
-            0,
-            0});
-            this.nudLatitude.Minimum = new decimal(new int[] {
-            90,
-            0,
-            0,
-            -2147483648});
-            this.nudLatitude.Name = "nudLatitude";
-            this.nudLatitude.Size = new System.Drawing.Size(274, 52);
-            this.nudLatitude.TabIndex = 49;
-            this.nudLatitude.Value = new decimal(new int[] {
-            881234567,
-            0,
-            0,
-            -2147024896});
-            this.nudLatitude.Enter += new System.EventHandler(this.NudLatitude_Enter);
-            // 
             // label18
             // 
-            this.label18.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.label18.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label18.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label18.Location = new System.Drawing.Point(20, 324);
+            this.label18.Location = new System.Drawing.Point(10, 302);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(252, 25);
+            this.label18.Size = new System.Drawing.Size(280, 30);
             this.label18.TabIndex = 178;
             this.label18.Text = "Latitude";
             this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label1
             // 
-            this.label1.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.label1.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label1.Location = new System.Drawing.Point(317, 324);
+            this.label1.Location = new System.Drawing.Point(300, 302);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(269, 25);
+            this.label1.Size = new System.Drawing.Size(280, 30);
             this.label1.TabIndex = 179;
             this.label1.Text = "Longitude";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -168,7 +113,7 @@
             this.btnGetFieldFix.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnGetFieldFix.Location = new System.Drawing.Point(594, 154);
             this.btnGetFieldFix.Name = "btnGetFieldFix";
-            this.btnGetFieldFix.Size = new System.Drawing.Size(109, 110);
+            this.btnGetFieldFix.Size = new System.Drawing.Size(110, 110);
             this.btnGetFieldFix.TabIndex = 181;
             this.btnGetFieldFix.Text = "Use Field";
             this.btnGetFieldFix.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -272,7 +217,7 @@
             this.btnLoadGPSFix.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnLoadGPSFix.Location = new System.Drawing.Point(774, 154);
             this.btnLoadGPSFix.Name = "btnLoadGPSFix";
-            this.btnLoadGPSFix.Size = new System.Drawing.Size(109, 110);
+            this.btnLoadGPSFix.Size = new System.Drawing.Size(110, 110);
             this.btnLoadGPSFix.TabIndex = 187;
             this.btnLoadGPSFix.Text = "Use GPS";
             this.btnLoadGPSFix.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -309,25 +254,55 @@
             // 
             // label8
             // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.label8.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label8.Location = new System.Drawing.Point(75, 349);
+            this.label8.Location = new System.Drawing.Point(10, 340);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(134, 25);
+            this.label8.Size = new System.Drawing.Size(280, 30);
             this.label8.TabIndex = 195;
             this.label8.Text = "( +90 to -90)";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label9
             // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Tahoma", 15.75F);
+            this.label9.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label9.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label9.Location = new System.Drawing.Point(370, 349);
+            this.label9.Location = new System.Drawing.Point(300, 340);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(163, 25);
+            this.label9.Size = new System.Drawing.Size(280, 30);
             this.label9.TabIndex = 196;
             this.label9.Text = "( +180 to -180 )";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TboxLatitude
+            // 
+            this.TboxLatitude.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxLatitude.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxLatitude.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLatitude.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxLatitude.Location = new System.Drawing.Point(10, 380);
+            this.TboxLatitude.MaxLength = 10;
+            this.TboxLatitude.Name = "TboxLatitude";
+            this.TboxLatitude.Size = new System.Drawing.Size(280, 50);
+            this.TboxLatitude.TabIndex = 478;
+            this.TboxLatitude.Text = "-88.1234567";
+            this.TboxLatitude.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxLatitude.Enter += new System.EventHandler(this.TboxLatitude_Enter);
+            // 
+            // TboxLongitude
+            // 
+            this.TboxLongitude.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxLongitude.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxLongitude.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLongitude.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxLongitude.Location = new System.Drawing.Point(300, 380);
+            this.TboxLongitude.MaxLength = 10;
+            this.TboxLongitude.Name = "TboxLongitude";
+            this.TboxLongitude.Size = new System.Drawing.Size(280, 50);
+            this.TboxLongitude.TabIndex = 479;
+            this.TboxLongitude.Text = "-178.1234567";
+            this.TboxLongitude.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxLongitude.Enter += new System.EventHandler(this.TboxLongitude_Enter);
             // 
             // FormSimCoords
             // 
@@ -337,6 +312,8 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(931, 438);
             this.ControlBox = false;
+            this.Controls.Add(this.TboxLongitude);
+            this.Controls.Add(this.TboxLatitude);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.lblGPSLon);
@@ -353,8 +330,6 @@
             this.Controls.Add(this.btnGetFieldFix);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label18);
-            this.Controls.Add(this.nudLatitude);
-            this.Controls.Add(this.nudLongitude);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.bntOK);
             this.Name = "FormSimCoords";
@@ -362,8 +337,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Enter Coordinates For Simulator";
             this.Load += new System.EventHandler(this.FormSimCoords_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.nudLongitude)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLatitude)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -373,8 +346,6 @@
 
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button bntOK;
-        private System.Windows.Forms.NumericUpDown nudLongitude;
-        private System.Windows.Forms.NumericUpDown nudLatitude;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnGetFieldFix;
@@ -392,5 +363,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox TboxLatitude;
+        private System.Windows.Forms.TextBox TboxLongitude;
     }
 }

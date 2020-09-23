@@ -19,7 +19,6 @@ namespace AgOpenGPS
             mf = _f;
         }
 
-
         public void FindPointsDriveAround(Vec3 fromPt, double headAB, ref Vec3 start, ref Vec3 stop)
         {
             //initial scan is straight ahead of pivot point of vehicle to find the right turnLine/boundary
@@ -35,8 +34,8 @@ namespace AgOpenGPS
 
             for (int b = 1; b < mf.maxCrossFieldLength; b += 2)
             {
-                pt.easting = fromPt.easting + (sinHead * b);
-                pt.northing = fromPt.northing + (cosHead * b);
+                pt.Easting = fromPt.Easting + (sinHead * b);
+                pt.Northing = fromPt.Northing + (cosHead * b);
 
                 if (mf.turn.turnArr[0].IsPointInTurnWorkArea(pt))
                 {
@@ -52,18 +51,18 @@ namespace AgOpenGPS
                                 closestTurnNum = t;
                                 closestTurnIndex = b;
 
-                                start.easting = fromPt.easting + (sinHead * b);
-                                start.northing = fromPt.northing + (cosHead * b);
-                                start.heading = headAB;
+                                start.Easting = fromPt.Easting + (sinHead * b);
+                                start.Northing = fromPt.Northing + (cosHead * b);
+                                start.Heading = headAB;
                                 break;
                             }
                         }
                         else
                         {
                             //its a uturn obstacle
-                            if (mf.turn.turnArr[t].IsPointInTurnWorkArea(pt))
+                            if (mf.turn.turnArr[0].IsPointInTurnWorkArea(pt))
                             {
-                                start.easting = 88888;
+                                start.Easting = 88888;
                                 return;
                             }
                         }
@@ -71,26 +70,26 @@ namespace AgOpenGPS
                 }
                 else
                 {
-                    start.easting = 88888;
+                    start.Easting = 88888;
                     return;
                 }
                 if (isFound) break;
             }
-
+            if (closestTurnNum == 99) return;
             isFound = false;
 
             for (int b = closestTurnIndex + 200; b > closestTurnIndex; b--)
             {
-                pt.easting = fromPt.easting + (sinHead * b);
-                pt.northing = fromPt.northing + (cosHead * b);
+                pt.Easting = fromPt.Easting + (sinHead * b);
+                pt.Northing = fromPt.Northing + (cosHead * b);
 
                 if (mf.gf.geoFenceArr[closestTurnNum].IsPointInGeoFenceArea(pt))
                 {
                     isFound = true;
 
-                    stop.easting = fromPt.easting + (sinHead * b);
-                    stop.northing = fromPt.northing + (cosHead * b);
-                    stop.heading = headAB;
+                    stop.Easting = fromPt.Easting + (sinHead * b);
+                    stop.Northing = fromPt.Northing + (cosHead * b);
+                    stop.Heading = headAB;
                 }
 
                 if (isFound) break;
@@ -98,38 +97,38 @@ namespace AgOpenGPS
 
             for (int i = 0; i < 30; i++)
             {
-                start.easting -= sinHead;
-                start.northing -= cosHead;
-                start.heading = headAB;
+                start.Easting -= sinHead;
+                start.Northing -= cosHead;
+                start.Heading = headAB;
 
-                int iStart = (int)((((int)((start.northing - mf.minFieldY) / mf.mazeGrid.mazeScale)) * mf.mazeGrid.mazeColXDim)
-                    + (int)((start.easting - mf.minFieldX) / mf.mazeGrid.mazeScale));
+                int iStart = (int)((((int)((start.Northing - mf.minFieldY) / mf.mazeGrid.mazeScale)) * mf.mazeGrid.mazeColXDim)
+                    + (int)((start.Easting - mf.minFieldX) / mf.mazeGrid.mazeScale));
 
                 if (iStart >= mazeDim)
                 {
-                    start.easting = 88888;
+                    start.Easting = 88888;
                     return;
                 }
 
-                if (mf.mazeGrid.mazeArr[iStart] == 0) break;
+                if (mf.mazeGrid.mazeArr[iStart] == false) break;
             }
 
             for (int i = 0; i < 30; i++)
             {
-                stop.easting += sinHead;
-                stop.northing += cosHead;
-                stop.heading = headAB;
+                stop.Easting += sinHead;
+                stop.Northing += cosHead;
+                stop.Heading = headAB;
 
-                int iStop = (int)((((int)((stop.northing - mf.minFieldY) / mf.mazeGrid.mazeScale)) * mf.mazeGrid.mazeColXDim)
-                    + (int)((stop.easting - mf.minFieldX) / mf.mazeGrid.mazeScale));
+                int iStop = (int)((((int)((stop.Northing - mf.minFieldY) / mf.mazeGrid.mazeScale)) * mf.mazeGrid.mazeColXDim)
+                    + (int)((stop.Easting - mf.minFieldX) / mf.mazeGrid.mazeScale));
 
                 if (iStop >= mazeDim)
                 {
-                    start.easting = 88888;
+                    start.Easting = 88888;
                     return;
                 }
 
-                if (mf.mazeGrid.mazeArr[iStop] == 0) break;
+                if (mf.mazeGrid.mazeArr[iStop] == false) break;
             }
         }
 
@@ -183,7 +182,7 @@ namespace AgOpenGPS
             }
 
             //to fill the list of line points
-            Vec3 point = new Vec3();
+            Vec2 point = new Vec2();
 
             //inside boundaries
             for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
@@ -196,19 +195,11 @@ namespace AgOpenGPS
 
                 for (int i = ptCount - 1; i >= 0; i--)
                 {
-                    //calculate the point outside the boundary
-                    point.easting = mf.bnd.bndArr[j].bndLine[i].easting + (-Math.Sin(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
-                    point.northing = mf.bnd.bndArr[j].bndLine[i].northing + (-Math.Cos(Glm.PIBy2 + mf.bnd.bndArr[j].bndLine[i].heading) * mf.yt.geoFenceDistance * ChangeDirection);
-                    point.heading = mf.bnd.bndArr[j].bndLine[i].heading;
-
-                    //only add if outside actual field boundary
-                    if ((j == 0 && mf.bnd.bndArr[j].IsPointInsideBoundary(point)) || (j != 0 && !mf.bnd.bndArr[j].IsPointInsideBoundary(point)))
-                    {
-                        Vec2 tPnt = new Vec2(point.easting, point.northing);
-                        geoFenceArr[j].geoFenceLine.Add(tPnt);
-                    }
+                    point.Northing = mf.bnd.bndArr[j].bndLine[i].Northing + Math.Sin(mf.bnd.bndArr[j].bndLine[i].Heading) * -mf.yt.geoFenceDistance * ChangeDirection;
+                    point.Easting = mf.bnd.bndArr[j].bndLine[i].Easting + Math.Cos(mf.bnd.bndArr[j].bndLine[i].Heading) * mf.yt.geoFenceDistance * ChangeDirection;
+                    geoFenceArr[j].geoFenceLine.Add(point);
                 }
-                geoFenceArr[j].FixGeoFenceLine(mf.yt.geoFenceDistance, mf.bnd.bndArr[j].bndLine, mf.Guidance.GuidanceWidth * 0.5);
+                geoFenceArr[j].FixGeoFenceLine(mf.yt.geoFenceDistance, mf.bnd.bndArr[j].bndLine);
                 geoFenceArr[j].PreCalcTurnLines();
 
                 if (Num > -1) break;
@@ -219,6 +210,9 @@ namespace AgOpenGPS
         {
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
+                if (geoFenceArr[i].Eastingmin > mf.worldGrid.EastingMax || geoFenceArr[i].Eastingmax < mf.worldGrid.EastingMin) continue;
+                if (geoFenceArr[i].Northingmin > mf.worldGrid.NorthingMax || geoFenceArr[i].Northingmax < mf.worldGrid.NorthingMin) continue;
+
                 geoFenceArr[i].DrawGeoFenceLine();
             }
         }

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -40,7 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -58,7 +58,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <DebugSymbols>false</DebugSymbols>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>AppIcon.ico</ApplicationIcon>
@@ -119,11 +119,9 @@
     <Compile Include="Classes\CBoundaryLines.cs" />
     <Compile Include="Classes\CDubins.cs" />
     <Compile Include="Classes\CAHRS.cs" />
-    <Compile Include="Classes\CAutoSteer.cs" />
     <Compile Include="Classes\CABCurve.cs" />
     <Compile Include="Classes\CFont.cs" />
     <Compile Include="Classes\CHeadLines.cs" />
-    <Compile Include="Classes\CHead.cs" />
     <Compile Include="Classes\CGeoFence.cs" />
     <Compile Include="Classes\CGeoFenceLines.cs" />
     <Compile Include="Classes\CMazeGrid.cs" />
@@ -147,6 +145,12 @@
     <Compile Include="Classes\CTurn.cs" />
     <Compile Include="Classes\CTurnLines.cs" />
     <Compile Include="Classes\CTool.cs" />
+    <Compile Include="Forms\FormShutDown.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormShutDown.Designer.cs">
+      <DependentUpon>FormShutDown.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Pickers\FormColorPicker.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -182,12 +186,6 @@
     </Compile>
     <Compile Include="Forms\Pickers\FormDrivePicker.Designer.cs">
       <DependentUpon>FormDrivePicker.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormTouchPick.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormTouchPick.Designer.cs">
-      <DependentUpon>FormTouchPick.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Pickers\FormToolPicker.cs">
       <SubType>Form</SubType>
@@ -230,18 +228,6 @@
     </Compile>
     <Compile Include="Forms\FormModules.Designer.cs">
       <DependentUpon>FormModules.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FormHeadland.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormHeadland.Designer.cs">
-      <DependentUpon>FormHeadland.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Guidance\FormEditCurve.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Guidance\FormEditCurve.Designer.cs">
-      <DependentUpon>FormEditCurve.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Guidance\FormEditAB.cs">
       <SubType>Form</SubType>
@@ -399,12 +385,6 @@
     <Compile Include="Forms\FormTimedMessage.Designer.cs">
       <DependentUpon>FormTimedMessage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Guidance\FormTramCurve.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Guidance\FormTramCurve.Designer.cs">
-      <DependentUpon>FormTramCurve.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FormWebCam.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -494,12 +474,6 @@
       <SubType>Form</SubType>
       <DependentUpon>FormGPS.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Guidance\FormABLine.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Guidance\FormABLine.Designer.cs">
-      <DependentUpon>FormABLine.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FormGPSData.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -568,6 +542,9 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Forms\FormShutDown.resx">
+      <DependentUpon>FormShutDown.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Pickers\FormColorPicker.resx">
       <DependentUpon>FormColorPicker.cs</DependentUpon>
     </EmbeddedResource>
@@ -579,15 +556,13 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form_First.resx">
       <DependentUpon>Form_First.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Inputs\FormKeyboard.resx">
       <DependentUpon>FormKeyboard.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Pickers\FormDrivePicker.resx">
       <DependentUpon>FormDrivePicker.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Pickers\FormTouchPick.resx">
-      <DependentUpon>FormTouchPick.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Pickers\FormToolPicker.resx">
       <DependentUpon>FormToolPicker.cs</DependentUpon>
@@ -611,13 +586,6 @@
     <EmbeddedResource Include="Forms\FormModules.resx">
       <DependentUpon>FormModules.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormHeadland.resx">
-      <DependentUpon>FormHeadland.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Guidance\FormEditCurve.resx">
-      <DependentUpon>FormEditCurve.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Guidance\FormEditAB.resx">
       <DependentUpon>FormEditAB.cs</DependentUpon>
@@ -678,13 +646,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormBoundaryPlayer.resx">
       <DependentUpon>FormBoundaryPlayer.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormFieldDir.resx">
       <DependentUpon>FormFieldDir.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Guidance\FormABLine.resx">
-      <DependentUpon>FormABLine.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\FormCommSet.resx">
       <DependentUpon>FormCommSet.cs</DependentUpon>
@@ -725,9 +690,6 @@
     <EmbeddedResource Include="Forms\FormtimedMessage.resx">
       <DependentUpon>FormTimedMessage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Guidance\FormTramCurve.resx">
-      <DependentUpon>FormTramCurve.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormWebCam.resx">
       <DependentUpon>FormWebCam.cs</DependentUpon>
     </EmbeddedResource>
@@ -753,14 +715,17 @@
     <EmbeddedResource Include="gStr.af.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.af.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="gStr.de.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.de.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="gStr.es.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.es.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="gStr.fr.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -770,14 +735,17 @@
     <EmbeddedResource Include="gStr.it.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.it.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="gStr.nl.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.nl.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="gStr.pl.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.pl.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="gStr.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
@@ -787,10 +755,12 @@
     <EmbeddedResource Include="gStr.sk.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.sk.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="gStr.uk.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>gStr.uk.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -9,53 +9,27 @@ namespace AgOpenGPS
         //pointers to mainform controls
         private readonly FormGPS mf;
 
-        public bool SpiralMode = false;
-        public bool CircleMode = false;
-        public double OldhowManyPathsAway;
-
         //flag for starting stop adding points
-        public bool isBtnCurveOn, isOkToAddPoints, isCurveSet;
-
-        public double distanceFromCurrentLine;
+        public bool BtnCurveLineOn, isOkToAddPoints;
+        public double distanceFromCurrentLine, distanceFromRefLine;
         public bool isABSameAsVehicleHeading = true;
-        public bool isOnRightSideCurrentLine = true;
 
-        public double howManyPathsAway, curveNumber;
-        public Vec2 refPoint1 = new Vec2(1, 1), refPoint2 = new Vec2(2, 2);
+        public double HowManyPathsAway, OldHowManyPathsAway;
+        public bool isSmoothWindowOpen, isSameWay, OldisSameWay;
 
-        public bool isSameWay, OldisSameWay;
-        public double moveDistance;
-
-        //generated box for finding closest point
-        public Vec2 boxA = new Vec2(0, 0), boxB = new Vec2(0, 2);
-
-        public Vec2 boxC = new Vec2(1, 1), boxD = new Vec2(2, 3);
-        private int A, B, C;
-        public int currentLocationIndex;
-
-        public double aveLineHeading;
+        public int A, B, CurrentLine = -1, CurrentEditLine = -1;
+        public int currentLocationIndex, tryoutcurve = -1;
 
         //pure pursuit values
-        public Vec2 goalPointCu = new Vec2(0, 0);
-
-        public Vec2 radiusPointCu = new Vec2(0, 0);
+        public Vec2 goalPointCu = new Vec2(0, 0), radiusPointCu = new Vec2(0, 0);
         public double steerAngleCu, rEastCu, rNorthCu, ppRadiusCu;
 
-        //the list of points of the ref line.
-        public List<Vec3> refList = new List<Vec3>();
         //the list of points of curve to drive on
         public List<Vec3> curList = new List<Vec3>();
-
-        public bool isSmoothWindowOpen;
         public List<Vec3> smooList = new List<Vec3>();
-
-        public List<CCurveLines> curveArr = new List<CCurveLines>();
-        public int numCurveLines, numCurveLineSelected;
+        public List<CCurveLines> Lines = new List<CCurveLines>();
 
         public bool isEditing;
-        public List<Vec2> tramArr = new List<Vec2>();
-        public List<List<Vec2>> tramList = new List<List<Vec2>>();
-
         public List<List<Vec3>> GuidanceLines = new List<List<Vec3>>();
 
         public CABCurve(FormGPS _f)
@@ -66,788 +40,781 @@ namespace AgOpenGPS
 
         public void DrawCurve()
         {
-            if (!isEditing)
+            int ptCount;
+            if (tryoutcurve > -1 && tryoutcurve < Lines.Count)
             {
-                int ptCount = refList.Count;
-                if (refList.Count == 0) return;
-
-                GL.LineWidth(mf.ABLine.lineWidth);
-                GL.Color3(0.96, 0.2f, 0.2f);
-                GL.Begin(PrimitiveType.Lines);
-                for (int h = 0; h < ptCount; h++) GL.Vertex3(refList[h].easting, refList[h].northing, 0);
-                if (!mf.curve.isCurveSet)
+                GL.LineWidth(mf.ABLines.lineWidth * 2);
+                GL.Color3(1.0f, 0.0f, 0.0f);
+                if (Lines[tryoutcurve].BoundaryMode) GL.Begin(PrimitiveType.LineLoop);
+                else GL.Begin(PrimitiveType.LineStrip);
+                for (int h = 0; h < Lines[tryoutcurve].curvePts.Count; h++) GL.Vertex3(Lines[tryoutcurve].curvePts[h].Easting, Lines[tryoutcurve].curvePts[h].Northing, 0);
+                GL.End();
+                return;
+            }
+            else if (isOkToAddPoints && CurrentEditLine < Lines.Count && CurrentEditLine > -1)//draw the last line to tractor
+            {
+                ptCount = Lines[CurrentEditLine].curvePts.Count;
+                if (ptCount > 0)
                 {
                     GL.Color3(0.930f, 0.0692f, 0.260f);
-                    ptCount--;
-                    GL.Vertex3(refList[ptCount].easting, refList[ptCount].northing, 0);
-                    GL.Vertex3(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0);
-                }
-                GL.End();
+                    GL.Begin(PrimitiveType.LineStrip);
+                    for (int h = 0; h < ptCount; h++) GL.Vertex3(Lines[CurrentEditLine].curvePts[h].Easting, Lines[CurrentEditLine].curvePts[h].Northing, 0);
 
-                if (mf.font.isFontOn && refList.Count > 410)
-                {
-                    GL.Color3(0.40f, 0.90f, 0.95f);
-                    mf.font.DrawText3D(refList[201].easting, refList[201].northing, "&A");
-                    mf.font.DrawText3D(refList[refList.Count - 200].easting, refList[refList.Count - 200].northing, "&B");
-                }
-
-                //just draw ref and smoothed line if smoothing window is open
-                if (isSmoothWindowOpen)
-                {
-                    ptCount = smooList.Count;
-                    if (smooList.Count == 0) return;
-
-                    GL.LineWidth(mf.ABLine.lineWidth);
-                    GL.Color3(0.930f, 0.92f, 0.260f);
-                    GL.Begin(PrimitiveType.Lines);
-                    for (int h = 0; h < ptCount; h++) GL.Vertex3(smooList[h].easting, smooList[h].northing, 0);
+                    GL.Vertex3(Lines[CurrentEditLine].curvePts[ptCount - 1].Easting, Lines[CurrentEditLine].curvePts[ptCount - 1].Northing, 0);
+                    GL.Vertex3(mf.pivotAxlePos.Easting, mf.pivotAxlePos.Northing, 0);
                     GL.End();
                 }
-                else //normal. Smoothing window is not open.
+            }
+            else if (isSmoothWindowOpen)
+            {
+                ptCount = smooList.Count;
+                if (smooList.Count == 0) return;
+
+                GL.LineWidth(mf.ABLines.lineWidth);
+                GL.Color3(0.930f, 0.92f, 0.260f);
+                GL.Begin(PrimitiveType.Lines);
+                for (int h = 0; h < ptCount; h++) GL.Vertex3(smooList[h].Easting, smooList[h].Northing, 0);
+                GL.End();
+            }
+            else
+            {
+                if (CurrentLine < Lines.Count && CurrentLine > -1)
                 {
-                    ptCount = curList.Count;
-                    if (ptCount > 0 && isCurveSet)
+                    ptCount = Lines[CurrentLine].curvePts.Count;
+                    if (ptCount < 2) return;
+
+                    GL.Color3(0.96, 0.2f, 0.2f);
+
+                    //original line
+
+                    if (Lines[CurrentLine].BoundaryMode) GL.Begin(PrimitiveType.LineLoop);
+                    else GL.Begin(PrimitiveType.LineStrip);
+                    for (int h = 0; h < ptCount; h++) GL.Vertex3(Lines[CurrentLine].curvePts[h].Easting, Lines[CurrentLine].curvePts[h].Northing, 0);
+                    GL.End();
+
+
+                    if (isEditing)
                     {
+                        ptCount = Lines[CurrentLine].curvePts.Count;
+                        GL.Color3(0.8f, 0.3f, 0.2f);
                         GL.PointSize(2);
+                        GL.Begin(PrimitiveType.Points);
 
-                        GL.Color3(0.95f, 0.2f, 0.95f);
-                        GL.Begin(PrimitiveType.LineStrip);
-                        for (int h = 0; h < ptCount; h++) GL.Vertex3(curList[h].easting, curList[h].northing, 0);
-                        GL.End();
-
-                        if (mf.isPureDisplayOn && !mf.isStanleyUsed)
+                        for (int i = 0; i <= 6; i++)
                         {
-                            if (ppRadiusCu < 100 && ppRadiusCu > -100)
-                            {
-                                const int numSegments = 100;
-                                double theta = Glm.twoPI / numSegments;
-                                double c = Math.Cos(theta);//precalculate the sine and cosine
-                                double s = Math.Sin(theta);
-                                double x = ppRadiusCu;//we start at angle = 0
-                                double y = 0;
+                            for (int h = 0; h < ptCount; h++)
+                                GL.Vertex3((Math.Cos(-Lines[CurrentLine].curvePts[h].Heading) * mf.Guidance.WidthMinusOverlap * i) + Lines[CurrentLine].curvePts[h].Easting,
+                                              (Math.Sin(-Lines[CurrentLine].curvePts[h].Heading) * mf.Guidance.WidthMinusOverlap * i) + Lines[CurrentLine].curvePts[h].Northing, 0);
+                        }
 
-                                GL.LineWidth(1);
-                                GL.Color3(0.95f, 0.30f, 0.950f);
-                                GL.Begin(PrimitiveType.LineLoop);
-                                for (int ii = 0; ii < numSegments; ii++)
-                                {
-                                    //glVertex2f(x + cx, y + cy);//output vertex
-                                    GL.Vertex3(x + radiusPointCu.easting, y + radiusPointCu.northing, 0);//output vertex
-                                    double t = x;//apply the rotation matrix
-                                    x = (c * x) - (s * y);
-                                    y = (s * t) + (c * y);
-                                }
+                        GL.End();
+                        return;
+                    }
+
+                    if (mf.isSideGuideLines)
+                    {
+                        GL.Color3(0.56f, 0.650f, 0.650f);
+                        GL.Enable(EnableCap.LineStipple);
+                        GL.LineStipple(1, 0x0101);
+
+                        GL.LineWidth(mf.ABLines.lineWidth);
+
+                        for (int i = 0; i < GuidanceLines.Count; i++)
+                        {
+                            if (GuidanceLines[i].Count > 0)
+                            {
+                                if (Lines[CurrentLine].BoundaryMode) GL.Begin(PrimitiveType.LineLoop);
+                                else GL.Begin(PrimitiveType.LineStrip);
+                                for (int h = 0; h < GuidanceLines[i].Count; h++) GL.Vertex3(GuidanceLines[i][h].Easting, GuidanceLines[i][h].Northing, 0);
                                 GL.End();
                             }
+                        }
+                        GL.Disable(EnableCap.LineStipple);
+                    }
 
-                            //Draw lookahead Point
-                            GL.PointSize(4.0f);
-                            GL.Begin(PrimitiveType.Points);
-                            GL.Color3(1.0f, 0.5f, 0.95f);
-                            GL.Vertex3(goalPointCu.easting, goalPointCu.northing, 0.0);
+                    if (mf.font.isFontOn && ptCount > 410)
+                    {
+                        GL.Color3(0.40f, 0.90f, 0.95f);
+                        mf.font.DrawText3D(Lines[CurrentLine].curvePts[201].Easting, Lines[CurrentLine].curvePts[201].Northing, "&A");
+                        mf.font.DrawText3D(Lines[CurrentLine].curvePts[Lines[CurrentLine].curvePts.Count - 200].Easting, Lines[CurrentLine].curvePts[Lines[CurrentLine].curvePts.Count - 200].Northing, "&B");
+                    }
+
+                    ptCount = curList.Count;
+                    if (ptCount > 1)
+                    {
+                        GL.PointSize(4.0f);
+                       // GL.Begin(PrimitiveType.Points);
+                        GL.Color3(1.0f, 0.0f, 0.0f);
+                       //GL.Vertex3(curList[A].Easting, curList[A].Northing, 0.0);
+                        GL.Color3(0.0f, 1.0f, 0.0f);
+                        //GL.Vertex3(curList[B].Easting, curList[B].Northing, 0.0);
+                       //GL.End();
+
+
+
+
+                        //OnDrawGizmos();
+
+                        GL.LineWidth(mf.ABLines.lineWidth);
+                        GL.Color3(0.95f, 0.2f, 0.95f);
+                        if (Lines[CurrentLine].BoundaryMode) GL.Begin(PrimitiveType.LineLoop);
+                        else GL.Begin(PrimitiveType.LineStrip);
+                        for (int h = 0; h < ptCount; h++) GL.Vertex3(curList[h].Easting, curList[h].Northing, 0);
+                        GL.End();
+                    }
+
+                    if (mf.isPureDisplayOn && !mf.isStanleyUsed)
+                    {
+                        if (ppRadiusCu < 100 && ppRadiusCu > -100)
+                        {
+                            const int numSegments = 100;
+                            double theta = Glm.twoPI / numSegments;
+                            double c = Math.Cos(theta);//precalculate the sine and cosine
+                            double s = Math.Sin(theta);
+                            double x = ppRadiusCu;//we start at angle = 0
+                            double y = 0;
+
+                            GL.LineWidth(1);
+                            GL.Color3(0.95f, 0.30f, 0.950f);
+                            GL.Begin(PrimitiveType.LineLoop);
+                            for (int ii = 0; ii < numSegments; ii++)
+                            {
+                                //glVertex2f(x + cx, y + cy);//output vertex
+                                GL.Vertex3(x + radiusPointCu.Easting, y + radiusPointCu.Northing, 0);//output vertex
+                                double t = x;//apply the rotation matrix
+                                x = (c * x) - (s * y);
+                                y = (s * t) + (c * y);
+                            }
                             GL.End();
                         }
 
-                        mf.yt.DrawYouTurn();
-
-                        if (mf.yt.isYouTurnTriggered)
-                        {
-                            GL.Color3(0.95f, 0.95f, 0.25f);
-                            GL.LineWidth(mf.ABLine.lineWidth);
-                            ptCount = mf.yt.ytList.Count;
-                            if (ptCount > 0)
-                            {
-                                GL.Begin(PrimitiveType.Points);
-                                for (int i = 0; i < ptCount; i++)
-                                {
-                                    GL.Vertex3(mf.yt.ytList[i].easting, mf.yt.ytList[i].northing, 0);
-                                }
-                                GL.End();
-                            }
-                            GL.Color3(0.95f, 0.05f, 0.05f);
-                        }
-
-                        if (mf.isSideGuideLines)
-                        {
-                            GL.Color3(0.56f, 0.650f, 0.650f);
-                            GL.Enable(EnableCap.LineStipple);
-                            GL.LineStipple(1, 0x0101);
-
-                            GL.LineWidth(mf.ABLine.lineWidth);
-
-
-
-                            for (int i = 0; i < GuidanceLines.Count; i++)
-                            {
-                                if (GuidanceLines[i].Count > 0)
-                                {
-                                    GL.Begin(PrimitiveType.LineStrip);
-                                    for (int h = 0; h < GuidanceLines[i].Count; h++) GL.Vertex3(GuidanceLines[i][h].easting, GuidanceLines[i][h].northing, 0);
-                                    GL.End();
-                                }
-                            }
-                            GL.Disable(EnableCap.LineStipple);
-                        }
+                        //Draw lookahead Point
+                        GL.PointSize(4.0f);
+                        GL.Begin(PrimitiveType.Points);
+                        GL.Color3(1.0f, 0.5f, 0.95f);
+                        GL.Vertex3(goalPointCu.Easting, goalPointCu.Northing, 0.0);
+                        GL.End();
                     }
-                }
-                GL.PointSize(1.0f);
-            }
 
-            if (isEditing)
-            {
-                int ptCount = refList.Count;
-                if (refList.Count == 0) return;
+                    mf.yt.DrawYouTurn();
 
-                GL.LineWidth(mf.ABLine.lineWidth);
-                GL.Color3(0.930f, 0.2f, 0.260f);
-                GL.Begin(PrimitiveType.Lines);
-                for (int h = 0; h < ptCount; h++) GL.Vertex3(refList[h].easting, refList[h].northing, 0);
-                GL.End();
-
-                //current line
-                if (curList.Count > 0 && isCurveSet)
-                {
-                    ptCount = curList.Count;
-                    GL.Color3(0.95f, 0.2f, 0.950f);
-                    GL.Begin(PrimitiveType.LineStrip);
-                    for (int h = 0; h < ptCount; h++) GL.Vertex3(curList[h].easting, curList[h].northing, 0);
-                    GL.End();
-                }
-
-
-                if (mf.camera.camSetDistance > -200)
-                {
-                    double cosHeading2 = Math.Cos(-mf.curve.aveLineHeading);
-                    double sinHeading2 = Math.Sin(-mf.curve.aveLineHeading);
-
-                    GL.Color3(0.8f, 0.3f, 0.2f);
-                    GL.PointSize(2);
-                    GL.Begin(PrimitiveType.Points);
-
-                    for (int i = 1; i <= 6; i++)
+                    if (mf.yt.isYouTurnTriggered)
                     {
-                        for (int h = 0; h < ptCount; h++)
-                            GL.Vertex3((cosHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.curve.refList[h].easting,
-                                          (sinHeading2 * mf.Guidance.WidthMinusOverlap * i) + mf.curve.refList[h].northing, 0);
+                        GL.Color3(0.95f, 0.95f, 0.25f);
+                        GL.LineWidth(mf.ABLines.lineWidth);
+                        ptCount = mf.yt.ytList.Count;
+                        if (ptCount > 0)
+                        {
+                            GL.Begin(PrimitiveType.Points);
+                            for (int i = 0; i < ptCount; i++)
+                            {
+                                GL.Vertex3(mf.yt.ytList[i].Easting, mf.yt.ytList[i].Northing, 0);
+                            }
+                            GL.End();
+                        }
+                        GL.Color3(0.95f, 0.05f, 0.05f);
                     }
 
-                    GL.End();
+                    GL.Color4(0.8630f, 0.73692f, 0.60f, 0.25);
+                    mf.tram.DrawTram(false);
                 }
             }
-
-            if (mf.tram.displayMode == 1 || mf.tram.displayMode == 2) DrawTram();
-            if (mf.tram.displayMode == 1 || mf.tram.displayMode == 3) mf.tram.DrawTramBnd();
-        }
-
-        public void DrawTram()
-        {
-            GL.Color4(0.8630f, 0.93692f, 0.3260f, 0.22);
-
-            //int k = (int)(mf.camera.camSetDistance / -400);
-            for (int i = 0; i < tramList.Count; i++)
-            {
-                GL.Begin(PrimitiveType.TriangleStrip);
-                for (int h = 0; h < tramList[i].Count; h++) GL.Vertex3(tramList[i][h].easting, tramList[i][h].northing, 0);
-                GL.End();
-            }
-
-            if (mf.font.isFontOn)
-            {
-                for (int i = 0; i < tramList.Count; i++)
-                {
-                    GL.Color4(0.8630f, 0.93692f, 0.8260f, 0.752);
-                    if (tramList[i].Count > 0)
-                    {
-                        int middle = tramList[i].Count - 1;
-                        mf.font.DrawText3D(tramList[i][middle].easting, tramList[i][middle].northing, (i + 1).ToString());
-                        mf.font.DrawText3D(tramList[i][0].easting, tramList[i][0].northing, (i + 1).ToString());
-                    }
-                }
-            }
+            GL.PointSize(1.0f);
         }
 
         public void BuildTram()
         {
-            mf.tram.BuildTramBnd();
-            tramList?.Clear();
-            tramArr?.Clear();
+            mf.tram.TramList.Clear();
 
-            Vec2 tramLineP1;
+            if (mf.bnd.bndArr.Count > 0) mf.tram.CreateBndTramRef();
 
-            double pass = 0.5;
-            double headingCalc = aveLineHeading + Glm.PIBy2;
-
-            double hsin = Math.Sin(headingCalc);
-            double hcos = Math.Cos(headingCalc);
-
-            for (int i = 0; i < mf.tram.passes; i++)
+            if (CurrentLine > -1 && CurrentLine < Lines.Count)
             {
-                tramArr = new List<Vec2>();
-                tramList.Add(tramArr);
-                for (int j = 0; j < refList.Count; j += 4)
+                Vec2 tramLineP1 = new Vec2();
+                Vec2 tramLineP2 = new Vec2();
+                int cnt = Lines[CurrentLine].curvePts.Count;
+
+
+                for (double i = 1; i < mf.tram.passes; i++)
                 {
-                    tramLineP1.easting = (hsin * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + refList[j].easting;
-                    tramLineP1.northing = (hcos * ((mf.tram.tramWidth * (pass + i)) - mf.tram.halfWheelTrack + mf.tram.abOffset)) + refList[j].northing;
+                    double Offset = mf.tram.tramWidth * i - mf.tram.abOffset;
+                    List<Vec4> Crossings1 = new List<Vec4>();
 
-                    if (mf.bnd.bndArr.Count > 0)
+                    for (int j = 0; j + 1 < cnt; j += 4)
                     {
-                        if (mf.bnd.bndArr[0].IsPointInsideBoundary(tramLineP1))
-                        {
-                            tramArr.Add(tramLineP1);
+                        double CosHead = Math.Cos(Lines[CurrentLine].curvePts[j].Heading);
+                        double SinHead = Math.Sin(Lines[CurrentLine].curvePts[j].Heading);
+                        tramLineP1.Northing = Lines[CurrentLine].curvePts[j].Northing + (j == 0 ? CosHead * -4000 : 0) + SinHead * -Offset;
+                        tramLineP1.Easting = Lines[CurrentLine].curvePts[j].Easting + (j == 0 ? SinHead * -4000 : 0) + CosHead * Offset;
 
-                            tramLineP1.easting = (hsin * mf.tram.wheelTrack) + tramLineP1.easting;
-                            tramLineP1.northing = (hcos * mf.tram.wheelTrack) + tramLineP1.northing;
-                            tramArr.Add(tramLineP1);
+                        int k = (j + 4 >= cnt ? cnt - 1 : j + 4);
+
+                        double CosHead2 = Math.Cos(Lines[CurrentLine].curvePts[k].Heading);
+                        double SinHead2 = Math.Sin(Lines[CurrentLine].curvePts[k].Heading);
+                        tramLineP2.Northing = Lines[CurrentLine].curvePts[k].Northing + (k == cnt - 1 ? CosHead2 * 4000 : 0) + SinHead2 * -Offset;
+                        tramLineP2.Easting = Lines[CurrentLine].curvePts[k].Easting + (k == cnt - 1 ? SinHead2 * 4000 : 0) + CosHead2 * Offset;
+
+
+                        if (mf.bnd.bndArr.Count > 0 && mf.bnd.bndArr[0].bndLine.Count > 2)
+                        {
+                            mf.FindCrossingPoints(ref Crossings1, ref mf.tram.TramList[0].Left, tramLineP1.Northing, tramLineP1.Easting, tramLineP2.Northing - tramLineP1.Northing, tramLineP2.Easting - tramLineP1.Easting, j);//mf.bnd.bndArr[0].bndLine
                         }
                     }
-                    else
-                    {
-                        tramArr.Add(tramLineP1);
 
-                        tramLineP1.easting = (hsin * mf.tram.wheelTrack) + tramLineP1.easting;
-                        tramLineP1.northing = (hcos * mf.tram.wheelTrack) + tramLineP1.northing;
-                        tramArr.Add(tramLineP1);
+                    if (Crossings1.Count > 1)
+                    {
+                        Crossings1.Sort((x, y) => x.Index.CompareTo(y.Index));
+
+                        for (int j = 0; j + 1 < Crossings1.Count; j += 2)
+                        {
+                            if (Crossings1[j + 1].Index > 0)
+                            {
+                                mf.tram.TramList.Add(new Trams());
+
+                                tramLineP1.Northing = Crossings1[j].Northing;
+                                tramLineP1.Easting = Crossings1[j].Easting;
+                                AddPoin2t(ref tramLineP1, Crossings1[j].Index < 0 ? 0 : Crossings1[j].Index, Offset * Offset);
+
+                                for (int k = Crossings1[j].Index + 4; k < Crossings1[j + 1].Index && k < Lines[CurrentLine].curvePts.Count; k += 1)
+                                {
+                                    tramLineP1.Northing = Lines[CurrentLine].curvePts[k].Northing + Math.Sin(Lines[CurrentLine].curvePts[k].Heading) * -Offset;
+                                    tramLineP1.Easting = Lines[CurrentLine].curvePts[k].Easting + (Math.Cos(Lines[CurrentLine].curvePts[k].Heading) * Offset);
+                                    AddPoin2t(ref tramLineP1, k, Offset * Offset);
+                                }
+
+                                tramLineP1.Northing = Crossings1[j + 1].Northing;
+                                tramLineP1.Easting = Crossings1[j + 1].Easting;
+
+                                AddPoin2t(ref tramLineP1, Crossings1[j + 1].Index >= Lines[CurrentLine].curvePts.Count ? Lines[CurrentLine].curvePts.Count - 1 : Crossings1[j + 1].Index, Offset * Offset);
+                            }
+                        }
                     }
                 }
+            }
+        }
+
+        public void AddPoin2t(ref Vec2 Point, int Heading, double Offset)
+        {
+            double SinHead = Math.Sin(Lines[CurrentLine].curvePts[Heading].Heading);
+            double CosHead = Math.Cos(Lines[CurrentLine].curvePts[Heading].Heading);
+
+            bool AddPoint = true;
+            int ptCount = Lines[CurrentLine].curvePts.Count;
+            for (int k = 0; k < ptCount; k++)
+            {
+                double DistLeft = Glm.DistanceSquared(Point.Northing, Point.Easting, Lines[CurrentLine].curvePts[k].Northing, Lines[CurrentLine].curvePts[k].Easting);
+                if (DistLeft < Offset - 10)
+                {
+                    AddPoint = false;
+                }
+            }
+
+            if (AddPoint)
+            {
+                Point.Northing += SinHead * (mf.tram.halfWheelTrack + mf.tram.WheelWidth / 2);
+                Point.Easting += CosHead * (-mf.tram.halfWheelTrack + -mf.tram.WheelWidth / 2);
+                mf.tram.TramList[mf.tram.TramList.Count - 1].Left.Add(new Vec2(Point.Northing, Point.Easting));
+
+                Point.Northing += SinHead * -mf.tram.WheelWidth;
+                Point.Easting += CosHead * mf.tram.WheelWidth;
+                mf.tram.TramList[mf.tram.TramList.Count - 1].Left.Add(new Vec2(Point.Northing, Point.Easting));
+
+
+                Point.Northing += SinHead * (-mf.tram.wheelTrack + mf.tram.WheelWidth);
+                Point.Easting += CosHead * (mf.tram.wheelTrack + -mf.tram.WheelWidth);
+                mf.tram.TramList[mf.tram.TramList.Count - 1].Right.Add(new Vec2(Point.Northing, Point.Easting));
+
+                Point.Northing += SinHead * -mf.tram.WheelWidth;
+                Point.Easting += CosHead * mf.tram.WheelWidth;
+                mf.tram.TramList[mf.tram.TramList.Count - 1].Right.Add(new Vec2(Point.Northing, Point.Easting));
             }
         }
 
         //for calculating for display the averaged new line
         public void SmoothAB(int smPts)
         {
-            //count the reference list of original curve
-            int cnt = refList.Count;
-
-            //just go back if not very long
-            if (!isCurveSet || cnt < 400) return;
-
-            //the temp array
-            Vec3[] arr = new Vec3[cnt];
-
-            //read the points before and after the setpoint
-            for (int s = 0; s < smPts / 2; s++)
+            if (CurrentEditLine < Lines.Count && CurrentEditLine > -1)
             {
-                arr[s].easting = refList[s].easting;
-                arr[s].northing = refList[s].northing;
-                arr[s].heading = refList[s].heading;
-            }
+                //count the reference list of original curve
+                int cnt = Lines[CurrentEditLine].curvePts.Count;
 
-            for (int s = cnt - (smPts / 2); s < cnt; s++)
-            {
-                arr[s].easting = refList[s].easting;
-                arr[s].northing = refList[s].northing;
-                arr[s].heading = refList[s].heading;
-            }
+                //just go back if not very long
+                if (cnt < 10) return;
 
-            //average them - center weighted average
-            for (int i = smPts / 2; i < cnt - (smPts / 2); i++)
-            {
-                for (int j = -smPts / 2; j < smPts / 2; j++)
+                //the temp array
+                Vec3[] arr = new Vec3[cnt];
+
+                //read the points before and after the setpoint
+                for (int s = 0; s < smPts / 2; s++)
                 {
-                    arr[i].easting += refList[j + i].easting;
-                    arr[i].northing += refList[j + i].northing;
+                    arr[s].Easting = Lines[CurrentEditLine].curvePts[s].Easting;
+                    arr[s].Northing = Lines[CurrentEditLine].curvePts[s].Northing;
+                    arr[s].Heading = Lines[CurrentEditLine].curvePts[s].Heading;
                 }
-                arr[i].easting /= smPts;
-                arr[i].northing /= smPts;
-                arr[i].heading = refList[i].heading;
-            }
 
-            //make a list to draw
-            smooList?.Clear();
-            for (int i = 0; i < cnt; i++)
-            {
-                smooList.Add(arr[i]);
+                for (int s = cnt - (smPts / 2); s < cnt; s++)
+                {
+                    arr[s].Easting = Lines[CurrentEditLine].curvePts[s].Easting;
+                    arr[s].Northing = Lines[CurrentEditLine].curvePts[s].Northing;
+                    arr[s].Heading = Lines[CurrentEditLine].curvePts[s].Heading;
+                }
+
+                //average them - center weighted average
+                for (int i = smPts / 2; i < cnt - (smPts / 2); i++)
+                {
+                    for (int j = -smPts / 2; j < smPts / 2; j++)
+                    {
+                        arr[i].Easting += Lines[CurrentEditLine].curvePts[j + i].Easting;
+                        arr[i].Northing += Lines[CurrentEditLine].curvePts[j + i].Northing;
+                    }
+                    arr[i].Easting /= smPts;
+                    arr[i].Northing /= smPts;
+                    arr[i].Heading = Lines[CurrentEditLine].curvePts[i].Heading;
+                }
+
+                //make a list to draw
+                smooList.Clear();
+                smooList.AddRange(arr);
             }
         }
 
-        public void CalculateTurnHeadings()
+        public void SwapAB()
         {
-            //to calc heading based on next and previous points to give an average heading.
-            int cnt = refList.Count;
+            int cnt = Lines[CurrentLine].curvePts.Count;
             if (cnt > 0)
             {
-                Vec3[] arr = new Vec3[cnt];
-                cnt--;
-                refList.CopyTo(arr);
-                refList.Clear();
+                Lines[CurrentLine].curvePts.Reverse();
+                Lines[CurrentLine].Heading = (Lines[CurrentLine].Heading + Math.PI) % Glm.twoPI;
 
-                //middle points
-                for (int i = 1; i < cnt; i++)
-                {
-                    Vec3 pt3 = arr[i];
-                    pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                    if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                    refList.Add(pt3);
-                }
+                Lines[CurrentEditLine].curvePts.CalculateHeadings(Lines[CurrentEditLine].BoundaryMode);
             }
         }
 
         //turning the visual line into the real reference line to use
-        public void SaveSmoothAsRefList()
+        public void SaveSmoothList()
         {
-            //oops no smooth list generated
-            int cnt = smooList.Count;
-            if (cnt == 0) return;
-
-            //eek
-            refList?.Clear();
-
-            //copy to an array to calculate all the new headings
-            Vec3[] arr = new Vec3[cnt];
-            smooList.CopyTo(arr);
-
-            //calculate new headings on smoothed line
-            for (int i = 1; i < cnt - 1; i++)
+            if (CurrentEditLine < Lines.Count && CurrentEditLine > -1)
             {
-                arr[i].heading = Math.Atan2(arr[i + 1].easting - arr[i].easting, arr[i + 1].northing - arr[i].northing);
-                if (arr[i].heading < 0) arr[i].heading += Glm.twoPI;
-                refList.Add(arr[i]);
+                int cnt = smooList.Count;
+                if (cnt < 3) return;
+
+                smooList.CalculateHeadings(Lines[CurrentEditLine].BoundaryMode);
+                Lines[CurrentEditLine].curvePts = smooList;
+                OldHowManyPathsAway = double.NegativeInfinity;
             }
         }
-        bool test = false;
+
         public void GetCurrentCurveLine(Vec3 pivot, Vec3 steer)
         {
-
             double minDistance;
 
             double boundaryTriggerDistance = 1;
-
-            if (SpiralMode == true)
+            if (CurrentLine < Lines.Count && CurrentLine > -1)
             {
+                Vec3 point = mf.isStanleyUsed ? steer : pivot;
 
-                double dist = ((pivot.easting - refList[0].easting) * (pivot.easting - refList[0].easting)) + ((pivot.northing - refList[0].northing) * (pivot.northing - refList[0].northing));
-
-                minDistance = Math.Sqrt(dist);
-
-                howManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
-                if (OldhowManyPathsAway != howManyPathsAway && howManyPathsAway == 0)
+                if (Lines[CurrentLine].SpiralMode == true)
                 {
-                    OldhowManyPathsAway = howManyPathsAway;
-                    curList?.Clear();
-                }
-                if (OldhowManyPathsAway != howManyPathsAway)
-                {
-                    OldhowManyPathsAway = howManyPathsAway;
-                    if (howManyPathsAway < 2) howManyPathsAway = 2;
+                    double dist = ((pivot.Easting - Lines[CurrentLine].curvePts[0].Easting) * (pivot.Easting - Lines[CurrentLine].curvePts[0].Easting)) + ((pivot.Northing - Lines[CurrentLine].curvePts[0].Northing) * (pivot.Northing - Lines[CurrentLine].curvePts[0].Northing));
 
-                    double s = mf.Guidance.WidthMinusOverlap / 2;
+                    minDistance = Math.Sqrt(dist);
 
-                    curList?.Clear();
-                    //double circumference = (glm.twoPI * s) / (boundaryTriggerDistance * 0.1);
-                    double circumference;
-
-                    for (double round = Glm.twoPI * (howManyPathsAway - 2); round <= (Glm.twoPI * (howManyPathsAway + 2) + 0.00001); round += (Glm.twoPI / circumference))
+                    HowManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                    if (OldHowManyPathsAway != HowManyPathsAway)
                     {
-                        double x = s * (Math.Cos(round) + (round / Math.PI) * Math.Sin(round));
-                        double y = s * (Math.Sin(round) - (round / Math.PI) * Math.Cos(round));
+                        OldHowManyPathsAway = HowManyPathsAway;
+                        if (HowManyPathsAway < 2) HowManyPathsAway = 2;
 
-                        Vec3 pt = new Vec3(refList[0].easting + x, refList[0].northing + y, 0);
-                        curList.Add(pt);
+                        double s = mf.Guidance.WidthMinusOverlap / 2;
 
-                        double radius = Math.Sqrt(x * x + y * y);
-                        circumference = (Glm.twoPI * radius) / (boundaryTriggerDistance);
+                        curList.Clear();
+                        //double circumference = (glm.twoPI * s) / (boundaryTriggerDistance * 0.1);
+                        double circumference;
 
+                        for (double round = Glm.twoPI * (HowManyPathsAway - 2); round <= (Glm.twoPI * (HowManyPathsAway + 2) + 0.00001); round += (Glm.twoPI / circumference))
+                        {
+                            double x = s * (Math.Cos(round) + (round / Math.PI) * Math.Sin(round));
+                            double y = s * (Math.Sin(round) - (round / Math.PI) * Math.Cos(round));
+
+                            Vec3 pt = new Vec3(Lines[CurrentLine].curvePts[0].Northing + y, Lines[CurrentLine].curvePts[0].Easting + x, 0);
+                            curList.Add(pt);
+
+                            double radius = Math.Sqrt(x * x + y * y);
+                            circumference = (Glm.twoPI * radius) / (boundaryTriggerDistance);
+
+                        }
+
+                        if (curList.Count > 2) curList.CalculateHeadings(true);
                     }
+                }
+                else if (Lines[CurrentLine].CircleMode == true)
+                {
+                    double dist = ((pivot.Easting - Lines[CurrentLine].curvePts[0].Easting) * (pivot.Easting - Lines[CurrentLine].curvePts[0].Easting)) + ((pivot.Northing - Lines[CurrentLine].curvePts[0].Northing) * (pivot.Northing - Lines[CurrentLine].curvePts[0].Northing));
 
-                    int cnt = curList.Count;
+                    minDistance = Math.Sqrt(dist);
 
-                    if (cnt > 1)
+                    HowManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+
+                    if (OldHowManyPathsAway != HowManyPathsAway && HowManyPathsAway == 0)
                     {
-                        Vec3[] arr = new Vec3[cnt];
+                        OldHowManyPathsAway = HowManyPathsAway;
+                        curList.Clear();
+                    }
+                    else if (OldHowManyPathsAway != HowManyPathsAway)
+                    {
+                        if (HowManyPathsAway > 100) return;
+                        OldHowManyPathsAway = HowManyPathsAway;
 
-                        curList.CopyTo(arr);
                         curList.Clear();
 
-                        //first point needs last, first, second points
-                        Vec3 pt3 = arr[0];
-                        pt3.heading = Math.Atan2(arr[1].easting - arr[cnt - 1].easting, arr[1].northing - arr[cnt - 1].northing);
-                        if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                        curList.Add(pt3);
+                        int aa = (int)((Glm.twoPI * mf.Guidance.WidthMinusOverlap * HowManyPathsAway) / (boundaryTriggerDistance));
 
-                        //middle points
-                        for (int i = 1; i < (cnt - 1); i++)
+                        for (double round = 0; round <= Glm.twoPI + 0.00001; round += (Glm.twoPI) / aa)
                         {
-                            pt3 = arr[i];
-                            pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                            curList.Add(pt3);
+                            Vec3 pt = new Vec3(Lines[CurrentLine].curvePts[0].Northing + (Math.Cos(round) * mf.Guidance.WidthMinusOverlap * HowManyPathsAway), Lines[CurrentLine].curvePts[0].Easting + (Math.Sin(round) * mf.Guidance.WidthMinusOverlap * HowManyPathsAway), 0);
+                            curList.Add(pt);
                         }
 
-                        pt3 = arr[cnt - 1];
-                        pt3.heading = Math.Atan2(arr[0].easting - arr[cnt - 2].easting, arr[0].northing - arr[cnt - 2].northing);
-                        if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                        curList.Add(pt3);
+                        if (curList.Count > 2) curList.CalculateHeadings(true);
                     }
                 }
-                //refList = curList;
-            }
-            else if (CircleMode == true)
-            {
-                double dist = ((pivot.easting - refList[0].easting) * (pivot.easting - refList[0].easting)) + ((pivot.northing - refList[0].northing) * (pivot.northing - refList[0].northing));
-
-                minDistance = Math.Sqrt(dist);
-
-                howManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
-                if (OldhowManyPathsAway != howManyPathsAway && howManyPathsAway == 0)
+                else
                 {
-                    OldhowManyPathsAway = howManyPathsAway;
-                    curList?.Clear();
-                }
-                else if (OldhowManyPathsAway != howManyPathsAway)
-                {
-                    if (howManyPathsAway > 100) return;
-                    OldhowManyPathsAway = howManyPathsAway;
+                    if (Lines[CurrentLine].curvePts.Count < 2) return;
+                    double minDistA = double.PositiveInfinity, minDistB = double.PositiveInfinity;
 
-                    curList?.Clear();
-
-                    int aa = (int)((Glm.twoPI * mf.Guidance.WidthMinusOverlap * howManyPathsAway) / (boundaryTriggerDistance));
-
-                    for (double round = 0; round <= Glm.twoPI + 0.00001; round += (Glm.twoPI) / aa)
+                    if (!mf.isAutoSteerBtnOn || double.IsNegativeInfinity(OldHowManyPathsAway))
                     {
-                        Vec3 pt = new Vec3(refList[0].easting + (Math.Sin(round) * mf.Guidance.WidthMinusOverlap * howManyPathsAway), refList[0].northing + (Math.Cos(round) * mf.Guidance.WidthMinusOverlap * howManyPathsAway), 0);
-                        curList.Add(pt);
-                    }
-
-                    int cnt = curList.Count;
-
-                    if (cnt > 1)
-                    {
-                        Vec3[] arr = new Vec3[cnt];
-
-                        curList.CopyTo(arr);
-                        curList.Clear();
-
-                        //first point needs last, first, second points
-                        Vec3 pt3 = arr[0];
-                        pt3.heading = Math.Atan2(arr[1].easting - arr[cnt - 1].easting, arr[1].northing - arr[cnt - 1].northing);
-                        if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                        curList.Add(pt3);
-                        //middle points
-                        for (int i = 1; i < (cnt - 1); i++)
+                        //find the closest 2 points to current fix
+                        for (int t = 0; t < Lines[CurrentLine].curvePts.Count; t++)
                         {
-                            pt3 = arr[i];
-                            pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                            if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                            curList.Add(pt3);
-                        }
-
-                        pt3 = arr[cnt - 1];
-                        pt3.heading = Math.Atan2(arr[0].easting - arr[cnt - 2].easting, arr[0].northing - arr[cnt - 2].northing);
-                        if (pt3.heading < 0) pt3.heading += Glm.twoPI;
-                        curList.Add(pt3);
-                    }
-                }
-
-
-            }
-            else
-            {
-                if (refList.Count < 5) return;
-                double minDistA = double.PositiveInfinity, minDistB = double.PositiveInfinity;
-
-
-                if (!mf.isAutoSteerBtnOn)
-                {
-
-                    //find the closest 2 points to current fix
-                    for (int t = 0; t < refList.Count; t++)
-                    {
-                        double dist = ((pivot.easting - refList[t].easting) * (pivot.easting - refList[t].easting))
-                                        + ((pivot.northing - refList[t].northing) * (pivot.northing - refList[t].northing));
-                        if (dist < minDistA)
-                        {
-                            minDistB = minDistA;
-                            B = A;
-                            minDistA = dist;
-                            A = t;
-                        }
-                        else if (dist < minDistB)
-                        {
-                            minDistB = dist;
-                            B = t;
-                        }
-                    }
-                    if (A > B) { C = A; A = B; B = C; }
-
-                    if (minDistA == 1000000 || minDistB == 1000000) return;
-
-                    //are we going same direction as stripList was created?
-                    isSameWay = Math.PI - Math.Abs(Math.Abs(pivot.heading - refList[A].heading) - Math.PI) < Glm.PIBy2;
-
-
-                    //double distanceFromRefLine = (pivot.northing - refList[A].northing) * (refList[B].easting - refList[A].easting) - (pivot.easting - refList[A].easting) * (refList[B].northing - refList[A].northing);
-
-                    double distanceFromRefLine = ((refList[B].easting - refList[A].easting) * pivot.northing - (refList[B].northing - refList[A].northing) * pivot.easting + refList[B].northing * refList[A].easting - refList[B].easting * refList[A].northing) /
-                            Math.Sqrt((refList[A].easting - refList[B].easting) * (refList[A].easting - refList[B].easting) + (refList[A].northing - refList[B].northing) * (refList[A].northing - refList[B].northing));
-
-
-                    if (isSameWay) distanceFromRefLine -= mf.Guidance.GuidanceOffset;
-                    else distanceFromRefLine += mf.Guidance.GuidanceOffset;
-
-                    howManyPathsAway = Math.Round(Math.Abs(distanceFromRefLine) / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
-
-                    curveNumber = howManyPathsAway;
-                    if (distanceFromRefLine < 0) curveNumber = -curveNumber;
-                }
-
-                if (OldisSameWay != isSameWay || howManyPathsAway != OldhowManyPathsAway)
-                {
-                    OldisSameWay = isSameWay;
-                    OldhowManyPathsAway = howManyPathsAway;
-
-
-
-
-                    if (test == true)
-                    {
-                        for (int i = 0; i < refList.Count - 1; i++)
-                        {
-                            double Degree_Diff = (refList[i + 1].heading - refList[i].heading + 9.42478) % Glm.twoPI - Math.PI;
-
-                            if (Degree_Diff > 0.174533 || Degree_Diff < -0.174533)
+                            double dist = ((pivot.Easting - Lines[CurrentLine].curvePts[t].Easting) * (pivot.Easting - Lines[CurrentLine].curvePts[t].Easting))
+                                            + ((pivot.Northing - Lines[CurrentLine].curvePts[t].Northing) * (pivot.Northing - Lines[CurrentLine].curvePts[t].Northing));
+                            if (dist < minDistA)
                             {
-                                refList.Insert(i + 1, new Vec3(refList[i + 1].easting * 0.5 + refList[i].easting * 0.5, refList[i + 1].northing * 0.5 + refList[i].northing * 0.5, refList[i].heading + Degree_Diff * 0.5));
-                                i--;
+                                minDistB = minDistA;
+                                B = A;
+                                minDistA = dist;
+                                A = t;
+                            }
+                            else if (dist < minDistB)
+                            {
+                                minDistB = dist;
+                                B = t;
                             }
                         }
-                        test = false;
+
+                        if (A > B) { int C = A; A = B; B = C; }
+
+                        if (double.IsInfinity(minDistA) || double.IsInfinity(minDistB)) return;
+
+                        double dx = Lines[CurrentLine].curvePts[B].Easting - Lines[CurrentLine].curvePts[A].Easting;
+                        double dy = Lines[CurrentLine].curvePts[B].Northing - Lines[CurrentLine].curvePts[A].Northing;
+
+                        if (Math.Abs(dx) < double.Epsilon && Math.Abs(dy) < double.Epsilon) return;
+
+                        //are we going same direction as stripList was created?
+                        isSameWay = Math.PI - Math.Abs(Math.Abs(point.Heading - Lines[CurrentLine].curvePts[A].Heading) - Math.PI) < Glm.PIBy2;
+
+                        //save a copy of dx,dy in youTurn
+                        mf.yt.dxAB = dx; mf.yt.dyAB = dy;
+
+                        distanceFromRefLine = ((dy * point.Easting) - (dx * point.Northing) + (Lines[CurrentLine].curvePts[B].Easting * Lines[CurrentLine].curvePts[A].Northing) - (Lines[CurrentLine].curvePts[B].Northing * Lines[CurrentLine].curvePts[A].Easting)) / Math.Sqrt((dy * dy) + (dx * dx));
+
+                        if (isSameWay) distanceFromRefLine += mf.Guidance.GuidanceOffset;
+                        else distanceFromRefLine -= mf.Guidance.GuidanceOffset;
+
+                        HowManyPathsAway = Math.Round(distanceFromRefLine / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                    }
+                    else if (A < Lines[CurrentLine].curvePts.Count && B < Lines[CurrentLine].curvePts.Count)
+                    {
+                        double dx = Lines[CurrentLine].curvePts[B].Easting - Lines[CurrentLine].curvePts[A].Easting;
+                        double dy = Lines[CurrentLine].curvePts[B].Northing - Lines[CurrentLine].curvePts[A].Northing;
+
+                        if (Math.Abs(dx) < double.Epsilon && Math.Abs(dy) < double.Epsilon) return;
+
+                        distanceFromRefLine = ((dy * point.Easting) - (dx * point.Northing) + (Lines[CurrentLine].curvePts[B].Easting * Lines[CurrentLine].curvePts[A].Northing) - (Lines[CurrentLine].curvePts[B].Northing * Lines[CurrentLine].curvePts[A].Easting)) / Math.Sqrt((dy * dy) + (dx * dx));
                     }
 
-
-
-                    if (mf.isSideGuideLines)
+                    if (OldisSameWay != isSameWay || HowManyPathsAway != OldHowManyPathsAway)
                     {
-                        GuidanceLines.Clear();
-                        for (double i = -2.5; i < 3.5; i++)
+                        OldisSameWay = isSameWay;
+                        OldHowManyPathsAway = HowManyPathsAway;
+
+                        if (mf.isSideGuideLines)
                         {
-                            GuidanceLines.Add(new List<Vec3>());
-
-                            for (int j = 0; j < refList.Count - 1; j++)
+                            GuidanceLines.Clear();
+                            for (double i = -2.5; i < 3.5; i++)
                             {
+                                GuidanceLines.Add(new List<Vec3>());
+                                int Gcnt = GuidanceLines.Count - 1;
+                                double Offset2 = mf.Guidance.WidthMinusOverlap * (i + HowManyPathsAway);
 
-                                double piSide2;
-
-                                //sign of distance determines which side of line we are on
-                                if (curveNumber > 0) piSide2 = -Glm.PIBy2;
-                                else piSide2 = Glm.PIBy2;
-
-                                double Offset2 = mf.Guidance.WidthMinusOverlap * (i + howManyPathsAway);
-                                
-                                var point = new Vec3(
-                                refList[j].easting + (Math.Sin(piSide2 + refList[j].heading) * Offset2),
-                                refList[j].northing + (Math.Cos(piSide2 + refList[j].heading) * Offset2),
-                                refList[j].heading);
-                                bool Add = true;
-                                for (int t = 0; t < refList.Count; t++)
+                                for (int j = 0; j < Lines[CurrentLine].curvePts.Count; j++)
                                 {
-                                    double dist = ((point.easting - refList[t].easting) * (point.easting - refList[t].easting)) + ((point.northing - refList[t].northing) * (point.northing - refList[t].northing));
-                                    if (dist < (Offset2 * Offset2) - 10)
+                                    var point2 = new Vec3(
+                                        Lines[CurrentLine].curvePts[j].Northing + (Math.Sin(Lines[CurrentLine].curvePts[j].Heading) * -Offset2),
+                                        Lines[CurrentLine].curvePts[j].Easting + (Math.Cos(Lines[CurrentLine].curvePts[j].Heading) * Offset2),
+                                        Lines[CurrentLine].curvePts[j].Heading);
+
+                                    bool Add = true;
+                                    for (int t = 0; t < Lines[CurrentLine].curvePts.Count; t++)
                                     {
-                                        Add = false;
-                                        break;
+                                        double dist = ((point2.Easting - Lines[CurrentLine].curvePts[t].Easting) * (point2.Easting - Lines[CurrentLine].curvePts[t].Easting)) + ((point2.Northing - Lines[CurrentLine].curvePts[t].Northing) * (point2.Northing - Lines[CurrentLine].curvePts[t].Northing));
+                                        if (dist < (Offset2 * Offset2) - 0.001)
+                                        {
+                                            Add = false;
+                                            break;
+                                        }
+                                    }
+                                    if (Add)
+                                    {
+                                        if (GuidanceLines[Gcnt].Count > 0)
+                                        {
+                                            double dist = ((point2.Easting - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Easting) * (point2.Easting - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Easting)) + ((point2.Northing - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Northing) * (point2.Northing - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Northing));
+                                            if (dist > 1) GuidanceLines[Gcnt].Add(point2);
+                                        }
+                                        else GuidanceLines[Gcnt].Add(point2);
                                     }
                                 }
-                                if (Add) GuidanceLines[GuidanceLines.Count - 1].Add(point);
+
+                                if (Lines[CurrentLine].BoundaryMode)
+                                {
+
+                                    bool first = true;
+                                    int testa = -1;
+                                    int m = 1;
+                                    int l = 0;
+                                    for (int k = 1; k + 1 < GuidanceLines[Gcnt].Count; l = k++)
+                                    {
+                                        double dist = ((GuidanceLines[Gcnt][k].Easting - GuidanceLines[Gcnt][l].Easting) * (GuidanceLines[Gcnt][k].Easting - GuidanceLines[Gcnt][l].Easting)) + ((GuidanceLines[Gcnt][k].Northing - GuidanceLines[Gcnt][l].Northing) * (GuidanceLines[Gcnt][k].Northing - GuidanceLines[Gcnt][l].Northing));
+                                        if (dist > Offset2 * Offset2 + Offset2 * Offset2)
+                                        {
+                                            if (first)
+                                            {
+                                                first = false;
+                                                testa = k;
+                                            }
+                                            else
+                                            {
+                                                GuidanceLines.Add(new List<Vec3>());
+                                                GuidanceLines[Gcnt + m].AddRange(GuidanceLines[Gcnt].GetRange(testa, k - testa));
+                                                GuidanceLines[Gcnt].RemoveRange(testa, k - testa);
+                                                first = true;
+                                                m++;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-
-                    //build the current line
-                    curList?.Clear();
-
-                    double piSide;
-
-                    //sign of distance determines which side of line we are on
-                    if (curveNumber > 0) piSide = -Glm.PIBy2;
-                    else piSide = Glm.PIBy2;
 
 
-
-                    double Offset = mf.Guidance.WidthMinusOverlap * howManyPathsAway;
-                    if (isSameWay)
-                    {
-                        if (curveNumber > 0) Offset += mf.Guidance.GuidanceOffset;
-                        else Offset -= mf.Guidance.GuidanceOffset;
-                    }
-                    else
-                    {
-                        if (curveNumber > 0) Offset -= mf.Guidance.GuidanceOffset;
-                        else Offset += mf.Guidance.GuidanceOffset;
-                    }
-
-
-
-                    for (int i = 0; i < refList.Count - 1; i++)
-                    {
-                        var point = new Vec3(refList[i].easting + (Math.Sin(piSide + refList[i].heading) * Offset), refList[i].northing + (Math.Cos(piSide + refList[i].heading) * Offset), refList[i].heading);
-                        bool Add = true;
-
-                        for (int t = 0; t < refList.Count; t++)
-                        {
-                            double dist = ((point.easting - refList[t].easting) * (point.easting - refList[t].easting)) + ((point.northing - refList[t].northing) * (point.northing - refList[t].northing));
-                            if (dist < (Offset * Offset) - 10)
-                            {
-                                Add = false;
-                                break;
-                            }
-                        }
-                        if (Add)
-                        {
-                            if (curList.Count > 0)
-                            {
-                                double dist = ((point.easting - curList[curList.Count - 1].easting) * (point.easting - curList[curList.Count - 1].easting)) + ((point.northing - curList[curList.Count - 1].northing) * (point.northing - curList[curList.Count - 1].northing));
-                                if (dist > 1)
-                                    curList.Add(point);
-                            }
-                            else curList.Add(point);
-                        }
-                    }
-
-                    int cnt = curList.Count;
-                    if (cnt < -10)
-                    {
-                        for (int i = 1; i < (curList.Count - 1); i++)
-                        {
-                            curList[i] = new Vec3(curList[i].easting, curList[i].northing, Math.Atan2(curList[i + 1].easting - curList[i - 1].easting, curList[i + 1].northing - curList[i - 1].northing));
-                        }
-
-                        Vec3[] arr = new Vec3[cnt];
-                        curList.CopyTo(arr);
+                        //build the current line
                         curList.Clear();
-                        bool Next = false;
-                        for (int i = 0; i < arr.Length - 1; i++)
+
+                        double Offset = mf.Guidance.WidthMinusOverlap * HowManyPathsAway;
+
+                        if (isSameWay) Offset -= mf.Guidance.GuidanceOffset;
+                        else Offset += mf.Guidance.GuidanceOffset;
+
+                        for (int i = 0; i < Lines[CurrentLine].curvePts.Count; i++)
                         {
-                            if (arr[i].heading - arr[i + 1].heading > 0.174533)
+                            var point2 = new Vec3(Lines[CurrentLine].curvePts[i].Northing + (Math.Sin(Lines[CurrentLine].curvePts[i].Heading) * -Offset), Lines[CurrentLine].curvePts[i].Easting + (Math.Cos(Lines[CurrentLine].curvePts[i].Heading) * Offset), Lines[CurrentLine].curvePts[i].Heading);
+                            bool Add = true;
+
+                            for (int t = 0; t < Lines[CurrentLine].curvePts.Count; t++)
                             {
-                                Next = true;
-                                curList.Add(new Vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
-                                curList.Add(new Vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                                double dist = ((point2.Easting - Lines[CurrentLine].curvePts[t].Easting) * (point2.Easting - Lines[CurrentLine].curvePts[t].Easting)) + ((point2.Northing - Lines[CurrentLine].curvePts[t].Northing) * (point2.Northing - Lines[CurrentLine].curvePts[t].Northing));
+                                if (dist < (Offset * Offset) - 0.001)
+                                {
+                                    Add = false;
+                                    break;
+                                }
                             }
-                            else if (Next)
+                            if (Add)
                             {
-                                Next = false;
-                                curList.Add(new Vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
-                                curList.Add(new Vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
-                            }
-                            else
-                            {
-                                curList.Add(new Vec3(arr[i].easting * 0.5 + arr[i + 1].easting * 0.5, arr[i].northing * 0.5 + arr[i + 1].northing * 0.5, 0));
+                                if (curList.Count > 0)
+                                {
+                                    double dist = ((point2.Easting - curList[curList.Count - 1].Easting) * (point2.Easting - curList[curList.Count - 1].Easting)) + ((point2.Northing - curList[curList.Count - 1].Northing) * (point2.Northing - curList[curList.Count - 1].Northing));
+                                    if (dist > 1) curList.Add(point2);
+                                }
+                                else curList.Add(point2);
                             }
                         }
 
-
-                        for (int i = 1; i < (curList.Count - 1); i++)
+                        /*
+                        if (Lines[CurrentLine].BoundaryMode)
                         {
-                            curList[i] = new Vec3(curList[i].easting, curList[i].northing, Math.Atan2(curList[i + 1].easting - curList[i - 1].easting, curList[i + 1].northing - curList[i - 1].northing));
-                        }
-
-
-
-                        if (mf.Tools[0].isToolTrailing)
-                        {
-                            double head = 0;
-                            if (isSameWay) head = Math.PI;
-
-                            if (mf.Tools[0].isToolTBT && mf.Tools[0].toolTankTrailingHitchLength < 0)
+                            bool first2 = true;
+                            int testa2 = -1;
+                            int l2 = 0;
+                            for (int k = 0; k < curList.Count; l2 = k++)
                             {
+                                double dist = ((curList[k].Easting - curList[l2].Easting) * (curList[k].Easting - curList[l2].Easting)) + ((curList[k].Northing - curList[l2].Northing) * (curList[k].Northing - curList[l2].Northing));
+                                if (dist > Offset * Offset + Offset * Offset)
+                                {
+                                    if (first2)
+                                    {
+                                        first2 = false;
+                                        testa2 = k;
+                                    }
+                                    else
+                                    {
+                                        curList.RemoveRange(testa2, k - testa2);
+                                        first2 = true;
+                                    }
+                                }
+                            }
+                        }
+                        */
+
+                        curList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332);//5 degrees
+
+                        int cnt = curList.Count;
+                        if (cnt < -10)
+                        {
+                            for (int i = 1; i < (curList.Count - 1); i++)
+                            {
+                                curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
+                            }
+
+                            Vec3[] arr = new Vec3[cnt];
+                            curList.CopyTo(arr);
+                            curList.Clear();
+                            bool Next = false;
+                            for (int i = 0; i < arr.Length - 1; i++)
+                            {
+                                if (arr[i].Heading - arr[i + 1].Heading > 0.174533)
+                                {
+                                    Next = true;
+                                    curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
+                                    curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
+                                }
+                                else if (Next)
+                                {
+                                    Next = false;
+                                    curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
+                                    curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
+                                }
+                                else
+                                {
+                                    curList.Add(new Vec3(arr[i].Northing * 0.5 + arr[i + 1].Northing * 0.5, arr[i].Easting * 0.5 + arr[i + 1].Easting * 0.5, 0));
+                                }
+                            }
+
+
+                            for (int i = 1; i < curList.Count - 1; i++)
+                            {
+                                curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
+                            }
+
+
+
+                            if (mf.Tools[0].isToolTrailing)
+                            {
+                                double head = 0;
+                                if (isSameWay) head = Math.PI;
+
+                                if (mf.Tools[0].isToolTBT && mf.Tools[0].toolTankTrailingHitchLength < 0)
+                                {
+                                    arr = new Vec3[curList.Count];
+                                    curList.CopyTo(arr);
+                                    curList.Clear();
+
+                                    for (int i = 0; i < arr.Length; i++)
+                                    {
+                                        arr[i].Easting += Math.Sin(arr[i].Heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
+                                        arr[i].Northing += Math.Cos(arr[i].Heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
+                                    }
+
+                                    for (int i = 1; i < (arr.Length - 1); i++)
+                                    {
+                                        arr[i].Heading = Math.Atan2(arr[i + 1].Easting - arr[i - 1].Easting, arr[i + 1].Northing - arr[i - 1].Northing);
+                                    }
+
+                                    Next = false;
+                                    for (int i = 0; i < arr.Length - 1; i++)
+                                    {
+                                        if (arr[i].Heading - arr[i + 1].Heading > 0.174533)
+                                        {
+                                            Next = true;
+                                            curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
+                                            curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
+                                        }
+                                        else if (Next)
+                                        {
+                                            Next = false;
+                                            curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
+                                            curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
+                                        }
+                                        else
+                                        {
+                                            curList.Add(new Vec3(arr[i].Northing * 0.5 + arr[i + 1].Northing * 0.5, arr[i].Easting * 0.5 + arr[i + 1].Easting * 0.5, 0));
+                                        }
+                                    }
+                                    for (int i = 1; i < (curList.Count - 1); i++)
+                                    {
+                                        curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
+                                    }
+                                }
+
                                 arr = new Vec3[curList.Count];
                                 curList.CopyTo(arr);
                                 curList.Clear();
 
+
                                 for (int i = 0; i < arr.Length; i++)
                                 {
-                                    arr[i].easting += Math.Sin(arr[i].heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
-                                    arr[i].northing += Math.Cos(arr[i].heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
+                                    arr[i].Easting += Math.Sin(arr[i].Heading + head) * mf.Tools[0].toolTrailingHitchLength;
+                                    arr[i].Northing += Math.Cos(arr[i].Heading + head) * mf.Tools[0].toolTrailingHitchLength;
                                 }
-
                                 for (int i = 1; i < (arr.Length - 1); i++)
                                 {
-                                    arr[i].heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
+                                    arr[i].Heading = Math.Atan2(arr[i + 1].Easting - arr[i - 1].Easting, arr[i + 1].Northing - arr[i - 1].Northing);
                                 }
 
                                 Next = false;
                                 for (int i = 0; i < arr.Length - 1; i++)
                                 {
-                                    if (arr[i].heading - arr[i + 1].heading > 0.174533)
+                                    if (arr[i].Heading - arr[i + 1].Heading > 0.174533)
                                     {
                                         Next = true;
-                                        curList.Add(new Vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
-                                        curList.Add(new Vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                                        curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
+                                        curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
                                     }
                                     else if (Next)
                                     {
                                         Next = false;
-                                        curList.Add(new Vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
-                                        curList.Add(new Vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
+                                        curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
+                                        curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
                                     }
                                     else
                                     {
-                                        curList.Add(new Vec3(arr[i].easting * 0.5 + arr[i + 1].easting * 0.5, arr[i].northing * 0.5 + arr[i + 1].northing * 0.5, 0));
+                                        curList.Add(new Vec3(arr[i].Northing * 0.5 + arr[i + 1].Northing * 0.5, arr[i].Easting * 0.5 + arr[i + 1].Easting * 0.5, 0));
                                     }
                                 }
                                 for (int i = 1; i < (curList.Count - 1); i++)
                                 {
-                                    curList[i] = new Vec3(curList[i].easting, curList[i].northing, Math.Atan2(curList[i + 1].easting - curList[i - 1].easting, curList[i + 1].northing - curList[i - 1].northing));
+                                    curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
                                 }
-                            }
-
-                            arr = new Vec3[curList.Count];
-                            curList.CopyTo(arr);
-                            curList.Clear();
-
-
-                            for (int i = 0; i < arr.Length; i++)
-                            {
-                                arr[i].easting += Math.Sin(arr[i].heading + head) * mf.Tools[0].toolTrailingHitchLength;
-                                arr[i].northing += Math.Cos(arr[i].heading + head) * mf.Tools[0].toolTrailingHitchLength;
-                            }
-                            for (int i = 1; i < (arr.Length - 1); i++)
-                            {
-                                arr[i].heading = Math.Atan2(arr[i + 1].easting - arr[i - 1].easting, arr[i + 1].northing - arr[i - 1].northing);
-                            }
-
-                            Next = false;
-                            for (int i = 0; i < arr.Length - 1; i++)
-                            {
-                                if (arr[i].heading - arr[i + 1].heading > 0.174533)
-                                {
-                                    Next = true;
-                                    curList.Add(new Vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
-                                    curList.Add(new Vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
-                                }
-                                else if (Next)
-                                {
-                                    Next = false;
-                                    curList.Add(new Vec3(arr[i].easting * 0.75 + arr[i + 1].easting * 0.25, arr[i].northing * 0.75 + arr[i + 1].northing * 0.25, 0));
-                                    curList.Add(new Vec3(arr[i].easting * 0.25 + arr[i + 1].easting * 0.75, arr[i].northing * 0.25 + arr[i + 1].northing * 0.75, 0));
-                                }
-                                else
-                                {
-                                    curList.Add(new Vec3(arr[i].easting * 0.5 + arr[i + 1].easting * 0.5, arr[i].northing * 0.5 + arr[i + 1].northing * 0.5, 0));
-                                }
-                            }
-                            for (int i = 1; i < (curList.Count - 1); i++)
-                            {
-                                curList[i] = new Vec3(curList[i].easting, curList[i].northing, Math.Atan2(curList[i + 1].easting - curList[i - 1].easting, curList[i + 1].northing - curList[i - 1].northing));
                             }
                         }
                     }
                 }
-            }
 
+                int ptCount = curList.Count;
 
-            int ptCount = curList.Count;
-
-            if (ptCount > 0)
-            {
-                double minDistA = 1000000, minDistB = 1000000;
-                if (mf.isStanleyUsed)
+                if (ptCount > 1)
                 {
+                    double minDistA = double.PositiveInfinity;
+                    double minDistB = double.PositiveInfinity;
+
                     //find the closest 2 points to current fix
                     for (int t = 0; t < ptCount; t++)
                     {
-                        double dist = ((steer.easting - curList[t].easting) * (steer.easting - curList[t].easting))
-                                        + ((steer.northing - curList[t].northing) * (steer.northing - curList[t].northing));
+                        double dist = ((point.Easting - curList[t].Easting) * (point.Easting - curList[t].Easting))
+                                        + ((point.Northing - curList[t].Northing) * (point.Northing - curList[t].Northing));
                         if (dist < minDistA)
                         {
                             minDistB = minDistA;
@@ -861,321 +828,233 @@ namespace AgOpenGPS
                             B = t;
                         }
                     }
+                    if (minDistA == double.PositiveInfinity || minDistB == double.PositiveInfinity) return;
+
 
                     //just need to make sure the points continue ascending or heading switches all over the place
-                    if (A > B) { C = A; A = B; B = C; }
+                    if (A > B) { int C = A; A = B; B = C; }
+
+                    if (A == 0 && B == ptCount - 1) { int C = A; A = B; B = C; }
 
                     currentLocationIndex = A;
 
                     //get the distance from currently active AB line
-                    double dx = curList[B].easting - curList[A].easting;
-                    double dz = curList[B].northing - curList[A].northing;
+                    double dx = curList[B].Easting - curList[A].Easting;
+                    double dz = curList[B].Northing - curList[A].Northing;
 
-                    if (Math.Abs(dx) < Double.Epsilon && Math.Abs(dz) < Double.Epsilon) return;
-
-                    //abHeading = Math.Atan2(dz, dx);
-                    double abHeading = curList[A].heading;
+                    if (Math.Abs(dx) < double.Epsilon && Math.Abs(dz) < double.Epsilon) return;
 
                     //how far from current AB Line is fix
-                    distanceFromCurrentLine = ((dz * steer.easting) - (dx * steer.northing) + (curList[B].easting
-                                * curList[A].northing) - (curList[B].northing * curList[A].easting))
+                    distanceFromCurrentLine = ((dz * point.Easting) - (dx * point.Northing) + (curList[B].Easting
+                                * curList[A].Northing) - (curList[B].Northing * curList[A].Easting))
                                     / Math.Sqrt((dz * dz) + (dx * dx));
 
-                    //are we on the right side or not
-                    isOnRightSideCurrentLine = distanceFromCurrentLine > 0;
+                    // ** Pure pursuit ** - calc point on ABLine closest to current position
+                    double U = (((point.Easting - curList[A].Easting) * dx)
+                                + ((point.Northing - curList[A].Northing) * dz))
+                                / ((dx * dx) + (dz * dz));
 
-                    //absolute the distance
-                    distanceFromCurrentLine = Math.Abs(distanceFromCurrentLine);
+                    rEastCu = curList[A].Easting + (U * dx);
+                    rNorthCu = curList[A].Northing + (U * dz);
 
                     //Subtract the two headings, if > 1.57 its going the opposite heading as refAB
-                    double abFixHeadingDelta = (Math.Abs(mf.fixHeading - abHeading));
+                    double abFixHeadingDelta = (Math.Abs(mf.fixHeading - curList[A].Heading));
                     if (abFixHeadingDelta >= Math.PI) abFixHeadingDelta = Math.Abs(abFixHeadingDelta - Glm.twoPI);
                     isABSameAsVehicleHeading = abFixHeadingDelta < Glm.PIBy2;
 
-                    // calc point on ABLine closest to current position
-                    double U = (((steer.easting - curList[A].easting) * dx)
-                                + ((steer.northing - curList[A].northing) * dz))
-                                / ((dx * dx) + (dz * dz));
-
-                    rEastCu = curList[A].easting + (U * dx);
-                    rNorthCu = curList[A].northing + (U * dz);
-
-                    //distance is negative if on left, positive if on right
-                    if (isABSameAsVehicleHeading)
+                    if (mf.isStanleyUsed)
                     {
-                        if (!isOnRightSideCurrentLine)
+                        //distance is negative if on left, positive if on right
+                        abFixHeadingDelta = steer.Heading - curList[A].Heading;
+
+                        if (!isABSameAsVehicleHeading)
                         {
                             distanceFromCurrentLine *= -1.0;
+                            abFixHeadingDelta += Math.PI;
                         }
-                        abFixHeadingDelta = (steer.heading - abHeading);
-                    }
 
-                    //opposite way so right is left
+                        //Fix the circular error
+                        if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Glm.twoPI;
+                        else if (abFixHeadingDelta < -Math.PI) abFixHeadingDelta += Glm.twoPI;
+
+                        //if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
+                        //else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
+
+                        abFixHeadingDelta *= mf.vehicle.stanleyHeadingErrorGain;
+                        if (abFixHeadingDelta > 0.74) abFixHeadingDelta = 0.74;
+                        if (abFixHeadingDelta < -0.74) abFixHeadingDelta = -0.74;
+
+                        steerAngleCu = Math.Atan((distanceFromCurrentLine * mf.vehicle.stanleyGain)
+                            / ((Math.Abs(mf.pn.speed) * 0.277777) + 1));
+
+                        if (steerAngleCu > 0.74) steerAngleCu = 0.74;
+                        if (steerAngleCu < -0.74) steerAngleCu = -0.74;
+
+                        if (mf.pn.speed > -0.1)
+                            steerAngleCu = Glm.ToDegrees((steerAngleCu + abFixHeadingDelta) * -1.0);
+                        else
+                            steerAngleCu = Glm.ToDegrees((steerAngleCu - abFixHeadingDelta) * -1.0);
+
+                        if (steerAngleCu < -mf.vehicle.maxSteerAngle) steerAngleCu = -mf.vehicle.maxSteerAngle;
+                        if (steerAngleCu > mf.vehicle.maxSteerAngle) steerAngleCu = mf.vehicle.maxSteerAngle;
+
+                        //Convert to millimeters
+                        distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
+                    }
                     else
                     {
-                        if (isOnRightSideCurrentLine)
+                        //used for accumulating distance to find goal point
+                        double distSoFar;
+
+                        //update base on autosteer settings and distance from line
+                        double goalPointDistance = mf.vehicle.UpdateGoalPointDistance(distanceFromCurrentLine);
+
+                        // used for calculating the length squared of next segment.
+                        double tempDist;
+
+                        if (!isABSameAsVehicleHeading)
                         {
-                            distanceFromCurrentLine *= -1.0;
+                            //counting down
+                            distSoFar = Glm.Distance(curList[A], rEastCu, rNorthCu);
+                            //Is this segment long enough to contain the full lookahead distance?
+                            if (distSoFar > goalPointDistance)
+                            {
+                                //treat current segment like an AB Line
+                                goalPointCu.Easting = rEastCu - (Math.Sin(curList[A].Heading) * goalPointDistance);
+                                goalPointCu.Northing = rNorthCu - (Math.Cos(curList[A].Heading) * goalPointDistance);
+                            }
+
+                            //multiple segments required
+                            else
+                            {
+                                //cycle thru segments and keep adding lengths. check if start and break if so.
+                                while (true)
+                                {
+                                    B = (ptCount + B - 1) % ptCount;
+                                    A = (ptCount + A - 1) % ptCount;
+
+                                    tempDist = Glm.Distance(curList[B], curList[A]);
+
+                                    //will we go too far?
+                                    if ((tempDist + distSoFar) > goalPointDistance) break; //tempDist contains the full length of next segment
+                                    else distSoFar += tempDist;
+                                }
+
+                                double t = (goalPointDistance - distSoFar); // the remainder to yet travel
+                                t /= tempDist;
+
+                                goalPointCu.Easting = (((1 - t) * curList[B].Easting) + (t * curList[A].Easting));
+                                goalPointCu.Northing = (((1 - t) * curList[B].Northing) + (t * curList[A].Northing));
+                            }
                         }
-                        abFixHeadingDelta = (steer.heading - abHeading + Math.PI);
+                        else
+                        {
+                            //counting up
+                            distSoFar = Glm.Distance(curList[B], rEastCu, rNorthCu);
+
+                            //Is this segment long enough to contain the full lookahead distance?
+                            if (distSoFar > goalPointDistance)
+                            {
+                                //treat current segment like an AB Line
+                                goalPointCu.Easting = rEastCu + (Math.Sin(curList[A].Heading) * goalPointDistance);
+                                goalPointCu.Northing = rNorthCu + (Math.Cos(curList[A].Heading) * goalPointDistance);
+                            }
+
+                            //multiple segments required
+                            else
+                            {
+                                //cycle thru segments and keep adding lengths. check if end and break if so.
+                                // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
+                                while (true)
+                                {
+                                    B = (B + 1) % ptCount;
+                                    A = (A + 1) % ptCount;
+
+                                    tempDist = Glm.Distance(curList[B], curList[A]);
+
+                                    //will we go too far?
+                                    if ((tempDist + distSoFar) > goalPointDistance)
+                                    {
+                                        //A--; B--;
+                                        break; //tempDist contains the full length of next segment
+                                    }
+
+                                    distSoFar += tempDist;
+                                }
+
+                                //xt = (((1 - t) * x0 + t * x1)
+                                //yt = ((1 - t) * y0 + t * y1))
+
+                                double t = (goalPointDistance - distSoFar); // the remainder to yet travel
+                                t /= tempDist;
+
+                                goalPointCu.Easting = (((1 - t) * curList[A].Easting) + (t * curList[B].Easting));
+                                goalPointCu.Northing = (((1 - t) * curList[A].Northing) + (t * curList[B].Northing));
+                            }
+                        }
+
+                        //calc "D" the distance from pivot axle to lookahead point
+                        double goalPointDistanceSquared = Glm.DistanceSquared(goalPointCu.Northing, goalPointCu.Easting, pivot.Northing, pivot.Easting);
+
+                        //calculate the the delta x in local coordinates and steering angle degrees based on wheelbase
+                        double localHeading = Glm.twoPI - mf.fixHeading;
+                        ppRadiusCu = goalPointDistanceSquared / (2 * (((goalPointCu.Easting - pivot.Easting) * Math.Cos(localHeading)) + ((goalPointCu.Northing - pivot.Northing) * Math.Sin(localHeading))));
+
+                        steerAngleCu = Glm.ToDegrees(Math.Atan(2 * (((goalPointCu.Easting - pivot.Easting) * Math.Cos(localHeading))
+                            + ((goalPointCu.Northing - pivot.Northing) * Math.Sin(localHeading))) * mf.vehicle.wheelbase / goalPointDistanceSquared));
+
+                        if (steerAngleCu < -mf.vehicle.maxSteerAngle) steerAngleCu = -mf.vehicle.maxSteerAngle;
+                        if (steerAngleCu > mf.vehicle.maxSteerAngle) steerAngleCu = mf.vehicle.maxSteerAngle;
+
+                        if (ppRadiusCu < -500) ppRadiusCu = -500;
+                        if (ppRadiusCu > 500) ppRadiusCu = 500;
+
+                        radiusPointCu.Easting = pivot.Easting + (ppRadiusCu * Math.Cos(localHeading));
+                        radiusPointCu.Northing = pivot.Northing + (ppRadiusCu * Math.Sin(localHeading));
+
+                        //angular velocity in rads/sec  = 2PI * m/sec * radians/meters
+                        double angVel = Glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(Glm.ToRadians(steerAngleCu))) / mf.vehicle.wheelbase;
+
+                        //clamp the steering angle to not exceed safe angular velocity
+                        if (Math.Abs(angVel) > mf.vehicle.maxAngularVelocity)
+                        {
+                            steerAngleCu = Glm.ToDegrees(steerAngleCu > 0 ?
+                                    (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777)))
+                                : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777))));
+                        }
+                        //Convert to centimeters
+                        distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
+
+                        //distance is negative if on left, positive if on right
+                        //if you're going the opposite direction left is right and right is left
+                        //double temp;
+                        if (!isABSameAsVehicleHeading) distanceFromCurrentLine *= -1.0;
                     }
 
-                    //Fix the circular error
-                    if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
-                    else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
+                    mf.guidanceLineDistanceOff = mf.distanceFromCurrentLine = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
+                    mf.guidanceLineSteerAngle = (Int16)(steerAngleCu * 100);
 
-                    if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
-                    else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
+                    if (mf.yt.isYouTurnTriggered)
+                    {
+                        //do the pure pursuit from youTurn
+                        mf.yt.DistanceFromYouTurnLine();
+                        mf.seq.DoSequenceEvent();
 
-                    abFixHeadingDelta *= mf.vehicle.stanleyHeadingErrorGain;
-                    if (abFixHeadingDelta > 0.74) abFixHeadingDelta = 0.74;
-                    if (abFixHeadingDelta < -0.74) abFixHeadingDelta = -0.74;
+                        //now substitute what it thinks are AB line values with auto turn values
+                        steerAngleCu = mf.yt.steerAngleYT;
+                        distanceFromCurrentLine = mf.yt.distanceFromCurrentLine;
 
-                    steerAngleCu = Math.Atan((distanceFromCurrentLine * mf.vehicle.stanleyGain)
-                        / ((Math.Abs(mf.pn.speed) * 0.277777) + 1));
-
-                    if (steerAngleCu > 0.74) steerAngleCu = 0.74;
-                    if (steerAngleCu < -0.74) steerAngleCu = -0.74;
-
-                    if (mf.pn.speed > -0.1)
-                        steerAngleCu = Glm.ToDegrees((steerAngleCu + abFixHeadingDelta) * -1.0);
-                    else
-                        steerAngleCu = Glm.ToDegrees((steerAngleCu - abFixHeadingDelta) * -1.0);
-
-                    if (steerAngleCu < -mf.vehicle.maxSteerAngle) steerAngleCu = -mf.vehicle.maxSteerAngle;
-                    if (steerAngleCu > mf.vehicle.maxSteerAngle) steerAngleCu = mf.vehicle.maxSteerAngle;
-
-                    //Convert to millimeters
-                    distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
+                        goalPointCu = mf.yt.goalPointYT;
+                        radiusPointCu.Easting = mf.yt.radiusPointYT.Easting;
+                        radiusPointCu.Northing = mf.yt.radiusPointYT.Northing;
+                        ppRadiusCu = mf.yt.ppRadiusYT;
+                    }
                 }
                 else
                 {
-                    //find the closest 2 points to current fix
-                    for (int t = 0; t < ptCount; t++)
-                    {
-                        double dist = ((pivot.easting - curList[t].easting) * (pivot.easting - curList[t].easting))
-                                        + ((pivot.northing - curList[t].northing) * (pivot.northing - curList[t].northing));
-                        if (dist < minDistA)
-                        {
-                            minDistB = minDistA;
-                            B = A;
-                            minDistA = dist;
-                            A = t;
-                        }
-                        else if (dist < minDistB)
-                        {
-                            minDistB = dist;
-                            B = t;
-                        }
-                    }
-
-                    //just need to make sure the points continue ascending or heading switches all over the place
-                    if (A > B) { C = A; A = B; B = C; }
-
-                    currentLocationIndex = A;
-
-                    //get the distance from currently active AB line
-                    double dx = curList[B].easting - curList[A].easting;
-                    double dz = curList[B].northing - curList[A].northing;
-
-                    if (Math.Abs(dx) < Double.Epsilon && Math.Abs(dz) < Double.Epsilon) return;
-
-                    //abHeading = Math.Atan2(dz, dx);
-
-                    //how far from current AB Line is fix
-                    distanceFromCurrentLine = ((dz * pivot.easting) - (dx * pivot.northing) + (curList[B].easting
-                                * curList[A].northing) - (curList[B].northing * curList[A].easting))
-                                    / Math.Sqrt((dz * dz) + (dx * dx));
-
-                    //are we on the right side or not
-                    isOnRightSideCurrentLine = distanceFromCurrentLine > 0;
-
-                    //absolute the distance
-                    distanceFromCurrentLine = Math.Abs(distanceFromCurrentLine);
-
-                    // ** Pure pursuit ** - calc point on ABLine closest to current position
-                    double U = (((pivot.easting - curList[A].easting) * dx)
-                                + ((pivot.northing - curList[A].northing) * dz))
-                                / ((dx * dx) + (dz * dz));
-
-                    rEastCu = curList[A].easting + (U * dx);
-                    rNorthCu = curList[A].northing + (U * dz);
-
-                    //double minx, maxx, miny, maxy;
-
-                    //minx = Math.Min(curList[A].northing, curList[B].northing);
-                    //maxx = Math.Max(curList[A].northing, curList[B].northing);
-
-                    //miny = Math.Min(curList[A].easting, curList[B].easting);
-                    //maxy = Math.Max(curList[A].easting, curList[B].easting);
-
-                    //isValid = rNorthCu >= minx && rNorthCu <= maxx && (rEastCu >= miny && rEastCu <= maxy);
-
-                    //if (!isValid)
-                    //{
-                    //    //invalid distance so tell AS module
-                    //    distanceFromCurrentLine = 32000;
-                    //    mf.guidanceLineDistanceOff = 32000;
-                    //    return;
-                    //}
-
-                    //used for accumulating distance to find goal point
-                    double distSoFar;
-
-                    //update base on autosteer settings and distance from line
-                    double goalPointDistance = mf.vehicle.UpdateGoalPointDistance(distanceFromCurrentLine);
-                    mf.lookaheadActual = goalPointDistance;
-
-                    // used for calculating the length squared of next segment.
-                    double tempDist = 0.0;
-
-                    if (!isSameWay)
-                    {
-                        //counting down
-                        isABSameAsVehicleHeading = false;
-                        distSoFar = Glm.Distance(curList[A], rEastCu, rNorthCu);
-                        //Is this segment long enough to contain the full lookahead distance?
-                        if (distSoFar > goalPointDistance)
-                        {
-                            //treat current segment like an AB Line
-                            goalPointCu.easting = rEastCu - (Math.Sin(curList[A].heading) * goalPointDistance);
-                            goalPointCu.northing = rNorthCu - (Math.Cos(curList[A].heading) * goalPointDistance);
-                        }
-
-                        //multiple segments required
-                        else
-                        {
-                            //cycle thru segments and keep adding lengths. check if start and break if so.
-                            while (A > 0)
-                            {
-                                B--; A--;
-                                tempDist = Glm.Distance(curList[B], curList[A]);
-
-                                //will we go too far?
-                                if ((tempDist + distSoFar) > goalPointDistance) break; //tempDist contains the full length of next segment
-                                else distSoFar += tempDist;
-                            }
-
-                            double t = (goalPointDistance - distSoFar); // the remainder to yet travel
-                            t /= tempDist;
-
-                            goalPointCu.easting = (((1 - t) * curList[B].easting) + (t * curList[A].easting));
-                            goalPointCu.northing = (((1 - t) * curList[B].northing) + (t * curList[A].northing));
-                        }
-                    }
-                    else
-                    {
-                        //counting up
-                        isABSameAsVehicleHeading = true;
-                        distSoFar = Glm.Distance(curList[B], rEastCu, rNorthCu);
-
-                        //Is this segment long enough to contain the full lookahead distance?
-                        if (distSoFar > goalPointDistance)
-                        {
-                            //treat current segment like an AB Line
-                            goalPointCu.easting = rEastCu + (Math.Sin(curList[A].heading) * goalPointDistance);
-                            goalPointCu.northing = rNorthCu + (Math.Cos(curList[A].heading) * goalPointDistance);
-                        }
-
-                        //multiple segments required
-                        else
-                        {
-                            //cycle thru segments and keep adding lengths. check if end and break if so.
-                            // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
-                            while (B < ptCount - 1)
-                            {
-                                B++; A++;
-                                tempDist = Glm.Distance(curList[B], curList[A]);
-
-                                //will we go too far?
-                                if ((tempDist + distSoFar) > goalPointDistance)
-                                {
-                                    //A--; B--;
-                                    break; //tempDist contains the full length of next segment
-                                }
-
-                                distSoFar += tempDist;
-                            }
-
-                            //xt = (((1 - t) * x0 + t * x1)
-                            //yt = ((1 - t) * y0 + t * y1))
-
-                            double t = (goalPointDistance - distSoFar); // the remainder to yet travel
-                            t /= tempDist;
-
-                            goalPointCu.easting = (((1 - t) * curList[A].easting) + (t * curList[B].easting));
-                            goalPointCu.northing = (((1 - t) * curList[A].northing) + (t * curList[B].northing));
-                        }
-                    }
-
-                    //calc "D" the distance from pivot axle to lookahead point
-                    double goalPointDistanceSquared = Glm.DistanceSquared(goalPointCu.northing, goalPointCu.easting, pivot.northing, pivot.easting);
-
-                    //calculate the the delta x in local coordinates and steering angle degrees based on wheelbase
-                    double localHeading = Glm.twoPI - mf.fixHeading;
-                    ppRadiusCu = goalPointDistanceSquared / (2 * (((goalPointCu.easting - pivot.easting) * Math.Cos(localHeading)) + ((goalPointCu.northing - pivot.northing) * Math.Sin(localHeading))));
-
-                    steerAngleCu = Glm.ToDegrees(Math.Atan(2 * (((goalPointCu.easting - pivot.easting) * Math.Cos(localHeading))
-                        + ((goalPointCu.northing - pivot.northing) * Math.Sin(localHeading))) * mf.vehicle.wheelbase / goalPointDistanceSquared));
-
-                    if (steerAngleCu < -mf.vehicle.maxSteerAngle) steerAngleCu = -mf.vehicle.maxSteerAngle;
-                    if (steerAngleCu > mf.vehicle.maxSteerAngle) steerAngleCu = mf.vehicle.maxSteerAngle;
-
-                    if (ppRadiusCu < -500) ppRadiusCu = -500;
-                    if (ppRadiusCu > 500) ppRadiusCu = 500;
-
-                    radiusPointCu.easting = pivot.easting + (ppRadiusCu * Math.Cos(localHeading));
-                    radiusPointCu.northing = pivot.northing + (ppRadiusCu * Math.Sin(localHeading));
-
-                    //angular velocity in rads/sec  = 2PI * m/sec * radians/meters
-                    double angVel = Glm.twoPI * 0.277777 * mf.pn.speed * (Math.Tan(Glm.ToRadians(steerAngleCu))) / mf.vehicle.wheelbase;
-
-                    //clamp the steering angle to not exceed safe angular velocity
-                    if (Math.Abs(angVel) > mf.vehicle.maxAngularVelocity)
-                    {
-                        steerAngleCu = Glm.ToDegrees(steerAngleCu > 0 ?
-                                (Math.Atan((mf.vehicle.wheelbase * mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777)))
-                            : (Math.Atan((mf.vehicle.wheelbase * -mf.vehicle.maxAngularVelocity) / (Glm.twoPI * mf.pn.speed * 0.277777))));
-                    }
-                    //Convert to centimeters
-                    distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
-
-                    //distance is negative if on left, positive if on right
-                    //if you're going the opposite direction left is right and right is left
-                    //double temp;
-                    if (isABSameAsVehicleHeading)
-                    {
-                        //temp = (abHeading);
-                        if (!isOnRightSideCurrentLine) distanceFromCurrentLine *= -1.0;
-                    }
-
-                    //opposite way so right is left
-                    else
-                    {
-                        //temp = (abHeading - Math.PI);
-                        //if (temp < 0) temp = (temp + glm.twoPI);
-                        //temp = glm.toDegrees(temp);
-                        if (isOnRightSideCurrentLine) distanceFromCurrentLine *= -1.0;
-                    }
-                }
-
-                mf.guidanceLineDistanceOff = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
-                mf.guidanceLineSteerAngle = (Int16)(steerAngleCu * 100);
-
-                if (mf.yt.isYouTurnTriggered)
-                {
-                    //do the pure pursuit from youTurn
-                    mf.yt.DistanceFromYouTurnLine();
-                    mf.seq.DoSequenceEvent();
-
-                    //now substitute what it thinks are AB line values with auto turn values
-                    steerAngleCu = mf.yt.steerAngleYT;
-                    distanceFromCurrentLine = mf.yt.distanceFromCurrentLine;
-
-                    goalPointCu = mf.yt.goalPointYT;
-                    radiusPointCu.easting = mf.yt.radiusPointYT.easting;
-                    radiusPointCu.northing = mf.yt.radiusPointYT.northing;
-                    ppRadiusCu = mf.yt.ppRadiusYT;
+                    //invalid distance so tell AS module
+                    distanceFromCurrentLine = 32000;
+                    mf.guidanceLineDistanceOff = 32000;
                 }
             }
             else
@@ -1186,138 +1065,101 @@ namespace AgOpenGPS
             }
         }
 
-        public void SnapABCurve()
+        public void MoveLine(double dist)
         {
-            double headingAt90;
-
-            //calculate the heading 90 degrees to ref ABLine heading
-            if (isOnRightSideCurrentLine)
+            if (CurrentEditLine < Lines.Count && CurrentEditLine > -1)
             {
-                headingAt90 = Glm.PIBy2;
+                int cnt = Lines[CurrentEditLine].curvePts.Count;
+
+                Vec3 point;
+                for (int i = 0; i < cnt; i++)
+                {
+                    point.Northing = Lines[CurrentEditLine].curvePts[i].Northing + Math.Sin(Lines[CurrentEditLine].curvePts[i].Heading) * -dist;
+                    point.Easting = Lines[CurrentEditLine].curvePts[i].Easting + Math.Cos(Lines[CurrentEditLine].curvePts[i].Heading) * dist;
+                    point.Heading = Lines[CurrentEditLine].curvePts[i].Heading;
+                    Lines[CurrentEditLine].curvePts[i] = point;
+                }
             }
-            else
-            {
-                headingAt90 = -Glm.PIBy2;
-            }
-
-            if (isABSameAsVehicleHeading)
-            {
-                moveDistance += distanceFromCurrentLine * 0.001;
-            }
-            else
-            {
-                moveDistance -= distanceFromCurrentLine * 0.001;
-            }
-
-
-            int cnt = curList.Count;
-            Vec3[] arr = new Vec3[cnt];
-            curList.CopyTo(arr);
-            refList.Clear();
-
-            for (int i = 0; i < cnt; i++)
-            {
-                arr[i].easting = (Math.Sin(headingAt90 + arr[i].heading) * Math.Abs(distanceFromCurrentLine) * 0.001) + arr[i].easting;
-                arr[i].northing = (Math.Cos(headingAt90 + arr[i].heading) * Math.Abs(distanceFromCurrentLine) * 0.001) + arr[i].northing;
-                refList.Add(arr[i]);
-            }
-        }
-
-        public void MoveABCurve(double dist)
-        {
-            double headingAt90;
-
-            //calculate the heading 90 degrees to ref ABLine heading
-
-            if (isABSameAsVehicleHeading)
-            {
-                headingAt90 = Glm.PIBy2;
-                moveDistance += dist;
-            }
-            else
-            {
-                headingAt90 = -Glm.PIBy2;
-                moveDistance -= dist;
-            }
-
-            int cnt = refList.Count;
-            Vec3[] arr = new Vec3[cnt];
-            refList.CopyTo(arr);
-            refList.Clear();
-
-            for (int i = 0; i < cnt; i++)
-            {
-                arr[i].easting = (Math.Sin(headingAt90 + arr[i].heading) * dist) + arr[i].easting;
-                arr[i].northing = (Math.Cos(headingAt90 + arr[i].heading) * dist) + arr[i].northing;
-                refList.Add(arr[i]);
-            }
+            OldHowManyPathsAway = double.NegativeInfinity;
         }
 
         public bool PointOnLine(Vec3 pt1, Vec3 pt2, Vec3 pt)
         {
             var r = new Vec2(0, 0);
-            if (pt1.northing == pt2.northing && pt1.easting == pt2.easting) { pt1.northing -= 0.00001; }
+            if (pt1.Northing == pt2.Northing && pt1.Easting == pt2.Easting) { pt1.Northing -= 0.00001; }
 
-            var U = ((pt.northing - pt1.northing) * (pt2.northing - pt1.northing)) + ((pt.easting - pt1.easting) * (pt2.easting - pt1.easting));
+            var U = ((pt.Northing - pt1.Northing) * (pt2.Northing - pt1.Northing)) + ((pt.Easting - pt1.Easting) * (pt2.Easting - pt1.Easting));
 
-            var Udenom = Math.Pow(pt2.northing - pt1.northing, 2) + Math.Pow(pt2.easting - pt1.easting, 2);
+            var Udenom = Math.Pow(pt2.Northing - pt1.Northing, 2) + Math.Pow(pt2.Easting - pt1.Easting, 2);
 
             U /= Udenom;
 
-            r.northing = pt1.northing + (U * (pt2.northing - pt1.northing));
-            r.easting = pt1.easting + (U * (pt2.easting - pt1.easting));
+            r.Northing = pt1.Northing + (U * (pt2.Northing - pt1.Northing));
+            r.Easting = pt1.Easting + (U * (pt2.Easting - pt1.Easting));
 
             double minx, maxx, miny, maxy;
 
-            minx = Math.Min(pt1.northing, pt2.northing);
-            maxx = Math.Max(pt1.northing, pt2.northing);
+            minx = Math.Min(pt1.Northing, pt2.Northing);
+            maxx = Math.Max(pt1.Northing, pt2.Northing);
 
-            miny = Math.Min(pt1.easting, pt2.easting);
-            maxy = Math.Max(pt1.easting, pt2.easting);
-            return _ = r.northing >= minx && r.northing <= maxx && (r.easting >= miny && r.easting <= maxy);
+            miny = Math.Min(pt1.Easting, pt2.Easting);
+            maxy = Math.Max(pt1.Easting, pt2.Easting);
+            return _ = r.Northing >= minx && r.Northing <= maxx && (r.Easting >= miny && r.Easting <= maxy);
         }
 
-        //add extensons
         public void AddFirstLastPoints()
         {
-            int ptCnt = refList.Count - 1;
-            for (int i = 1; i < 200; i++)
+            Lines[CurrentEditLine].curvePts.RemoveAt(0);
+            int ptCnt = Lines[CurrentEditLine].curvePts.Count - 1;
+            Lines[CurrentEditLine].curvePts.RemoveAt(ptCnt);
+            double x = 0, y = 0;
+            for (int i = ptCnt - 4; i < ptCnt; i++)
             {
-                Vec3 pt = new Vec3(refList[ptCnt]);
-                pt.easting += (Math.Sin(pt.heading) * i);
-                pt.northing += (Math.Cos(pt.heading) * i);
-                refList.Add(pt);
+                x += Math.Cos(Lines[CurrentEditLine].curvePts[i].Heading);
+                y += Math.Sin(Lines[CurrentEditLine].curvePts[i].Heading);
             }
+            x /= 5;
+            y /= 5;
+            double EndHeading = Math.Atan2(y, x);
+            Vec3 EndPoint = Lines[CurrentEditLine].curvePts[ptCnt-1];
+            EndPoint.Heading = EndHeading;
+            for (int i = 2; i < 25; i++)
+            {
+                EndPoint.Easting += Math.Sin(EndHeading) * i * 0.5;
+                EndPoint.Northing += Math.Cos(EndHeading) * i * 0.5;
+                Lines[CurrentEditLine].curvePts.Add(EndPoint);
+            }
+
+            x = 0;
+            y = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                x += Math.Cos(Lines[CurrentEditLine].curvePts[i].Heading);
+                y += Math.Sin(Lines[CurrentEditLine].curvePts[i].Heading);
+            }
+            x /= 5;
+            y /= 5;
+            double StartHeading = Math.Atan2(y, x);
 
             //and the beginning
-            Vec3 start = new Vec3(refList[0]);
-            for (int i = 1; i < 200; i++)
+            Vec3 StartPoint = Lines[CurrentEditLine].curvePts[1];
+            StartPoint.Heading = StartHeading;
+            for (int i = 2; i < 25; i++)
             {
-                Vec3 pt = new Vec3(start);
-                pt.easting -= (Math.Sin(pt.heading) * i);
-                pt.northing -= (Math.Cos(pt.heading) * i);
-                refList.Insert(0, pt);
+                StartPoint.Easting -= Math.Sin(StartHeading) * i * 0.5;
+                StartPoint.Northing -= Math.Cos(StartHeading) * i * 0.5;
+                Lines[CurrentEditLine].curvePts.Insert(0, StartPoint);
             }
         }
-
-        public void ResetCurveLine()
-        {
-            curList?.Clear();
-            refList?.Clear();
-            isCurveSet = false;
-            isOkToAddPoints = false;
-        }
-
-        ////draw the guidance line
     }
 
     public class CCurveLines
     {
         public List<Vec3> curvePts = new List<Vec3>();
-        public double aveHeading = 3;
+        public double Heading = 3;
         public string Name = "aa";
-        public bool spiralmode = false;
-        public bool circlemode = false;
+        public bool SpiralMode = false;
+        public bool CircleMode = false;
+        public bool BoundaryMode = false;
     }
-
 }

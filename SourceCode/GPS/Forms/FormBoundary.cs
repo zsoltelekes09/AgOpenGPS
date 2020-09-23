@@ -9,19 +9,12 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        private bool Selectedreset = true;
-        private int Position = 0;
-        private int oldposition = 0;
-        private bool scroll = false;
-        private double viewableRatio = 0;
-        private double contentHeight = 0;
-        private int oldY = 0;
-        private double thumbHeight = 0;
-        private readonly int scrollmaxheight = 0;
-        private readonly int startscrollY = 0;
-        private readonly int startscrollX = 0;
-        private readonly int items = 0;
-        private readonly int rowheight = 0;
+        private bool Selectedreset = true, scroll = false;
+        private int Position = 0,oldposition = 0,oldY = 0;
+        private double viewableRatio = 0, contentHeight = 0,thumbHeight = 0;
+        private readonly int scrollmaxheight = 0, startscrollY = 0, startscrollX = 0;
+        private readonly int items = 0,rowheight = 0;
+        
 
         private double easting, northing, latK, lonK;
 
@@ -33,7 +26,6 @@ namespace AgOpenGPS
             //winform initialization
             InitializeComponent();
 
-            nudBndOffset.Controls[0].Enabled = false;
 
             scrollmaxheight = button4.Size.Height;
             startscrollY = button4.Location.Y;
@@ -62,7 +54,7 @@ namespace AgOpenGPS
             btnLoadMultiBoundaryFromGE.Visible = false;
         }
 
-        void UpdateScroll(double pos)
+        public void UpdateScroll(double pos)
         {
             contentHeight = (mf.bnd.bndArr.Count) * rowheight;
             viewableRatio = tableLayoutPanel1.Size.Height / contentHeight;
@@ -86,7 +78,7 @@ namespace AgOpenGPS
             }
         }
 
-        private void UpdateChart()
+        public void UpdateChart()
         {
             int field = 1;
             int inner = 1;
@@ -238,7 +230,7 @@ namespace AgOpenGPS
             //update the list view with real data
             UpdateScroll(-1);
             UpdateChart();
-            nudBndOffset.Value = (decimal)(mf.Guidance.GuidanceWidth * 0.5);
+            TboxBndOffset.Text = (mf.bnd.createBndOffset = mf.Guidance.GuidanceWidth * 0.5).ToString();
         }
 
         void DriveThru_Click(object sender, EventArgs e)
@@ -301,33 +293,28 @@ namespace AgOpenGPS
 
             if (result3 == DialogResult.Yes)
             {
-
-                btnLeftRight.Enabled = false;
-                btnGo.Enabled = false;
                 btnDelete.Enabled = false;
-                nudBndOffset.Enabled = false;
 
-            if (mf.bnd.bndArr.Count > mf.bnd.boundarySelected)
-            {
-                mf.bnd.bndArr.RemoveAt(mf.bnd.boundarySelected);
-                mf.turn.turnArr.RemoveAt(mf.bnd.boundarySelected);
-                mf.gf.geoFenceArr.RemoveAt(mf.bnd.boundarySelected);
-                mf.hd.headArr.RemoveAt(mf.bnd.boundarySelected);
-            }
+                if (mf.bnd.bndArr.Count > mf.bnd.boundarySelected)
+                {
+                    mf.bnd.bndArr.RemoveAt(mf.bnd.boundarySelected);
+                    mf.turn.turnArr.RemoveAt(mf.bnd.boundarySelected);
+                    mf.gf.geoFenceArr.RemoveAt(mf.bnd.boundarySelected);
+                    mf.hd.headArr.RemoveAt(mf.bnd.boundarySelected);
+                }
 
-            mf.FileSaveBoundary();
-            mf.FileSaveHeadland();
+                mf.FileSaveBoundary();
+                mf.FileSaveHeadland();
 
-            if (mf.bnd.bndArr.Count == 0) mf.hd.isOn = false;
+                if (mf.bnd.bndArr.Count == 0) mf.hd.BtnHeadLand = false;
 
-            mf.bnd.boundarySelected = -1;
+                mf.bnd.boundarySelected = -1;
 
-            if (Position + items >= mf.bnd.bndArr.Count) Position--;
-            if (Position < 0) Position = 0;
+                if (Position + items >= mf.bnd.bndArr.Count) Position--;
+                if (Position < 0) Position = 0;
 
-            Selectedreset = true;
-            mf.fd.UpdateFieldBoundaryGUIAreas();
-            mf.mazeGrid.BuildMazeGridArray();
+                Selectedreset = true;
+                mf.fd.UpdateFieldBoundaryGUIAreas();
 
                 UpdateChart();
                 UpdateScroll(-1);
@@ -367,20 +354,12 @@ namespace AgOpenGPS
 
         }
 
-        private void NudBndOffset_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            //btnCancel.Focus();
-        }
-
         private void BtnGo_Click(object sender, EventArgs e)
         {
-            mf.bnd.createBndOffset = (double)nudBndOffset.Value;
             mf.bnd.isBndBeingMade = true;
 
             Form form2 = new FormBoundaryPlayer(mf, this);
             form2.Show(this);
-
 
             Hide();
         }
@@ -404,9 +383,8 @@ namespace AgOpenGPS
                 mf.bnd.isOkToAddPoints = false;
                 mf.FileSaveHeadland();
 
-                mf.hd.isOn = false;
+                mf.hd.BtnHeadLand = false;
                 mf.fd.UpdateFieldBoundaryGUIAreas();
-                mf.mazeGrid.BuildMazeGridArray();
             }
         }
 
@@ -453,7 +431,20 @@ namespace AgOpenGPS
         {
             scroll = false;
         }
-        
+
+        private void TboxBndOffset_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, 50, mf.bnd.createBndOffset, this, false,2))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxBndOffset.Text = (mf.bnd.createBndOffset = form.ReturnValue).ToString("N2");
+                }
+            }
+            btnSerialCancel.Focus();
+        }
+
         void Mouse_Move(object sender, MouseEventArgs e)
         {
             if (scroll == true && viewableRatio < 1)
@@ -587,18 +578,17 @@ namespace AgOpenGPS
                                         northing = (Math.Sin(-mf.pn.convergenceAngle) * east) + (Math.Cos(-mf.pn.convergenceAngle) * nort);
 
                                         //add the point to boundary
-                                        Vec3 bndPt = new Vec3(easting, northing, 0);
+                                        Vec3 bndPt = new Vec3(northing, easting, 0);
                                         mf.bnd.bndArr[i].bndLine.Add(bndPt);
                                     }
 
                                     if (mf.bnd.bndArr[i].bndLine.Count > 0)
                                     {
                                         //fix the points if there are gaps bigger then
-                                        mf.bnd.bndArr[i].FixBoundaryLine(i, mf.Guidance.GuidanceWidth);
-                                        mf.bnd.bndArr[i].PreCalcBoundaryLines();
+                                        mf.bnd.bndArr[i].FixBoundaryLine();
                                         mf.bnd.bndArr[i].CalculateBoundaryArea();
                                         mf.bnd.bndArr[i].CalculateBoundaryWinding();
-
+                                        mf.bnd.bndArr[i].PreCalcBoundaryLines();
 
                                         mf.turn.BuildTurnLines(i);
                                         mf.gf.BuildGeoFenceLines(i);
@@ -625,7 +615,6 @@ namespace AgOpenGPS
                             }
                         }
                         mf.fd.UpdateFieldBoundaryGUIAreas();
-                        mf.mazeGrid.BuildMazeGridArray();
 
                         mf.FileSaveBoundary();
                         UpdateChart();
@@ -647,8 +636,7 @@ namespace AgOpenGPS
                 btnLoadMultiBoundaryFromGE.Visible = false;
                 btnGo.Visible = true;
                 btnLeftRight.Visible = true;
-                nudBndOffset.Visible = true;
-                label1.Visible = true;
+                TboxBndOffset.Visible = true;
                 lblOffset.Visible = true;
 
             }
@@ -658,8 +646,7 @@ namespace AgOpenGPS
                 btnLoadMultiBoundaryFromGE.Visible = true;
                 btnGo.Visible = false;
                 btnLeftRight.Visible = false;
-                nudBndOffset.Visible = false;
-                label1.Visible = false;
+                TboxBndOffset.Visible = false;
                 lblOffset.Visible = false;
             }
         }

@@ -8,7 +8,7 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        public int[] mazeArr;
+        public bool[] mazeArr;
         public int mazeScale = 1;
         public int mazeRowYDim;
         public int mazeColXDim;
@@ -17,7 +17,7 @@ namespace AgOpenGPS
         public CMazeGrid(FormGPS _f)
         {
             mf = _f;
-            mazeArr = new int[0];
+            mazeArr = new bool[0];
         }
 
         public void BuildMazeGridArray()
@@ -26,101 +26,44 @@ namespace AgOpenGPS
             double mazeY = (mf.maxFieldY - mf.minFieldY);
             double mazeX = (mf.maxFieldX - mf.minFieldX);
 
-            if (mazeY > mazeX) mazeScale = (int)(mazeY / 150);
-            else mazeScale = (int)(mazeX / 150);
+            mazeScale = (mazeY > mazeX) ? (int)(mazeY / 150) : (int)(mazeX / 150);
 
             if (mazeScale < 4) mazeScale = 4;
             //mazeScale = 4;
 
-            mazeRowYDim = (int)mazeY / mazeScale;
-            mazeColXDim = (int)mazeX / mazeScale;
-            mazeArr = new int[mazeRowYDim * mazeColXDim];
+            mazeRowYDim = (int)(mazeY / mazeScale) + 1;
+            mazeColXDim = (int)(mazeX / mazeScale) + 2;
+            mazeArr = new bool[mazeRowYDim * mazeColXDim];
 
             //row is Y, col is X   int[Y,X] [i,j] [row,col]
-            Vec3 pot = new Vec3();
-
-            //mf.yt.triggerDistanceOffset += mazeScale;
-            //mf.turn.BuildTurnLines();
-
-            int[,] arr = new int[mazeRowYDim, mazeColXDim];
+            Vec3 Pos = new Vec3();
 
             for (int i = 0; i < mazeRowYDim; i++)
             {
                 for (int j = 0; j < mazeColXDim; j++)
                 {
-                    pot.easting = (j * mazeScale) + (int)mf.minFieldX;
-                    pot.northing = (i * mazeScale) + (int)mf.minFieldY;
-                    if (!mf.gf.IsPointInsideGeoFences(pot))
+                    Pos.Easting = (j * mazeScale) + (int)mf.minFieldX;
+                    Pos.Northing = (i * mazeScale) + (int)mf.minFieldY;
+                    if (!mf.gf.IsPointInsideGeoFences(Pos))
                     {
-                        mazeArr[(i * mazeColXDim) + j] = 1;
-                        arr[i, j] = 1;
+                        mazeArr[(i * mazeColXDim) + j] = true;
                     }
                     else
                     {
-                        mazeArr[(i * mazeColXDim) + j] = 0;
-                        arr[i, j] = 0;
+                        mazeArr[(i * mazeColXDim) + j] = false;
                     }
                 }
             }
-
-            for (int i = 0; i < mazeRowYDim; i++)
-            {
-                for (int j = 0; j < mazeColXDim; j++)
-                {
-                    if (i > 0 && i < mazeRowYDim - 1 && j > 0 && j < mazeColXDim - 1)
-                    {
-                        if (arr[i, j] == 1 && arr[i + 1, j] == 0) arr[i + 1, j] = 2;
-                        if (arr[i, j] == 1 && arr[i - 1, j] == 0) arr[i - 1, j] = 2;
-                        if (arr[i, j] == 1 && arr[i, j + 1] == 0) arr[i, j + 1] = 2;
-                        if (arr[i, j] == 1 && arr[i, j - 1] == 0) arr[i, j - 1] = 2;
-                    }
-                }
-            }
-
-            for (int i = 0; i < mazeRowYDim; i++)
-            {
-                for (int j = 0; j < mazeColXDim; j++)
-                {
-                    if (arr[i, j] == 2)
-                    {
-                        mazeArr[(i * mazeColXDim) + j] = 1;
-                        arr[i, j] = 1;
-                    }
-                }
-            }
-
-            //for (int i = 0; i < mazeRowYDim; i++)
-            //{
-            //    for (int j = 0; j < mazeColXDim; j++)
-            //    {
-            //        if (i > 0 && i < mazeRowYDim - 1 && j > 0 && j < mazeColXDim - 1)
-            //        {
-            //            if (arr[i, j] == 1 && arr[i + 1, j] == 0) arr[i + 1, j] = 2;
-            //            if (arr[i, j] == 1 && arr[i - 1, j] == 0) arr[i - 1, j] = 2;
-            //            if (arr[i, j] == 1 && arr[i, j + 1] == 0) arr[i, j + 1] = 2;
-            //            if (arr[i, j] == 1 && arr[i, j - 1] == 0) arr[i, j - 1] = 2;
-            //        }
-            //    }
-            //}
-
-            //for (int i = 0; i < mazeRowYDim; i++)
-            //{
-            //    for (int j = 0; j < mazeColXDim; j++)
-            //    {
-            //        if (arr[i, j] == 2)
-            //            mazeArr[(i * mazeColXDim) + j] = 1;
-            //    }
-            //}
         }
 
         public List<Vec3> SearchForPath(Vec3 start, Vec3 stop)
         {
             CMazePath maze = new CMazePath(mazeRowYDim, mazeColXDim, mazeArr);
 
-            List<Vec3> mazeList = maze.Search((int)((start.northing - mf.minFieldY) / mf.mazeGrid.mazeScale),
-                                                (int)((start.easting - mf.minFieldX) / mf.mazeGrid.mazeScale),
-                                          (int)((stop.northing - mf.minFieldY) / mf.mazeGrid.mazeScale),
-                                          (int)((stop.easting - mf.minFieldX) / mf.mazeGrid.mazeScale));
+            List<Vec3> mazeList = maze.Search((int)((start.Northing - mf.minFieldY) / mf.mazeGrid.mazeScale),
+                                                (int)((start.Easting - mf.minFieldX) / mf.mazeGrid.mazeScale),
+                                          (int)((stop.Northing - mf.minFieldY) / mf.mazeGrid.mazeScale),
+                                          (int)((stop.Easting - mf.minFieldX) / mf.mazeGrid.mazeScale));
 
             if (mazeList == null) return mazeList;
 
@@ -131,7 +74,7 @@ namespace AgOpenGPS
 
             if (cnt < 3)
             {
-                mazeList?.Clear();
+                mazeList.Clear();
                 return mazeList;
             }
 
@@ -143,8 +86,8 @@ namespace AgOpenGPS
 
             for (int h = 0; h < cnt; h++)
             {
-                arr2[h].easting = (arr2[h].easting * mazeScale) + mf.minFieldX;
-                arr2[h].northing = (arr2[h].northing * mazeScale) + mf.minFieldY;
+                arr2[h].Easting = (arr2[h].Easting * mazeScale) + mf.minFieldX;
+                arr2[h].Northing = (arr2[h].Northing * mazeScale) + mf.minFieldY;
                 mazeList.Add(arr2[h]);
             }
 
@@ -157,8 +100,8 @@ namespace AgOpenGPS
                 double distance = Glm.Distance(mazeList[i], mazeList[j]);
                 if (distance > 2)
                 {
-                    Vec3 pointB = new Vec3((mazeList[i].easting + mazeList[j].easting) / 2.0,
-                                        (mazeList[i].northing + mazeList[j].northing) / 2.0, 0);
+                    Vec3 pointB = new Vec3((mazeList[i].Northing + mazeList[j].Northing) / 2.0,
+                        (mazeList[i].Easting + mazeList[j].Easting) / 2.0, 0);
 
                     mazeList.Insert(j, pointB);
                     cnt = mazeList.Count;
@@ -177,16 +120,16 @@ namespace AgOpenGPS
             //read the points before and after the setpoint
             for (int s = 0; s < smPts; s++)
             {
-                arr[s].easting = mazeList[s].easting;
-                arr[s].northing = mazeList[s].northing;
-                arr[s].heading = mazeList[s].heading;
+                arr[s].Easting = mazeList[s].Easting;
+                arr[s].Northing = mazeList[s].Northing;
+                arr[s].Heading = mazeList[s].Heading;
             }
 
             for (int s = cnt - smPts; s < cnt; s++)
             {
-                arr[s].easting = mazeList[s].easting;
-                arr[s].northing = mazeList[s].northing;
-                arr[s].heading = mazeList[s].heading;
+                arr[s].Easting = mazeList[s].Easting;
+                arr[s].Northing = mazeList[s].Northing;
+                arr[s].Heading = mazeList[s].Heading;
             }
 
             //average them - center weighted average
@@ -194,56 +137,41 @@ namespace AgOpenGPS
             {
                 for (int j = -smPts; j < smPts; j++)
                 {
-                    arr[i].easting += mazeList[j + i].easting;
-                    arr[i].northing += mazeList[j + i].northing;
+                    arr[i].Easting += mazeList[j + i].Easting;
+                    arr[i].Northing += mazeList[j + i].Northing;
                 }
-                arr[i].easting /= (smPts * 2);
-                arr[i].northing /= (smPts * 2);
-                arr[i].heading = mazeList[i].heading;
+                arr[i].Easting /= (smPts * 2);
+                arr[i].Northing /= (smPts * 2);
+                arr[i].Heading = mazeList[i].Heading;
             }
 
             //clear the list and reload with calc headings - first and last droppped
-            mazeList?.Clear();
+            mazeList.Clear();
 
             for (int i = mazeScale; i < cnt - mazeScale; i++)
             {
                 Vec3 pt3 = arr[i];
-                pt3.heading = Math.Atan2(arr[i + 1].easting - arr[i].easting, arr[i + 1].northing - arr[i].northing);
-                if (pt3.heading < 0) pt3.heading += Glm.twoPI;
+                pt3.Heading = Math.Atan2(arr[i + 1].Easting - arr[i].Easting, arr[i + 1].Northing - arr[i].Northing);
+                if (pt3.Heading < 0) pt3.Heading += Glm.twoPI;
                 mazeList.Add(pt3);
             }
 
             return mazeList;
         }
 
-        //public int ConvertToGrid(vec3 pt)
-        //{
-        //    pt.northing = (pt.northing - mf.minFieldY) / mazeScale;
-        //    pt.easting = (pt.easting - mf.minFieldX) / mazeScale;
-        //    return (int)((pt.northing * mazeColXDim) + pt.easting);
-        //}
-
         public void DrawArr()
         {
             GL.PointSize(2.0f);
             GL.Begin(PrimitiveType.Points);
-            int ptCount = mazeRowYDim * mazeColXDim;
-            for (int h = 0; h < ptCount; h++)
+
+            for (int h = 0; h < mazeArr.Length; h++)
             {
-                if (mazeArr[h] == 1)
-                {
-                    GL.Color3(0.0095f, 0.007520f, 0.97530f);
-                    int Y = h / mazeColXDim; //Y
-                    int X = h - (h / mazeColXDim * mazeColXDim); //X
-                    GL.Vertex3((X * mazeScale) + (int)mf.minFieldX, (Y * mazeScale) + (int)mf.minFieldY, 0);
-                }
-                else
-                {
-                    GL.Color3(0.95f, 0.7520f, 0.07530f);
-                    int Y = h / mazeColXDim; //Y
-                    int X = h - (h / mazeColXDim * mazeColXDim); //X
-                    GL.Vertex3((X * mazeScale) + (int)mf.minFieldX, (Y * mazeScale) + (int)mf.minFieldY, 0);
-                }
+                if (mazeArr[h]) GL.Color3(0.0095f, 0.007520f, 0.97530f);
+                else GL.Color3(0.95f, 0.7520f, 0.07530f);
+
+                int Y = h / mazeColXDim; //Y
+                int X = h - (h / mazeColXDim * mazeColXDim); //X
+                GL.Vertex3((X * mazeScale) + (int)mf.minFieldX, (Y * mazeScale) + (int)mf.minFieldY, 0);
             }
             GL.End();
         }

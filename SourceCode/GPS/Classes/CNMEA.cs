@@ -130,7 +130,7 @@ Field	Meaning
         //WGS84 Lat Long
         public double latitude, longitude;
 
-        public double latStart, lonStart;
+        public double latStart = 0, lonStart = 0;
 
         public double actualEasting, actualNorthing, zone;
         public double centralMeridian, convergenceAngle;
@@ -178,8 +178,6 @@ Field	Meaning
             //constructor, grab the main form reference
             mf = f;
             fixFrom = Properties.Settings.Default.setGPS_fixFromWhichSentence;
-            latStart = 0;
-            lonStart = 0;
         }
 
         //ParseNMEA
@@ -695,23 +693,23 @@ Field	Meaning
             actualNorthing = xy[1];
 
             //if a field is open, the real one is subtracted from the integer
-            fix.easting = xy[0] - utmEast + fixOffset.easting;
-            fix.northing = xy[1] - utmNorth + fixOffset.northing;
+            fix.Easting = xy[0] - utmEast + fixOffset.Easting;
+            fix.Northing = xy[1] - utmNorth + fixOffset.Northing;
 
-            double east = fix.easting;
-            double nort = fix.northing;
+            double east = fix.Easting;
+            double nort = fix.Northing;
             //compensate for the fact the zones lines are a grid and the world is spheroid
-            fix.easting = (Math.Cos(-convergenceAngle) * east) - (Math.Sin(-convergenceAngle) * nort);
-            fix.northing = (Math.Sin(-convergenceAngle) * east) + (Math.Cos(-convergenceAngle) * nort);
+            fix.Easting = (Math.Cos(-convergenceAngle) * east) - (Math.Sin(-convergenceAngle) * nort);
+            fix.Northing = (Math.Sin(-convergenceAngle) * east) + (Math.Cos(-convergenceAngle) * nort);
 
             UpdatedLatLon = true;
 
-            //east = fix.easting;
-            //nort = fix.northing;
+            //east = fix.Easting;
+            //nort = fix.Northing;
 
             //go back again - programming reference only
-            //fix.easting = (Math.Cos(convergenceAngle) * east) - (Math.Sin(convergenceAngle) * nort);
-            //fix.northing = (Math.Sin(convergenceAngle) * east) + (Math.Cos(convergenceAngle) * nort);
+            //fix.Easting = (Math.Cos(convergenceAngle) * east) - (Math.Sin(convergenceAngle) * nort);
+            //fix.Northing = (Math.Sin(convergenceAngle) * east) + (Math.Cos(convergenceAngle) * nort);
 
             #endregion Convergence
         }

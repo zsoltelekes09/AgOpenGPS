@@ -54,8 +54,8 @@
             this.label9 = new System.Windows.Forms.Label();
             this.tboxTinkerUID = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.TboxFixStepDistance = new System.Windows.Forms.TextBox();
             this.label35 = new System.Windows.Forms.Label();
-            this.nudMinFixStepDistance = new System.Windows.Forms.NumericUpDown();
             this.btnCancel = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -66,8 +66,6 @@
             this.rbtnRMC = new System.Windows.Forms.RadioButton();
             this.rbtnGGA = new System.Windows.Forms.RadioButton();
             this.lblSimGGA = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.cboxNMEAHz = new System.Windows.Forms.ComboBox();
             this.cboxIsRTK = new System.Windows.Forms.CheckBox();
             this.tabHeading = new System.Windows.Forms.TabPage();
             this.lblFusionIMU = new System.Windows.Forms.Label();
@@ -83,7 +81,6 @@
             this.groupBox6.SuspendLayout();
             this.groupBoxHeadingCorrection.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinFixStepDistance)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabFix.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -424,8 +421,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.TboxFixStepDistance);
             this.groupBox1.Controls.Add(this.label35);
-            this.groupBox1.Controls.Add(this.nudMinFixStepDistance);
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.groupBox1.Location = new System.Drawing.Point(17, 360);
             this.groupBox1.Name = "groupBox1";
@@ -433,6 +430,21 @@
             this.groupBox1.TabIndex = 121;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Fix To Fix Distance";
+            // 
+            // TboxFixStepDistance
+            // 
+            this.TboxFixStepDistance.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxFixStepDistance.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxFixStepDistance.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxFixStepDistance.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxFixStepDistance.Location = new System.Drawing.Point(22, 47);
+            this.TboxFixStepDistance.MaxLength = 10;
+            this.TboxFixStepDistance.Name = "TboxFixStepDistance";
+            this.TboxFixStepDistance.Size = new System.Drawing.Size(130, 50);
+            this.TboxFixStepDistance.TabIndex = 477;
+            this.TboxFixStepDistance.Text = "1.0";
+            this.TboxFixStepDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxFixStepDistance.Enter += new System.EventHandler(this.TboxFixStepDistance_Enter);
             // 
             // label35
             // 
@@ -445,44 +457,10 @@
             this.label35.TabIndex = 67;
             this.label35.Text = "Meters";
             // 
-            // nudMinFixStepDistance
-            // 
-            this.nudMinFixStepDistance.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudMinFixStepDistance.DecimalPlaces = 1;
-            this.nudMinFixStepDistance.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudMinFixStepDistance.Increment = new decimal(new int[] {
-            2,
-            0,
-            0,
-            65536});
-            this.nudMinFixStepDistance.InterceptArrowKeys = false;
-            this.nudMinFixStepDistance.Location = new System.Drawing.Point(22, 47);
-            this.nudMinFixStepDistance.Maximum = new decimal(new int[] {
-            40,
-            0,
-            0,
-            65536});
-            this.nudMinFixStepDistance.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            65536});
-            this.nudMinFixStepDistance.Name = "nudMinFixStepDistance";
-            this.nudMinFixStepDistance.Size = new System.Drawing.Size(129, 50);
-            this.nudMinFixStepDistance.TabIndex = 66;
-            this.nudMinFixStepDistance.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            65536});
-            this.nudMinFixStepDistance.ValueChanged += new System.EventHandler(this.NudMinFixStepDistance_ValueChanged);
-            this.nudMinFixStepDistance.Enter += new System.EventHandler(this.NudMinFixStepDistance_Enter);
-            // 
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.btnCancel.Image = global::AgOpenGPS.Properties.Resources.Cancel64;
             this.btnCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -528,8 +506,6 @@
             this.tabFix.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.tabFix.Controls.Add(this.label3);
             this.tabFix.Controls.Add(this.groupBox4);
-            this.tabFix.Controls.Add(this.label7);
-            this.tabFix.Controls.Add(this.cboxNMEAHz);
             this.tabFix.Controls.Add(this.cboxIsRTK);
             this.tabFix.Location = new System.Drawing.Point(4, 64);
             this.tabFix.Name = "tabFix";
@@ -623,33 +599,6 @@
             this.lblSimGGA.TabIndex = 87;
             this.lblSimGGA.Text = "Use GGA For Simulator";
             this.lblSimGGA.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold);
-            this.label7.Location = new System.Drawing.Point(463, 215);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(83, 19);
-            this.label7.TabIndex = 89;
-            this.label7.Text = "NMEA Hz";
-            // 
-            // cboxNMEAHz
-            // 
-            this.cboxNMEAHz.Cursor = System.Windows.Forms.Cursors.Default;
-            this.cboxNMEAHz.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboxNMEAHz.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold);
-            this.cboxNMEAHz.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "5",
-            "8",
-            "10"});
-            this.cboxNMEAHz.Location = new System.Drawing.Point(458, 242);
-            this.cboxNMEAHz.Name = "cboxNMEAHz";
-            this.cboxNMEAHz.Size = new System.Drawing.Size(96, 37);
-            this.cboxNMEAHz.TabIndex = 88;
-            this.cboxNMEAHz.SelectedIndexChanged += new System.EventHandler(this.CboxNMEAHz_SelectedIndexChanged);
             // 
             // cboxIsRTK
             // 
@@ -797,10 +746,8 @@
             this.groupBoxHeadingCorrection.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinFixStepDistance)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabFix.ResumeLayout(false);
-            this.tabFix.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.tabHeading.ResumeLayout(false);
             this.tabHeading.PerformLayout();
@@ -833,7 +780,6 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label35;
-        private System.Windows.Forms.NumericUpDown nudMinFixStepDistance;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabFix;
         private System.Windows.Forms.TabPage tabHeading;
@@ -851,8 +797,6 @@
         private System.Windows.Forms.RadioButton rbtnRollAutoSteer;
         private System.Windows.Forms.RadioButton rbtnRollAVR;
         private System.Windows.Forms.Label lblSimGGA;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox cboxNMEAHz;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.HScrollBar hsbarFusion;
         private System.Windows.Forms.Label lblIMUFusion;
@@ -861,5 +805,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label lblFusionIMU;
+        private System.Windows.Forms.TextBox TboxFixStepDistance;
     }
 }

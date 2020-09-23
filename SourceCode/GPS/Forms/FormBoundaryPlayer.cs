@@ -9,7 +9,7 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         //constructor
-        public FormBoundaryPlayer(FormGPS AgOpenGPS, Form callingForm)
+        public FormBoundaryPlayer(FormGPS AgOpenGPS, FormBoundary callingForm)
         {
             Owner = callingForm;
             mf = AgOpenGPS;
@@ -20,6 +20,25 @@ namespace AgOpenGPS
             btnPausePlay.Text = gStr.gsRecord;
             label1.Text = gStr.gsArea + ":";
             this.Text = gStr.gsStopRecordPauseBoundary;
+            lblOffset.Text = gStr.gsOffset;
+
+
+
+            //mf.bnd.isOkToAddPoints = false;
+            btnPausePlay.Image = Properties.Resources.BoundaryRecord;
+            TboxBndOffset.Text = mf.bnd.createBndOffset.ToString("N2");
+            mf.Focus();
+
+            if (mf.isMetric)
+            {
+                lblArea.Text = Math.Round(0.0, 2) + " Ha";
+            }
+            else
+            {
+                lblArea.Text = Math.Round(0.0, 2) + " Acre";
+            }
+            lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
+
         }
 
         private void BtnStop_Click(object sender, EventArgs e)
@@ -32,17 +51,16 @@ namespace AgOpenGPS
                 mf.hd.headArr.Add(new CHeadLines());
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].bndLine.AddRange(mf.bnd.bndBeingMadePts);
 
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine(mf.bnd.bndArr.Count - 1, mf.Guidance.GuidanceWidth);
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine();
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();
+                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
 
 
                 mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
                 mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
 
                 mf.fd.UpdateFieldBoundaryGUIAreas();
-                mf.mazeGrid.BuildMazeGridArray();
 
                 mf.FileSaveBoundary();
             }
@@ -54,7 +72,13 @@ namespace AgOpenGPS
 
             mf.bnd.bndBeingMadePts.Clear();
             Hide();
+
+            FormBoundary Boundary = (FormBoundary)Owner;
+            Boundary.UpdateChart();
+            Boundary.UpdateScroll(-1);
+
             Owner.Show();
+
             Close();
         }
 
@@ -80,24 +104,6 @@ namespace AgOpenGPS
             mf.Focus();
         }
 
-        private void FormBoundaryPlayer_Load(object sender, EventArgs e)
-        {
-            //mf.bnd.isOkToAddPoints = false;
-            btnPausePlay.Image = Properties.Resources.BoundaryRecord;
-            nudOffset.Value = (decimal)mf.bnd.createBndOffset;
-            mf.Focus();
-
-            if (mf.isMetric)
-            {
-                lblArea.Text = Math.Round(0.0, 2) + " Ha";
-            }
-            else
-            {
-                lblArea.Text = Math.Round(0.0, 2) + " Acre";
-            }
-            lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
-        }
-
         private void Timer1_Tick(object sender, EventArgs e)
         {
             int ptCount = mf.bnd.bndBeingMadePts.Count;
@@ -109,7 +115,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < ptCount; j = i++)
                 {
-                    area += (mf.bnd.bndBeingMadePts[j].easting + mf.bnd.bndBeingMadePts[i].easting) * (mf.bnd.bndBeingMadePts[j].northing - mf.bnd.bndBeingMadePts[i].northing);
+                    area += (mf.bnd.bndBeingMadePts[j].Easting + mf.bnd.bndBeingMadePts[i].Easting) * (mf.bnd.bndBeingMadePts[j].Northing - mf.bnd.bndBeingMadePts[i].Northing);
                 }
                 area = Math.Abs(area / 2);
             }
@@ -127,9 +133,8 @@ namespace AgOpenGPS
 
         private void BtnAddPoint_Click(object sender, EventArgs e)
         {
-        
             mf.bnd.isOkToAddPoints = true;
-                mf.AddBoundaryPoint();
+            mf.AddBoundaryPoint();
             mf.bnd.isOkToAddPoints = false;
             lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
 
@@ -154,17 +159,23 @@ namespace AgOpenGPS
                                     MessageBoxDefaultButton.Button2);
             if (result3 == DialogResult.Yes)
             {
-                mf.bnd.bndBeingMadePts?.Clear();
-                lblPoints.Text = mf.bnd.bndBeingMadePts.Count.ToString();
+                mf.bnd.bndBeingMadePts.Clear();
+                lblPoints.Text = "0";
             }
             mf.Focus();
         }
 
-        private void NudOffset_Enter(object sender, EventArgs e)
+        private void TboxBndOffset_Enter(object sender, EventArgs e)
         {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnPausePlay.Focus();
-            mf.bnd.createBndOffset = (double)nudOffset.Value;
+            using (var form = new FormNumeric(0, 50, mf.bnd.createBndOffset, this, false, 2))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxBndOffset.Text = (mf.bnd.createBndOffset = form.ReturnValue).ToString("N2");
+                }
+            }
+            btnStop.Focus();
         }
     }
 }

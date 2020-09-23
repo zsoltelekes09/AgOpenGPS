@@ -23,50 +23,50 @@ namespace AgOpenGPS
 
         private void FormShiftPos_Load(object sender, EventArgs e)
         {
-            nudEast.Value = (decimal)mf.pn.fixOffset.easting * 100;
-            nudNorth.Value = (decimal)mf.pn.fixOffset.northing * 100;
+            nudEast.Value = (decimal)mf.pn.fixOffset.Easting * 100;
+            nudNorth.Value = (decimal)mf.pn.fixOffset.Northing * 100;
         }
 
         private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
         {
             nudNorth.UpButton();
-            mf.pn.fixOffset.northing = (double)nudNorth.Value / 100;
+            mf.pn.fixOffset.Northing = (double)nudNorth.Value / 100;
         }
 
         private void BtnSouth_MouseDown(object sender, MouseEventArgs e)
         {
             nudNorth.DownButton();
-            mf.pn.fixOffset.northing = (double)nudNorth.Value / 100;
+            mf.pn.fixOffset.Northing = (double)nudNorth.Value / 100;
         }
 
         private void BtnWest_MouseDown(object sender, MouseEventArgs e)
         {
             nudEast.DownButton();
-            mf.pn.fixOffset.easting = (double)nudEast.Value / 100;
+            mf.pn.fixOffset.Easting = (double)nudEast.Value / 100;
         }
 
         private void BtnEast_MouseDown(object sender, MouseEventArgs e)
         {
             nudEast.UpButton();
-            mf.pn.fixOffset.easting = (double)nudEast.Value / 100;
+            mf.pn.fixOffset.Easting = (double)nudEast.Value / 100;
         }
 
         private void NudNorth_ValueChanged(object sender, EventArgs e)
         {
-            mf.pn.fixOffset.northing = (double)nudNorth.Value / 100;
+            mf.pn.fixOffset.Northing = (double)nudNorth.Value / 100;
         }
 
         private void NudEast_ValueChanged(object sender, EventArgs e)
         {
-            mf.pn.fixOffset.easting = (double)nudEast.Value / 100;
+            mf.pn.fixOffset.Easting = (double)nudEast.Value / 100;
         }
 
         private void BtnZero_Click(object sender, EventArgs e)
         {
             nudEast.Value = 0;
             nudNorth.Value = 0;
-            mf.pn.fixOffset.easting = 0;
-            mf.pn.fixOffset.northing = 0;
+            mf.pn.fixOffset.Easting = 0;
+            mf.pn.fixOffset.Northing = 0;
         }
 
         private void BntOK_Click(object sender, EventArgs e)

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace AgOpenGPS
+﻿namespace AgOpenGPS
 {
     public class CModuleComm
     {
@@ -18,53 +16,44 @@ namespace AgOpenGPS
 
         public bool isMachineDataSentToAutoSteer;
 
-        //AutoSteer --------------------------------------------------------------------------------------------
-        // PGN - 32766 - 127.254 0x7FFE
-        public byte[] autoSteerData = new byte[pgnSentenceLength];
-        public int sdHeaderHi, sdHeaderLo = 1, sdSpeedHi = 2, sdSpeedLo = 3, sdDistanceHi = 4, sdDistanceLo = 5,
-                    sdSteerAngleHi = 6, sdSteerAngleLo = 7, sd8 = 8, sd9 = 9;
 
-        //Auto Steer Basic setting -------------------------------------------------------------------------------
-        // PGN - 32764 - 127.252 0x7FFC
-        public byte[] autoSteerSettings = new byte[pgnSentenceLength];
-        public int ssHeaderHi, ssHeaderLo = 1, ssKp = 2, ssLowPWM = 3, ssKd = 4, ssKo = 5,
-                    ssSteerOffset = 6, ssMinPWM = 7, ssHighPWM = 8, ssCountsPerDegree = 9;
+        //AutoSteer PGN - 32624 - 127.112 - 0x7F70          Header index Length Speed HiLo,  Dist HiLo, Angle HiLo
+        public byte[] Send_AutoSteer = new byte[9]          { 0x7F, 0x70, 0x09, 0x00, 0x00, 0x7D, 0x14, 0x7D, 0x14 };
+        public byte[] Send_Sections = new byte[6]           { 0x7F, 0x71, 0x06, 0xFF, 0xFF, 0x00 };
+        public byte[] Send_AutoSteerButton = new byte[4]    { 0x7F, 0x72, 0x04, 0x00 };
+        public byte[] Send_HydraulicLift = new byte[4]      { 0x7F, 0x73, 0x04, 0x00 };
+        public byte[] Send_Uturn = new byte[4]              { 0x7F, 0x74, 0x04, 0x80 };
+        public byte[] Send_Treeplant = new byte[4]          { 0x7F, 0x75, 0x04, 0x00 };
+
+        public byte[] Recieve_AutoSteer = new byte[6]       { 0x7F, 0xC0, 0x06, 0x00, 0x00, 0x00 };
+        public byte[] Recieve_SectionsStatus = new byte[6]  { 0x7F, 0xC1, 0x06, 0xFF, 0xFF, 0x00 };
+        public byte[] Recieve_Heading = new byte[5]         { 0x7F, 0xC2, 0x05, 0x00, 0x00 };
+        public byte[] Recieve_Roll = new byte[5]            { 0x7F, 0xC3, 0x05, 0x00, 0x00 };
+        public byte[] Recieve_AutoSteerButton = new byte[4] { 0x7F, 0xC4, 0x04, 0x00 };
+        public byte[] Recieve_WorkSwitch = new byte[4]      { 0x7F, 0xC5, 0x04, 0x00 };
+        public byte[] Recieve_Checksum = new byte[4]        { 0x7F, 0xC6, 0x04, 0x00 };
+        public byte[] Recieve_lidarDistance = new byte[5]   { 0x7F, 0xC7, 0x04, 0x00, 0x00 };
+
+        //Auto Steer Basic config -------------------------------------------------------------------------------
+        public byte[] Config_AutoSteer = new byte[11];
+        public int ssKp = 3, ssLowPWM = 4, ssKd = 5, ssKo = 6, ssSteerOffset = 7, ssMinPWM = 8, ssHighPWM = 9, ssCountsPerDegree = 10;
 
         // ----  Arduino Steer Config ----------------------------------------------------------------------------
-        //PGN 32763 - 127.251 0x7FFB
-        public byte[] ardSteerConfig = new byte[pgnSentenceLength];
-        public int arHeaderHi, arHeaderLo = 1, arSet0 = 2, arSet1 = 3, arMaxSpd = 4, arMinSpd = 5, arIncMaxPulse = 6,
-            arAckermanFix = 7, arSet2 = 8, ar9 = 9;
-
-        //Machine Module Data ------------------------------------------------------------------------------------
-        // PGN - 32762 - 127.250 0x7FFA
-        public byte[] machineData = new byte[pgnSentenceLength];
-        public int mdHeaderHi, mdHeaderLo = 1, mdSectionControlByteHi = 2, mdSectionControlByteLo = 3,
-            mdSpeedXFour = 4, mdUTurn = 5, mdTree = 6, mdHydLift = 7, md8 = 8, md9 = 9;
+        public byte[] Config_ardSteer = new byte[10];
+        public int arSet0 = 3, arSet1 = 4, arMaxSpd = 5, arMinSpd = 6, arIncMaxPulse = 7, arAckermanFix = 8, arSet2 = 9;
 
         // ---- Arduino configuration on machine module  ---------------------------------------------------------
-        //PGN - 32760 - 127.248 0x7FF9
-        public byte[] ardMachineConfig = new byte[pgnSentenceLength];
-        public int amHeaderHi, amHeaderLo = 1, amRaiseTime = 2, amLowerTime = 3, amEnableHyd = 4,
-             amSet0 = 5, am6 = 6, am7 = 7, am8 = 8, am9 = 9;
+        public byte[] Config_ardMachine = new byte[7];
+        public int amRaiseTime = 3, amLowerTime = 4, amEnableHyd = 5, amSet0 = 6;
 
-        // ---- Section control switches to AOG  ---------------------------------------------------------
-        //PGN - 32736 - 127.249 0x7FE9
-        public byte[] ss = new byte[pgnSentenceLength];
-        public byte[] ssP = new byte[pgnSentenceLength];
-        public int swHeaderHi, swHeaderLo = 1, sw2 = 2, sw3 = 3, sw4 = 4,
-             swONHi = 5, swONLo = 6, swOFFHi = 7, swOFFLo = 8, swMain = 9;
 
-        //LIDAR
         //UDP sentence just rec'd
         public string recvUDPSentence = "Inital UDP";
 
-        public int lidarDistance;
+        public int lidarDistance, pwmDisplay = 0;
 
         //for the workswitch
         public bool isWorkSwitchActiveLow, isWorkSwitchEnabled, isWorkSwitchManual;
-
-        public int workSwitchValue, steerSwitchValue = 1, pwmDisplay = 0;
 
         //constructor
         public CModuleComm(FormGPS _f)
@@ -80,154 +69,63 @@ namespace AgOpenGPS
             isWorkSwitchActiveLow = true;
 
             isMachineDataSentToAutoSteer = Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer;
+            ResetAllModuleCommValues(false);
 
-            //autosteer constant data
-            autoSteerData[sdHeaderHi] = 127; // PGN - 32766
-            autoSteerData[sdHeaderLo] = 254;
-            autoSteerData[sdSpeedHi] = 0;
-            autoSteerData[sdSpeedLo] = 0;
-            autoSteerData[sdDistanceHi] = 125; // PGN - 32020
-            autoSteerData[sdDistanceLo] = 20;
-            autoSteerData[sdSteerAngleHi] = 125; // PGN - 32020
-            autoSteerData[sdSteerAngleLo] = 20;
-            autoSteerData[sd8] = 0;
-            autoSteerData[sd9] = 0;
 
-            //autosteer steer settings
-            autoSteerSettings[ssHeaderHi] = 127;// PGN - 32764 as header
-            autoSteerSettings[ssHeaderLo] = 252;
-            autoSteerSettings[ssKp] = Properties.Settings.Default.setAS_Kp;
-            autoSteerSettings[ssLowPWM] = Properties.Settings.Default.setAS_lowSteerPWM;
-            autoSteerSettings[ssKd] = Properties.Settings.Default.setAS_Kd;
-            autoSteerSettings[ssKo] = Properties.Settings.Default.setAS_Ko;
-            autoSteerSettings[ssSteerOffset] = Properties.Settings.Default.setAS_steerAngleOffset;
-            autoSteerSettings[ssMinPWM] = Properties.Settings.Default.setAS_minSteerPWM;
-            autoSteerSettings[ssHighPWM] = Properties.Settings.Default.setAS_highSteerPWM;
-            autoSteerSettings[ssCountsPerDegree] = Properties.Settings.Default.setAS_countsPerDegree;
+            Config_AutoSteer[0] = 127;// PGN - 32764 as header
+            Config_AutoSteer[1] = 252;
+            Config_AutoSteer[2] = 11;
+            Config_AutoSteer[ssKp] = Properties.Vehicle.Default.setAS_Kp;
+            Config_AutoSteer[ssLowPWM] = Properties.Vehicle.Default.setAS_lowSteerPWM;
+            Config_AutoSteer[ssKd] = Properties.Vehicle.Default.setAS_Kd;
+            Config_AutoSteer[ssKo] = Properties.Vehicle.Default.setAS_Ko;
+            Config_AutoSteer[ssSteerOffset] = Properties.Vehicle.Default.setAS_steerAngleOffset;
+            Config_AutoSteer[ssMinPWM] = Properties.Vehicle.Default.setAS_minSteerPWM;
+            Config_AutoSteer[ssHighPWM] = Properties.Vehicle.Default.setAS_highSteerPWM;
+            Config_AutoSteer[ssCountsPerDegree] = Properties.Vehicle.Default.setAS_countsPerDegree;
 
-            //arduino basic steer settings
-            ardSteerConfig[arHeaderHi] = 127; //PGN - 32763
-            ardSteerConfig[arHeaderLo] = 251;
-            ardSteerConfig[arSet0] = Properties.Vehicle.Default.setArdSteer_setting0;
-            ardSteerConfig[arSet1] = Properties.Vehicle.Default.setArdSteer_setting1;
-            ardSteerConfig[arMaxSpd] = Properties.Vehicle.Default.setArdSteer_maxSpeed;
-            ardSteerConfig[arMinSpd] = Properties.Vehicle.Default.setArdSteer_minSpeed;
+
+            Config_ardSteer[0] = 127; //PGN - 32763
+            Config_ardSteer[1] = 251;
+            Config_ardSteer[2] = 10;
+            Config_ardSteer[arSet0] = Properties.Vehicle.Default.setArdSteer_setting0;
+            Config_ardSteer[arSet1] = Properties.Vehicle.Default.setArdSteer_setting1;
+            Config_ardSteer[arMaxSpd] = Properties.Vehicle.Default.setArdSteer_maxSpeed;
+            Config_ardSteer[arMinSpd] = Properties.Vehicle.Default.setArdSteer_minSpeed;
             byte inc = (byte)(Properties.Vehicle.Default.setArdSteer_inclinometer << 6);
-            ardSteerConfig[arIncMaxPulse] = (byte)(inc + (byte)Properties.Vehicle.Default.setArdSteer_maxPulseCounts);
-            ardSteerConfig[arAckermanFix] = Properties.Vehicle.Default.setArdSteer_ackermanFix;
-            ardSteerConfig[arSet2] = Properties.Vehicle.Default.setArdSteer_setting2;
-            ardSteerConfig[ar9] = 0;
-
-            //machine, sections data array
-            machineData[mdHeaderHi] = 127; // PGN - 32762
-            machineData[mdHeaderLo] = 250;
-            machineData[mdSectionControlByteHi] = 0;
-            machineData[mdSectionControlByteLo] = 0;
-            machineData[mdSpeedXFour] = 0;
-            machineData[mdUTurn] = 0;
-            machineData[mdTree] = 0;
-            machineData[mdHydLift] = 0;
-            machineData[md8] = 0;
-            machineData[md9] = 0;
+            Config_ardSteer[arIncMaxPulse] = (byte)(inc + Properties.Vehicle.Default.setArdSteer_maxPulseCounts);
+            Config_ardSteer[arAckermanFix] = Properties.Vehicle.Default.setArdSteer_ackermanFix;
+            Config_ardSteer[arSet2] = Properties.Vehicle.Default.setArdSteer_setting2;
 
             //arduino machine configuration
-            ardMachineConfig[amHeaderHi] = 127; //PGN - 32760
-            ardMachineConfig[amHeaderLo] = 248;
-            ardMachineConfig[amRaiseTime] = Properties.Vehicle.Default.setArdMac_hydRaiseTime;
-            ardMachineConfig[amLowerTime] = Properties.Vehicle.Default.setArdMac_hydLowerTime;
-            ardMachineConfig[amEnableHyd] = Properties.Vehicle.Default.setArdMac_isHydEnabled;
-            ardMachineConfig[amSet0] = Properties.Vehicle.Default.setArdMac_setting0;
-            ardMachineConfig[am6] = 0;
-            ardMachineConfig[am7] = 0;
-            ardMachineConfig[am8] = 0;
-            ardMachineConfig[am9] = 0;
-
-            //Section control: switches
-            ss[swHeaderHi] = 0;  //PGN - 32609
-            ss[swHeaderLo] = 0;  //0xE0
-            ss[sw2] = 0;
-            ss[sw3] = 0;
-            ss[sw4] = 0;
-            ss[swONHi] = 0;
-            ss[swONLo] = 0;
-            ss[swOFFHi] = 0;
-            ss[swOFFLo] = 0;
-            ss[swMain] = 0;
-
-            ssP[swHeaderHi] = 0;  //PGN - 32609
-            ssP[swHeaderLo] = 0;  //0xE0
-            ssP[sw2] = 0;
-            ssP[sw3] = 0;
-            ssP[sw4] = 0;
-            ssP[swONHi] = 0;
-            ssP[swONLo] = 0;
-            ssP[swOFFHi] = 0;
-            ssP[swOFFLo] = 0;
-            ssP[swMain] = 0;
+            Config_ardMachine[0] = 127; //PGN - 32760
+            Config_ardMachine[1] = 248;
+            Config_ardMachine[2] = 7;
+            Config_ardMachine[amRaiseTime] = Properties.Vehicle.Default.setArdMac_hydRaiseTime;
+            Config_ardMachine[amLowerTime] = Properties.Vehicle.Default.setArdMac_hydLowerTime;
+            Config_ardMachine[amEnableHyd] = Properties.Vehicle.Default.setArdMac_isHydEnabled;
+            Config_ardMachine[amSet0] = Properties.Vehicle.Default.setArdMac_setting0;
         }
 
         //Reset all the byte arrays from modules
-        public void ResetAllModuleCommValues()
+        public void ResetAllModuleCommValues(bool send)
         {
-            machineData[mdHeaderHi] = 127; // PGN - 32762
-            machineData[mdHeaderLo] = 250;
-            machineData[mdSectionControlByteHi] = 0;
-            machineData[mdSectionControlByteLo] = 0;
-            machineData[mdSpeedXFour] = 0;
-            machineData[mdUTurn] = 0;
-            machineData[mdTree] = 0;
-            machineData[mdHydLift] = 0;
-            machineData[md8] = 0;
-            machineData[md9] = 0;
-            mf.SendOutUSBMachinePort(machineData, pgnSentenceLength);
+            Send_AutoSteer = new byte[9] { 0x7F, 0x70, 0x09, 0x00, 0x00, 0x7D, 0x14, 0x7D, 0x14 };
+            Send_Sections = new byte[6] { 0x7F, 0x71, 0x06, 0xFF, 0xFF, 0x00 };
+            Send_AutoSteerButton = new byte[4] { 0x7F, 0x72, 0x04, 0x00 };
+            Send_HydraulicLift = new byte[4] { 0x7F, 0x73, 0x04, 0x00 };
+            Send_Uturn = new byte[4] { 0x7F, 0x74, 0x04, 0x80 };
+            Send_Treeplant = new byte[4] { 0x7F, 0x75, 0x04, 0x00 };
 
-            autoSteerData[sdHeaderHi] = 127; // PGN - 32766
-            autoSteerData[sdHeaderLo] = 254;
-            autoSteerData[sdSpeedHi] = 0;
-            autoSteerData[sdSpeedLo] = 0;
-            autoSteerData[sdDistanceHi] = 125; // PGN - 32020
-            autoSteerData[sdDistanceLo] = 20;
-            autoSteerData[sdSteerAngleHi] = 125; // PGN - 32020
-            autoSteerData[sdSteerAngleLo] = 20;
-            autoSteerData[sd8] = 0;
-            autoSteerData[sd9] = 0;
-            mf.SendOutUSBAutoSteerPort(autoSteerData, pgnSentenceLength);
-
-            autoSteerSettings[ssHeaderHi] = 127;// PGN - 32764 as header
-            autoSteerSettings[ssHeaderLo] = 252;
-            autoSteerSettings[ssKp] = Properties.Settings.Default.setAS_Kp;
-            autoSteerSettings[ssLowPWM] = Properties.Settings.Default.setAS_lowSteerPWM;
-            autoSteerSettings[ssKd] = Properties.Settings.Default.setAS_Kd;
-            autoSteerSettings[ssKo] = Properties.Settings.Default.setAS_Ko;
-            autoSteerSettings[ssSteerOffset] = Properties.Settings.Default.setAS_steerAngleOffset;
-            autoSteerSettings[ssMinPWM] = Properties.Settings.Default.setAS_minSteerPWM;
-            autoSteerSettings[ssHighPWM] = Properties.Settings.Default.setAS_highSteerPWM;
-            autoSteerSettings[ssCountsPerDegree] = Properties.Settings.Default.setAS_countsPerDegree;
-            //mf.SendSteerSettingsOutAutoSteerPort();
-
-            ardSteerConfig[arHeaderHi] = 127; //PGN - 32763
-            ardSteerConfig[arHeaderLo] = 251;
-            ardSteerConfig[arSet0] = Properties.Vehicle.Default.setArdSteer_setting0;
-            ardSteerConfig[arSet1] = Properties.Vehicle.Default.setArdSteer_setting1;
-            ardSteerConfig[arMaxSpd] = Properties.Vehicle.Default.setArdSteer_maxSpeed;
-            ardSteerConfig[arMinSpd] = Properties.Vehicle.Default.setArdSteer_minSpeed;
-                byte inc = (byte)(Properties.Vehicle.Default.setArdSteer_inclinometer << 6);
-            ardSteerConfig[arIncMaxPulse] = (byte)(inc + (byte)Properties.Vehicle.Default.setArdSteer_maxPulseCounts);
-            ardSteerConfig[arAckermanFix] = Properties.Vehicle.Default.setArdSteer_ackermanFix;
-            ardSteerConfig[arSet2] = Properties.Vehicle.Default.setArdSteer_setting2;
-            ardSteerConfig[ar9] = 0;
-
-            //arduino machine configuration
-            ardMachineConfig[amHeaderHi] = 127; //PGN - 32760
-            ardMachineConfig[amHeaderLo] = 248;
-            ardMachineConfig[amRaiseTime] = Properties.Vehicle.Default.setArdMac_hydRaiseTime;
-            ardMachineConfig[amLowerTime] = Properties.Vehicle.Default.setArdMac_hydLowerTime;
-            ardMachineConfig[amEnableHyd] = Properties.Vehicle.Default.setArdMac_isHydEnabled;
-            ardMachineConfig[amSet0] = Properties.Vehicle.Default.setArdMac_setting0;
-            ardMachineConfig[am6] = 0;
-            ardMachineConfig[am7] = 0;
-            ardMachineConfig[am8] = 0;
-            ardMachineConfig[am9] = 0;
+            if (send)
+            {
+                mf.SendData(Send_AutoSteer, false);
+                mf.SendData(Send_Sections, false);
+                mf.SendData(Send_AutoSteerButton, false);
+                mf.SendData(Send_HydraulicLift, false);
+                mf.SendData(Send_Uturn, false);
+                mf.SendData(Send_Treeplant, false);
+            }
         }
     }
 

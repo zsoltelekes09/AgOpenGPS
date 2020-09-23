@@ -7,7 +7,7 @@ namespace AgOpenGPS
         /// <summary>
         /// Class attributes/members
         /// </summary>
-        readonly private int[] mazeGrid;
+        readonly private bool[] mazeGrid;
 
         readonly private int numCols;
         readonly private int numMax;
@@ -16,7 +16,7 @@ namespace AgOpenGPS
         /// Constructor 2: initializes the dimensions of maze,
         /// later, indexers may be used to set individual elements' values
         /// </summary>
-        public CMazePath(int iRows, int iCols, int[] _iMaze)
+        public CMazePath(int iRows, int iCols, bool[] _iMaze)
         {
             numMax = iRows * iCols;
             mazeGrid = _iMaze;
@@ -38,14 +38,12 @@ namespace AgOpenGPS
             int iStart = (int)((iFromY * numCols) + iFromX);
             int iStop = (int)((iToY * numCols) + iToX);
 
-            const int empty = 0;
-
             int[] Queue = new int[numMax];
             int[] Origin = new int[numMax];
             int iFront = 0, iRear = 0;
 
             //check if starting and ending points are valid (open)
-            if (mazeGrid[iStart] != empty || mazeGrid[iStop] != empty)
+            if (mazeGrid[iStart] == false || mazeGrid[iStop] == false)
             {
                 return null;
             }
@@ -71,7 +69,7 @@ namespace AgOpenGPS
                 iLeft = iCurrent - 1;
                 if (iLeft >= 0 && iLeft / numCols == iCurrent / numCols)    //if left node exists
                 {
-                    if (mazeGrid[iLeft] == empty)   //if left node is open(a path exists)
+                    if (mazeGrid[iLeft] == false)   //if left node is open(a path exists)
                     {
                         if (iMazeStatus[iLeft] == (int)Status.Ready)   //if left node is ready
                         {
@@ -86,7 +84,7 @@ namespace AgOpenGPS
                 iRight = iCurrent + 1;
                 if (iRight < numMax && iRight / numCols == iCurrent / numCols)    //if right node exists
                 {
-                    if (mazeGrid[iRight] == empty)  //if right node is open(a path exists)
+                    if (mazeGrid[iRight] == false)  //if right node is open(a path exists)
                     {
                         if (iMazeStatus[iRight] == (int)Status.Ready)  //if right node is ready
                         {
@@ -101,7 +99,7 @@ namespace AgOpenGPS
                 iUp = iCurrent + numCols;
                 if (iUp < numMax)  //if top node exists
                 {
-                    if (mazeGrid[iUp] == empty)    //if top node is open(a path exists)
+                    if (mazeGrid[iUp] == false)    //if top node is open(a path exists)
                     {
                         if (iMazeStatus[iUp] == (int)Status.Ready)    //if top node is ready
                         {
@@ -116,7 +114,7 @@ namespace AgOpenGPS
                 iDown = iCurrent - numCols;
                 if (iDown >= 0)   //if bottom node exists
                 {
-                    if (mazeGrid[iDown] == empty)   //if bottom node is open(a path exists)
+                    if (mazeGrid[iDown] == false)   //if bottom node is open(a path exists)
                     {
                         if (iMazeStatus[iDown] == (int)Status.Ready)   //if bottom node is ready
                         {
@@ -132,7 +130,7 @@ namespace AgOpenGPS
                     iRightDown = iCurrent - numCols + 1;
                     if (iRightDown < numMax && iRightDown >= 0 && iRightDown / numCols == (iCurrent / numCols) - 1)     //if bottom-right node exists
                     {
-                        if (mazeGrid[iRightDown] == empty)  //if this node is open(a path exists)
+                        if (mazeGrid[iRightDown] == false)  //if this node is open(a path exists)
                         {
                             if (iMazeStatus[iRightDown] == (int)Status.Ready)  //if this node is ready
                             {
@@ -147,7 +145,7 @@ namespace AgOpenGPS
                     iRightUp = iCurrent + numCols + 1;
                     if (iRightUp >= 0 && iRightUp < numMax && iRightUp / numCols == (iCurrent / numCols) + 1)   //if upper-right node exists
                     {
-                        if (mazeGrid[iRightUp] == empty)    //if this node is open(a path exists)
+                        if (mazeGrid[iRightUp] == false)    //if this node is open(a path exists)
                         {
                             if (iMazeStatus[iRightUp] == (int)Status.Ready)    //if this node is ready
                             {
@@ -162,7 +160,7 @@ namespace AgOpenGPS
                     iLeftDown = iCurrent - numCols - 1;
                     if (iLeftDown < numMax && iLeftDown >= 0 && iLeftDown / numCols == (iCurrent / numCols) - 1)    //if bottom-left node exists
                     {
-                        if (mazeGrid[iLeftDown] == empty)   //if this node is open(a path exists)
+                        if (mazeGrid[iLeftDown] == false)   //if this node is open(a path exists)
                         {
                             if (iMazeStatus[iLeftDown] == (int)Status.Ready)   //if this node is ready
                             {
@@ -177,7 +175,7 @@ namespace AgOpenGPS
                     iLeftUp = iCurrent + numCols - 1;
                     if (iLeftUp >= 0 && iLeftUp < numMax && iLeftUp / numCols == (iCurrent / numCols) + 1)  //if upper-left node exists
                     {
-                        if (mazeGrid[iLeftUp] == empty)     //if this node is open(a path exists)
+                        if (mazeGrid[iLeftUp] == false)     //if this node is open(a path exists)
                         {
                             if (iMazeStatus[iLeftUp] == (int)Status.Ready) //if this node is ready
                             {
@@ -199,11 +197,11 @@ namespace AgOpenGPS
 
             iCurrent = iStop;
             //Y
-            ptt.northing = iCurrent / numCols;
+            ptt.Northing = iCurrent / numCols;
             //X
-            ptt.easting = iCurrent - (iCurrent / numCols * numCols);
+            ptt.Easting = iCurrent - (iCurrent / numCols * numCols);
 
-            mazeList?.Clear();
+            mazeList.Clear();
             mazeList.Add(ptt);
 
             for (int i = iFront; i >= 0; i--)
@@ -214,8 +212,8 @@ namespace AgOpenGPS
                     if (iCurrent == -1)     // maze is solved
                         return mazeList;
                     //add point
-                    ptt.northing = iCurrent / numCols; //Y
-                    ptt.easting = iCurrent - (iCurrent / numCols * numCols); //X
+                    ptt.Northing = iCurrent / numCols; //Y
+                    ptt.Easting = iCurrent - (iCurrent / numCols * numCols); //X
                     mazeList.Add(ptt);
                 }
             }

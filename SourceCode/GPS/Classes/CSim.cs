@@ -51,6 +51,15 @@ namespace AgOpenGPS
             LastSteerAngle = 0;
         }
 
+        // Instantiate random number generator.  
+        private readonly Random _random = new Random();
+
+        // Generates a random number within a range.      
+        public double RandomNumber(int min, int max)
+        {
+            return min + _random.NextDouble() * (max - min);
+        }
+
         public void DoSimTick(double _st)
         {
 
@@ -60,18 +69,28 @@ namespace AgOpenGPS
 
             mf.actualSteerAngleDisp = LastSteerAngle * 100.0;
             steerAngle = LastSteerAngle;
-            double temp = (stepDistance / mf.fixUpdateHz * Math.Tan(steerAngle * 0.0165329252) / 3.3);
+            double temp = (stepDistance / mf.HzTime * Math.Tan(steerAngle * 0.0165329252) / 3.3);
             headingTrue += temp;
-            if (headingTrue > (2.0 * Math.PI)) headingTrue -= (2.0 * Math.PI);
-            if (headingTrue < 0) headingTrue += (2.0 * Math.PI);
+            if (headingTrue > Glm.twoPI) headingTrue -= Glm.twoPI;
+            if (headingTrue < 0) headingTrue += Glm.twoPI;
 
 
             //Calculate the next Lat Long based on heading and distance
             degrees = Glm.ToDegrees(headingTrue);
-            CalculateNewPostionFromBearingDistance(latitude, longitude, degrees, (stepDistance / mf.fixUpdateHz) / 1000.0);
 
+            if (mf.isSimNoisy)
+            {
+                double noiseLat = RandomNumber(-3, 3) * 0.0000001295;
+                double noiseLon = RandomNumber(-3, 3) * 0.0000001295;
+                CalculateNewPostionFromBearingDistance(latitude + noiseLat, longitude + noiseLon, degrees, (stepDistance / mf.HzTime) / 1000.0);
+                latitude -= noiseLat;
+                longitude -= noiseLon;
+            }
+            else
+            {
+                CalculateNewPostionFromBearingDistance(latitude, longitude, degrees, (stepDistance / mf.HzTime) / 1000.0);
+            }
             //calc the speed
-            //speed = Math.Round(1.944 * stepDistance * (double)nudHz.Value, 1);
             speed = Math.Round(1.944 * stepDistance, 1);
             //lblSpeed.Text = (Math.Round(1.852 * speed, 1)).ToString();
 

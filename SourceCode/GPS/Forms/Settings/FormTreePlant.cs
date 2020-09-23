@@ -28,8 +28,6 @@ namespace AgOpenGPS
             //Button
             btnZeroDistance.Text = gStr.gsBegin;
             btnStop.Text = gStr.gsDone;
-
-            nudTreeSpacing.Controls[0].Enabled = false;
         }
 
         private void BtnStop_Click(object sender, EventArgs e)
@@ -110,14 +108,16 @@ namespace AgOpenGPS
             isRunning = !isRunning;
         }
 
-        private void NudTreeSpacing_ValueChanged(object sender, EventArgs e)
+        private void TboxTreeSpacing_Enter(object sender, EventArgs e)
         {
-            mf.vehicle.treeSpacing = (double)nudTreeSpacing.Value;
-        }
-
-        private void NudTreeSpacing_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
+            using (var form = new FormNumeric(1, 5000, mf.vehicle.treeSpacing, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxTreeSpacing.Text = (mf.vehicle.treeSpacing = form.ReturnValue).ToString();
+                }
+            }
             btnStop.Focus();
         }
 
@@ -131,7 +131,8 @@ namespace AgOpenGPS
 
             //mf.vehicle.treeSpacing = Properties.Settings.Default.setDistance_TreeSpacing;
 
-            nudTreeSpacing.Value = (decimal)mf.vehicle.treeSpacing;
+            TboxTreeSpacing.Text = mf.vehicle.treeSpacing.ToString();
+
             lastDist = 0;
             mf.treeSpacingCounter = 0;
             trees = 0;

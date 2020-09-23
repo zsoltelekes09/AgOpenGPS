@@ -78,7 +78,7 @@ namespace AgOpenGPS
             if (recListCount < 5) return false;
 
             //the goal is the first point of path, the start is the current position
-            Vec3 goal = new Vec3(recList[0].Easting, recList[0].Northing, recList[0].Heading);
+            Vec3 goal = new Vec3(recList[0].Northing, recList[0].Easting, recList[0].Heading);
 
             //save a copy of where we started.
             homePos = mf.pivotAxlePos;
@@ -122,7 +122,7 @@ namespace AgOpenGPS
                 pathCount = cnt - B;
                 if (pathCount < 8)
                 {
-                    double distSqr = Glm.DistanceSquared(steerAxlePosRP.northing, steerAxlePosRP.easting, recList[0].Northing, recList[0].Easting);
+                    double distSqr = Glm.DistanceSquared(steerAxlePosRP.Northing, steerAxlePosRP.Easting, recList[0].Northing, recList[0].Easting);
                     if (distSqr < 2)
                     {
                         isFollowingRecPath = true;
@@ -218,9 +218,9 @@ namespace AgOpenGPS
             //bump it forward
             Vec3 pt2 = new Vec3
             {
-                easting = steerAxlePosRP.easting + (Math.Sin(steerAxlePosRP.heading) * 3),
-                northing = steerAxlePosRP.northing + (Math.Cos(steerAxlePosRP.heading) * 3),
-                heading = steerAxlePosRP.heading
+                Easting = steerAxlePosRP.Easting + (Math.Sin(steerAxlePosRP.Heading) * 3),
+                Northing = steerAxlePosRP.Northing + (Math.Cos(steerAxlePosRP.Heading) * 3),
+                Heading = steerAxlePosRP.Heading
             };
 
             //get the dubins path vec3 point coordinates of turn
@@ -237,7 +237,7 @@ namespace AgOpenGPS
                 //transfer point list to recPath class point style
                 for (int i = 0; i < shortestDubinsList.Count; i++)
                 {
-                    CRecPathPt pt = new CRecPathPt(shortestDubinsList[i].easting, shortestDubinsList[i].northing, shortestDubinsList[i].heading, 9.0, false);
+                    CRecPathPt pt = new CRecPathPt(shortestDubinsList[i].Easting, shortestDubinsList[i].Northing, shortestDubinsList[i].Heading, 9.0, false);
                     shuttleDubinsList.Add(pt);
                 }
                 return;
@@ -269,7 +269,7 @@ namespace AgOpenGPS
                 {
                     for (int i = 0; i < shortestDubinsList.Count; i++)
                     {
-                        CRecPathPt pt = new CRecPathPt(shortestDubinsList[i].easting, shortestDubinsList[i].northing, shortestDubinsList[i].heading, 10.0, false);
+                        CRecPathPt pt = new CRecPathPt(shortestDubinsList[i].Easting, shortestDubinsList[i].Northing, shortestDubinsList[i].Heading, 10.0, false);
                         shuttleDubinsList.Add(pt);
                     }
                 }
@@ -280,7 +280,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < mazeList.Count; i++)
                 {
-                    CRecPathPt pt = new CRecPathPt(mazeList[i].easting, mazeList[i].northing, mazeList[i].heading, 15.0, false);
+                    CRecPathPt pt = new CRecPathPt(mazeList[i].Easting, mazeList[i].Northing, mazeList[i].Heading, 15.0, false);
                     shuttleDubinsList.Add(pt);
                 }
 
@@ -288,7 +288,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < shortestDubinsList.Count; i++)
                 {
-                    CRecPathPt pt = new CRecPathPt(shortestDubinsList[i].easting, shortestDubinsList[i].northing, shortestDubinsList[i].heading, 11.0, false);
+                    CRecPathPt pt = new CRecPathPt(shortestDubinsList[i].Easting, shortestDubinsList[i].Northing, shortestDubinsList[i].Heading, 11.0, false);
                     shuttleDubinsList.Add(pt);
                 }
                 return;
@@ -307,8 +307,8 @@ namespace AgOpenGPS
             double dist;
             for (int t = currentPositonIndex; t < top; t++)
             {
-                dist = ((steerAxlePosRP.easting - recList[t].Easting) * (steerAxlePosRP.easting - recList[t].Easting))
-                                + ((steerAxlePosRP.northing - recList[t].Northing) * (steerAxlePosRP.northing - recList[t].Northing));
+                dist = ((steerAxlePosRP.Easting - recList[t].Easting) * (steerAxlePosRP.Easting - recList[t].Easting))
+                                + ((steerAxlePosRP.Northing - recList[t].Northing) * (steerAxlePosRP.Northing - recList[t].Northing));
                 if (dist < minDistA)
                 {
                     minDistA = dist;
@@ -339,11 +339,10 @@ namespace AgOpenGPS
             if (Math.Abs(dx) < Double.Epsilon && Math.Abs(dz) < Double.Epsilon) return;
 
             abHeading = Math.Atan2(dx, dz);
-            //abHeading = recList[A].heading;
 
             //how far from current AB Line is fix
             distanceFromCurrentLine =
-                ((dz * steerAxlePosRP.easting) - (dx * steerAxlePosRP.northing) + (recList[B].Easting
+                ((dz * steerAxlePosRP.Easting) - (dx * steerAxlePosRP.Northing) + (recList[B].Easting
                         * recList[A].Northing) - (recList[B].Northing * recList[A].Easting))
                             / Math.Sqrt((dz * dz) + (dx * dx));
 
@@ -351,19 +350,19 @@ namespace AgOpenGPS
             isOnRightSideCurrentLine = distanceFromCurrentLine > 0;
 
             // calc point on ABLine closest to current position
-            double U = (((steerAxlePosRP.easting - recList[A].Easting) * dx)
-                        + ((steerAxlePosRP.northing - recList[A].Northing) * dz))
+            double U = (((steerAxlePosRP.Easting - recList[A].Easting) * dx)
+                        + ((steerAxlePosRP.Northing - recList[A].Northing) * dz))
                         / ((dx * dx) + (dz * dz));
 
             rEastRP = recList[A].Easting + (U * dx);
             rNorthRP = recList[A].Northing + (U * dz);
 
             //the first part of stanley is to extract heading error
-            double abFixHeadingDelta = (steerAxlePosRP.heading - abHeading);
+            double abFixHeadingDelta = (steerAxlePosRP.Heading - abHeading);
 
             //Fix the circular error - get it from -Pi/2 to Pi/2
             if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
-            else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
+            else if (abFixHeadingDelta < -Math.PI) abFixHeadingDelta += Math.PI;
             if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
             else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
 
@@ -388,7 +387,7 @@ namespace AgOpenGPS
             distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
 
             //every guidance method dumps into these that are used and sent everywhere, last one wins
-            mf.guidanceLineDistanceOff = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
+            mf.guidanceLineDistanceOff = mf.distanceFromCurrentLine = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
             mf.guidanceLineSteerAngle = (Int16)(steerAngleRP * 100);
         }
 
@@ -399,8 +398,8 @@ namespace AgOpenGPS
             double minDistA = 9999999999;
             for (int t = 0; t < ptCount; t++)
             {
-                double dist = ((steerAxlePosRP.easting - shuttleDubinsList[t].Easting) * (steerAxlePosRP.easting - shuttleDubinsList[t].Easting))
-                                + ((steerAxlePosRP.northing - shuttleDubinsList[t].Northing) * (steerAxlePosRP.northing - shuttleDubinsList[t].Northing));
+                double dist = ((steerAxlePosRP.Easting - shuttleDubinsList[t].Easting) * (steerAxlePosRP.Easting - shuttleDubinsList[t].Easting))
+                                + ((steerAxlePosRP.Northing - shuttleDubinsList[t].Northing) * (steerAxlePosRP.Northing - shuttleDubinsList[t].Northing));
                 if (dist < minDistA)
                 {
                     minDistA = dist;
@@ -426,8 +425,8 @@ namespace AgOpenGPS
             abHeading = shuttleDubinsList[A].Heading;
 
             //how far from current AB Line is fix
-            distanceFromCurrentLine = ((dz * steerAxlePosRP.easting) - (dx * steerAxlePosRP
-                .northing) + (shuttleDubinsList[B].Easting
+            distanceFromCurrentLine = ((dz * steerAxlePosRP.Easting) - (dx * steerAxlePosRP
+                .Northing) + (shuttleDubinsList[B].Easting
                         * shuttleDubinsList[A].Northing) - (shuttleDubinsList[B].Northing * shuttleDubinsList[A].Easting))
                             / Math.Sqrt((dz * dz) + (dx * dx));
 
@@ -435,19 +434,19 @@ namespace AgOpenGPS
             isOnRightSideCurrentLine = distanceFromCurrentLine > 0;
 
             // calc point on ABLine closest to current position
-            double U = (((steerAxlePosRP.easting - shuttleDubinsList[A].Easting) * dx)
-                        + ((steerAxlePosRP.northing - shuttleDubinsList[A].Northing) * dz))
+            double U = (((steerAxlePosRP.Easting - shuttleDubinsList[A].Easting) * dx)
+                        + ((steerAxlePosRP.Northing - shuttleDubinsList[A].Northing) * dz))
                         / ((dx * dx) + (dz * dz));
 
             rEastRP = shuttleDubinsList[A].Easting + (U * dx);
             rNorthRP = shuttleDubinsList[A].Northing + (U * dz);
 
             //the first part of stanley is to extract heading error
-            double abFixHeadingDelta = (steerAxlePosRP.heading - abHeading);
+            double abFixHeadingDelta = (steerAxlePosRP.Heading - abHeading);
 
             //Fix the circular error - get it from -Pi/2 to Pi/2
             if (abFixHeadingDelta > Math.PI) abFixHeadingDelta -= Math.PI;
-            else if (abFixHeadingDelta < Math.PI) abFixHeadingDelta += Math.PI;
+            else if (abFixHeadingDelta < -Math.PI) abFixHeadingDelta += Math.PI;
             if (abFixHeadingDelta > Glm.PIBy2) abFixHeadingDelta -= Math.PI;
             else if (abFixHeadingDelta < -Glm.PIBy2) abFixHeadingDelta += Math.PI;
 
@@ -472,7 +471,7 @@ namespace AgOpenGPS
             distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
 
             //every guidance method dumps into these that are used and sent everywhere, last one wins
-            mf.guidanceLineDistanceOff = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
+            mf.guidanceLineDistanceOff = mf.distanceFromCurrentLine = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
             mf.guidanceLineSteerAngle = (Int16)(steerAngleRP * 100);
         }
 

@@ -36,31 +36,31 @@
             this.btnChangeAttachment = new System.Windows.Forms.Button();
             this.rbtnTractor = new System.Windows.Forms.RadioButton();
             this.tabSettings = new System.Windows.Forms.TabPage();
+            this.TboxWheelbase = new System.Windows.Forms.TextBox();
+            this.TboxAntennaOffset = new System.Windows.Forms.TextBox();
+            this.TboxAntennaHeight = new System.Windows.Forms.TextBox();
+            this.TboxAntennaPivot = new System.Windows.Forms.TextBox();
             this.btnNext = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
-            this.nudAntennaHeight = new System.Windows.Forms.NumericUpDown();
             this.label26 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.nudWheelbase = new System.Windows.Forms.NumericUpDown();
-            this.nudAntennaPivot = new System.Windows.Forms.NumericUpDown();
             this.label18 = new System.Windows.Forms.Label();
-            this.nudAntennaOffset = new System.Windows.Forms.NumericUpDown();
             this.tabVehicle = new System.Windows.Forms.TabPage();
+            this.TboxMinTurnRadius = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.nudHydLiftSecs = new System.Windows.Forms.NumericUpDown();
-            this.nudMinTurnRadius = new System.Windows.Forms.NumericUpDown();
+            this.TboxHydLiftSecs = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
             this.tabGuidance = new System.Windows.Forms.TabPage();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.nudLineWidth = new System.Windows.Forms.NumericUpDown();
+            this.TboxLineWidth = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.nudLightbarCmPerPixel = new System.Windows.Forms.NumericUpDown();
+            this.TboxLightbarCmPerPixel = new System.Windows.Forms.TextBox();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.cboxAutoSteerAuto = new System.Windows.Forms.CheckBox();
+            this.BtnAutoSteerAuto = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.nudSnapDistance = new System.Windows.Forms.NumericUpDown();
+            this.TboxSnapDistance = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
             this.lblInchesCm = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -69,23 +69,14 @@
             this.tabConfig.SuspendLayout();
             this.gboxAttachment.SuspendLayout();
             this.tabSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAntennaHeight)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudWheelbase)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAntennaPivot)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAntennaOffset)).BeginInit();
             this.tabVehicle.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudHydLiftSecs)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinTurnRadius)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabGuidance.SuspendLayout();
             this.groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLineWidth)).BeginInit();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLightbarCmPerPixel)).BeginInit();
             this.groupBox9.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSnapDistance)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -168,6 +159,7 @@
             // btnChangeAttachment
             // 
             this.btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
+            this.btnChangeAttachment.Enabled = false;
             this.btnChangeAttachment.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnChangeAttachment.Image = global::AgOpenGPS.Properties.Resources.ToolAcceptChange;
             this.btnChangeAttachment.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -200,22 +192,86 @@
             this.tabSettings.BackColor = System.Drawing.SystemColors.Window;
             this.tabSettings.BackgroundImage = global::AgOpenGPS.Properties.Resources.VehicleSettingsTractor;
             this.tabSettings.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabSettings.Controls.Add(this.TboxWheelbase);
+            this.tabSettings.Controls.Add(this.TboxAntennaOffset);
+            this.tabSettings.Controls.Add(this.TboxAntennaHeight);
+            this.tabSettings.Controls.Add(this.TboxAntennaPivot);
             this.tabSettings.Controls.Add(this.btnNext);
             this.tabSettings.Controls.Add(this.label9);
-            this.tabSettings.Controls.Add(this.nudAntennaHeight);
             this.tabSettings.Controls.Add(this.label26);
             this.tabSettings.Controls.Add(this.label15);
             this.tabSettings.Controls.Add(this.label7);
-            this.tabSettings.Controls.Add(this.nudWheelbase);
-            this.tabSettings.Controls.Add(this.nudAntennaPivot);
             this.tabSettings.Controls.Add(this.label18);
-            this.tabSettings.Controls.Add(this.nudAntennaOffset);
             this.tabSettings.Location = new System.Drawing.Point(4, 73);
             this.tabSettings.Name = "tabSettings";
             this.tabSettings.Padding = new System.Windows.Forms.Padding(3);
             this.tabSettings.Size = new System.Drawing.Size(970, 541);
             this.tabSettings.TabIndex = 11;
             this.tabSettings.Text = "Settings";
+            // 
+            // TboxWheelbase
+            // 
+            this.TboxWheelbase.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxWheelbase.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxWheelbase.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxWheelbase.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxWheelbase.Location = new System.Drawing.Point(266, 312);
+            this.TboxWheelbase.Name = "TboxWheelbase";
+            this.TboxWheelbase.ShortcutsEnabled = false;
+            this.TboxWheelbase.Size = new System.Drawing.Size(150, 70);
+            this.TboxWheelbase.TabIndex = 474;
+            this.TboxWheelbase.Text = "501";
+            this.TboxWheelbase.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxWheelbase.WordWrap = false;
+            this.TboxWheelbase.Enter += new System.EventHandler(this.TboxWheelbase_Enter);
+            // 
+            // TboxAntennaOffset
+            // 
+            this.TboxAntennaOffset.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxAntennaOffset.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxAntennaOffset.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxAntennaOffset.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxAntennaOffset.Location = new System.Drawing.Point(710, 319);
+            this.TboxAntennaOffset.Name = "TboxAntennaOffset";
+            this.TboxAntennaOffset.ShortcutsEnabled = false;
+            this.TboxAntennaOffset.Size = new System.Drawing.Size(150, 70);
+            this.TboxAntennaOffset.TabIndex = 473;
+            this.TboxAntennaOffset.Text = "0";
+            this.TboxAntennaOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxAntennaOffset.WordWrap = false;
+            this.TboxAntennaOffset.Enter += new System.EventHandler(this.TboxAntennaOffset_Enter);
+            // 
+            // TboxAntennaHeight
+            // 
+            this.TboxAntennaHeight.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxAntennaHeight.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxAntennaHeight.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxAntennaHeight.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxAntennaHeight.Location = new System.Drawing.Point(710, 180);
+            this.TboxAntennaHeight.Name = "TboxAntennaHeight";
+            this.TboxAntennaHeight.ShortcutsEnabled = false;
+            this.TboxAntennaHeight.Size = new System.Drawing.Size(150, 70);
+            this.TboxAntennaHeight.TabIndex = 472;
+            this.TboxAntennaHeight.Text = "300";
+            this.TboxAntennaHeight.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxAntennaHeight.WordWrap = false;
+            this.TboxAntennaHeight.Enter += new System.EventHandler(this.TboxAntennaHeight_Enter);
+            // 
+            // TboxAntennaPivot
+            // 
+            this.TboxAntennaPivot.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxAntennaPivot.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxAntennaPivot.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxAntennaPivot.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxAntennaPivot.Location = new System.Drawing.Point(292, 22);
+            this.TboxAntennaPivot.Name = "TboxAntennaPivot";
+            this.TboxAntennaPivot.ShortcutsEnabled = false;
+            this.TboxAntennaPivot.Size = new System.Drawing.Size(150, 70);
+            this.TboxAntennaPivot.TabIndex = 471;
+            this.TboxAntennaPivot.Text = "5.0";
+            this.TboxAntennaPivot.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxAntennaPivot.WordWrap = false;
+            this.TboxAntennaPivot.Enter += new System.EventHandler(this.TboxAntennaPivot_Enter);
             // 
             // btnNext
             // 
@@ -240,30 +296,6 @@
             this.label9.TabIndex = 28;
             this.label9.Text = "*Left is negative";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // nudAntennaHeight
-            // 
-            this.nudAntennaHeight.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudAntennaHeight.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudAntennaHeight.InterceptArrowKeys = false;
-            this.nudAntennaHeight.Location = new System.Drawing.Point(710, 180);
-            this.nudAntennaHeight.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.nudAntennaHeight.Name = "nudAntennaHeight";
-            this.nudAntennaHeight.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.nudAntennaHeight.Size = new System.Drawing.Size(144, 65);
-            this.nudAntennaHeight.TabIndex = 5;
-            this.nudAntennaHeight.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudAntennaHeight.Value = new decimal(new int[] {
-            300,
-            0,
-            0,
-            0});
-            this.nudAntennaHeight.ValueChanged += new System.EventHandler(this.NudAntennaHeight_ValueChanged);
-            this.nudAntennaHeight.Enter += new System.EventHandler(this.NudAntennaHeight_Enter);
             // 
             // label26
             // 
@@ -300,59 +332,6 @@
             this.label7.Text = "Offset";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // nudWheelbase
-            // 
-            this.nudWheelbase.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudWheelbase.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudWheelbase.InterceptArrowKeys = false;
-            this.nudWheelbase.Location = new System.Drawing.Point(266, 312);
-            this.nudWheelbase.Maximum = new decimal(new int[] {
-            1999,
-            0,
-            0,
-            0});
-            this.nudWheelbase.Minimum = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.nudWheelbase.Name = "nudWheelbase";
-            this.nudWheelbase.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.nudWheelbase.Size = new System.Drawing.Size(152, 65);
-            this.nudWheelbase.TabIndex = 6;
-            this.nudWheelbase.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudWheelbase.Value = new decimal(new int[] {
-            501,
-            0,
-            0,
-            0});
-            this.nudWheelbase.ValueChanged += new System.EventHandler(this.NudWheelbase_ValueChanged);
-            this.nudWheelbase.Enter += new System.EventHandler(this.NudWheelbase_Enter);
-            // 
-            // nudAntennaPivot
-            // 
-            this.nudAntennaPivot.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudAntennaPivot.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudAntennaPivot.InterceptArrowKeys = false;
-            this.nudAntennaPivot.Location = new System.Drawing.Point(292, 22);
-            this.nudAntennaPivot.Maximum = new decimal(new int[] {
-            999,
-            0,
-            0,
-            0});
-            this.nudAntennaPivot.Name = "nudAntennaPivot";
-            this.nudAntennaPivot.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.nudAntennaPivot.Size = new System.Drawing.Size(144, 65);
-            this.nudAntennaPivot.TabIndex = 3;
-            this.nudAntennaPivot.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudAntennaPivot.Value = new decimal(new int[] {
-            111,
-            0,
-            0,
-            0});
-            this.nudAntennaPivot.ValueChanged += new System.EventHandler(this.NudAntennaPivot_ValueChanged);
-            this.nudAntennaPivot.Enter += new System.EventHandler(this.NudAntennaPivot_Enter);
-            // 
             // label18
             // 
             this.label18.BackColor = System.Drawing.SystemColors.Window;
@@ -365,35 +344,12 @@
             this.label18.Text = "Distance";
             this.label18.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // nudAntennaOffset
-            // 
-            this.nudAntennaOffset.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudAntennaOffset.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudAntennaOffset.InterceptArrowKeys = false;
-            this.nudAntennaOffset.Location = new System.Drawing.Point(710, 319);
-            this.nudAntennaOffset.Maximum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.nudAntennaOffset.Minimum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            -2147483648});
-            this.nudAntennaOffset.Name = "nudAntennaOffset";
-            this.nudAntennaOffset.Size = new System.Drawing.Size(144, 65);
-            this.nudAntennaOffset.TabIndex = 26;
-            this.nudAntennaOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudAntennaOffset.ValueChanged += new System.EventHandler(this.NudAntennaOffset_ValueChanged);
-            this.nudAntennaOffset.Enter += new System.EventHandler(this.NudAntennaOffset_Enter);
-            // 
             // tabVehicle
             // 
             this.tabVehicle.BackColor = System.Drawing.SystemColors.Window;
             this.tabVehicle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabVehicle.Controls.Add(this.TboxMinTurnRadius);
             this.tabVehicle.Controls.Add(this.groupBox3);
-            this.tabVehicle.Controls.Add(this.nudMinTurnRadius);
             this.tabVehicle.Controls.Add(this.pictureBox1);
             this.tabVehicle.Controls.Add(this.label6);
             this.tabVehicle.Location = new System.Drawing.Point(4, 73);
@@ -405,9 +361,25 @@
             this.tabVehicle.TabIndex = 1;
             this.tabVehicle.Text = "  Vehicle ";
             // 
+            // TboxMinTurnRadius
+            // 
+            this.TboxMinTurnRadius.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxMinTurnRadius.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxMinTurnRadius.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxMinTurnRadius.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxMinTurnRadius.Location = new System.Drawing.Point(96, 255);
+            this.TboxMinTurnRadius.Name = "TboxMinTurnRadius";
+            this.TboxMinTurnRadius.ShortcutsEnabled = false;
+            this.TboxMinTurnRadius.Size = new System.Drawing.Size(150, 70);
+            this.TboxMinTurnRadius.TabIndex = 471;
+            this.TboxMinTurnRadius.Text = "301";
+            this.TboxMinTurnRadius.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxMinTurnRadius.WordWrap = false;
+            this.TboxMinTurnRadius.Enter += new System.EventHandler(this.TboxMinTurnRadius_Enter);
+            // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.nudHydLiftSecs);
+            this.groupBox3.Controls.Add(this.TboxHydLiftSecs);
             this.groupBox3.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(393, 36);
             this.groupBox3.Name = "groupBox3";
@@ -416,57 +388,21 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Hydraulic Lift Look Ahead (secs)";
             // 
-            // nudHydLiftSecs
+            // TboxHydLiftSecs
             // 
-            this.nudHydLiftSecs.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudHydLiftSecs.DecimalPlaces = 1;
-            this.nudHydLiftSecs.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudHydLiftSecs.InterceptArrowKeys = false;
-            this.nudHydLiftSecs.Location = new System.Drawing.Point(50, 63);
-            this.nudHydLiftSecs.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.nudHydLiftSecs.Name = "nudHydLiftSecs";
-            this.nudHydLiftSecs.Size = new System.Drawing.Size(148, 65);
-            this.nudHydLiftSecs.TabIndex = 117;
-            this.nudHydLiftSecs.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudHydLiftSecs.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.nudHydLiftSecs.Enter += new System.EventHandler(this.NudHydLiftSecs_Enter);
-            // 
-            // nudMinTurnRadius
-            // 
-            this.nudMinTurnRadius.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudMinTurnRadius.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudMinTurnRadius.InterceptArrowKeys = false;
-            this.nudMinTurnRadius.Location = new System.Drawing.Point(96, 255);
-            this.nudMinTurnRadius.Maximum = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
-            this.nudMinTurnRadius.Minimum = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.nudMinTurnRadius.Name = "nudMinTurnRadius";
-            this.nudMinTurnRadius.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.nudMinTurnRadius.Size = new System.Drawing.Size(152, 65);
-            this.nudMinTurnRadius.TabIndex = 24;
-            this.nudMinTurnRadius.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudMinTurnRadius.Value = new decimal(new int[] {
-            301,
-            0,
-            0,
-            0});
-            this.nudMinTurnRadius.ValueChanged += new System.EventHandler(this.NudMinTurnRadius_ValueChanged);
-            this.nudMinTurnRadius.Enter += new System.EventHandler(this.NudMinTurnRadius_Enter);
+            this.TboxHydLiftSecs.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxHydLiftSecs.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxHydLiftSecs.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxHydLiftSecs.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxHydLiftSecs.Location = new System.Drawing.Point(50, 63);
+            this.TboxHydLiftSecs.Name = "TboxHydLiftSecs";
+            this.TboxHydLiftSecs.ShortcutsEnabled = false;
+            this.TboxHydLiftSecs.Size = new System.Drawing.Size(150, 70);
+            this.TboxHydLiftSecs.TabIndex = 470;
+            this.TboxHydLiftSecs.Text = "5.0";
+            this.TboxHydLiftSecs.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxHydLiftSecs.WordWrap = false;
+            this.TboxHydLiftSecs.Enter += new System.EventHandler(this.TboxHydLiftSecs_Enter);
             // 
             // pictureBox1
             // 
@@ -506,7 +442,7 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.nudLineWidth);
+            this.groupBox4.Controls.Add(this.TboxLineWidth);
             this.groupBox4.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox4.Location = new System.Drawing.Point(714, 59);
             this.groupBox4.Name = "groupBox4";
@@ -515,36 +451,25 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Guidance Line Width";
             // 
-            // nudLineWidth
+            // TboxLineWidth
             // 
-            this.nudLineWidth.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudLineWidth.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudLineWidth.InterceptArrowKeys = false;
-            this.nudLineWidth.Location = new System.Drawing.Point(44, 76);
-            this.nudLineWidth.Maximum = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
-            this.nudLineWidth.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudLineWidth.Name = "nudLineWidth";
-            this.nudLineWidth.Size = new System.Drawing.Size(148, 65);
-            this.nudLineWidth.TabIndex = 118;
-            this.nudLineWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudLineWidth.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudLineWidth.Enter += new System.EventHandler(this.NudLineWidth_Enter);
+            this.TboxLineWidth.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxLineWidth.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxLineWidth.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLineWidth.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxLineWidth.Location = new System.Drawing.Point(44, 76);
+            this.TboxLineWidth.Name = "TboxLineWidth";
+            this.TboxLineWidth.ShortcutsEnabled = false;
+            this.TboxLineWidth.Size = new System.Drawing.Size(150, 70);
+            this.TboxLineWidth.TabIndex = 470;
+            this.TboxLineWidth.Text = "1";
+            this.TboxLineWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxLineWidth.WordWrap = false;
+            this.TboxLineWidth.Enter += new System.EventHandler(this.TboxLineWidth_Enter);
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.nudLightbarCmPerPixel);
+            this.groupBox2.Controls.Add(this.TboxLightbarCmPerPixel);
             this.groupBox2.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(394, 59);
             this.groupBox2.Name = "groupBox2";
@@ -553,37 +478,25 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "cm / Lightbar Pixel";
             // 
-            // nudLightbarCmPerPixel
+            // TboxLightbarCmPerPixel
             // 
-            this.nudLightbarCmPerPixel.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudLightbarCmPerPixel.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudLightbarCmPerPixel.InterceptArrowKeys = false;
-            this.nudLightbarCmPerPixel.Location = new System.Drawing.Point(26, 73);
-            this.nudLightbarCmPerPixel.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.nudLightbarCmPerPixel.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudLightbarCmPerPixel.Name = "nudLightbarCmPerPixel";
-            this.nudLightbarCmPerPixel.Size = new System.Drawing.Size(148, 65);
-            this.nudLightbarCmPerPixel.TabIndex = 117;
-            this.nudLightbarCmPerPixel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudLightbarCmPerPixel.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.nudLightbarCmPerPixel.ValueChanged += new System.EventHandler(this.NudLightbarCmPerPixel_ValueChanged);
-            this.nudLightbarCmPerPixel.Enter += new System.EventHandler(this.NudLightbarCmPerPixel_Enter);
+            this.TboxLightbarCmPerPixel.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxLightbarCmPerPixel.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxLightbarCmPerPixel.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLightbarCmPerPixel.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxLightbarCmPerPixel.Location = new System.Drawing.Point(26, 73);
+            this.TboxLightbarCmPerPixel.Name = "TboxLightbarCmPerPixel";
+            this.TboxLightbarCmPerPixel.ShortcutsEnabled = false;
+            this.TboxLightbarCmPerPixel.Size = new System.Drawing.Size(150, 70);
+            this.TboxLightbarCmPerPixel.TabIndex = 469;
+            this.TboxLightbarCmPerPixel.Text = "5";
+            this.TboxLightbarCmPerPixel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxLightbarCmPerPixel.WordWrap = false;
+            this.TboxLightbarCmPerPixel.Enter += new System.EventHandler(this.TboxLightbarCmPerPixel_Enter);
             // 
             // groupBox9
             // 
-            this.groupBox9.Controls.Add(this.cboxAutoSteerAuto);
+            this.groupBox9.Controls.Add(this.BtnAutoSteerAuto);
             this.groupBox9.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox9.Location = new System.Drawing.Point(714, 288);
             this.groupBox9.Name = "groupBox9";
@@ -592,26 +505,25 @@
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Remote/Manual AutoSteer Button";
             // 
-            // cboxAutoSteerAuto
+            // BtnAutoSteerAuto
             // 
-            this.cboxAutoSteerAuto.Appearance = System.Windows.Forms.Appearance.Button;
-            this.cboxAutoSteerAuto.FlatAppearance.BorderSize = 3;
-            this.cboxAutoSteerAuto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cboxAutoSteerAuto.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cboxAutoSteerAuto.Image = global::AgOpenGPS.Properties.Resources.AutoSteerOn;
-            this.cboxAutoSteerAuto.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.cboxAutoSteerAuto.Location = new System.Drawing.Point(58, 66);
-            this.cboxAutoSteerAuto.Name = "cboxAutoSteerAuto";
-            this.cboxAutoSteerAuto.Size = new System.Drawing.Size(98, 103);
-            this.cboxAutoSteerAuto.TabIndex = 0;
-            this.cboxAutoSteerAuto.Text = "Manual";
-            this.cboxAutoSteerAuto.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.cboxAutoSteerAuto.UseVisualStyleBackColor = true;
-            this.cboxAutoSteerAuto.CheckedChanged += new System.EventHandler(this.CboxAutoSteerAuto_CheckedChanged);
+            this.BtnAutoSteerAuto.FlatAppearance.BorderSize = 3;
+            this.BtnAutoSteerAuto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BtnAutoSteerAuto.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnAutoSteerAuto.Image = global::AgOpenGPS.Properties.Resources.AutoSteerOn;
+            this.BtnAutoSteerAuto.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.BtnAutoSteerAuto.Location = new System.Drawing.Point(58, 66);
+            this.BtnAutoSteerAuto.Name = "BtnAutoSteerAuto";
+            this.BtnAutoSteerAuto.Size = new System.Drawing.Size(90, 100);
+            this.BtnAutoSteerAuto.TabIndex = 125;
+            this.BtnAutoSteerAuto.Text = "Manual";
+            this.BtnAutoSteerAuto.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.BtnAutoSteerAuto.UseVisualStyleBackColor = true;
+            this.BtnAutoSteerAuto.Click += new System.EventHandler(this.BtnAutoSteerAuto_Click);
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.nudSnapDistance);
+            this.groupBox1.Controls.Add(this.TboxSnapDistance);
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.groupBox1.Location = new System.Drawing.Point(34, 63);
             this.groupBox1.Name = "groupBox1";
@@ -620,28 +532,21 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "<< >> Snap Distance";
             // 
-            // nudSnapDistance
+            // TboxSnapDistance
             // 
-            this.nudSnapDistance.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudSnapDistance.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudSnapDistance.InterceptArrowKeys = false;
-            this.nudSnapDistance.Location = new System.Drawing.Point(23, 73);
-            this.nudSnapDistance.Maximum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this.nudSnapDistance.Name = "nudSnapDistance";
-            this.nudSnapDistance.Size = new System.Drawing.Size(184, 65);
-            this.nudSnapDistance.TabIndex = 66;
-            this.nudSnapDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudSnapDistance.Value = new decimal(new int[] {
-            499,
-            0,
-            0,
-            0});
-            this.nudSnapDistance.ValueChanged += new System.EventHandler(this.NudSnapDistance_ValueChanged);
-            this.nudSnapDistance.Enter += new System.EventHandler(this.NudSnapDistance_Enter);
+            this.TboxSnapDistance.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxSnapDistance.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxSnapDistance.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxSnapDistance.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxSnapDistance.Location = new System.Drawing.Point(23, 73);
+            this.TboxSnapDistance.Name = "TboxSnapDistance";
+            this.TboxSnapDistance.ShortcutsEnabled = false;
+            this.TboxSnapDistance.Size = new System.Drawing.Size(150, 70);
+            this.TboxSnapDistance.TabIndex = 470;
+            this.TboxSnapDistance.Text = "499";
+            this.TboxSnapDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxSnapDistance.WordWrap = false;
+            this.TboxSnapDistance.Enter += new System.EventHandler(this.TboxSnapDistance_Enter);
             // 
             // label17
             // 
@@ -680,7 +585,6 @@
             this.btnCancel.Size = new System.Drawing.Size(88, 68);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -725,23 +629,20 @@
             this.tabConfig.ResumeLayout(false);
             this.gboxAttachment.ResumeLayout(false);
             this.tabSettings.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudAntennaHeight)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudWheelbase)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAntennaPivot)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAntennaOffset)).EndInit();
+            this.tabSettings.PerformLayout();
             this.tabVehicle.ResumeLayout(false);
+            this.tabVehicle.PerformLayout();
             this.groupBox3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudHydLiftSecs)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinTurnRadius)).EndInit();
+            this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabGuidance.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudLineWidth)).EndInit();
+            this.groupBox4.PerformLayout();
             this.groupBox2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudLightbarCmPerPixel)).EndInit();
+            this.groupBox2.PerformLayout();
             this.groupBox9.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudSnapDistance)).EndInit();
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -753,29 +654,20 @@
         private System.Windows.Forms.TabPage tabVehicle;
         private System.Windows.Forms.Button bntOK;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.NumericUpDown nudAntennaHeight;
-        private System.Windows.Forms.NumericUpDown nudAntennaPivot;
-        private System.Windows.Forms.NumericUpDown nudWheelbase;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label lblInchesCm;
-        private System.Windows.Forms.NumericUpDown nudMinTurnRadius;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.NumericUpDown nudAntennaOffset;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TabPage tabSettings;
         private System.Windows.Forms.TabPage tabGuidance;
         private System.Windows.Forms.GroupBox groupBox9;
-        private System.Windows.Forms.CheckBox cboxAutoSteerAuto;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.NumericUpDown nudSnapDistance;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.NumericUpDown nudLightbarCmPerPixel;
-        private System.Windows.Forms.NumericUpDown nudLineWidth;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TabPage tabConfig;
         private System.Windows.Forms.GroupBox gboxAttachment;
@@ -785,6 +677,15 @@
         private System.Windows.Forms.RadioButton rbtn4WD;
         private System.Windows.Forms.Button btnNext;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.NumericUpDown nudHydLiftSecs;
+        private System.Windows.Forms.TextBox TboxLightbarCmPerPixel;
+        private System.Windows.Forms.TextBox TboxLineWidth;
+        private System.Windows.Forms.TextBox TboxSnapDistance;
+        private System.Windows.Forms.TextBox TboxHydLiftSecs;
+        private System.Windows.Forms.TextBox TboxMinTurnRadius;
+        private System.Windows.Forms.TextBox TboxAntennaPivot;
+        private System.Windows.Forms.TextBox TboxAntennaHeight;
+        private System.Windows.Forms.TextBox TboxAntennaOffset;
+        private System.Windows.Forms.TextBox TboxWheelbase;
+        private System.Windows.Forms.Button BtnAutoSteerAuto;
     }
 }

@@ -27,12 +27,12 @@ namespace AgOpenGPS
         public double minLookAheadDistance = 2.0;
         public double maxSteerAngle;
         public double maxAngularVelocity;
-        public double treeSpacing;
+        public double treeSpacing = 0;
         public double hydLiftLookAheadTime;
         
         public double hydLiftLookAheadDistanceLeft, hydLiftLookAheadDistanceRight;
 
-        public bool isHydLiftOn;
+        public bool BtnHydLiftOn = false;
 
         public CVehicle(FormGPS _f)
         {
@@ -59,11 +59,6 @@ namespace AgOpenGPS
             maxAngularVelocity = Properties.Vehicle.Default.setVehicle_maxAngularVelocity;
             maxSteerAngle = Properties.Vehicle.Default.setVehicle_maxSteerAngle;
 
-            isHydLiftOn = false;
-
-            //treeSpacing = Properties.Settings.Default.setDistance_TreeSpacing;
-            treeSpacing = 0;
-
             vehicleType = Properties.Vehicle.Default.setVehicle_vehicleType;
 
             hydLiftLookAheadTime = Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead;
@@ -89,10 +84,9 @@ namespace AgOpenGPS
         public void DrawVehicle()
         {
             //draw vehicle
-            GL.Translate(mf.pivotAxlePos.easting, mf.pivotAxlePos.northing, 0);
+            GL.Translate(mf.pivotAxlePos.Easting, mf.pivotAxlePos.Northing, 0);
             GL.Rotate(Glm.ToDegrees(-mf.fixHeading), 0.0, 0.0, 1.0);
             GL.PushMatrix();
-
 
             GL.PointSize(6.0f);
 
@@ -112,7 +106,7 @@ namespace AgOpenGPS
                 }
             }
 
-            if (!mf.vehicle.isHydLiftOn)
+            if (!mf.vehicle.BtnHydLiftOn)
             {
                 GL.Color3(0.9, 0.90, 0.0);
                 GL.Begin(PrimitiveType.TriangleFan);
@@ -239,20 +233,20 @@ namespace AgOpenGPS
             //    GL.End();
             //}
 
-            if (mf.curve.isBtnCurveOn && !mf.ct.isContourBtnOn)
+            if (mf.CurveLines.BtnCurveLineOn && !mf.ct.isContourBtnOn)
             {
                 GL.Color4(0.969, 0.95, 0.9510, 0.87);
-                if (mf.curve.curveNumber == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
-                else  if (mf.curve.curveNumber < 0) mf.font.DrawTextVehicle(0, wheelbase, (-mf.curve.curveNumber) + "R", 1.5);
-                else mf.font.DrawTextVehicle(0, wheelbase, mf.curve.curveNumber.ToString() + "L", 1.5);
+                if (mf.CurveLines.HowManyPathsAway == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
+                else  if (mf.CurveLines.HowManyPathsAway > 0) mf.font.DrawTextVehicle(0, wheelbase, (mf.CurveLines.HowManyPathsAway) + "R", 1.5);
+                else mf.font.DrawTextVehicle(0, wheelbase, mf.CurveLines.HowManyPathsAway.ToString() + "L", 1.5);
             }
-            else if (mf.ABLine.isBtnABLineOn && !mf.ct.isContourBtnOn)
+            else if (mf.ABLines.BtnABLineOn && !mf.ct.isContourBtnOn)
             {
                 GL.Color4(0.96, 0.95, 0.9510, 0.87);
 
-                if (mf.ABLine.passNumber == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
-                else if (mf.ABLine.passNumber < 0) mf.font.DrawTextVehicle(0, wheelbase, -mf.ABLine.passNumber + "R", 1.5);
-                else mf.font.DrawTextVehicle(0, wheelbase, mf.ABLine.passNumber.ToString() + "L", 1.5);
+                if (mf.ABLines.HowManyPathsAway == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
+                else if (mf.ABLines.HowManyPathsAway >= 0) mf.font.DrawTextVehicle(0, wheelbase, mf.ABLines.HowManyPathsAway + "R", 1.5);
+                else mf.font.DrawTextVehicle(0, wheelbase, mf.ABLines.HowManyPathsAway.ToString() + "L", 1.5);
             }
 
             //draw the rigid hitch

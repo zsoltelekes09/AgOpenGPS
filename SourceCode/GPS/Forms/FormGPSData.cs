@@ -18,36 +18,37 @@ namespace AgOpenGPS
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
+            lblZone.Text = mf.pn.zone.ToString();
 
-            lblZone.Text = mf.Zone;
+            lblEastingField.Text = Math.Round(mf.pn.fix.Easting, 1).ToString();
+            lblNorthingField.Text = Math.Round(mf.pn.fix.Northing, 1).ToString();
+                                                                                                                                                                  
+            lblEasting.Text = ((int)mf.pn.actualEasting).ToString();
+            lblNorthing.Text = ((int)mf.pn.actualNorthing).ToString();
 
-                lblEastingField.Text = Math.Round(mf.pn.fix.easting, 1).ToString();
-                lblNorthingField.Text = Math.Round(mf.pn.fix.northing, 1).ToString();
-                                                                                                                                                                      
-                lblEasting.Text = ((int)mf.pn.actualEasting).ToString();
-                lblNorthing.Text = ((int)mf.pn.actualNorthing).ToString();
-
-            lblLatitude.Text = mf.Latitude;
-            lblLongitude.Text = mf.Longitude;
+            lblLatitude.Text = Math.Round(mf.pn.latitude, 7).ToString();
+            lblLongitude.Text = Math.Round(mf.pn.longitude, 7).ToString();
 
             //other sat and GPS info
             lblFixQuality.Text = mf.FixQuality;
-            lblSatsTracked.Text = mf.SatsTracked;
-            lblStatus.Text = mf.Status;
-            lblHDOP.Text = mf.HDOP;
+            lblSatsTracked.Text = mf.pn.satellitesTracked.ToString();
+            lblStatus.Text = (mf.pn.status == "A" ? "Active": "Void");
+
+
+            lblHDOP.Text = mf.pn.hdop.ToString();
             tboxNMEASerial.Lines = mf.recvSentenceSettings;
             lblSpeed.Text = mf.pn.speed.ToString();
 
-            lblUturnByte.Text = Convert.ToString(mf.mc.machineData[mf.mc.mdUTurn], 2).PadLeft(6, '0');
+            lblUturnByte.Text = Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
 
             lblRoll.Text = mf.RollInDegrees;
             lblYawHeading.Text = mf.GyroInDegrees;
-            lblGPSHeading.Text = mf.GPSHeading;
+            lblGPSHeading.Text = Math.Round(Glm.ToDegrees(mf.gpsHeading), 1) + "\u00B0";
             lblFixHeading.Text = (mf.fixHeading * 57.2957795).ToString("N1");
 
             if (mf.isMetric)
             {
-                    lblAltitude.Text = mf.Altitude;
+                lblAltitude.Text = mf.Altitude;
                 lblTotalFieldArea.Text = mf.fd.AreaBoundaryLessInnersHectares;
                 lblTotalAppliedArea.Text = mf.fd.WorkedHectares;
                 lblWorkRemaining.Text = mf.fd.WorkedAreaRemainHectares;
@@ -78,8 +79,10 @@ namespace AgOpenGPS
                 tboxUDPMachine.Text = "NC";
                 tboxUDPSwitch.Text = "NC";
             }
+
+
             txtBoxRecvAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;
-                txtBoxRecvMachine.Text = mf.mc.serialRecvMachineStr;
+            txtBoxRecvMachine.Text = mf.mc.serialRecvMachineStr;
         }
 
         private void FormGPSData_Load(object sender, EventArgs e)

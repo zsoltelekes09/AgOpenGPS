@@ -1,8 +1,8 @@
 ﻿using System.IO.Ports;
 using System;
 using System.Windows.Forms;
-using System.Globalization;
 using AgOpenGPS.Properties;
+using System.Globalization;
 
 namespace AgOpenGPS
 {
@@ -24,6 +24,10 @@ namespace AgOpenGPS
         public byte checksumSent = 0;
         public byte checksumRecd = 0;
 
+        //called by the AutoSteer module delegate every time a chunk is rec'd
+        public double actualSteerAngleDisp = 0;
+
+
         public string[] recvSentenceSettings = new string[4];
         public string lastRecvd = "";
         //used to decide to autoconnect autosteer arduino this run
@@ -34,16 +38,70 @@ namespace AgOpenGPS
 
         //serial port Arduino is connected to
         public SerialPort spMachine = new SerialPort(portNameMachine, baudRateMachine, Parity.None, 8, StopBits.One);
+        int spMachineIdx = 0;
+        public byte[] spMachineBytes = new byte[3] { 0x7F, 0, 0 };
 
         //serial port AutoSteer is connected to
         public SerialPort spAutoSteer = new SerialPort(portNameAutoSteer, baudRateAutoSteer, Parity.None, 8, StopBits.One);
+        int spAutoSteerIdx = 0;
+        public byte[] spAutoSteerBytes = new byte[3] { 0x7F, 0, 0 };
+
+
+        public void SendData(byte[] Data, bool Checksum)
+        {
+            if (spAutoSteer.IsOpen)
+            {
+                try { spAutoSteer.Write(Data, 0, Data.Length); }
+                catch (Exception e)
+                {
+                    WriteErrorLog("Out Steer Port " + e.ToString());
+                    SerialPortAutoSteerClose();
+                }
+            }
+
+            if (spMachine.IsOpen)
+            {
+                try { spMachine.Write(Data, 0, Data.Length); }
+                catch (Exception e)
+                {
+                    WriteErrorLog("Out Machine Port " + e.ToString());
+                    SerialPortMachineClose();
+                }
+            }
+
+            //send out to udp network
+            if (Properties.Settings.Default.setUDP_isOn)
+            {
+                if (isUDPSendConnected)
+                {
+                    try
+                    {
+                        if (Data.Length != 0)
+                        {
+                            sendSocket.BeginSendTo(Data, 0, Data.Length, 0, epAutoSteer, new AsyncCallback(SendData), null);
+                        }
+                    }
+                    catch (Exception) { }
+                }
+            }
+            if (Checksum)
+            {
+                int tt = Data[2];
+                checksumSent = 0;
+                for (int i = 3; i < Data[2]; i++)
+                {
+                    checksumSent += Data[i];
+                }
+            }
+        }
+
 
         #region AutoSteerPort // --------------------------------------------------------------------
         private void SerialLineReceivedAutoSteer(string sentence)
         {
             //spit it out no matter what it says
             mc.serialRecvAutoSteerStr = sentence;
-            if (pbarSteer++ > 99) pbarSteer=0;
+            if (pbarSteer++ > 99) pbarSteer = 0;
 
             // Find end of sentence and a comma, if not a CR, return
             int end = sentence.IndexOf("\r");
@@ -80,16 +138,71 @@ namespace AgOpenGPS
 
                         if (ahrs.isRollFromAutoSteer) int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.rollX16);
 
-                        int.TryParse(words[6], out mc.steerSwitchValue);
-                        mc.workSwitchValue = mc.steerSwitchValue & 1;
-                        mc.steerSwitchValue = mc.steerSwitchValue & 2;
+
+                        byte.TryParse(words[6], out byte Data);
+
+
+                        if (isJobStarted && mc.isWorkSwitchEnabled)
+                        {
+                            if ((!mc.isWorkSwitchActiveLow && (Data & 1) == 1) || (mc.isWorkSwitchActiveLow && (Data & 1) == 0))
+                            {
+                                if (mc.isWorkSwitchManual)
+                                {
+                                    if (autoBtnState != FormGPS.btnStates.On)
+                                    {
+                                        autoBtnState = FormGPS.btnStates.On;
+                                        btnSection_Update();
+                                    }
+                                }
+                                else
+                                {
+                                    if (autoBtnState != FormGPS.btnStates.Auto)
+                                    {
+                                        autoBtnState = FormGPS.btnStates.Auto;
+                                        btnSection_Update();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (autoBtnState != FormGPS.btnStates.Off)
+                                {
+                                    autoBtnState = FormGPS.btnStates.Off;
+                                    btnSection_Update();
+                                }
+                            }
+                        }
+
+
+                        //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
+                        if (ahrs.RemoteAutoSteer)
+                        {
+                            if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLines.BtnABLineOn || ct.isContourBtnOn || CurveLines.BtnCurveLineOn))
+                            {
+                                if ((Data & 2) == 0)
+                                {
+                                    if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                    btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
+                                }
+                                else
+                                {
+                                    if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                    btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
+                                }
+                            }
+                            else
+                            {
+                                if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
+                                btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
+                            }
+                        }
 
                         int.TryParse(words[7], out mc.pwmDisplay);
 
                         break;
 
                     // 127,230, 2=checksum, 8 = ino version
-                    case 230: 
+                    case 230:
 
                         byte.TryParse(words[2], out checksumRecd);
 
@@ -130,120 +243,52 @@ namespace AgOpenGPS
             }
         }
 
+        private delegate void LineReceivedEventHandlerAutoSteer(string sentence);
+
         //Arduino serial port receive in its own thread
         private void sp_DataReceivedAutoSteer(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             if (spAutoSteer.IsOpen)
             {
-                //if (!Properties.Settings.Default.setAS_isJRK)
+                try
                 {
-                    try
+
+
+                    string sentence = spAutoSteer.ReadLine();
+                    this.BeginInvoke(new LineReceivedEventHandlerAutoSteer(SerialLineReceivedAutoSteer), sentence);
+
+
+                    /*
+                    while (spAutoSteer.BytesToRead > 0)
                     {
-                        //System.Threading.Thread.Sleep(25);
-                        string sentence = spAutoSteer.ReadLine();
-                        this.BeginInvoke(new LineReceivedEventHandlerAutoSteer(SerialLineReceivedAutoSteer), sentence);
+                        int test = spAutoSteer.ReadByte();
+                        if (spAutoSteerIdx == 0)
+                        {
+                            if (test == spAutoSteerBytes[spAutoSteerIdx]) spAutoSteerIdx++;
+                            else spAutoSteerIdx = 0;
+                        }
+                        else
+                        {
+                            spAutoSteerBytes[spAutoSteerIdx] = (byte)test;
+                            if (spAutoSteerIdx == 2) Array.Resize(ref spAutoSteerBytes, Math.Max((int)spAutoSteerBytes[spAutoSteerIdx], 3));
+                            spAutoSteerIdx++;
+
+                            if (spAutoSteerIdx == spAutoSteerBytes.Length)
+                            {
+                                BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spAutoSteerBytes)));
+                                spAutoSteerIdx = 0;
+                            }
+                        }
                     }
-                    //this is bad programming, it just ignores errors until its hooked up again.
-                    catch (Exception ex)
-                    {
-                        WriteErrorLog("AutoSteer Recv" + ex.ToString());
-                    }
-
+                    */
                 }
-                //else   //get 2 byte feedback from pololu
-
-                //{
-
-
-                //    byte[] buffer = new byte[2];
-                //    spAutoSteer.Read(buffer, 0, 2);
-                //    int feedback = buffer[0] + 256 * buffer[1];
-
-                //    actualSteerAngleDisp = feedback - 2047;
-                //    actualSteerAngleDisp += (Properties.Settings.Default.setAS_steerAngleOffset - 127) * 5;
-                //    actualSteerAngleDisp /= Properties.Settings.Default.setAS_countsPerDegree;
-                //    actualSteerAngleDisp *= 100;                               
-                //}
-            }
-        }
-
-        public void SendOutUSBAutoSteerPort(byte[] items, int numItems)
-        {
-            //add the out of bounds bit to uturn byte bit 7
-            if (mc.isOutOfBounds)
-                mc.machineData[mc.mdUTurn] |= 0b10000000;
-            else
-                mc.machineData[mc.mdUTurn] &= 0b01111111;
-
-            if (spAutoSteer.IsOpen)
-            {
-                try { spAutoSteer.Write(items, 0, numItems); }
-                catch (Exception e)
+                //this is bad programming, it just ignores errors until its hooked up again.
+                catch (Exception ex)
                 {
-                    WriteErrorLog("Out Data to Steering Port " + e.ToString());
-                    SerialPortAutoSteerClose();
+                    WriteErrorLog("AutoSteer Recv" + ex.ToString());
                 }
             }
         }
-
-        public void SendSteerSettingsOutAutoSteerPort()
-        {
-            //Tell Arduino autoSteer settings
-            if (spAutoSteer.IsOpen)
-            {
-                try { spAutoSteer.Write(mc.autoSteerSettings, 0, CModuleComm.pgnSentenceLength); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Out Settings to Steer Port " + e.ToString());
-                    SerialPortAutoSteerClose();
-                }
-            }
-
-            //send out to udp network
-            else if (Properties.Settings.Default.setUDP_isOn)
-            {
-                SendUDPMessage(mc.autoSteerSettings);
-            }
-
-
-            checksumSent = 0;
-            for (int i = 2; i < 10; i++)
-            {
-                checksumSent += mc.autoSteerSettings[i];
-            }
-        }
-
-        public void SendArduinoSettingsOutToAutoSteerPort()
-        {
-            //Tell Arduino autoSteer settings
-            if (spAutoSteer.IsOpen)
-            {
-                try { spAutoSteer.Write(mc.ardSteerConfig, 0, CModuleComm.pgnSentenceLength); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Out Arduino Settings to Steer Port " + e.ToString());
-                    SerialPortAutoSteerClose();
-                }
-            }
-
-            //send out to udp network
-            else if (Properties.Settings.Default.setUDP_isOn)
-            {
-                SendUDPMessage(mc.ardSteerConfig);
-            }
-
-            checksumSent = 0;
-            for (int i = 2; i < 10; i++)
-            {
-                checksumSent += mc.ardSteerConfig[i];
-            }
-        }
-
-        //called by the AutoSteer module delegate every time a chunk is rec'd
-        public double actualSteerAngleDisp = 0;
-
-        //the delegate for thread
-        private delegate void LineReceivedEventHandlerAutoSteer(string sentence);
 
         //open the Arduino serial port
         public void SerialPortAutoSteerOpen()
@@ -256,7 +301,6 @@ namespace AgOpenGPS
                 spAutoSteer.DtrEnable = true;
                 spAutoSteer.RtsEnable = true;
             }
-
             try { spAutoSteer.Open(); }
             catch (Exception e)
             {
@@ -304,137 +348,6 @@ namespace AgOpenGPS
 
         #region MachineSerialPort //--------------------------------------------------------------------
 
-        //build the byte for individual realy control
-        private void BuildMachineByte()
-        {
-            int set = 1;
-            int reset = 2046;
-            mc.machineData[mc.mdSectionControlByteHi] = (byte)0;
-            mc.machineData[mc.mdSectionControlByteLo] = (byte)0;
-
-            int machine = 0;
-
-            for (int i = 0; i < Tools.Count; i++)
-            {
-                //check if super section is on
-                if (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn)
-                {
-                    for (int j = 0; j < Tools[i].numOfSections; j++)
-                    {
-                        //all the sections are on, so set them
-                        machine = machine | set;
-                        set = (set << 1);
-                    }
-                }
-
-                else
-                {
-                    for (int j = 0; j <= Tools[i].numOfSections; j++)
-                    {
-                        //set if on, reset bit if off
-                        if (Tools[i].Sections[j].IsSectionOn) machine = machine | set;
-                        else machine = machine & reset;
-
-                        //move set and reset over 1 bit left
-                        set = (set << 1);
-                        reset = (reset << 1);
-                        reset = (reset + 1);
-                    }
-                }
-            }
-
-            //rate port gets high and low byte
-            mc.machineData[mc.mdSectionControlByteHi] = unchecked((byte)(machine >> 8));
-            mc.machineData[mc.mdSectionControlByteLo] = unchecked((byte)machine);
-
-            //autosteer gets only the first 8 sections
-            //mc.autoSteerData[mc.sdMachineLo] = unchecked((byte)(mc.machineData[mc.rdSectionControlByteLo]));
-        }
-
-        //Send machine info out to machine board
-        public void SendOutUSBMachinePort(byte[] items, int numItems)
-        {
-            //load the uturn byte with the accumulated spacing
-            if (vehicle.treeSpacing != 0) mc.machineData[mc.mdTree] = unchecked((byte)((treeTrigger == true) ? 1 : 0));
-
-            //speed
-            mc.machineData[mc.mdSpeedXFour] = unchecked((byte)(pn.speed * 4));
-            
-            //Tell Arduino to turn section on or off accordingly
-            if (spMachine.IsOpen)
-            {
-                try { spMachine.Write(items, 0, numItems); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Out to Section machines" + e.ToString());
-                    SerialPortMachineClose();
-                }
-            }
-        }
-
-        public void SendArduinoSettingsOutMachinePort()
-        {
-            //Tell Arduino autoSteer settings
-            if (spMachine.IsOpen)
-            {
-                try { spMachine.Write(mc.ardMachineConfig, 0, CModuleComm.pgnSentenceLength); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Out Settings to Machine Port " + e.ToString());
-                    SerialPortAutoSteerClose();
-                }
-            }
-
-            //send out to udp network
-            else if (Properties.Settings.Default.setUDP_isOn)
-            {
-                SendUDPMessage(mc.ardMachineConfig);
-            }
-        }
-
-        private void SerialLineReceivedMachine(string sentence)
-        {
-            mc.serialRecvMachineStr = sentence;
-            if (pbarMachine++ > 99) pbarMachine = 0;
-
-            // Find end of sentence, if not a CR, return
-            int end = sentence.IndexOf("\r");
-            if (end == -1) return;
-            end = sentence.IndexOf(",", StringComparison.Ordinal);
-            if (end == -1) return;
-
-            //the ArdMachine sentence to be parsed
-            //sentence = sentence.Substring(0, end);
-            string[] words = sentence.Split(',');
-
-            if (words.Length != 10) return; // check lenght: 2 byte header + 8 byte data
-
-            // MTZ8302 Feb 2020
-            int.TryParse(words[0], out int incomingInt);
-
-            if (incomingInt == 127)
-            {
-                int.TryParse(words[1], out incomingInt);
-
-                switch (incomingInt)
-                {
-                    case 249:  //PGN 127 249: Switch status from Section Control
-                        mc.ss[mc.swHeaderLo] = 0xF9;
-                        byte.TryParse(words[5], out mc.ss[mc.swONHi]);  //Section On status
-                        byte.TryParse(words[6], out mc.ss[mc.swONLo]);  //Section On status
-                        byte.TryParse(words[7], out mc.ss[mc.swOFFHi]);//Section Auto status(only when On)
-                        byte.TryParse(words[8], out mc.ss[mc.swOFFLo]);//Section Auto status(only when On)
-                        byte.TryParse(words[9], out mc.ss[mc.swMain]);  //read MainSW+RateSW
-                        break;
-                    case 224:    //PGN 127 224 F7E0: Back From MAchine Module
-                        break;
-                }
-            }
-        }
-
-        //the delegate for thread
-        private delegate void LineReceivedEventHandlerMachine(string sentence);
-
         //Arduino serial port receive in its own thread
         private void sp_DataReceivedMachine(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
@@ -442,17 +355,33 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    //System.Threading.Thread.Sleep(25);
-                    string sentence = spMachine.ReadLine();
-                    this.BeginInvoke(new LineReceivedEventHandlerMachine(SerialLineReceivedMachine), sentence);
-                    if (spMachine.BytesToRead > 32) spMachine.DiscardInBuffer();
+                    while (spMachine.BytesToRead > 0)
+                    {
+                        int test = spMachine.ReadByte();
+                        if (spMachineIdx == 0)
+                        {
+                            if (test == spMachineBytes[spMachineIdx]) spMachineIdx++;
+                            else spMachineIdx = 0;
+                        }
+                        else
+                        {
+                            spMachineBytes[spMachineIdx] = (byte)test;
+                            if (spMachineIdx == 2) Array.Resize(ref spMachineBytes, Math.Max((int)spMachineBytes[spMachineIdx], 3));
+                            spMachineIdx++;
+
+                            if (spMachineIdx == spMachineBytes.Length)
+                            {
+                                BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spMachineBytes)));
+                                spMachineIdx = 0;
+                            }
+                        }
+                    }
                 }
                 //this is bad programming, it just ignores errors until its hooked up again.
                 catch (Exception ex)
                 {
                     WriteErrorLog("Machine Data Recvd " + ex.ToString());
                 }
-
             }
         }
 
@@ -521,9 +450,6 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    //give it a sec to spit it out
-                    //System.Threading.Thread.Sleep(2000);
-
                     //read whatever is in port
                     string sentence = spGPS.ReadExisting();
                     BeginInvoke((MethodInvoker)(() => pn.rawBuffer += sentence));

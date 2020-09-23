@@ -33,8 +33,8 @@ namespace AgOpenGPS
         private Socket recvFromAppSocket;
 
         //endpoints of modules
-        IPEndPoint epAppOne;
-
+        IPEndPoint epAppOne, epAutoSteer, epNTRIP;
+        EndPoint epSender;
         // Data stream
         private byte[] appBuffer = new byte[1024];
 
@@ -47,13 +47,12 @@ namespace AgOpenGPS
         {
             try
             {
-
-
-
                 if (isUDPSendConnected) StopUDPServer();
 
+                epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
 
-
+                // Initialise the IPEndPoint for the client
+                epSender = new IPEndPoint(IPAddress.Any, 0);
 
                 // Initialise the delegate which updates the message received
                 updateRecvMessageDelegate = UpdateRecvMessage;
@@ -94,6 +93,7 @@ namespace AgOpenGPS
             {
                 if (isUDPSendConnected)
                 {
+                    epAutoSteer = null;
                     sendSocket.Shutdown(SocketShutdown.Both);
                     sendSocket.Close();
                     recvSocket.Shutdown(SocketShutdown.Both);
@@ -108,10 +108,11 @@ namespace AgOpenGPS
             }
         }
 
-        private void UpdateRecvMessage(int port, byte[] Data)
+        public void UpdateRecvMessage(int port, byte[] Data)
         {
+            if (Data.Length < 4) return;
             //update progress bar for autosteer
-            pbarUDP++;
+            if (port != 5) pbarUDP++;
 
             if (Data[0] == 0xB5 && Data[1] == 0x62 && Data[2] == 0x01)//Daniel P
             {
@@ -216,16 +217,25 @@ namespace AgOpenGPS
                 }
                 return;
             }
-            else if (Data[0] == 0x7F)
+            else if (Data[0] == 0x24)//if it starts with a $, its an nmea sentence
             {
-                //quick check
-                if (Data.Length != 10) return;
+                pn.rawBuffer += Encoding.ASCII.GetString(Data);
 
+                if (isLogNMEA)
+                {
+                    pn.logNMEASentence.Append(Encoding.ASCII.GetString(Data));
+                }
+                return;
+            }
+            else
+            {
                 switch (Data[1])
                 {
                     //autosteer FD - 253
                     case 0xFD:
                         {
+                            //quick check
+                            if (Data.Length != 10) return;
                             //Steer angle actual
                             actualSteerAngleDisp = (Int16)((Data[2] << 8) + Data[3]);
 
@@ -272,9 +282,9 @@ namespace AgOpenGPS
 
 
                             //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
-                            if (ahrs.isAutoSteerAuto)
+                            if (ahrs.RemoteAutoSteer)
                             {
-                                if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLine.isBtnABLineOn || ct.isContourBtnOn || curve.isBtnCurveOn))
+                                if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLines.BtnABLineOn || ct.isContourBtnOn || CurveLines.BtnCurveLineOn))
                                 {
                                     if ((Data[8] & 2) == 0)
                                     {
@@ -299,19 +309,23 @@ namespace AgOpenGPS
 
                             autoSteerUDPActivity++;
 
-                            break;
+                            return;
                         }
 
                     //From Machine Data
                     case 0xE0:
                         {
+                            //quick check
+                            if (Data.Length != 10) return;
                             //mc.recvUDPSentence = DateTime.Now.ToString() + "," + data[2].ToString();
                             machineUDPActivity++;
-                            break;
+                            return;
                         }
 
                     case 230:
 
+                        //quick check
+                        if (Data.Length != 10) return;
                         checksumRecd = Data[2];
 
                         if (checksumRecd != checksumSent)
@@ -346,19 +360,23 @@ namespace AgOpenGPS
                             Close();
                         }
 
-                        break;
+                        return;
 
                     //lidar
                     case 0xF1:
                         {
+                            //quick check
+                            if (Data.Length != 10) return;
                             mc.lidarDistance = (Int16)((Data[2] << 8) + Data[3]);
                             //mc.recvUDPSentence = DateTime.Now.ToString() + "," + mc.lidarDistance.ToString();
-                            break;
+                            return;
                         }
 
                     //Ext UDP IMU
                     case 0xEE:
                         {
+                            //quick check
+                            if (Data.Length != 10) return;
                             //by Matthias Hammer Jan 2019
                             //if ((data[0] == 127) & (data[1] == 238))
 
@@ -372,53 +390,171 @@ namespace AgOpenGPS
                                 ahrs.rollX16 = (Int16)((Data[6] << 8) + Data[7]);
                             }
 
-                            break;
-                        }
-
-                    case 0xF9://MTZ8302 Feb 2020
-                        {
-                            /*rate stuff
-                            
-                            //left or single actual rate
-                            //int.TryParse(data[0], out mc.incomingInt);
-                            mc.rateActualLeft = (double)data[2] * 0.01;
-                            //right actual rate
-                            mc.rateActualRight = (double)data[3] * 0.01;
-                            //Volume for dual and single
-                            mc.dualVolumeActual = data[4];
-
-                            rate stuff  */
-
-                            //header
-                            mc.ss[mc.swHeaderLo] = 0xF9;
-                            mc.ss[mc.swONHi] = Data[5];  //Section On status
-                            mc.ss[mc.swONLo] = Data[6];  //Section On status
-                            mc.ss[mc.swOFFHi] = Data[7];//Section Auto status(only when Section On)
-                            mc.ss[mc.swOFFLo] = Data[8];//Section Auto status(only when Section On)
-                            mc.ss[mc.swMain] = Data[9];  //read MainSW+RateSW
-                            mc.ss[mc.swHeaderLo] = 249;
-
-
-
-                            switchUDPActivity++;
-                            break;
+                            return;
                         }
                 }
-            }
-            else if (Data[0] == 0x24)//if it starts with a $, its an nmea sentence
-            {
-                pn.rawBuffer += Encoding.ASCII.GetString(Data);
 
-                if (isLogNMEA)
+
+
+
+                while (Data[0] == 0x7F && Data.Length > 2)
                 {
-                    pn.logNMEASentence.Append(Encoding.ASCII.GetString(Data));
-                }
+                    if (Data.Length < Data[2]) return;
 
-                return;
-            }
-            else
-            {
-                pn.logNMEASentence.Append(Encoding.ASCII.GetString(Data));
+                    if (Data[1] == 0xC0)
+                    {
+                        mc.Recieve_AutoSteer[3] = Data[3];
+                        mc.Recieve_AutoSteer[4] = Data[4];
+                        mc.Recieve_AutoSteer[5] = Data[5];
+                        actualSteerAngleDisp = (Int16)((Data[3] << 8) + Data[4]);
+
+                        mc.pwmDisplay = Data[5];
+                    }
+                    if (Data[1] == 0xC1)//Section Control
+                    {
+                        mc.Recieve_SectionsStatus[3] = Data[3];//tool index; do all if 255
+                        mc.Recieve_SectionsStatus[4] = Data[4];//Section Index; do all if 255
+                        mc.Recieve_SectionsStatus[5] = Data[5];//On Off Auto
+
+                        for (int j = (Data[3] == 0xFF ? 0 : Data[3]); j < Tools.Count && (Data[3] == 0xFF ? true : j <= Data[3]); j++)
+                        {
+                            for (int k = (Data[4] == 0xFF ? 0 : Data[4]); k < Tools[j].Sections.Count && (Data[4] == 0xFF ? true : k <= Data[4]); k++)
+                            {
+                                if ((Data[5] & 2) == 2 && autoBtnState != 0)
+                                {
+                                    if (Tools[j].Sections[k].BtnSectionState != btnStates.On) Tools[j].Sections[k].BtnSectionState = btnStates.On;
+                                }
+                                else if (Data[5] == 1 && autoBtnState != 0)
+                                {
+                                    if (Tools[j].Sections[k].BtnSectionState != btnStates.Auto) Tools[j].Sections[k].BtnSectionState = btnStates.Auto;
+                                }
+                                else
+                                {
+                                    if (Tools[j].Sections[k].BtnSectionState != btnStates.Off) Tools[j].Sections[k].BtnSectionState = btnStates.Off;
+                                }
+                                Tools[j].SectionButtonColor(k);
+                            }
+                        }
+                    }
+                    else if (Data[1] == 0xC2)
+                    {
+                        mc.Recieve_Heading[3] = Data[3];
+                        mc.Recieve_Heading[4] = Data[4];
+                        ahrs.correctionHeadingX16 = (Int16)((Data[3] << 8) + Data[4]);
+                    }
+                    else if (Data[1] == 0xC3)
+                    {
+                        mc.Recieve_Roll[3] = Data[3];
+                        mc.Recieve_Roll[4] = Data[4];
+                        ahrs.rollX16 = (Int16)((Data[3] << 8) + Data[4]);
+                    }
+                    else if (Data[1] == 0xC4)
+                    {
+                        if ((Data[3] & 16) == 16)//SteerSensorCount
+                        {
+                            mc.Recieve_AutoSteerButton[3] = Data[3];
+                            isAutoSteerBtnOn = false;
+                            btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
+                        }
+                        else if (ahrs.RemoteAutoSteer)
+                        {
+                            mc.Recieve_AutoSteerButton[3] = Data[3];
+
+                            isAutoSteerBtnOn = (isJobStarted && !recPath.isDrivingRecordedPath && (ABLines.BtnABLineOn || ct.isContourBtnOn || CurveLines.BtnCurveLineOn) && (Data[3] & 2) == 2) ? true : false;
+                            btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
+                        }
+                    }
+                    else if (Data[1] == 0xC5)
+                    {
+                        if (isJobStarted && mc.isWorkSwitchEnabled)
+                        {
+                            mc.Recieve_WorkSwitch[3] = Data[3];
+                            if ((Data[3] & 3) == 3)
+                            {
+                                if (autoBtnState != FormGPS.btnStates.On) autoBtnState = FormGPS.btnStates.On;
+                            }
+                            else if ((Data[3] & 1) == 1)
+                            {
+                                if (autoBtnState != FormGPS.btnStates.Auto) autoBtnState = FormGPS.btnStates.Auto;
+                            }
+                            else if (autoBtnState != FormGPS.btnStates.Off) autoBtnState = FormGPS.btnStates.Off;
+
+
+                            //if ((!mc.isWorkSwitchActiveLow && (Data[3] & 1) == 1) || (mc.isWorkSwitchActiveLow && (Data[3] & 1) == 0))
+
+                            //if (mc.isWorkSwitchManual)
+
+                            btnSection_Update();
+                        }
+                    }
+                    else if (Data[1] == 0xC6)
+                    {
+                        mc.Recieve_Checksum[3] = Data[3];
+                        checksumRecd = Data[3];
+
+                        if (checksumRecd != checksumSent)
+                        {
+                            MessageBox.Show("Sent: " + checksumSent + "\r\n Recieved: " + checksumRecd, "Checksum Error", MessageBoxButtons.OK, MessageBoxIcon.Question);
+                        }
+
+                        if (Data[4] != inoVersionInt)
+                        {
+                            Form af = Application.OpenForms["FormSteer"];
+
+                            if (af != null)
+                            {
+                                af.Focus();
+                                af.Close();
+                            }
+
+                            af = Application.OpenForms["FormArduinoSettings"];
+
+                            if (af != null)
+                            {
+                                af.Focus();
+                                af.Close();
+                            }
+
+                            //spAutoSteer.Close();
+                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_UDP_" + currentVersionStr + ".ino", gStr.gsFileError,
+                                                MessageBoxButtons.OK, MessageBoxIcon.Question);
+                            Close();
+                        }
+
+                    }
+                    else if (Data[1] == 0xC7)
+                    {
+                        mc.lidarDistance = (Int16)((Data[3] << 8) + Data[4]);
+                    }
+
+                    if (Data[2] <= 0) return;
+
+                    if (Data.Length - Data[2] <= 3) return;
+
+                    byte[] dst = new byte[Data.Length - Data[2]];
+                    Array.Copy(Data, Data[2], dst, 0, dst.Length);
+                    Data = dst;
+                }
+                /*
+                
+                        //mc.recvUDPSentence = DateTime.Now.ToString() + "," + mc.lidarDistance.ToString();
+                string Text = "";
+                for (int i = 0; i < Data.Length; i++)
+                {
+                    Text += ((int)Data[i]).ToString();
+                    if (i + 1 < Data.Length) Text += ",";
+                }
+                mc.serialRecvMachineStr = Text;
+
+                if (pbarMachine++ > 99) pbarMachine = 0;
+                switchUDPActivity++;
+
+                */
+
+                //mc.serialRecvAutoSteerStr = Text;
+                //if (port == 5) if (pbarSteer++ > 99) pbarSteer = 0;
+                //    else autoSteerUDPActivity++;
+
                 return;
             }
         }
@@ -427,9 +563,6 @@ namespace AgOpenGPS
         {
             try
             {
-                // Initialise the IPEndPoint for the client
-                EndPoint epSender = new IPEndPoint(IPAddress.Any, 0);
-
                 // Receive all data
                 int msgLen = recvSocket.EndReceiveFrom(asyncResult, ref epSender);
 
@@ -459,17 +592,12 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
-
-                    // Send packet to the zero
                     if (byteData.Length != 0)
+                    {
                         sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
+                    }
                 }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                catch (Exception) {}
             }
         }
 
@@ -479,31 +607,20 @@ namespace AgOpenGPS
             {
                 sendSocket.EndSend(asyncResult);
             }
-            catch (Exception)
-            {
-                //WriteErrorLog(" UDP Send Data" + e.ToString());
-                //MessageBox.Show("SendData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch (Exception) {}
         }
 
         //sends byte array
-        public void SendUDPMessageNTRIP(byte[] byteData, int port)
+        public void SendUDPMessageNTRIP(byte[] byteData)
         {
             if (isUDPSendConnected)
             {
                 try
                 {
-                    IPEndPoint epAutoSteer = new IPEndPoint(epIP, port);
-
-                    // Send packet to the zero
                     if (byteData.Length != 0)
-                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
+                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epNTRIP, new AsyncCallback(SendData), null);
                 }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                catch (Exception){}
             }
         }
 
@@ -525,9 +642,6 @@ namespace AgOpenGPS
         {
             try
             {
-                // Initialise the IPEndPoint for the clients
-                EndPoint epSender = new IPEndPoint(IPAddress.Any, 0);
-
                 // Receive all data
                 int msgLen = recvFromAppSocket.EndReceiveFrom(asyncResult, ref epSender);
 
@@ -634,7 +748,7 @@ namespace AgOpenGPS
             //turn right
             if (keyData == Keys.Right)
             {
-                sim.steerAngle+=2;
+                sim.steerAngle += 2;
                 if (sim.steerAngle > 40) sim.steerAngle = 40;
                 if (sim.steerAngle < -40) sim.steerAngle = -40;
                 sim.steerAngleScrollBar = sim.steerAngle;
@@ -646,7 +760,7 @@ namespace AgOpenGPS
             //turn left
             if (keyData == Keys.Left)
             {
-                sim.steerAngle-=2;
+                sim.steerAngle -= 2;
                 if (sim.steerAngle > 40) sim.steerAngle = 40;
                 if (sim.steerAngle < -40) sim.steerAngle = -40;
                 sim.steerAngleScrollBar = sim.steerAngle;
@@ -740,6 +854,46 @@ namespace AgOpenGPS
             if (keyData == (Keys.P)) // Snap/Prioritu click
             {
                 btnContourPriority.PerformClick();
+                return true;    // indicate that you handled this keystroke
+            }
+
+            if (keyData == (Keys.H)) // Snap/Prioritu click
+            {
+                spAutoSteerBytes = new byte[10];
+
+                spAutoSteerBytes[0] = 0x7F;
+                spAutoSteerBytes[1] = 0xCA;
+                spAutoSteerBytes[2] = 0x04;
+                spAutoSteerBytes[3] = 0x00;
+
+
+                spAutoSteerBytes[4] = 0x7F;
+                spAutoSteerBytes[5] = 0xCF;
+                spAutoSteerBytes[6] = 0x06;
+                spAutoSteerBytes[7] = 0xFF;
+                spAutoSteerBytes[8] = 0x01;
+
+
+
+
+                if (spAutoSteerIdx == 0)
+                {
+                    spAutoSteerBytes[3] = 0x02;
+                    //spAutoSteerBytes[9] = 0x00;
+                    BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spAutoSteerBytes)));
+                    spAutoSteerIdx++;
+                }
+                else
+                {
+                    spAutoSteerBytes[3] = 0x00;
+                    //spAutoSteerBytes[9] = 0x01;
+                    BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spAutoSteerBytes)));
+                    spAutoSteerIdx = 0;
+                }
+
+
+
+
                 return true;    // indicate that you handled this keystroke
             }
 

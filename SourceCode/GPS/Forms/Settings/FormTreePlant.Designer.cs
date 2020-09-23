@@ -39,9 +39,8 @@
             this.lblSpeed = new System.Windows.Forms.Label();
             this.lblTrees = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.nudTreeSpacing = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.nudTreeSpacing)).BeginInit();
+            this.TboxTreeSpacing = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // lblDistanceTree
@@ -160,27 +159,6 @@
             this.label3.Text = "Trees";
             this.label3.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
-            // nudTreeSpacing
-            // 
-            this.nudTreeSpacing.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudTreeSpacing.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudTreeSpacing.Location = new System.Drawing.Point(169, 26);
-            this.nudTreeSpacing.Maximum = new decimal(new int[] {
-            5000,
-            0,
-            0,
-            0});
-            this.nudTreeSpacing.Name = "nudTreeSpacing";
-            this.nudTreeSpacing.Size = new System.Drawing.Size(122, 52);
-            this.nudTreeSpacing.TabIndex = 314;
-            this.nudTreeSpacing.Value = new decimal(new int[] {
-            5000,
-            0,
-            0,
-            0});
-            this.nudTreeSpacing.ValueChanged += new System.EventHandler(this.NudTreeSpacing_ValueChanged);
-            this.nudTreeSpacing.Enter += new System.EventHandler(this.NudTreeSpacing_Enter);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -192,6 +170,19 @@
             this.label2.TabIndex = 311;
             this.label2.Text = "kmh";
             // 
+            // TboxTreeSpacing
+            // 
+            this.TboxTreeSpacing.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxTreeSpacing.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxTreeSpacing.Location = new System.Drawing.Point(169, 26);
+            this.TboxTreeSpacing.Name = "TboxTreeSpacing";
+            this.TboxTreeSpacing.Size = new System.Drawing.Size(122, 50);
+            this.TboxTreeSpacing.TabIndex = 465;
+            this.TboxTreeSpacing.Text = "5000";
+            this.TboxTreeSpacing.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxTreeSpacing.WordWrap = false;
+            this.TboxTreeSpacing.Enter += new System.EventHandler(this.TboxTreeSpacing_Enter);
+            // 
             // FormTreePlant
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -199,8 +190,8 @@
             this.BackColor = System.Drawing.Color.Lavender;
             this.ClientSize = new System.Drawing.Size(332, 286);
             this.ControlBox = false;
+            this.Controls.Add(this.TboxTreeSpacing);
             this.Controls.Add(this.lblSpeed);
-            this.Controls.Add(this.nudTreeSpacing);
             this.Controls.Add(this.lblStepDistance);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblTrees);
@@ -218,7 +209,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Tree Plant Control";
             this.Load += new System.EventHandler(this.FormTreePlant_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.nudTreeSpacing)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -236,7 +226,7 @@
         private System.Windows.Forms.Label lblSpeed;
         private System.Windows.Forms.Label lblTrees;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown nudTreeSpacing;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox TboxTreeSpacing;
     }
 }

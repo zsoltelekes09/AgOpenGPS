@@ -10,16 +10,10 @@ namespace AgOpenGPS
         //class variables
         private readonly FormGPS mf;
 
-        private double antennaHeight, antennaOffset, antennaPivot, wheelbase, minTurningRadius;
+        private double antennaHeight, antennaOffset, antennaPivot, wheelbase, minTurningRadius, hydliftsecs;
 
-        private bool isPivotBehindAntenna, isSteerAxleAhead;
-
-        private readonly double metImp2m, m2MetImp;
-
-        private bool isAutoSteerAuto;
-        private int snapDistance, vehicleType;
-
-        private int lightbarCmPerPixie;
+        private bool isAutoSteerAuto, isPivotBehindAntenna, isSteerAxleAhead;
+        private int snapDistance, vehicleType, lightbarCmPerPixie, linewidth;
 
         //constructor
         public FormSettings(Form callingForm, int page)
@@ -45,35 +39,13 @@ namespace AgOpenGPS
 
             groupBox2.Text = gStr.gsCmPerLightbarPixel;
             groupBox9.Text = gStr.gsAutoManualAutosteerBtn;
-            cboxAutoSteerAuto.Text = gStr.gsManual;
             groupBox1.Text = gStr.gs____SnapDistance;
             label17.Text = gStr.gsMeasurementsIn;
             groupBox4.Text = gStr.gsGuidanceLineWidth;
             Text = gStr.gsVehicleSettings;
 
-            nudMinTurnRadius.Controls[0].Enabled = false;
-            nudAntennaHeight.Controls[0].Enabled = false;
-            nudAntennaOffset.Controls[0].Enabled = false;
-            nudAntennaPivot.Controls[0].Enabled = false;
-            nudLightbarCmPerPixel.Controls[0].Enabled = false;
-            nudMinTurnRadius.Controls[0].Enabled = false;
-            nudSnapDistance.Controls[0].Enabled = false;
-            nudWheelbase.Controls[0].Enabled = false;
-            nudLineWidth.Controls[0].Enabled = false;
-            nudHydLiftSecs.Controls[0].Enabled = false;
+            lblInchesCm.Text = mf.isMetric? gStr.gsCentimeters : gStr.gsInches;
 
-            if (mf.isMetric)
-            {
-                metImp2m = 0.01;
-                m2MetImp = 100.0;
-                lblInchesCm.Text = gStr.gsCentimeters;
-            }
-            else
-            {
-                metImp2m = Glm.in2m;
-                m2MetImp = Glm.m2in;
-                lblInchesCm.Text = gStr.gsInches;
-            }
             //select the page as per calling menu or button from mainGPS form
             tabControl1.SelectedIndex = page;
         }
@@ -81,85 +53,10 @@ namespace AgOpenGPS
         //do any field initializing for form here
         private void FormSettings_Load(object sender, EventArgs e)
         {
-            nudLightbarCmPerPixel.Value = (Properties.Settings.Default.setDisplay_lightbarCmPerPixel);
-            lightbarCmPerPixie = Properties.Settings.Default.setDisplay_lightbarCmPerPixel;
-
-            //Vehicle settings to what it is in the settings page------------------------------------------------
-            antennaHeight = Properties.Vehicle.Default.setVehicle_antennaHeight;
-            if (nudAntennaHeight.CheckValueCm(ref antennaHeight)) nudAntennaHeight.BackColor = System.Drawing.Color.OrangeRed;
-
-            antennaPivot = Math.Abs(Properties.Vehicle.Default.setVehicle_antennaPivot);
-            if (nudAntennaPivot.CheckValueCm(ref antennaPivot)) nudAntennaPivot.BackColor = System.Drawing.Color.OrangeRed;
-
-            wheelbase = Math.Abs(Properties.Vehicle.Default.setVehicle_wheelbase);
-            if (nudWheelbase.CheckValueCm(ref wheelbase)) nudWheelbase.BackColor = System.Drawing.Color.OrangeRed;
-
-            minTurningRadius = Properties.Vehicle.Default.setVehicle_minTurningRadius;
-            if (nudMinTurnRadius.CheckValueCm(ref minTurningRadius)) nudMinTurnRadius.BackColor = System.Drawing.Color.OrangeRed;
-
-            antennaOffset = Properties.Vehicle.Default.setVehicle_antennaOffset;
-            if (nudAntennaOffset.CheckValueCm(ref antennaOffset)) nudAntennaOffset.BackColor = System.Drawing.Color.OrangeRed;
-
-            nudHydLiftSecs.Value = (decimal)Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead;
-
+            //TypeTab
             isPivotBehindAntenna = Properties.Vehicle.Default.setVehicle_isPivotBehindAntenna;
             isSteerAxleAhead = Properties.Vehicle.Default.setVehicle_isSteerAxleAhead;
 
-            nudSnapDistance.Value = Properties.Settings.Default.setAS_snapDistance;
-
-            cboxAutoSteerAuto.Checked = Properties.Settings.Default.setAS_isAutoSteerAutoOn;
-            isAutoSteerAuto = Properties.Settings.Default.setAS_isAutoSteerAutoOn;
-            if (isAutoSteerAuto)
-            {
-                cboxAutoSteerAuto.Image = Properties.Resources.AutoSteerOn;
-                cboxAutoSteerAuto.Text = "Remote";
-            }
-            else
-            {
-                cboxAutoSteerAuto.Image = Properties.Resources.AutoSteerOff;
-                cboxAutoSteerAuto.Text = gStr.gsManual;
-            }
-
-            //fix the min max based on inches - they are 2.54 times smaller then cm
-            if (!mf.isMetric)
-            {
-                nudAntennaHeight.Maximum /= 2.54M;
-                nudAntennaHeight.Minimum /= 2.54M;
-
-                nudAntennaPivot.Maximum /= 2.54M;
-                nudAntennaPivot.Minimum /= 2.54M;
-
-                nudWheelbase.Maximum /= 2.54M;
-                nudWheelbase.Minimum /= 2.54M;
-
-                nudAntennaOffset.Maximum /= 2.54M;
-                nudAntennaOffset.Minimum /= 2.54M;
-
-                nudMinTurnRadius.Maximum /= 2.54M;
-                nudMinTurnRadius.Minimum /= 2.54M;
-            }
-
-            nudAntennaHeight.ValueChanged -= NudAntennaHeight_ValueChanged;
-            nudAntennaHeight.Value = (decimal)(antennaHeight * m2MetImp);
-            nudAntennaHeight.ValueChanged += NudAntennaHeight_ValueChanged;
-
-            nudAntennaOffset.ValueChanged -= NudAntennaOffset_ValueChanged;
-            nudAntennaOffset.Value = (decimal)(antennaOffset * m2MetImp);
-            nudAntennaOffset.ValueChanged += NudAntennaOffset_ValueChanged;
-
-            nudAntennaPivot.ValueChanged -= NudAntennaPivot_ValueChanged;
-            nudAntennaPivot.Value = (decimal)(antennaPivot * m2MetImp);
-            nudAntennaPivot.ValueChanged += NudAntennaPivot_ValueChanged;
-
-            nudWheelbase.ValueChanged -= NudWheelbase_ValueChanged;
-            nudWheelbase.Value = (decimal)(wheelbase * m2MetImp);
-            nudWheelbase.ValueChanged += NudWheelbase_ValueChanged;
-
-            nudMinTurnRadius.ValueChanged -= NudMinTurnRadius_ValueChanged;
-            nudMinTurnRadius.Value = (decimal)(minTurningRadius * m2MetImp);
-            nudMinTurnRadius.ValueChanged += NudMinTurnRadius_ValueChanged;
-
-            nudLineWidth.Value = Properties.Settings.Default.setDisplay_lineWidth;
 
             vehicleType = Properties.Vehicle.Default.setVehicle_vehicleType;
 
@@ -170,55 +67,65 @@ namespace AgOpenGPS
 
             FixRadioButtonsAndImages();
 
-            btnChangeAttachment.Enabled = false;
-            btnChangeAttachment.BackColor = System.Drawing.Color.Transparent;
+            //SettingsTab
+            TboxAntennaPivot.Text = (antennaPivot = Math.Round(Math.Abs(Properties.Vehicle.Default.setVehicle_antennaPivot) * mf.m2MetImp, mf.decimals)).ToString();
+            TboxAntennaPivot.CheckValue(ref antennaPivot, 0, Math.Round(10 * mf.m2MetImp, mf.decimals));
+            TboxAntennaHeight.Text = (antennaHeight = Math.Round(Properties.Vehicle.Default.setVehicle_antennaHeight * mf.m2MetImp, mf.decimals)).ToString();
+            TboxAntennaHeight.CheckValue(ref antennaHeight, 0, Math.Round(10 * mf.m2MetImp, mf.decimals));
+            TboxWheelbase.Text = (wheelbase = Math.Round(Math.Abs(Properties.Vehicle.Default.setVehicle_wheelbase) * mf.m2MetImp, mf.decimals)).ToString();
+            TboxWheelbase.CheckValue(ref wheelbase, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
+            TboxAntennaOffset.Text = (antennaOffset = Math.Round(Properties.Vehicle.Default.setVehicle_antennaOffset * mf.m2MetImp, mf.decimals)).ToString();
+            TboxAntennaOffset.CheckValue(ref antennaHeight, Math.Round(-10 * mf.m2MetImp, mf.decimals), Math.Round(10 * mf.m2MetImp, mf.decimals));
+
+            //VehicleTab
+            TboxMinTurnRadius.Text = (minTurningRadius = Math.Round(Properties.Vehicle.Default.setVehicle_minTurningRadius * mf.m2MetImp, mf.decimals)).ToString();
+            TboxMinTurnRadius.CheckValue(ref minTurningRadius, Math.Round(0.5 * mf.m2MetImp, mf.decimals), Math.Round(100 * mf.m2MetImp, mf.decimals));
+            TboxHydLiftSecs.Text = (hydliftsecs = Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead).ToString("0.0#");
+            TboxHydLiftSecs.CheckValue(ref hydliftsecs, 0, 20);
+
+            //GuidanceTab
+            TboxSnapDistance.Text = (snapDistance = Properties.Settings.Default.setAS_snapDistance).ToString();
+            TboxSnapDistance.CheckValue(ref snapDistance, 1, 500);
+            TboxLightbarCmPerPixel.Text = (lightbarCmPerPixie = Properties.Settings.Default.setDisplay_lightbarCmPerPixel).ToString();
+            TboxLightbarCmPerPixel.CheckValue(ref lightbarCmPerPixie, 1, 20);
+            TboxLineWidth.Text = (linewidth = Properties.Settings.Default.setDisplay_lineWidth).ToString();
+            TboxLineWidth.CheckValue(ref linewidth, 1, 8);
+
+            isAutoSteerAuto = Properties.Settings.Default.setAS_isAutoSteerAutoOn;
+            if (isAutoSteerAuto)
+            {
+                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOn;
+                BtnAutoSteerAuto.Text = "Remote";
+            }
+            else
+            {
+                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOff;
+                BtnAutoSteerAuto.Text = gStr.gsManual;
+            }
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.setDisplay_lightbarCmPerPixel = lightbarCmPerPixie;
-            mf.lightbarCmPerPixel = lightbarCmPerPixie;
+            //TypeTab
+            Properties.Vehicle.Default.setVehicle_isPivotBehindAntenna = mf.vehicle.isPivotBehindAntenna = isPivotBehindAntenna;
+            Properties.Vehicle.Default.setVehicle_isSteerAxleAhead = mf.vehicle.isSteerAxleAhead = isSteerAxleAhead;
+            Properties.Vehicle.Default.setVehicle_vehicleType = mf.vehicle.vehicleType = vehicleType;
 
-            //Vehicle settings -------------------------------------------------------------------------------
+            //SettingsTab
+            Properties.Vehicle.Default.setVehicle_antennaPivot = mf.vehicle.antennaPivot = Math.Round(antennaPivot * mf.metImp2m, 2);
+            Properties.Vehicle.Default.setVehicle_antennaHeight = mf.vehicle.antennaHeight = Math.Round(antennaHeight * mf.metImp2m, 2);
+            Properties.Vehicle.Default.setVehicle_wheelbase = mf.vehicle.wheelbase = Math.Round(wheelbase * mf.metImp2m, 2);
+            Properties.Vehicle.Default.setVehicle_antennaOffset = mf.vehicle.antennaOffset = Math.Round(antennaOffset * mf.metImp2m, 2);
 
-            mf.vehicle.isPivotBehindAntenna = isPivotBehindAntenna;
-            Properties.Vehicle.Default.setVehicle_isPivotBehindAntenna = mf.vehicle.isPivotBehindAntenna;
+            //VehicleTab
+            Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead = mf.vehicle.hydLiftLookAheadTime = hydliftsecs;
+            Properties.Vehicle.Default.setVehicle_minTurningRadius = mf.vehicle.minTurningRadius = Math.Round(minTurningRadius * mf.metImp2m, 2);
 
-            mf.vehicle.isSteerAxleAhead = isSteerAxleAhead;
-            Properties.Vehicle.Default.setVehicle_isSteerAxleAhead = mf.vehicle.isSteerAxleAhead;
-
-            mf.vehicle.antennaPivot = antennaPivot;
-            Properties.Vehicle.Default.setVehicle_antennaPivot = mf.vehicle.antennaPivot;
-
-            mf.vehicle.wheelbase = wheelbase;
-            Properties.Vehicle.Default.setVehicle_wheelbase = wheelbase;
-
-            mf.vehicle.minTurningRadius = minTurningRadius;
-            Properties.Vehicle.Default.setVehicle_minTurningRadius = minTurningRadius;
-
-            mf.vehicle.antennaHeight = antennaHeight;
-            Properties.Vehicle.Default.setVehicle_antennaHeight = mf.vehicle.antennaHeight;
-
-            mf.vehicle.antennaOffset = antennaOffset;
-            Properties.Vehicle.Default.setVehicle_antennaOffset = antennaOffset;
-
-            //Guidance
-
+            //GuidanceTab
             Properties.Settings.Default.setAS_snapDistance = snapDistance;
-
-            mf.ahrs.isAutoSteerAuto = isAutoSteerAuto;
-            Properties.Settings.Default.setAS_isAutoSteerAutoOn = isAutoSteerAuto;
-
-            Properties.Settings.Default.setDisplay_lineWidth = (int)(nudLineWidth.Value);
-            mf.ABLine.lineWidth = (int)(nudLineWidth.Value);
-
-            mf.tram.abOffset = (Math.Round((mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap) / 2.0, 3));
-
-            Properties.Vehicle.Default.setVehicle_vehicleType = vehicleType;
-            mf.vehicle.vehicleType = vehicleType;
-
-            mf.vehicle.hydLiftLookAheadTime = (double)nudHydLiftSecs.Value;
-            Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead = mf.vehicle.hydLiftLookAheadTime;
+            Properties.Settings.Default.setDisplay_lightbarCmPerPixel = mf.lightbarCmPerPixel = lightbarCmPerPixie;
+            Properties.Settings.Default.setDisplay_lineWidth = mf.ABLines.lineWidth = linewidth;
+            Properties.Settings.Default.setAS_isAutoSteerAutoOn = mf.ahrs.RemoteAutoSteer = isAutoSteerAuto;
 
             Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
@@ -226,101 +133,6 @@ namespace AgOpenGPS
             //back to FormGPS
             DialogResult = DialogResult.OK;
             Close();
-        }
-
-        private void NudLightbarCmPerPixel_ValueChanged(object sender, EventArgs e)
-        {
-            lightbarCmPerPixie = (int)nudLightbarCmPerPixel.Value;
-        }
-
-        private void NudSnapDistance_ValueChanged(object sender, EventArgs e)
-        {
-            snapDistance = (int)nudSnapDistance.Value;
-        }
-
-        private void NudMinTurnRadius_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-        
-        private void NudWheelbase_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudAntennaPivot_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudAntennaHeight_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudAntennaOffset_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudCutoffSpeed_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudSnapDistanceSmall_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudSnapDistance_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudLightbarCmPerPixel_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void NudLineWidth_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
-        }
-
-        private void CboxAutoSteerAuto_CheckedChanged(object sender, EventArgs e)
-        {
-            isAutoSteerAuto = cboxAutoSteerAuto.Checked;
-            if (isAutoSteerAuto)
-            {
-                cboxAutoSteerAuto.Image = Properties.Resources.AutoSteerOn;
-                cboxAutoSteerAuto.Text = "Remote";
-            }
-            else
-            {
-                cboxAutoSteerAuto.Image = Properties.Resources.AutoSteerOff;
-                cboxAutoSteerAuto.Text = gStr.gsManual;
-            }
-        }
-
-        //don't save anything, leave the settings as before
-        private void BtnCancel_Click(object sender, EventArgs e)
-        { DialogResult = DialogResult.Cancel; Close(); }
-
-        private void NudHydLiftSecs_Enter(object sender, EventArgs e)
-        {
-            mf.KeypadToNUD((NumericUpDown)sender, this);
-            btnCancel.Focus();
         }
 
         private void BtnChangeAttachment_Click(object sender, EventArgs e)
@@ -333,29 +145,15 @@ namespace AgOpenGPS
 
             btnNext.Focus();
 
-            if (vehicleType == 0) //2WD tractor
-            {
-                isPivotBehindAntenna = true;
-                isSteerAxleAhead = true;
-            }
-            if (vehicleType == 1) //harvestor
-            {
-                isPivotBehindAntenna = true;
-                isSteerAxleAhead = false;
-            }
-            if (vehicleType == 2) //4WD
-            {
-                isPivotBehindAntenna = false;
-                isSteerAxleAhead = true;
-            }
+            isPivotBehindAntenna = vehicleType != 2;//4WD
+            isSteerAxleAhead = vehicleType != 1;//harvestor
         }
+
 
         private void Rbtn4WD_CheckedChanged(object sender, EventArgs e)
         {
             var radioButton = sender as RadioButton;
 
-            // Only do something when the event was raised by the radiobutton 
-            // being checked, so we don't do this twice.
             if (radioButton.Checked)
             {
                 btnChangeAttachment.Enabled = true;
@@ -384,33 +182,140 @@ namespace AgOpenGPS
             }
         }
 
-        #region Vehicle //----------------------------------------------------------------
-
-        private void NudAntennaHeight_ValueChanged(object sender, EventArgs e)
+        #region SettingsTab
+        private void TboxAntennaPivot_Enter(object sender, EventArgs e)
         {
-            antennaHeight = (double)nudAntennaHeight.Value * metImp2m;
+            using (var form = new FormNumeric(0, Math.Round(10 * mf.m2MetImp, mf.decimals), antennaPivot, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxAntennaPivot.Text = (antennaPivot = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                }
+            }
+            btnCancel.Focus();
         }
 
-        private void NudAntennaPivot_ValueChanged(object sender, EventArgs e)
+        private void TboxAntennaHeight_Enter(object sender, EventArgs e)
         {
-            antennaPivot = (double)nudAntennaPivot.Value * metImp2m;
+            using (var form = new FormNumeric(0, Math.Round(10 * mf.m2MetImp, mf.decimals), antennaHeight, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxAntennaHeight.Text = (antennaHeight = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                }
+            }
+            btnCancel.Focus();
         }
 
-        private void NudAntennaOffset_ValueChanged(object sender, EventArgs e)
+        private void TboxWheelbase_Enter(object sender, EventArgs e)
         {
-            antennaOffset = (double)nudAntennaOffset.Value * metImp2m;
+            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), wheelbase, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxWheelbase.Text = (wheelbase = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                }
+            }
+            btnCancel.Focus();
         }
 
-        private void NudMinTurnRadius_ValueChanged(object sender, EventArgs e)
+        private void TboxAntennaOffset_Enter(object sender, EventArgs e)
         {
-            minTurningRadius = (double)nudMinTurnRadius.Value * metImp2m;
+            using (var form = new FormNumeric(Math.Round(-10 * mf.m2MetImp, mf.decimals), Math.Round(10 * mf.m2MetImp, mf.decimals), antennaOffset, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxAntennaOffset.Text = (antennaOffset = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+        #endregion SettingsTab
+        #region VehicleTab
+        private void TboxHydLiftSecs_Enter(object sender, EventArgs e)
+        {
+
+            using (var form = new FormNumeric(0, 20, hydliftsecs, this, false,2))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxHydLiftSecs.Text = (hydliftsecs = Math.Round(form.ReturnValue, 2)).ToString("0.0#");
+                }
+            }
+            btnCancel.Focus();
         }
 
-        private void NudWheelbase_ValueChanged(object sender, EventArgs e)
+        private void TboxMinTurnRadius_Enter(object sender, EventArgs e)
         {
-            wheelbase = (double)nudWheelbase.Value * metImp2m;
+            using (var form = new FormNumeric(Math.Round(0.5 * mf.m2MetImp, mf.decimals), Math.Round(100 * mf.m2MetImp, mf.decimals), minTurningRadius, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxMinTurnRadius.Text = (minTurningRadius = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+        #endregion VehicleTab
+        #region GuidanceTab
+        private void TboxSnapDistance_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(1, 500, snapDistance, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxSnapDistance.Text = (snapDistance = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnCancel.Focus();
         }
 
-        #endregion Vehicle //----------------------------------------------------------------
+        private void TboxLightbarCmPerPixel_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(1, 20, lightbarCmPerPixie, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxLightbarCmPerPixel.Text = (lightbarCmPerPixie = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxLineWidth_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(1, 8, linewidth, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxLineWidth.Text = (linewidth = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void BtnAutoSteerAuto_Click(object sender, EventArgs e)
+        {
+            if (isAutoSteerAuto = !isAutoSteerAuto)
+            {
+                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOn;
+                BtnAutoSteerAuto.Text = "Remote";
+            }
+            else
+            {
+                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOff;
+                BtnAutoSteerAuto.Text = gStr.gsManual;
+            }
+        }
+        #endregion GuidanceTab
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -27,19 +26,18 @@ namespace AgOpenGPS
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
+            timer1.Interval = (int)((1 / (double)mf.HzTime) * 1000);
             DrawChart();
         }
 
         private void DrawChart()
         {
-            {
-                //word 0 - steerangle, 1 - pwmDisplay
-                dataSteerAngle = mf.actualSteerAngleDisp.ToString();
-                dataPWM = mf.guidanceLineSteerAngle.ToString();
+            //word 0 - steerangle, 1 - pwmDisplay
+            dataSteerAngle = mf.actualSteerAngleDisp.ToString();
+            dataPWM = mf.guidanceLineSteerAngle.ToString();
 
-                lblSteerAng.Text = mf.ActualSteerAngle;
-                lblPWM.Text = mf.SetSteerAngle;
-            }
+            lblSteerAng.Text = mf.ActualSteerAngle;
+            lblPWM.Text = mf.SetSteerAngle;
 
             //chart data
             Series s = unoChart.Series["S"];
@@ -65,11 +63,6 @@ namespace AgOpenGPS
                 }
                 unoChart.ResetAutoValues();
             }
-        }
-
-        private void FormSteerGraph_Load(object sender, EventArgs e)
-        {
-            timer1.Interval = (int)((1 / (double)mf.fixUpdateHz) * 1000);
         }
 
         private void Button1_Click(object sender, EventArgs e)

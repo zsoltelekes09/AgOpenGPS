@@ -34,9 +34,7 @@
             this.cboxConv = new System.Windows.Forms.ComboBox();
             this.cboxEncoder = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.nudMinSpeed = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
-            this.nudMaxSpeed = new System.Windows.Forms.NumericUpDown();
             this.chkInvertRoll = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
             this.cboxMMAAxis = new System.Windows.Forms.ComboBox();
@@ -50,42 +48,38 @@
             this.cboxMotorDrive = new System.Windows.Forms.ComboBox();
             this.btnChangeAttachment = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
-            this.nudMaxCounts = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.tboxSerialFromAutoSteer = new System.Windows.Forms.TextBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.tabcArduino = new System.Windows.Forms.TabControl();
             this.tabAutoSteer = new System.Windows.Forms.TabPage();
+            this.TboxMaxSensorCounts = new System.Windows.Forms.TextBox();
+            this.TboxAckerman = new System.Windows.Forms.TextBox();
+            this.TboxMaxSpeed = new System.Windows.Forms.TextBox();
+            this.TboxMinSpeed = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.cboxSteerInvertRelays = new System.Windows.Forms.CheckBox();
             this.lblSent = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.lblRecd = new System.Windows.Forms.Label();
-            this.nudAckerman = new System.Windows.Forms.NumericUpDown();
             this.tabMachine = new System.Windows.Forms.TabPage();
             this.cboxMachInvertRelays = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.cboxIsSendMachineControlToAutoSteer = new System.Windows.Forms.CheckBox();
             this.tboxSerialFromMachine = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.nudLowerTime = new System.Windows.Forms.NumericUpDown();
-            this.nudRaiseTime = new System.Windows.Forms.NumericUpDown();
+            this.TboxRaiseTime = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.cboxIsHydOn = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinSpeed)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxSpeed)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxCounts)).BeginInit();
+            this.TboxLowerTime = new System.Windows.Forms.TextBox();
             this.tabcArduino.SuspendLayout();
             this.tabAutoSteer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAckerman)).BeginInit();
             this.tabMachine.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudLowerTime)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudRaiseTime)).BeginInit();
             this.SuspendLayout();
             // 
             // label2
@@ -161,23 +155,6 @@
             this.label8.Text = "Min Speed";
             this.label8.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
-            // nudMinSpeed
-            // 
-            this.nudMinSpeed.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudMinSpeed.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudMinSpeed.InterceptArrowKeys = false;
-            this.nudMinSpeed.Location = new System.Drawing.Point(357, 67);
-            this.nudMinSpeed.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.nudMinSpeed.Name = "nudMinSpeed";
-            this.nudMinSpeed.Size = new System.Drawing.Size(165, 52);
-            this.nudMinSpeed.TabIndex = 267;
-            this.nudMinSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudMinSpeed.Enter += new System.EventHandler(this.NudMinSpeed_Enter);
-            // 
             // label4
             // 
             this.label4.BackColor = System.Drawing.Color.Transparent;
@@ -189,33 +166,6 @@
             this.label4.TabIndex = 250;
             this.label4.Text = "Max Speed";
             this.label4.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            // 
-            // nudMaxSpeed
-            // 
-            this.nudMaxSpeed.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudMaxSpeed.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudMaxSpeed.InterceptArrowKeys = false;
-            this.nudMaxSpeed.Location = new System.Drawing.Point(357, 163);
-            this.nudMaxSpeed.Maximum = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.nudMaxSpeed.Minimum = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.nudMaxSpeed.Name = "nudMaxSpeed";
-            this.nudMaxSpeed.Size = new System.Drawing.Size(165, 52);
-            this.nudMaxSpeed.TabIndex = 249;
-            this.nudMaxSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudMaxSpeed.Value = new decimal(new int[] {
-            25,
-            0,
-            0,
-            0});
-            this.nudMaxSpeed.Enter += new System.EventHandler(this.NudMaxSpeed_Enter);
             // 
             // chkInvertRoll
             // 
@@ -399,33 +349,6 @@
             this.label7.Text = "Turn Sensor";
             this.label7.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
-            // nudMaxCounts
-            // 
-            this.nudMaxCounts.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudMaxCounts.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudMaxCounts.InterceptArrowKeys = false;
-            this.nudMaxCounts.Location = new System.Drawing.Point(357, 416);
-            this.nudMaxCounts.Maximum = new decimal(new int[] {
-            60,
-            0,
-            0,
-            0});
-            this.nudMaxCounts.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudMaxCounts.Name = "nudMaxCounts";
-            this.nudMaxCounts.Size = new System.Drawing.Size(165, 52);
-            this.nudMaxCounts.TabIndex = 273;
-            this.nudMaxCounts.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudMaxCounts.Value = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
-            this.nudMaxCounts.Enter += new System.EventHandler(this.NudMaxCounts_Enter);
-            // 
             // label9
             // 
             this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -473,12 +396,15 @@
             // tabAutoSteer
             // 
             this.tabAutoSteer.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.tabAutoSteer.Controls.Add(this.TboxMaxSensorCounts);
+            this.tabAutoSteer.Controls.Add(this.TboxAckerman);
+            this.tabAutoSteer.Controls.Add(this.TboxMaxSpeed);
+            this.tabAutoSteer.Controls.Add(this.TboxMinSpeed);
             this.tabAutoSteer.Controls.Add(this.label12);
             this.tabAutoSteer.Controls.Add(this.cboxSteerInvertRelays);
             this.tabAutoSteer.Controls.Add(this.lblSent);
             this.tabAutoSteer.Controls.Add(this.label13);
             this.tabAutoSteer.Controls.Add(this.lblRecd);
-            this.tabAutoSteer.Controls.Add(this.nudAckerman);
             this.tabAutoSteer.Controls.Add(this.cboxMotorDrive);
             this.tabAutoSteer.Controls.Add(this.tboxSerialFromAutoSteer);
             this.tabAutoSteer.Controls.Add(this.cboxSteerEnable);
@@ -486,15 +412,12 @@
             this.tabAutoSteer.Controls.Add(this.cboxMMAAxis);
             this.tabAutoSteer.Controls.Add(this.label7);
             this.tabAutoSteer.Controls.Add(this.cboxInclinometer);
-            this.tabAutoSteer.Controls.Add(this.nudMaxCounts);
             this.tabAutoSteer.Controls.Add(this.label6);
             this.tabAutoSteer.Controls.Add(this.chkInvertRoll);
             this.tabAutoSteer.Controls.Add(this.cboxConv);
             this.tabAutoSteer.Controls.Add(this.label8);
             this.tabAutoSteer.Controls.Add(this.chkInvertSteer);
-            this.tabAutoSteer.Controls.Add(this.nudMaxSpeed);
             this.tabAutoSteer.Controls.Add(this.label1);
-            this.tabAutoSteer.Controls.Add(this.nudMinSpeed);
             this.tabAutoSteer.Controls.Add(this.cboxEncoder);
             this.tabAutoSteer.Controls.Add(this.label4);
             this.tabAutoSteer.Controls.Add(this.label3);
@@ -507,6 +430,72 @@
             this.tabAutoSteer.Size = new System.Drawing.Size(860, 552);
             this.tabAutoSteer.TabIndex = 0;
             this.tabAutoSteer.Text = "Auto Steer";
+            // 
+            // TboxMaxSensorCounts
+            // 
+            this.TboxMaxSensorCounts.AcceptsReturn = true;
+            this.TboxMaxSensorCounts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxMaxSensorCounts.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxMaxSensorCounts.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxMaxSensorCounts.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxMaxSensorCounts.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxMaxSensorCounts.Location = new System.Drawing.Point(357, 416);
+            this.TboxMaxSensorCounts.MaxLength = 10;
+            this.TboxMaxSensorCounts.Name = "TboxMaxSensorCounts";
+            this.TboxMaxSensorCounts.Size = new System.Drawing.Size(165, 50);
+            this.TboxMaxSensorCounts.TabIndex = 476;
+            this.TboxMaxSensorCounts.Text = "15";
+            this.TboxMaxSensorCounts.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxMaxSensorCounts.Enter += new System.EventHandler(this.TboxMaxSensorCounts_Enter);
+            // 
+            // TboxAckerman
+            // 
+            this.TboxAckerman.AcceptsReturn = true;
+            this.TboxAckerman.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxAckerman.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxAckerman.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxAckerman.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxAckerman.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxAckerman.Location = new System.Drawing.Point(357, 301);
+            this.TboxAckerman.MaxLength = 10;
+            this.TboxAckerman.Name = "TboxAckerman";
+            this.TboxAckerman.Size = new System.Drawing.Size(165, 50);
+            this.TboxAckerman.TabIndex = 475;
+            this.TboxAckerman.Text = "100";
+            this.TboxAckerman.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxAckerman.Enter += new System.EventHandler(this.TboxAckerman_Enter);
+            // 
+            // TboxMaxSpeed
+            // 
+            this.TboxMaxSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxMaxSpeed.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxMaxSpeed.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxMaxSpeed.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxMaxSpeed.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxMaxSpeed.Location = new System.Drawing.Point(357, 163);
+            this.TboxMaxSpeed.MaxLength = 10;
+            this.TboxMaxSpeed.Name = "TboxMaxSpeed";
+            this.TboxMaxSpeed.Size = new System.Drawing.Size(165, 50);
+            this.TboxMaxSpeed.TabIndex = 474;
+            this.TboxMaxSpeed.Text = "25";
+            this.TboxMaxSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxMaxSpeed.Enter += new System.EventHandler(this.TboxMaxSpeed_Enter);
+            // 
+            // TboxMinSpeed
+            // 
+            this.TboxMinSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxMinSpeed.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxMinSpeed.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxMinSpeed.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxMinSpeed.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxMinSpeed.Location = new System.Drawing.Point(357, 67);
+            this.TboxMinSpeed.MaxLength = 10;
+            this.TboxMinSpeed.Name = "TboxMinSpeed";
+            this.TboxMinSpeed.Size = new System.Drawing.Size(165, 50);
+            this.TboxMinSpeed.TabIndex = 473;
+            this.TboxMinSpeed.Text = "0.0";
+            this.TboxMinSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxMinSpeed.Enter += new System.EventHandler(this.TboxMinSpeed_Enter);
             // 
             // label12
             // 
@@ -565,33 +554,6 @@
             this.lblRecd.Size = new System.Drawing.Size(68, 26);
             this.lblRecd.TabIndex = 318;
             this.lblRecd.Text = "Recd";
-            // 
-            // nudAckerman
-            // 
-            this.nudAckerman.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudAckerman.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudAckerman.InterceptArrowKeys = false;
-            this.nudAckerman.Location = new System.Drawing.Point(357, 301);
-            this.nudAckerman.Maximum = new decimal(new int[] {
-            200,
-            0,
-            0,
-            0});
-            this.nudAckerman.Minimum = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.nudAckerman.Name = "nudAckerman";
-            this.nudAckerman.Size = new System.Drawing.Size(165, 52);
-            this.nudAckerman.TabIndex = 315;
-            this.nudAckerman.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudAckerman.Value = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.nudAckerman.Enter += new System.EventHandler(this.NudAckerman_Enter);
             // 
             // tabMachine
             // 
@@ -663,8 +625,8 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.nudLowerTime);
-            this.groupBox1.Controls.Add(this.nudRaiseTime);
+            this.groupBox1.Controls.Add(this.TboxLowerTime);
+            this.groupBox1.Controls.Add(this.TboxRaiseTime);
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.cboxIsHydOn);
             this.groupBox1.Controls.Add(this.label11);
@@ -676,59 +638,21 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Hydraulic Tool Lift";
             // 
-            // nudLowerTime
+            // TboxRaiseTime
             // 
-            this.nudLowerTime.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudLowerTime.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudLowerTime.InterceptArrowKeys = false;
-            this.nudLowerTime.Location = new System.Drawing.Point(55, 288);
-            this.nudLowerTime.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.nudLowerTime.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudLowerTime.Name = "nudLowerTime";
-            this.nudLowerTime.Size = new System.Drawing.Size(165, 52);
-            this.nudLowerTime.TabIndex = 271;
-            this.nudLowerTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudLowerTime.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudLowerTime.Enter += new System.EventHandler(this.NudLowerTime_Enter);
-            // 
-            // nudRaiseTime
-            // 
-            this.nudRaiseTime.BackColor = System.Drawing.Color.AliceBlue;
-            this.nudRaiseTime.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudRaiseTime.InterceptArrowKeys = false;
-            this.nudRaiseTime.Location = new System.Drawing.Point(55, 165);
-            this.nudRaiseTime.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.nudRaiseTime.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudRaiseTime.Name = "nudRaiseTime";
-            this.nudRaiseTime.Size = new System.Drawing.Size(165, 52);
-            this.nudRaiseTime.TabIndex = 269;
-            this.nudRaiseTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.nudRaiseTime.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nudRaiseTime.Enter += new System.EventHandler(this.NudRaiseTime_Enter);
+            this.TboxRaiseTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxRaiseTime.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxRaiseTime.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxRaiseTime.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxRaiseTime.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxRaiseTime.Location = new System.Drawing.Point(55, 165);
+            this.TboxRaiseTime.MaxLength = 10;
+            this.TboxRaiseTime.Name = "TboxRaiseTime";
+            this.TboxRaiseTime.Size = new System.Drawing.Size(165, 50);
+            this.TboxRaiseTime.TabIndex = 474;
+            this.TboxRaiseTime.Text = "1";
+            this.TboxRaiseTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxRaiseTime.Enter += new System.EventHandler(this.TboxRaiseTime_Enter);
             // 
             // label10
             // 
@@ -783,7 +707,6 @@
             this.btnCancel.Size = new System.Drawing.Size(90, 67);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // bntOK
             // 
@@ -800,6 +723,22 @@
             this.bntOK.UseVisualStyleBackColor = true;
             this.bntOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
+            // TboxLowerTime
+            // 
+            this.TboxLowerTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TboxLowerTime.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxLowerTime.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxLowerTime.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLowerTime.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxLowerTime.Location = new System.Drawing.Point(55, 288);
+            this.TboxLowerTime.MaxLength = 10;
+            this.TboxLowerTime.Name = "TboxLowerTime";
+            this.TboxLowerTime.Size = new System.Drawing.Size(165, 50);
+            this.TboxLowerTime.TabIndex = 475;
+            this.TboxLowerTime.Text = "1";
+            this.TboxLowerTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxLowerTime.Enter += new System.EventHandler(this.TboxLowerTime_Enter);
+            // 
             // FormArduinoSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -807,6 +746,7 @@
             this.AutoScroll = true;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(892, 697);
+            this.ControlBox = false;
             this.Controls.Add(this.tabcArduino);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.bntOK);
@@ -821,19 +761,14 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Module Configure";
             this.Load += new System.EventHandler(this.FormToolSettings_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.nudMinSpeed)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxSpeed)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxCounts)).EndInit();
             this.tabcArduino.ResumeLayout(false);
             this.tabAutoSteer.ResumeLayout(false);
             this.tabAutoSteer.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAckerman)).EndInit();
             this.tabMachine.ResumeLayout(false);
             this.tabMachine.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nudLowerTime)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudRaiseTime)).EndInit();
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -841,10 +776,8 @@
         #endregion
         private System.Windows.Forms.Button btnChangeAttachment;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.NumericUpDown nudMaxSpeed;
         private System.Windows.Forms.ComboBox cboxMotorDrive;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.NumericUpDown nudMinSpeed;
         private System.Windows.Forms.CheckBox chkInvertRoll;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ComboBox cboxMMAAxis;
@@ -860,7 +793,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox cboxInclinometer;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.NumericUpDown nudMaxCounts;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox tboxSerialFromAutoSteer;
         private System.Windows.Forms.Timer timer1;
@@ -869,15 +801,12 @@
         private System.Windows.Forms.TabPage tabMachine;
         private System.Windows.Forms.CheckBox cboxIsHydOn;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.NumericUpDown nudLowerTime;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.NumericUpDown nudRaiseTime;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox tboxSerialFromMachine;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.CheckBox cboxIsSendMachineControlToAutoSteer;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.NumericUpDown nudAckerman;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button bntOK;
         private System.Windows.Forms.CheckBox cboxSteerInvertRelays;
@@ -885,5 +814,11 @@
         private System.Windows.Forms.Label lblSent;
         private System.Windows.Forms.Label lblRecd;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox TboxMinSpeed;
+        private System.Windows.Forms.TextBox TboxMaxSpeed;
+        private System.Windows.Forms.TextBox TboxAckerman;
+        private System.Windows.Forms.TextBox TboxMaxSensorCounts;
+        private System.Windows.Forms.TextBox TboxRaiseTime;
+        private System.Windows.Forms.TextBox TboxLowerTime;
     }
 }

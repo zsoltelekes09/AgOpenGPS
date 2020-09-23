@@ -1,8 +1,5 @@
-﻿//Please, if you use this, share the improvements
-
-using AgOpenGPS.Properties;
+﻿using AgOpenGPS.Properties;
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -11,7 +8,6 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf = null;
-
 
         //constructor
         public FormDisplayOptions(Form callingForm)
@@ -40,6 +36,7 @@ namespace AgOpenGPS
             unitsGroupBox.Text = gStr.gsUnits;
 
         }
+
         private void FormDisplaySettings_Load(object sender, EventArgs e)
         {
             chkSky.Checked = mf.isSkyOn;
@@ -54,6 +51,7 @@ namespace AgOpenGPS
             chkPursuitLines.Checked = mf.isPureDisplayOn;
             chkUTurnOn.Checked = mf.isUTurnAlwaysOn;
             chkAutoLoadFields.Checked = mf.isAutoLoadFields;
+            chkDrawBackBuffer.Checked = mf.DrawBackBuffer;
 
             if (mf.isMetric) rbtnMetric.Checked = true;
             else rbtnImperial.Checked = true;
@@ -71,6 +69,7 @@ namespace AgOpenGPS
             mf.isPureDisplayOn = chkPursuitLines.Checked;
             mf.isUTurnAlwaysOn = chkUTurnOn.Checked;
             mf.isAutoLoadFields = chkAutoLoadFields.Checked;
+            mf.DrawBackBuffer = chkDrawBackBuffer.Checked;
             if (mf.isAutoLoadFields) mf.LoadFields();
             else mf.Fields.Clear();
 
@@ -86,10 +85,29 @@ namespace AgOpenGPS
             Settings.Default.setMenu_isPureOn = mf.isPureDisplayOn;
             Settings.Default.setMenu_isUTurnAlwaysOn = mf.isUTurnAlwaysOn;
             Settings.Default.AutoLoadFields = mf.isAutoLoadFields;
-            
+            Settings.Default.DrawBackBuffer = mf.DrawBackBuffer;
+
+
 
             if (rbtnMetric.Checked) { Settings.Default.setMenu_isMetric = true; mf.isMetric = true; }
             else { Settings.Default.setMenu_isMetric = false; mf.isMetric = false; }
+
+            //metric settings
+            if (mf.isMetric)
+            {
+                mf.metImp2m = 0.01;
+                mf.m2MetImp = 100.0;
+                mf.cutoffMetricImperial = 1;
+                mf.decimals = 0;
+            }
+            else
+            {
+                mf.metImp2m = Glm.in2m;
+                mf.m2MetImp = Glm.m2in;
+                mf.cutoffMetricImperial = 1.60934;
+                mf.decimals = 3;
+            }
+
 
             Settings.Default.Save();
             Close();

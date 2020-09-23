@@ -44,43 +44,44 @@ namespace AgOpenGPS
             //put the driven list into an array
             for (i = 0; i < numShapePoints; i++)
             {
-                pt[i].easting = mf.yt.youFileList[i].easting;
-                pt[i].northing = mf.yt.youFileList[i].northing;
+                pt[i].Easting = mf.yt.youFileList[i].Easting;
+                pt[i].Northing = mf.yt.youFileList[i].Northing;
             }
 
             //empty out the youFileList
             mf.yt.youFileList.Clear();
 
             //rotate pattern to match AB Line heading
+            double head = (mf.ABLines.CurrentLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentLine > -1) ? mf.ABLines.ABLines[mf.ABLines.CurrentLine].Heading : 0;
             for (i = 0; i < pt.Length; i++)
             {
                 //since we want to unwind the heading, we go not negative for heading unlike GPS circle
                 double xr, yr;
-                xr = (Math.Cos(mf.ABLine.abHeading) * pt[i].easting) - (Math.Sin(mf.ABLine.abHeading) * pt[i].northing);
-                yr = (Math.Sin(mf.ABLine.abHeading) * pt[i].easting) + (Math.Cos(mf.ABLine.abHeading) * pt[i].northing);
+                xr = (Math.Cos(head) * pt[i].Easting) - (Math.Sin(head) * pt[i].Northing);
+                yr = (Math.Sin(head) * pt[i].Easting) + (Math.Cos(head) * pt[i].Northing);
 
                 //update the array
-                pt[i].easting = xr;
-                pt[i].northing = yr;
+                pt[i].Easting = xr;
+                pt[i].Northing = yr;
             }
 
             //scale the drawing to match exactly the ABLine width
-            double adjustFactor = pt[pt.Length - 1].easting;
-            adjustFactor = (mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap + mf.Guidance.GuidanceOffset) / adjustFactor;
+            double adjustFactor = pt[pt.Length - 1].Easting;
+            adjustFactor = (mf.Guidance.WidthMinusOverlap + mf.Guidance.GuidanceOffset) / adjustFactor;
             for (i = 0; i < pt.Length; i++)
             {
-                pt[i].easting *= adjustFactor;
-                pt[i].northing *= adjustFactor;
+                pt[i].Easting *= adjustFactor;
+                pt[i].Northing *= adjustFactor;
             }
 
             // 2nd pass scale it so coords are based on 10m
             //last point is the width
-            adjustFactor = pt[pt.Length - 1].easting;
+            adjustFactor = pt[pt.Length - 1].Easting;
             adjustFactor = 10.0 / adjustFactor;
             for (i = 0; i < pt.Length; i++)
             {
-                pt[i].easting *= adjustFactor;
-                pt[i].northing *= adjustFactor;
+                pt[i].Easting *= adjustFactor;
+                pt[i].Northing *= adjustFactor;
                 mf.yt.youFileList.Add(pt[i]);
             }
 
@@ -92,7 +93,7 @@ namespace AgOpenGPS
             {
                 writer.WriteLine(pt.Length);
                 for (i = 0; i < mf.yt.youFileList.Count; i++)
-                    writer.WriteLine(mf.yt.youFileList[i].easting + "," + mf.yt.youFileList[i].northing);
+                    writer.WriteLine(mf.yt.youFileList[i].Easting + "," + mf.yt.youFileList[i].Northing);
             }
 
             Close();

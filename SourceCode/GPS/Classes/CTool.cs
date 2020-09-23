@@ -123,11 +123,12 @@ namespace AgOpenGPS
                     mf.Controls.Remove(Sections[j].SectionButton);
                     Sections[j].SectionButton.Dispose();
                     Sections.RemoveAt(j);
+                    mf.TotalSections--;
                 }
                 else if (j == numOfSections)
                 {
                     mf.Controls.Remove(Sections[j].SectionButton);
-                    Sections[j].SectionButton.Dispose();
+                    //Sections[j].SectionButton.Dispose();
                 }
             }
 
@@ -154,8 +155,8 @@ namespace AgOpenGPS
 
                         if (!mf.Controls.Contains(Sections[j].SectionButton))
                         {
+                            mf.TotalSections++;
                             Sections[j].BtnSectionState = mf.autoBtnState;
-                            Sections[j].IsAllowedOn = (mf.autoBtnState != 0);
 
                             mf.Controls.Add(Sections[j].SectionButton);
 
@@ -211,7 +212,7 @@ namespace AgOpenGPS
                 if (isToolTBT)
                 {
                     //rotate to tank heading
-                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.heading), 0.0, 0.0, 1.0);
+                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.Heading), 0.0, 0.0, 1.0);
 
                     //draw the tank hitch
                     GL.LineWidth(2f);
@@ -230,11 +231,10 @@ namespace AgOpenGPS
 
                     //move down the tank hitch, unwind, rotate to section heading
                     GL.Translate(0.0, toolTankTrailingHitchLength, 0.0);
-                    //GL.Rotate(Glm.ToDegrees(tankPos.heading), 0.0, 0.0, 1.0);
                 }
 
 
-                GL.Rotate(Glm.ToDegrees(TankPos.heading - ToolPos.heading), 0.0, 0.0, 1.0);
+                GL.Rotate(Glm.ToDegrees(TankPos.Heading - ToolPos.Heading), 0.0, 0.0, 1.0);
 
                 //draw the hitch
                 GL.LineWidth(2);
@@ -281,7 +281,7 @@ namespace AgOpenGPS
                 }
                 GL.Vertex3(Sections[numOfSections - 1].positionRight, Sections[numOfSections - 1].positionForward + (lookAheadDistanceOffPixelsRight) * 0.1, 0);
 
-                if (mf.vehicle.isHydLiftOn)
+                if (mf.vehicle.BtnHydLiftOn)
                 {
                     GL.Color3(0.70f, 0.2f, 0.72f);
                     GL.Vertex3(Sections[0].positionLeft, (mf.vehicle.hydLiftLookAheadDistanceLeft * 0.1), 0);
@@ -368,12 +368,12 @@ namespace AgOpenGPS
             if (isToolTrailing)
             {
                 GL.Translate(0.0, -toolTrailingHitchLength, 0.0);
-                GL.Rotate(Glm.ToDegrees(TankPos.heading - ToolPos.heading), 0.0, 0.0, -1.0);
+                GL.Rotate(Glm.ToDegrees(TankPos.Heading - ToolPos.Heading), 0.0, 0.0, -1.0);
 
                 if (isToolTBT)
                 {
                     GL.Translate(0.0, -toolTankTrailingHitchLength, 0.0);
-                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.heading), 0.0, 0.0, -1.0);
+                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.Heading), 0.0, 0.0, -1.0);
                 }
 
             }
