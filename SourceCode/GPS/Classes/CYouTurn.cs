@@ -1172,7 +1172,7 @@ namespace AgOpenGPS
             bool TurnAround;
             double head;
             //point on AB line closest to pivot axle point from ABLine PurePursuit
-            if (mf.ABLines.CurrentLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentLine > -1)
+            if (mf.ABLines.BtnABLineOn && mf.ABLines.CurrentLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentLine > -1)
             {
                 rEastYT = mf.ABLines.rEastAB;
                 rNorthYT = mf.ABLines.rNorthAB;

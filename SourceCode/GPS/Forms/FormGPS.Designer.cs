@@ -1778,7 +1778,7 @@
             this.toolstripVehicleConfig.Name = "toolstripVehicleConfig";
             this.toolstripVehicleConfig.Size = new System.Drawing.Size(400, 72);
             this.toolstripVehicleConfig.Text = "Vehicle";
-            this.toolstripVehicleConfig.Click += new System.EventHandler(this.toolstripVehicleConfig_Click_1);
+            this.toolstripVehicleConfig.Click += new System.EventHandler(this.vehicleToolStripBtn_Click);
             // 
             // toolToolStripMenu
             // 

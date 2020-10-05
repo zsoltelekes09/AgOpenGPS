@@ -202,6 +202,7 @@ byte serialResetTimer = 100; //if serial buffer is getting full, empty it
   
   //Steer switch button  ***********************************************************************************************************
   byte reading;
+  byte previous = 0;
 
    byte pulseCount = 0; // Steering Wheel Encoder
    bool encEnable = false; //debounce flag
@@ -231,6 +232,8 @@ byte serialResetTimer = 100; //if serial buffer is getting full, empty it
       byte SteerSwitch = 0;
       byte UseMMA_X_Axis = 0;
       byte ShaftEncoder = 0;
+      byte WorkSwActiveLow = 0;
+      byte WorkSwManual = 0;
       
       byte BNOInstalled = 0;
       byte InclinometerInstalled = 0;   // set to 0 for none
@@ -243,7 +246,8 @@ byte serialResetTimer = 100; //if serial buffer is getting full, empty it
       byte AckermanFix = 100;     //sent as percent
       byte isRelayActiveHigh = 0; //if zero, active low (default)
 
-  };  Setup aogSettings;          //15 bytes
+  };  Setup aogSettings;          //17 bytes
+
 
   //Variables for config - 0 is false  
   struct Config {
@@ -316,7 +320,7 @@ void setup()
   EEPROM.get(0, EEread);              // read identifier
     
   if (EEread != EEP_Ident)   // check on first start and write EEPROM
-  {           
+  {
     EEPROM.put(0, EEP_Ident);
     EEPROM.put(2, WAS_ZERO);
     EEPROM.put(10, steerSettings);   
@@ -465,11 +469,17 @@ void loop()
     {
         workSwitch = reading;
         
+        byte num = workSwitch;
+        
+        if (aogSettings.WorkSwActiveLow) num = num ^ 0x01;
+        if (aogSettings.WorkSwManual) num += num << 1;
+        
         toSend[1] = 0xC5;
         toSend[2] = 0x04;
-        toSend[3] = (byte)workSwitch;
+        toSend[3] = num;
         SendData(toSend, 4);
     }
+    
     if (aogSettings.SteerSwitch == 1) //steer switch on - off
     {
       reading = digitalRead(STEERSW_PIN); //read auto steer enable switch open = 0n closed = Off
@@ -477,18 +487,16 @@ void loop()
       {
         steerSwitch = reading;
         pulseCount = 0;
-        
         toSend[1] = 0xC4;
         toSend[2] = 0x04;
-        toSend[3] = (byte)steerSwitch;
+        toSend[3] = (byte)steerSwitch << 1 ^ 0x02;
         SendData(toSend, 4);
       }
     }
     else   //steer Button momentary
     {
-      byte previous = reading;
       reading = digitalRead(STEERSW_PIN);
-      if (reading == LOW && previous == HIGH) 
+      if (reading == LOW && previous == HIGH)
       {
         pulseCount = 0;
         if (steerSwitch == 1) steerSwitch = 0;
@@ -496,9 +504,10 @@ void loop()
 
         toSend[1] = 0xC4;
         toSend[2] = 0x04;
-        toSend[3] = (byte)steerSwitch;
+        toSend[3] = (byte)steerSwitch << 1 ^ 0x02;
         SendData(toSend, 4);
       }
+      previous = reading;
     }
     
     #if (Enable_Section_Control_Input)
@@ -516,7 +525,6 @@ void loop()
           toSend[3] = ToolIndex;
           toSend[4] = (byte)k;
           toSend[5] = SectionsState[k];
-          //Serial.println(toSend[5]);
           SendData(toSend, 6);
         }
       }
@@ -629,7 +637,7 @@ void loop()
       {
         if (encEnable)
         {
-          pulseCount++; 
+          pulseCount++;
           encEnable = false;
 
           if (aogSettings.ShaftEncoder && pulseCount >= aogSettings.PulseCountMax ) 

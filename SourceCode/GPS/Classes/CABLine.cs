@@ -171,22 +171,20 @@ namespace AgOpenGPS
             {
                 double hsin = Math.Sin(ABLines[CurrentLine].Heading);
                 double hcos = Math.Cos(ABLines[CurrentLine].Heading);
+                
+                int tramcount = mf.tram.TramList.Count;
 
-                for (double i = 0; i < mf.tram.passes; i++)
+                for (double i = 0.5; i < mf.tram.passes; i++)
                 {
-                    double offset = (mf.tram.tramWidth * i) - mf.tram.halfWheelTrack - mf.tram.abOffset;
+                    double Offset = (mf.tram.tramWidth * i) - mf.Guidance.WidthMinusOverlap / 2 - mf.tram.halfWheelTrack - mf.tram.abOffset;
 
                     Vec2 pos1A = ABLines[CurrentLine].ref1;
-                    double p = pos1A.Northing;
-                    double q = pos1A.Easting;
-                    pos1A.Northing += hcos * 4000 + hsin * -offset;
-                    pos1A.Easting += hsin * 4000 + hcos * offset;
+                    pos1A.Northing += hcos * 4000 + hsin * -Offset;
+                    pos1A.Easting += hsin * 4000 + hcos * Offset;
 
                     Vec2 pos1B = ABLines[CurrentLine].UsePoint ? ABLines[CurrentLine].ref2 : ABLines[CurrentLine].ref1;
-                    p = pos1B.Northing;
-                    q = pos1B.Easting;
-                    pos1B.Northing += hcos * -4000 + hsin * -offset;
-                    pos1B.Easting += hsin * -4000 + hcos * offset;
+                    pos1B.Northing += hcos * -4000 + hsin * -Offset;
+                    pos1B.Easting += hsin * -4000 + hcos * Offset;
 
                     Vec2 pos2A = pos1A;
                     pos2A.Northing += hsin * -mf.tram.wheelTrack;
@@ -202,12 +200,19 @@ namespace AgOpenGPS
                         List<Vec4> Crossings1 = new List<Vec4>();
                         Vec2 crossing = new Vec2();
 
-                        mf.FindCrossingPoints(ref Crossings1, ref mf.tram.TramList[0].Left, pos1A.Northing, pos1A.Easting, pos1B.Northing - pos1A.Northing, pos1B.Easting - pos1A.Easting, 0);
+                        for (int m = 0; m < tramcount; m++)
+                        {
+                            Crossings1.FindCrossingPoints(ref mf.tram.TramList[m].Left, pos1A.Northing, pos1A.Easting, pos1B.Northing - pos1A.Northing, pos1B.Easting - pos1A.Easting, 0);
+
+                        }
 
                         if (Crossings1.Count > 1)
                         {
                             List<Vec4> Crossings2 = new List<Vec4>();
-                            mf.FindCrossingPoints(ref Crossings2, ref mf.tram.TramList[0].Left, pos2A.Northing, pos2A.Easting, pos2B.Northing - pos2A.Northing, pos2B.Easting - pos2A.Easting, 0);
+                            for (int m = 0; m < tramcount; m++)
+                            {
+                                Crossings2.FindCrossingPoints(ref mf.tram.TramList[m].Left, pos2A.Northing, pos2A.Easting, pos2B.Northing - pos2A.Northing, pos2B.Easting - pos2A.Easting, 0);
+                            }
 
                             if (Crossings2.Count > 1)
                             {
@@ -286,7 +291,7 @@ namespace AgOpenGPS
 
                                         //left of left tram
                                         crossing = new Vec2(Crossings1[j].Northing, Crossings1[j].Easting);
-                                        crossing.Northing += hcos * -mf.tram.halfWheelTrack + hsin * -(mf.tram.WheelWidth/2);
+                                        crossing.Northing += hcos * -mf.tram.halfWheelTrack + hsin * -(mf.tram.WheelWidth / 2);
                                         crossing.Easting += hsin * -mf.tram.halfWheelTrack + hcos * (mf.tram.WheelWidth / 2);
                                         mf.tram.TramList[mf.tram.TramList.Count - 1].Left.Add(crossing);
 

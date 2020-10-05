@@ -305,6 +305,7 @@ namespace AgOpenGPS
             if (toSend && counter > 6)
             {
                 Properties.Vehicle.Default.Save();
+                mf.DataSend[8] = "Auto Steer: Config Steer Settings";
                 mf.SendData(mf.mc.Config_AutoSteer, true);
                 toSend = false;
                 counter = 0;

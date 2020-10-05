@@ -23,11 +23,6 @@ namespace AgOpenGPS
             btnCloseSerialAutoSteer.Text = gStr.gsDisconnect;
             btnRescan.Text = gStr.gsRescanPorts;
 
-            label3.Text = gStr.gsToAutoSteer;
-            label6.Text = gStr.gsFromAutoSteer;
-            label2.Text = gStr.gsToMachinePort;
-            label15.Text = gStr.gsFromMachinePort;
-
             groupBox1.Text = gStr.gsGPSPort;
             groupBox3.Text = gStr.gsAutoSteerPort;
             groupBox2.Text = gStr.gsMachinePort;
@@ -269,14 +264,9 @@ namespace AgOpenGPS
         {
             //GPS phrase
             textBoxRcv.Lines = mf.recvSentenceSettings;
-            //mf.recvSentenceSettings = "";
 
-            //RateMachine phrases
-            txtBoxRecvArduino.Text = mf.mc.serialRecvMachineStr;
-            //autoSteer phrases
-            txtBoxRecvAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;
-
-            txtBoxSendAutoSteer.Text = "Speed " + mf.pn.speed.ToString("0.00") + ",DistanceLine " + mf.guidanceLineDistanceOff + ", SteerAngle " + mf.guidanceLineSteerAngle;
+            tBoxSend.Lines = mf.DataSend;
+            tBoxRecieved.Lines = mf.DataRecieved;
         }
 
         private void BtnSerialOK_Click(object sender, EventArgs e)

@@ -16,12 +16,14 @@ namespace AgOpenGPS
 
         public List<Trams> TramList = new List<Trams>();
 
+        public List<List<Vec2>> calcList = new List<List<Vec2>>();
+        List<double[]> MaxBound = new List<double[]>();
+
         //tram settings
         public double wheelTrack, WheelWidth;
         public double tramWidth, abOffset;
         public double halfWheelTrack;
         public int passes;
-        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
         // 0 off, 1 All, 2, Lines, 3 Outer
         public int displayMode;
@@ -80,55 +82,39 @@ namespace AgOpenGPS
 
         public void CreateBndTramRef()
         {
-            //count the points from the boundary
-            int ptCount = mf.bnd.bndArr[0].bndLine.Count;
-
-            TramList.Add(new Trams());
-
-            //outside point
-            Vec2 Point = new Vec2();
-
-            double Offset = tramWidth * 0.5 - halfWheelTrack - abOffset;
-            double Offset2 = tramWidth * 0.5 + halfWheelTrack - abOffset;
-
             //make the boundary tram outer array
-            for (int i = 0; i < ptCount; i++)
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                double CosHeading = Math.Cos(mf.bnd.bndArr[0].bndLine[i].Heading);
-                double SinHeading = Math.Sin(mf.bnd.bndArr[0].bndLine[i].Heading);
+                int ChangeDirection = i == 0 ? 1 : -1;
 
-                //calculate the point inside the boundary
-                Point.Northing = mf.bnd.bndArr[0].bndLine[i].Northing + SinHeading * -Offset;
-                Point.Easting = mf.bnd.bndArr[0].bndLine[i].Easting + CosHeading * Offset;
+                //count the points from the boundary
+                int ptCount = mf.bnd.bndArr[i].bndLine.Count;
 
-                bool fail = false;
+                double Offset = tramWidth * 0.5 - halfWheelTrack - abOffset;
+                double Offset2 = tramWidth * 0.5 + halfWheelTrack - abOffset;
+                Vec3 Point;
+
+                List<Vec3> BuildLeft = new List<Vec3>();
+                List<Vec3> BuildRight = new List<Vec3>();
+
+                //make the boundary tram outer array
                 for (int j = 0; j < ptCount; j++)
                 {
-                    double dist = Glm.DistanceSquared(Point.Northing, Point.Easting, mf.bnd.bndArr[0].bndLine[j].Northing, mf.bnd.bndArr[0].bndLine[j].Easting);
-                    if (dist < (Offset * Offset) - 1)
+                    double CosHeading = Math.Cos(mf.bnd.bndArr[i].bndLine[j].Heading);
+                    double SinHeading = Math.Sin(mf.bnd.bndArr[i].bndLine[j].Heading);
+
+
+                    Point = mf.bnd.bndArr[i].bndLine[j];
+
+                    //calculate the point inside the boundary
+                    Point.Northing += SinHeading * -Offset * ChangeDirection;
+                    Point.Easting += CosHeading * Offset * ChangeDirection;
+
+                    bool fail = false;
+                    for (int k = 0; k < ptCount; k++)
                     {
-                        fail = true;
-                        break;
-                    }
-                }
-                if (!fail)
-                {
-
-                    Point.Northing += SinHeading * (WheelWidth / 2);
-                    Point.Easting += CosHeading * (-WheelWidth / 2);
-                    TramList[0].Left.Add(Point);
-                    Point.Northing += SinHeading * -WheelWidth;
-                    Point.Easting += CosHeading * WheelWidth;
-                    TramList[0].Left.Add(Point);
-
-                    Point.Northing = mf.bnd.bndArr[0].bndLine[i].Northing + SinHeading * -Offset2;
-                    Point.Easting = mf.bnd.bndArr[0].bndLine[i].Easting + CosHeading * Offset2;
-
-                    fail = false;
-                    for (int j = 0; j < ptCount; j++)
-                    {
-                        double dist = Glm.DistanceSquared(Point.Northing, Point.Easting, mf.bnd.bndArr[0].bndLine[j].Northing, mf.bnd.bndArr[0].bndLine[j].Easting);
-                        if (dist < (Offset * Offset) - 1)
+                        double dist = Glm.DistanceSquared(Point.Northing, Point.Easting, mf.bnd.bndArr[i].bndLine[k].Northing, mf.bnd.bndArr[i].bndLine[k].Easting);
+                        if (dist < (Offset * Offset) - 0.001)
                         {
                             fail = true;
                             break;
@@ -136,26 +122,161 @@ namespace AgOpenGPS
                     }
                     if (!fail)
                     {
+                        BuildLeft.Add(Point);
+
+                        Point = mf.bnd.bndArr[i].bndLine[j];
+                        Point.Northing += SinHeading * -Offset2 * ChangeDirection;
+                        Point.Easting += CosHeading * Offset2 * ChangeDirection;
+
+                        fail = false;
+                        for (int k = 0; k < ptCount; k++)
+                        {
+                            double dist = Glm.DistanceSquared(Point.Northing, Point.Easting, mf.bnd.bndArr[i].bndLine[k].Northing, mf.bnd.bndArr[i].bndLine[k].Easting);
+                            if (dist < (Offset2 * Offset2) - 0.001)
+                            {
+                                fail = true;
+                                break;
+                            }
+                        }
+                        if (!fail)
+                        {
+                            BuildRight.Add(Point);
+                        }
+                    }
+                }
+
+                if (BuildLeft.Count > 1 && BuildRight.Count > 1)
+                {
+
+                    TramList.Add(new Trams());
+                    BuildLeft.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, true, false, true, halfWheelTrack);
+
+                    BuildLeft.Add(BuildLeft[0]);
+
+                    for (int k = 0; k < BuildLeft.Count; k += 2)
+                    {
+                        Point = BuildLeft[k];
+
+                        double CosHeading = Math.Cos(BuildLeft[k].Heading);
+                        double SinHeading = Math.Sin(BuildLeft[k].Heading);
+
                         Point.Northing += SinHeading * (WheelWidth / 2);
                         Point.Easting += CosHeading * (-WheelWidth / 2);
-                        TramList[0].Right.Add(Point);
+                        TramList[i].Left.Add(new Vec2(Point.Northing, Point.Easting));
                         Point.Northing += SinHeading * -WheelWidth;
                         Point.Easting += CosHeading * WheelWidth;
-                        TramList[0].Right.Add(Point);
+                        TramList[i].Left.Add(new Vec2(Point.Northing, Point.Easting));
+                    }
+
+                    BuildRight.Add(BuildRight[0]);
+
+                    BuildRight.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, true, false, false, halfWheelTrack);
+
+                    BuildRight.Add(BuildRight[0]);
+
+                    for (int k = 0; k < BuildRight.Count; k += 2)
+                    {
+                        Point = BuildRight[k];
+
+                        double CosHeading = Math.Cos(BuildRight[k].Heading);
+                        double SinHeading = Math.Sin(BuildRight[k].Heading);
+
+                        Point.Northing += SinHeading * (WheelWidth / 2);
+                        Point.Easting += CosHeading * (-WheelWidth / 2);
+                        TramList[i].Right.Add(new Vec2(Point.Northing, Point.Easting));
+                        Point.Northing += SinHeading * -WheelWidth;
+                        Point.Easting += CosHeading * WheelWidth;
+                        TramList[i].Right.Add(new Vec2(Point.Northing, Point.Easting));
                     }
                 }
             }
 
-            if (TramList[0].Left.Count > 1)
+            //PreCalcTurnLines();
+        }
+
+        public void PreCalcTurnLines()
+        {
+            calcList.Clear();
+            MaxBound.Clear();
+            for (int i = 0; i < TramList.Count; i++)
             {
-                TramList[0].Left.Add(TramList[0].Left[0]);
-                TramList[0].Left.Add(TramList[0].Left[1]);
+                calcList.Add(new List<Vec2>());
+
+                if (TramList[i].Left.Count > 3)
+                {
+                    int j = TramList[i].Left.Count - 2;
+
+                    Vec2 constantMultiple = new Vec2(0, 0);
+
+                    MaxBound.Add(new double[4] { TramList[i].Left[0].Northing, TramList[i].Left[0].Northing, TramList[i].Left[0].Easting, TramList[i].Left[0].Easting });
+
+                    for (int k = -2; k + 2 < TramList[i].Left.Count; j = k)
+                    {
+                        k += 2;
+                        if (MaxBound[i][0] < TramList[i].Left[k].Northing) MaxBound[i][0] = TramList[i].Left[k].Northing;
+                        if (MaxBound[i][1] > TramList[i].Left[k].Northing) MaxBound[i][1] = TramList[i].Left[k].Northing;
+                        if (MaxBound[i][2] < TramList[i].Left[k].Easting) MaxBound[i][2] = TramList[i].Left[k].Easting;
+                        if (MaxBound[i][3] > TramList[i].Left[k].Easting) MaxBound[i][3] = TramList[i].Left[k].Easting;
+
+                        //check for divide by zero
+                        if (Math.Abs(TramList[i].Left[k].Northing - TramList[i].Left[j].Northing) < double.Epsilon)
+                        {
+                            constantMultiple.Easting = TramList[i].Left[k].Easting;
+                            constantMultiple.Northing = 0;
+                            calcList[i].Add(constantMultiple);
+                        }
+                        else
+                        {
+                            //determine constant and multiple and add to list
+                            constantMultiple.Easting = TramList[i].Left[k].Easting - ((TramList[i].Left[k].Northing * TramList[i].Left[j].Easting)
+                                            / (TramList[i].Left[j].Northing - TramList[i].Left[k].Northing)) + ((TramList[i].Left[k].Northing * TramList[i].Left[k].Easting)
+                                                / (TramList[i].Left[j].Northing - TramList[i].Left[k].Northing));
+                            constantMultiple.Northing = (TramList[i].Left[j].Easting - TramList[i].Left[k].Easting) / (TramList[i].Left[j].Northing - TramList[i].Left[k].Northing);
+                            calcList[i].Add(constantMultiple);
+                        }
+                    }
+                }
             }
-            if (TramList[0].Right.Count > 1)
+        }
+
+        public bool IsPointInsideTrams(Vec3 pt)
+        {
+            //if inside outer boundary, then potentially add
+            if (calcList.Count > 0 && IsPointInGeoFenceArea(0 , pt))
             {
-                TramList[0].Right.Add(TramList[0].Right[0]);
-                TramList[0].Right.Add(TramList[0].Right[1]);
+                for (int b = 1; b < calcList.Count; b++)
+                {
+                    if (IsPointInGeoFenceArea(b, pt))
+                    {
+                        //point is in an inner turn area but inside outer
+                        return false;
+                    }
+                }
+                return true;
             }
+            else return false;
+        }
+
+        public bool IsPointInGeoFenceArea(int idx, Vec3 TestPoint)
+        {
+            if (calcList[idx].Count < 3) return false;
+            int j = TramList[idx].Left.Count - 2;
+            bool oddNodes = false;
+
+            if (TestPoint.Northing > MaxBound[idx][1] || TestPoint.Northing < MaxBound[idx][0] || TestPoint.Easting > MaxBound[idx][3] || TestPoint.Easting < MaxBound[idx][2])
+            {
+                //test against the constant and multiples list the test point
+                for (int k = -2; k + 2 < TramList[idx].Left.Count; j = k)
+                {
+                    k += 2;
+                    if ((TramList[idx].Left[k].Northing < TestPoint.Northing && TramList[idx].Left[j].Northing >= TestPoint.Northing)
+                    || (TramList[idx].Left[j].Northing < TestPoint.Northing && TramList[idx].Left[k].Northing >= TestPoint.Northing))
+                    {
+                        oddNodes ^= ((TestPoint.Northing * calcList[idx][k/2].Northing) + calcList[idx][k/2].Easting < TestPoint.Easting);
+                    }
+                }
+            }
+            return oddNodes; //true means inside.
         }
     }
 }

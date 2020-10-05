@@ -57,8 +57,6 @@
             this.TboxLineWidth = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.TboxLightbarCmPerPixel = new System.Windows.Forms.TextBox();
-            this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.BtnAutoSteerAuto = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.TboxSnapDistance = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
@@ -75,7 +73,6 @@
             this.tabGuidance.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox9.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -431,7 +428,6 @@
             this.tabGuidance.BackColor = System.Drawing.SystemColors.Window;
             this.tabGuidance.Controls.Add(this.groupBox4);
             this.tabGuidance.Controls.Add(this.groupBox2);
-            this.tabGuidance.Controls.Add(this.groupBox9);
             this.tabGuidance.Controls.Add(this.groupBox1);
             this.tabGuidance.Location = new System.Drawing.Point(4, 73);
             this.tabGuidance.Name = "tabGuidance";
@@ -493,33 +489,6 @@
             this.TboxLightbarCmPerPixel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxLightbarCmPerPixel.WordWrap = false;
             this.TboxLightbarCmPerPixel.Enter += new System.EventHandler(this.TboxLightbarCmPerPixel_Enter);
-            // 
-            // groupBox9
-            // 
-            this.groupBox9.Controls.Add(this.BtnAutoSteerAuto);
-            this.groupBox9.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox9.Location = new System.Drawing.Point(714, 288);
-            this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(232, 192);
-            this.groupBox9.TabIndex = 92;
-            this.groupBox9.TabStop = false;
-            this.groupBox9.Text = "Remote/Manual AutoSteer Button";
-            // 
-            // BtnAutoSteerAuto
-            // 
-            this.BtnAutoSteerAuto.FlatAppearance.BorderSize = 3;
-            this.BtnAutoSteerAuto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.BtnAutoSteerAuto.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnAutoSteerAuto.Image = global::AgOpenGPS.Properties.Resources.AutoSteerOn;
-            this.BtnAutoSteerAuto.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.BtnAutoSteerAuto.Location = new System.Drawing.Point(58, 66);
-            this.BtnAutoSteerAuto.Name = "BtnAutoSteerAuto";
-            this.BtnAutoSteerAuto.Size = new System.Drawing.Size(90, 100);
-            this.BtnAutoSteerAuto.TabIndex = 125;
-            this.BtnAutoSteerAuto.Text = "Manual";
-            this.BtnAutoSteerAuto.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.BtnAutoSteerAuto.UseVisualStyleBackColor = true;
-            this.BtnAutoSteerAuto.Click += new System.EventHandler(this.BtnAutoSteerAuto_Click);
             // 
             // groupBox1
             // 
@@ -640,7 +609,6 @@
             this.groupBox4.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox9.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -665,7 +633,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TabPage tabSettings;
         private System.Windows.Forms.TabPage tabGuidance;
-        private System.Windows.Forms.GroupBox groupBox9;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox4;
@@ -686,6 +653,5 @@
         private System.Windows.Forms.TextBox TboxAntennaHeight;
         private System.Windows.Forms.TextBox TboxAntennaOffset;
         private System.Windows.Forms.TextBox TboxWheelbase;
-        private System.Windows.Forms.Button BtnAutoSteerAuto;
     }
 }

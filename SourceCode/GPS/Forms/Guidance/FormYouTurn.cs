@@ -1309,6 +1309,7 @@ namespace AgOpenGPS
             if ((mf.mc.Send_Uturn[3] & 0x20) == 0x20) btnToggle8.BackColor = Color.LightGreen;
             else btnToggle8.BackColor = Color.LightSalmon;
 
+            mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
             mf.SendData(mf.mc.Send_Uturn, false);
         }
     }

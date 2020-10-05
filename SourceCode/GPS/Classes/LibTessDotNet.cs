@@ -103,8 +103,6 @@ namespace AgOpenGPS
         /// </summary>
         public const int Undef = ~0;
 
-        public double SUnitX = 1;
-        public double SUnitY = 0;
         public double SentinelCoord = 4e30f;
 
         /// <summary>
@@ -136,7 +134,6 @@ namespace AgOpenGPS
 
             Vertices = null;
             VertexCount = 0;
-            Elements = null;
             ElementCount = 0;
         }
 
@@ -601,9 +598,6 @@ namespace AgOpenGPS
         /// <param name="combineCallback"> Interpolator used to determine the data payload of generated vertices. </param>
         public void Tessellate(WindingRule windingRule = WindingRule.EvenOdd, ElementType elementType = ElementType.Polygons, int polySize = 3)
         {
-            Vertices = null;
-            Elements = null;
-
             _windingRule = windingRule;
 
             if (_mesh == null)

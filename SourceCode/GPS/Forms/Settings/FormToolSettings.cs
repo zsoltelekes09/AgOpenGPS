@@ -14,7 +14,7 @@ namespace AgOpenGPS
 
         private double toolOverlap, toolOffset, toolTurnOffDelay, toolLookAheadOn, toolLookAheadOff, MappingOnDelay, MappingOffDelay;
         private double hitchLength, toolTrailingHitchLength, tankTrailingHitchLength, SectionWidth, cutoffSpeed;
-        private bool isToolTrailing, isToolBehindPivot, isToolTBT, isWorkSwEn, isWorkSwActiveLow, isWorkSwitchManual;
+        private bool isToolTrailing, isToolBehindPivot, isToolTBT;
         public int Here = 0, numberOfSections, MinApplied;
 
 
@@ -35,7 +35,6 @@ namespace AgOpenGPS
             tabConfig.Text = gStr.gsConfiguration;
             tabSections.Text = gStr.gsSection;
             tabSettings.Text = gStr.gsSettings;
-            tabWorkSwitch.Text = gStr.gsSwitches;
 
             label23.Text = gStr.gsTurnOffDelaySecs;
             label8.Text = gStr.gsTurnOffAheadSecs;
@@ -46,10 +45,6 @@ namespace AgOpenGPS
 
             label30.Text = gStr.gsSectionsTurnOffBelow;
 
-            groupBox3.Text = gStr.gsWorkSwitch;
-            checkWorkSwitchManual.Text = gStr.gsWorkSwitchControlsManual;
-            chkWorkSwActiveLow.Text = gStr.gsActiveLow;
-            chkEnableWorkSwitch.Text = gStr.gsEnableWorkSwitch;
             label17.Text = gStr.gsMeasurementsIn;
             label16.Text = gStr.gsToolWidth;
 
@@ -137,24 +132,6 @@ namespace AgOpenGPS
             //based on number of sections and values update the page before displaying
             UpdateNumberOfSections();
 
-            isWorkSwActiveLow = Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow;
-
-            chkWorkSwActiveLow.CheckedChanged -= ChkWorkSwActiveLow_CheckedChanged;
-            chkWorkSwActiveLow.Checked = isWorkSwActiveLow;
-            chkWorkSwActiveLow.CheckedChanged += ChkWorkSwActiveLow_CheckedChanged;
-
-            isWorkSwEn = Properties.Vehicle.Default.setF_IsWorkSwitchEnabled;
-
-            chkEnableWorkSwitch.CheckedChanged -= ChkEnableWorkSwitch_CheckedChanged;
-            chkEnableWorkSwitch.Checked = isWorkSwEn;
-            chkEnableWorkSwitch.CheckedChanged += ChkEnableWorkSwitch_CheckedChanged;
-
-            isWorkSwitchManual = Properties.Vehicle.Default.setF_IsWorkSwitchManual;
-
-            checkWorkSwitchManual.CheckedChanged -= CheckWorkSwitchManual_CheckedChanged;
-            checkWorkSwitchManual.Checked = isWorkSwitchManual;
-            checkWorkSwitchManual.CheckedChanged += CheckWorkSwitchManual_CheckedChanged;
-
             btnChangeAttachment.BackColor = Color.Transparent;
             btnChangeAttachment.Enabled = false;
         }
@@ -204,11 +181,6 @@ namespace AgOpenGPS
             }
             Properties.Vehicle.Default.ToolSettings[Here].Sections = aa;
 
-            //WorkSwitch settings
-            
-            Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow = mf.mc.isWorkSwitchActiveLow = isWorkSwActiveLow;
-            Properties.Vehicle.Default.setF_IsWorkSwitchEnabled = mf.mc.isWorkSwitchEnabled = isWorkSwEn;
-            Properties.Vehicle.Default.setF_IsWorkSwitchManual = mf.mc.isWorkSwitchManual = isWorkSwitchManual;
             Properties.Vehicle.Default.setTool_defaultSectionWidth = Math.Round(SectionWidth * mf.metImp2m,2);
 
             Properties.Vehicle.Default.Save();
@@ -645,27 +617,5 @@ namespace AgOpenGPS
         }
 
         # endregion Keypad
-
-        #region WorkSwitch //---------------------------------------------------------
-
-        private void ChkWorkSwActiveLow_CheckedChanged(object sender, EventArgs e)
-        {
-            isWorkSwActiveLow = !isWorkSwActiveLow;
-            chkWorkSwActiveLow.Checked = isWorkSwActiveLow;
-        }
-
-        private void ChkEnableWorkSwitch_CheckedChanged(object sender, EventArgs e)
-        {
-            isWorkSwEn = !isWorkSwEn;
-            chkEnableWorkSwitch.Checked = isWorkSwEn;
-        }
-
-        private void CheckWorkSwitchManual_CheckedChanged(object sender, EventArgs e)
-        {
-            isWorkSwitchManual = !isWorkSwitchManual;
-            checkWorkSwitchManual.Checked = isWorkSwitchManual;
-        }
-
-        #endregion WorkSwitch //---------------------------------------------------------
     }
 }

@@ -69,7 +69,7 @@ namespace AgOpenGPS
 
     public static class ListCalc
     {
-        public static void LimitToRange( this double value, double Minimum, double Maximum)
+        public static void LimitToRange(this double value, double Minimum, double Maximum)
         {
             if (value < Minimum) value = Minimum;
             else if (value > Maximum) value = Maximum;
@@ -104,10 +104,10 @@ namespace AgOpenGPS
             }
         }
 
-
-        public static void CalculateRoundedCorner(this List<Vec3> Points, double radius, bool Loop, double MaxAngle)
+        public static void CalculateRoundedCorner(this List<Vec3> Points, double Radius, bool Loop, double MaxAngle, bool tram = false, bool Experimental = false, bool Left = false, double halfWheelTrack = 0)
         {
             int A, C;
+            double radius = Radius;
 
             for (int B = 0; B < Points.Count; B++)
             {
@@ -132,9 +132,31 @@ namespace AgOpenGPS
 
                     if (Math.Abs(angle) > Glm.PIBy2 - MaxAngle && Math.Abs(angle) < Glm.PIBy2 + MaxAngle) //(170 / 2 = 85) > 85 degrees almost flat && < 95 degrees
                     {
+                        if ((C - A > 2) || (Experimental && C - A > 0))
+                        {
+                            while (C - 1 > A)//Fix for some weird spikes
+                            {
+                                C = C == 0 ? Points.Count - 1 : C - 1;
+                                Points.RemoveAt(C);
+                            }
+                        }
                         stop = true;
                         break;
                     }
+                    if (tram)
+                    {
+                        if (Left)
+                        {
+                            if (Math.Abs(angle) > Glm.PIBy2) radius = Radius - halfWheelTrack;
+                            else radius = Radius + halfWheelTrack;
+                        }
+                        else
+                        {
+                            if (Math.Abs(angle) < Glm.PIBy2) radius = Radius - halfWheelTrack;
+                            else radius = Radius + halfWheelTrack;
+                        }
+                    }
+
                     tan = Math.Abs(Math.Tan(angle));
 
                     segment = radius / tan;
@@ -181,6 +203,9 @@ namespace AgOpenGPS
                 // center by the addition of angular vectors.
                 double dx = Points[B].Northing * 2 - p1Cross.Northing - p2Cross.Northing;
                 double dy = Points[B].Easting * 2 - p1Cross.Easting - p2Cross.Easting;
+
+
+                if (dx1 == 0 && dy1 == 0 || dx2 == 0 && dy2 == 0 || dx == 0 && dy == 0) continue;
 
                 Vec2 circlePoint;
 
@@ -253,7 +278,55 @@ namespace AgOpenGPS
             Points.CalculateHeadings(Loop);
         }
 
-        private static double GetLength(double dx, double dy)
+        public static void FindCrossingPoints(this List<Vec4> Crossings, ref List<Vec2> Tram, double Northing, double Easting, double Northing2, double Easting2, int Index)
+        {
+            if (Tram.Count > 2)
+            {
+                int k = Tram.Count - 2;
+                for (int j = -2; j < Tram.Count - 2; k = j)
+                {
+                    j += 2;
+                    if (DoLinesIntersect(Northing, Easting, Northing2, Easting2, Tram[j].Northing, Tram[j].Easting, Tram[k].Northing - Tram[j].Northing, Tram[k].Easting - Tram[j].Easting, out double t))
+                    {
+                        Crossings.Add(new Vec4(Northing + (t * Northing2), Easting + (t * Easting2), t, Index));
+                    }
+                }
+            }
+        }
+
+        public static void FindCrossingPoints(this List<Vec4> Crossings, ref List<Vec3> Bound, double Northing, double Easting, double Northing2, double Easting2, int Index)
+        {
+            if (Bound.Count > 2)
+            {
+                int k = Bound.Count - 2;
+                for (int j = -2; j < Bound.Count - 2; k = j)
+                {
+                    j += 2;
+                    if (DoLinesIntersect(Northing, Easting, Northing2, Easting2, Bound[j].Northing, Bound[j].Easting, Bound[k].Northing - Bound[j].Northing, Bound[k].Easting - Bound[j].Easting, out double t))
+                    {
+                        Crossings.Add(new Vec4(Northing + (t * Northing2), Easting + (t * Easting2), t, Index));
+                    }
+                }
+            }
+        }
+
+        public static bool DoLinesIntersect(double Northing, double Easting, double Northing2, double Easting2, double Northing3, double Easting3, double Northing4, double Easting4, out double t)
+        {
+            t = -1;
+            double s = (-Easting2 * (Northing - Northing3) + Northing2 * (Easting - Easting3)) / (-Northing4 * Easting2 + Northing2 * Easting4);
+            if (s >= 0 && s <= 1)
+            {
+                t = (Northing4 * (Easting - Easting3) - Easting4 * (Northing - Northing3)) / (-Northing4 * Easting2 + Northing2 * Easting4);
+                if (t >= 0 && t <= 1)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+        }
+
+        public static double GetLength(double dx, double dy)
         {
             return Math.Sqrt(dx * dx + dy * dy);
         }
@@ -262,37 +335,6 @@ namespace AgOpenGPS
         {
             double factor = segment / length;
             return new Vec2((point.Northing - dx * factor), (point.Easting - dy * factor));
-        }
-
-
-
-        public static void CalculateHeadings2(this List<Vec3> Points, bool loop)
-        {
-            int cnt = Points.Count;
-            if (cnt > 3)
-            {
-                Vec3 point;
-                for (int i = 0; i + 1 < cnt; i++)
-                {
-                    point = Points[i];
-                    point.Heading = Math.Atan2(Points[i + 1].Easting - Points[i].Easting, Points[i + 1].Northing - Points[i].Northing);
-                    if (point.Heading < 0) point.Heading += Glm.twoPI;
-                    Points[i] = point;
-                }
-                if (loop)//loop headings
-                {
-                    point = Points[cnt - 1];
-                    point.Heading = Math.Atan2(Points[0].Easting - Points[cnt - 1].Easting, Points[0].Northing - Points[cnt - 1].Northing);
-                    if (point.Heading < 0) point.Heading += Glm.twoPI;
-                    Points[cnt - 1] = point;
-                }
-                else
-                {
-                    point = Points[cnt - 1];
-                    point.Heading = Points[cnt - 2].Heading;
-                    Points[cnt - 1] = point;
-                }
-            }
         }
     }
 

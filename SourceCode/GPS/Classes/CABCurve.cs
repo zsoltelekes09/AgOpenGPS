@@ -4,8 +4,130 @@ using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
+
+    class EndpointEntry
+    {
+        public double XValue;
+        public bool isHi;
+        public int hi;
+        public int lo;
+    }
+
+
+    class LineIntersections
+    {
+        public int A_Hi;
+        public int A_Lo;
+        public int B_Hi;
+        public int B_Lo;
+        public double T;
+    }
+
     public class CABCurve
     {
+
+
+        class EndpointSorter : IComparer<EndpointEntry>
+        {
+            public int Compare(EndpointEntry c1, EndpointEntry c2)
+            {
+                // sort values on XValue, descending
+                if (c1.XValue > c2.XValue) { return -1; }
+                else if (c1.XValue < c2.XValue) { return 1; }
+                else if (c1.isHi && !c2.isHi) { return -1; }
+                else if (!c1.isHi && c2.isHi) { return 1; }
+                else { return 0; }
+            }
+        }
+
+        public bool IntersectsLine(ref List<Vec3> lines, int A, int B, int C, int D, out double t)//Line2D comparedLine 
+        {
+            t = -1;
+            if (A == C || A == D || B == C)
+            {
+                return false;
+            }
+
+            double firstLineSlopeX, firstLineSlopeY, secondLineSlopeX, secondLineSlopeY;
+
+            firstLineSlopeX = lines[B].Northing - lines[A].Northing;
+            firstLineSlopeY = lines[B].Easting - lines[A].Easting;
+
+            secondLineSlopeX = lines[D].Northing - lines[C].Northing;
+            secondLineSlopeY = lines[D].Easting - lines[C].Easting;
+
+            double s = (-firstLineSlopeY * (lines[A].Northing - lines[C].Northing) + firstLineSlopeX * (lines[A].Easting - lines[C].Easting)) / (-secondLineSlopeX * firstLineSlopeY + firstLineSlopeX * secondLineSlopeY);
+            if (s > 0 && s < 1)
+            {
+                t = (secondLineSlopeX * (lines[A].Easting - lines[C].Easting) - secondLineSlopeY * (lines[A].Northing - lines[C].Northing)) / (-secondLineSlopeX * firstLineSlopeY + firstLineSlopeX * secondLineSlopeY);
+                if (t > 0 && t < 1) return true;
+            }
+            return false;
+        }
+
+        internal void CheckForCrossing(ref List<Vec3> lines, out List<LineIntersections> lineintersects)
+        {
+            List<EndpointEntry> pts = new List<EndpointEntry>();
+
+            // Make endpoint objects from the lines so that we can sort all of the
+            // lines endpoints.
+            int i = lines.Count - 1;
+            for (int j = 0; j < lines.Count; i = j++)
+            {
+                pts.Add(new EndpointEntry() { XValue = lines[i].Northing, isHi = true, hi = j, lo = i });
+                pts.Add(new EndpointEntry() { XValue = lines[j].Northing, isHi = false, hi = j, lo = i });
+            }
+
+            pts.Sort(new EndpointSorter());
+
+            List<EndpointEntry> openpts = new List<EndpointEntry>();
+            List<EndpointEntry> closedpts = new List<EndpointEntry>();
+
+            lineintersects = new List<LineIntersections>();
+
+            for (int j = 0; j < pts.Count; j++)
+            {
+                if (pts[j].isHi)
+                {
+                    bool add = true;
+                    for (int k = 0; k < closedpts.Count; k++)
+                    {
+                        if (closedpts[k].hi == pts[j].hi)
+                        {
+                            closedpts.RemoveAt(k);
+                            add = false;
+                        }
+                    }
+                    if (add)
+                    {
+                        //check intersection with open
+                        for (int k = 0; k < openpts.Count; k++)
+                        {
+                            if (IntersectsLine(ref lines, pts[j].lo, pts[j].hi, openpts[k].lo, openpts[k].hi, out double t))
+                            {
+                                lineintersects.Add(new LineIntersections() { A_Hi = pts[j].lo, A_Lo = pts[j].lo, B_Hi = openpts[k].hi, B_Lo = openpts[k].lo, T = t });
+                            }
+                        }
+                        openpts.Add(pts[j]);
+                    }
+                }
+                else
+                {
+                    bool deleted = false;
+                    for (int k = 0; k < openpts.Count; k++)
+                    {
+                        if (openpts[k].hi == pts[j].hi)
+                        {
+                            deleted = true;
+                            openpts.RemoveAt(k);
+                            break;
+                        }
+                    }
+                    if (!deleted) closedpts.Add(pts[j]);//does only happen when multiple straight lines
+                }
+            }
+        }
+
         //pointers to mainform controls
         private readonly FormGPS mf;
 
@@ -142,16 +264,6 @@ namespace AgOpenGPS
                     ptCount = curList.Count;
                     if (ptCount > 1)
                     {
-                        GL.PointSize(4.0f);
-                       // GL.Begin(PrimitiveType.Points);
-                        GL.Color3(1.0f, 0.0f, 0.0f);
-                       //GL.Vertex3(curList[A].Easting, curList[A].Northing, 0.0);
-                        GL.Color3(0.0f, 1.0f, 0.0f);
-                        //GL.Vertex3(curList[B].Easting, curList[B].Northing, 0.0);
-                       //GL.End();
-
-
-
 
                         //OnDrawGizmos();
 
@@ -230,103 +342,101 @@ namespace AgOpenGPS
 
             if (CurrentLine > -1 && CurrentLine < Lines.Count)
             {
-                Vec2 tramLineP1 = new Vec2();
-                Vec2 tramLineP2 = new Vec2();
-                int cnt = Lines[CurrentLine].curvePts.Count;
+                //int cnt = Lines[CurrentLine].curvePts.Count;
 
+                Vec3 Point;
 
-                for (double i = 1; i < mf.tram.passes; i++)
+                if (!Lines[CurrentLine].BoundaryMode)
                 {
-                    double Offset = mf.tram.tramWidth * i - mf.tram.abOffset;
-                    List<Vec4> Crossings1 = new List<Vec4>();
+                    //double cos = Math.Cos(Lines[CurrentLine].curvePts[0].Heading) * 10000;
+                    //double sin = Math.Sin(Lines[CurrentLine].curvePts[0].Heading) * 10000;
+                    //double cos2 = Math.Cos(Lines[CurrentLine].curvePts[cnt - 1].Heading) * -10000;
+                    //double sin2 = Math.Sin(Lines[CurrentLine].curvePts[cnt - 1].Heading) * -10000;
 
-                    for (int j = 0; j + 1 < cnt; j += 4)
+                    //Lines[CurrentLine].curvePts.Insert(0, new Vec3((Lines[CurrentLine].curvePts[0].Northing - cos), (Lines[CurrentLine].curvePts[0].Easting - sin),0));
+                    //Lines[CurrentLine].curvePts.Add(new Vec3((Lines[CurrentLine].curvePts[cnt - 1].Northing - cos2), (Lines[CurrentLine].curvePts[cnt - 1].Easting - sin2), 0));
+                }
+
+
+                List<List<Vec3>> BuildLeft = new List<List<Vec3>>();
+                for (double i = 0.5; i < mf.tram.passes; i++)
+                {
+                    List<Vec3> Build = new List<Vec3>();
+                    double Offset = (mf.tram.tramWidth * i) - mf.Guidance.WidthMinusOverlap / 2 - mf.tram.abOffset - mf.tram.halfWheelTrack;
+                    for (int j = 0; j < Lines[CurrentLine].curvePts.Count; j++)
                     {
-                        double CosHead = Math.Cos(Lines[CurrentLine].curvePts[j].Heading);
-                        double SinHead = Math.Sin(Lines[CurrentLine].curvePts[j].Heading);
-                        tramLineP1.Northing = Lines[CurrentLine].curvePts[j].Northing + (j == 0 ? CosHead * -4000 : 0) + SinHead * -Offset;
-                        tramLineP1.Easting = Lines[CurrentLine].curvePts[j].Easting + (j == 0 ? SinHead * -4000 : 0) + CosHead * Offset;
+                        double CosHeading = Math.Cos(Lines[CurrentLine].curvePts[j].Heading);
+                        double SinHeading = Math.Sin(Lines[CurrentLine].curvePts[j].Heading);
 
-                        int k = (j + 4 >= cnt ? cnt - 1 : j + 4);
-
-                        double CosHead2 = Math.Cos(Lines[CurrentLine].curvePts[k].Heading);
-                        double SinHead2 = Math.Sin(Lines[CurrentLine].curvePts[k].Heading);
-                        tramLineP2.Northing = Lines[CurrentLine].curvePts[k].Northing + (k == cnt - 1 ? CosHead2 * 4000 : 0) + SinHead2 * -Offset;
-                        tramLineP2.Easting = Lines[CurrentLine].curvePts[k].Easting + (k == cnt - 1 ? SinHead2 * 4000 : 0) + CosHead2 * Offset;
-
-
-                        if (mf.bnd.bndArr.Count > 0 && mf.bnd.bndArr[0].bndLine.Count > 2)
-                        {
-                            mf.FindCrossingPoints(ref Crossings1, ref mf.tram.TramList[0].Left, tramLineP1.Northing, tramLineP1.Easting, tramLineP2.Northing - tramLineP1.Northing, tramLineP2.Easting - tramLineP1.Easting, j);//mf.bnd.bndArr[0].bndLine
-                        }
+                        Point = Lines[CurrentLine].curvePts[j];
+                        Point.Northing += SinHeading * -Offset;
+                        Point.Easting += CosHeading * Offset;
+                        Build.Add(Point);
                     }
 
-                    if (Crossings1.Count > 1)
+                    //CheckForCrossing(ref Build, out List<LineIntersections> lineintersects);
+
+
+
+                    List<Vec4> Crossings = new List<Vec4>();
+
+
+                    int cnt = 0;
+                    bool remove = false;
+                    int idx = 0;
+
+                    for (int k = 1; k < Build.Count; k++)
                     {
-                        Crossings1.Sort((x, y) => x.Index.CompareTo(y.Index));
-
-                        for (int j = 0; j + 1 < Crossings1.Count; j += 2)
+                        if (idx < Crossings.Count && Crossings[idx].Index == k)
                         {
-                            if (Crossings1[j + 1].Index > 0)
-                            {
-                                mf.tram.TramList.Add(new Trams());
-
-                                tramLineP1.Northing = Crossings1[j].Northing;
-                                tramLineP1.Easting = Crossings1[j].Easting;
-                                AddPoin2t(ref tramLineP1, Crossings1[j].Index < 0 ? 0 : Crossings1[j].Index, Offset * Offset);
-
-                                for (int k = Crossings1[j].Index + 4; k < Crossings1[j + 1].Index && k < Lines[CurrentLine].curvePts.Count; k += 1)
-                                {
-                                    tramLineP1.Northing = Lines[CurrentLine].curvePts[k].Northing + Math.Sin(Lines[CurrentLine].curvePts[k].Heading) * -Offset;
-                                    tramLineP1.Easting = Lines[CurrentLine].curvePts[k].Easting + (Math.Cos(Lines[CurrentLine].curvePts[k].Heading) * Offset);
-                                    AddPoin2t(ref tramLineP1, k, Offset * Offset);
-                                }
-
-                                tramLineP1.Northing = Crossings1[j + 1].Northing;
-                                tramLineP1.Easting = Crossings1[j + 1].Easting;
-
-                                AddPoin2t(ref tramLineP1, Crossings1[j + 1].Index >= Lines[CurrentLine].curvePts.Count ? Lines[CurrentLine].curvePts.Count - 1 : Crossings1[j + 1].Index, Offset * Offset);
-                            }
+                            remove = !remove;
+                            idx++;
                         }
+                        if (remove)
+                        {
+                            Build.RemoveAt(k - cnt);
+                            cnt++;
+                        }
+
+
+                    }
+                    BuildLeft.Add(Build);
+
+
+                }
+
+
+
+                for (int k = 0; k < BuildLeft.Count; k++)
+                {
+                    BuildLeft[k].CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332, true, false, true, mf.tram.halfWheelTrack);
+
+                    if (Lines[CurrentLine].BoundaryMode) BuildLeft[k].Add(BuildLeft[k][0]);
+
+                    mf.tram.TramList.Add(new Trams());
+                    int tramidx = mf.tram.TramList.Count - 1;
+
+                    for (int l = 0; l < BuildLeft[k].Count; l += 2)
+                    {
+                        Point = BuildLeft[k][l];
+
+                        double CosHeading = Math.Cos(BuildLeft[k][l].Heading);
+                        double SinHeading = Math.Sin(BuildLeft[k][l].Heading);
+
+                        Point.Northing += SinHeading * (mf.tram.WheelWidth / 2);
+                        Point.Easting += CosHeading * (-mf.tram.WheelWidth / 2);
+                        mf.tram.TramList[tramidx].Left.Add(new Vec2(Point.Northing, Point.Easting));
+                        Point.Northing += SinHeading * -mf.tram.WheelWidth;
+                        Point.Easting += CosHeading * mf.tram.WheelWidth;
+                        mf.tram.TramList[tramidx].Left.Add(new Vec2(Point.Northing, Point.Easting));
                     }
                 }
-            }
-        }
 
-        public void AddPoin2t(ref Vec2 Point, int Heading, double Offset)
-        {
-            double SinHead = Math.Sin(Lines[CurrentLine].curvePts[Heading].Heading);
-            double CosHead = Math.Cos(Lines[CurrentLine].curvePts[Heading].Heading);
-
-            bool AddPoint = true;
-            int ptCount = Lines[CurrentLine].curvePts.Count;
-            for (int k = 0; k < ptCount; k++)
-            {
-                double DistLeft = Glm.DistanceSquared(Point.Northing, Point.Easting, Lines[CurrentLine].curvePts[k].Northing, Lines[CurrentLine].curvePts[k].Easting);
-                if (DistLeft < Offset - 10)
+                if (!Lines[CurrentLine].BoundaryMode)
                 {
-                    AddPoint = false;
+                    //Lines[CurrentLine].curvePts.RemoveAt(0);
+                    //Lines[CurrentLine].curvePts.RemoveAt(Lines[CurrentLine].curvePts.Count - 1);
                 }
-            }
-
-            if (AddPoint)
-            {
-                Point.Northing += SinHead * (mf.tram.halfWheelTrack + mf.tram.WheelWidth / 2);
-                Point.Easting += CosHead * (-mf.tram.halfWheelTrack + -mf.tram.WheelWidth / 2);
-                mf.tram.TramList[mf.tram.TramList.Count - 1].Left.Add(new Vec2(Point.Northing, Point.Easting));
-
-                Point.Northing += SinHead * -mf.tram.WheelWidth;
-                Point.Easting += CosHead * mf.tram.WheelWidth;
-                mf.tram.TramList[mf.tram.TramList.Count - 1].Left.Add(new Vec2(Point.Northing, Point.Easting));
-
-
-                Point.Northing += SinHead * (-mf.tram.wheelTrack + mf.tram.WheelWidth);
-                Point.Easting += CosHead * (mf.tram.wheelTrack + -mf.tram.WheelWidth);
-                mf.tram.TramList[mf.tram.TramList.Count - 1].Right.Add(new Vec2(Point.Northing, Point.Easting));
-
-                Point.Northing += SinHead * -mf.tram.WheelWidth;
-                Point.Easting += CosHead * mf.tram.WheelWidth;
-                mf.tram.TramList[mf.tram.TramList.Count - 1].Right.Add(new Vec2(Point.Northing, Point.Easting));
             }
         }
 
@@ -609,8 +719,6 @@ namespace AgOpenGPS
                             }
                         }
 
-
-                        //build the current line
                         curList.Clear();
 
                         double Offset = mf.Guidance.WidthMinusOverlap * HowManyPathsAway;
@@ -642,32 +750,6 @@ namespace AgOpenGPS
                                 else curList.Add(point2);
                             }
                         }
-
-                        /*
-                        if (Lines[CurrentLine].BoundaryMode)
-                        {
-                            bool first2 = true;
-                            int testa2 = -1;
-                            int l2 = 0;
-                            for (int k = 0; k < curList.Count; l2 = k++)
-                            {
-                                double dist = ((curList[k].Easting - curList[l2].Easting) * (curList[k].Easting - curList[l2].Easting)) + ((curList[k].Northing - curList[l2].Northing) * (curList[k].Northing - curList[l2].Northing));
-                                if (dist > Offset * Offset + Offset * Offset)
-                                {
-                                    if (first2)
-                                    {
-                                        first2 = false;
-                                        testa2 = k;
-                                    }
-                                    else
-                                    {
-                                        curList.RemoveRange(testa2, k - testa2);
-                                        first2 = true;
-                                    }
-                                }
-                            }
-                        }
-                        */
 
                         curList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332);//5 degrees
 
@@ -810,7 +892,6 @@ namespace AgOpenGPS
                     double minDistA = double.PositiveInfinity;
                     double minDistB = double.PositiveInfinity;
 
-                    //find the closest 2 points to current fix
                     for (int t = 0; t < ptCount; t++)
                     {
                         double dist = ((point.Easting - curList[t].Easting) * (point.Easting - curList[t].Easting))

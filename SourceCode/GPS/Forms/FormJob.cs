@@ -78,7 +78,7 @@ namespace AgOpenGPS
                 if (result == DialogResult.Yes)
                 {
                     mf.FileOpenField(mf.filePickerFileAndDirectory);
-                    //Close();
+                    Close();
                 }
                 else
                 {

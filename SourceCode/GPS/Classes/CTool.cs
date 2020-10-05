@@ -47,6 +47,7 @@ namespace AgOpenGPS
 
         //how many individual sections
         public int numOfSections;
+        public bool SuperSection;
 
 
         //read pixel values
@@ -107,7 +108,6 @@ namespace AgOpenGPS
                 Sections.RemoveAt(j);
             }
         }
-
 
         public void SetSections()
         {

@@ -245,7 +245,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(210, 40);
             this.label1.TabIndex = 466;
-            this.label1.Text = "10 cm";
+            this.label1.Text = "10 (Cm)";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panel3

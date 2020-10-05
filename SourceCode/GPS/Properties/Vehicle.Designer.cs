@@ -12,7 +12,7 @@ namespace AgOpenGPS.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     public sealed partial class Vehicle : global::System.Configuration.ApplicationSettingsBase {
         
         private static Vehicle defaultInstance = ((Vehicle)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Vehicle())));
@@ -694,19 +694,22 @@ namespace AgOpenGPS.Properties {
                 this["setArdSteer_setting2"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<ToolSettings> ToolSettings {
-            get {
+        public global::System.Collections.Generic.List<ToolSettings> ToolSettings
+        {
+            get
+            {
                 if ((this["ToolSettings"]) == null) (this["ToolSettings"]) = new System.Collections.Generic.List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -4.415, -1.415, 0 }, new double[] { -1.5, 1.5, 4 }, new double[] { 1.415, 4.415, 0 } } } };
                 return ((global::System.Collections.Generic.List<ToolSettings>)(this["ToolSettings"]));
             }
-            set {
+            set
+            {
                 this["ToolSettings"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("8.83")]
@@ -788,6 +791,18 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["Setting"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool setAS_isAutoSteerAutoOn {
+            get {
+                return ((bool)(this["setAS_isAutoSteerAutoOn"]));
+            }
+            set {
+                this["setAS_isAutoSteerAutoOn"] = value;
             }
         }
     }

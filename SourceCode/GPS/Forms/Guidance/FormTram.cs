@@ -30,9 +30,10 @@ namespace AgOpenGPS
 
         private void FormTram_Load(object sender, EventArgs e)
         {
-            snapAdj = Properties.Settings.Default.setTram_eqWidth/2;
-
+            //snapAdj = Properties.Settings.Default.setTram_eqWidth/2;
+            snapAdj = Math.Round(mf.Guidance.WidthMinusOverlap / 2, mf.decimals);
             TboxSnapAdj.Text = Math.Round(snapAdj * mf.m2MetImp, mf.decimals).ToString();
+
             TboxWheelTrack.Text = Math.Round(mf.tram.wheelTrack * mf.m2MetImp, mf.decimals).ToString();
             TboxWheelWidth.Text = Math.Round(mf.tram.WheelWidth * mf.m2MetImp, mf.decimals).ToString();
             TboxOffset.Text = Math.Round(mf.tram.abOffset * mf.m2MetImp, mf.decimals).ToString();

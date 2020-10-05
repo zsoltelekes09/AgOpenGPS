@@ -20,26 +20,6 @@ namespace AgOpenGPS
             this.Heading = heading;
         }
 
-        public static Vec3 operator -(Vec3 lhs, Vec3 rhs)
-        {
-            return new Vec3(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting, 0);
-        }
-
-        public static Vec3 operator +(Vec3 lhs, Vec3 rhs)
-        {
-            return new Vec3(lhs.Northing + rhs.Northing, lhs.Easting + rhs.Easting, 0);
-        }
-
-        public static Vec3 operator *(Vec3 self, double s)
-        {
-            return new Vec3(self.Northing * s, self.Easting * s, 0);
-        }
-
-        public static Vec3 operator *(double s, Vec3 self)
-        {
-            return new Vec3(self.Northing * s, self.Easting * s, 0);
-        }
-
     }
 
     //
@@ -83,11 +63,6 @@ namespace AgOpenGPS
             Northing = northing;
         }
 
-        public static Vec2 operator -(Vec2 lhs, Vec2 rhs)
-        {
-            return new Vec2(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting);
-        }
-
         public Vec2 Normalize()
         {
             double length = GetLength();
@@ -117,6 +92,10 @@ namespace AgOpenGPS
         public static Vec2 operator +(Vec2 lhs, Vec2 rhs)
         {
             return new Vec2(lhs.Northing + rhs.Northing, lhs.Easting + rhs.Easting);
+        }
+        public static Vec2 operator -(Vec2 lhs, Vec2 rhs)
+        {
+            return new Vec2(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting);
         }
     }
 

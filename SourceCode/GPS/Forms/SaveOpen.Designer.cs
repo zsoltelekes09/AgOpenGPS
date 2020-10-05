@@ -16,8 +16,6 @@ namespace AgOpenGPS
         //list of the list of patch data individual triangles for field sections
         public List<List<Vec3>> PatchSaveList = new List<List<Vec3>>();
         public List<List<Vec3>> PatchDrawList = new List<List<Vec3>>();
-
-        //list of the list of patch data individual triangles for contour tracking
         public List<List<Vec3>> ContourSaveList = new List<List<Vec3>>();
 
         public List<CAutoLoadField> Fields = new List<CAutoLoadField>();
@@ -168,7 +166,7 @@ namespace AgOpenGPS
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
                                     CurveLines.Lines[idx].curvePts.Add(vecPt);
                                 }
-                                CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, true, 0.0436332);
+                                CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, CurveLines.Lines[idx].BoundaryMode, 0.0436332);
                             }
                             else
                             {
@@ -801,7 +799,7 @@ namespace AgOpenGPS
                 writer.WriteLine("WorkSwitch," + Properties.Vehicle.Default.setF_IsWorkSwitchEnabled.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("ActiveLow," + Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("SwitchManual," + Properties.Vehicle.Default.setF_IsWorkSwitchManual.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("AutoSteerRemote," + Properties.Vehicle.Default.setAS_isAutoSteerAutoOn.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("Empty," + "10");
 
                 writer.WriteLine("Empty," + "10");
@@ -912,12 +910,13 @@ namespace AgOpenGPS
                         line = reader.ReadLine();
 
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setF_IsWorkSwitchEnabled = bool.Parse(words[1]);
+                        mc.isWorkSwitchEnabled = Properties.Vehicle.Default.setF_IsWorkSwitchEnabled = bool.Parse(words[1]);
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow = bool.Parse(words[1]);
+                        mc.isWorkSwitchActiveLow = Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow = bool.Parse(words[1]);
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.setF_IsWorkSwitchManual = bool.Parse(words[1]);
-                        line = reader.ReadLine();
+                        mc.isWorkSwitchManual = Properties.Vehicle.Default.setF_IsWorkSwitchManual = bool.Parse(words[1]);
+                        line = reader.ReadLine(); words = line.Split(',');
+                        mc.RemoteAutoSteer = Properties.Vehicle.Default.setAS_isAutoSteerAutoOn = bool.Parse(words[1]);
                         line = reader.ReadLine();
 
 
@@ -945,10 +944,6 @@ namespace AgOpenGPS
                         Properties.Vehicle.Default.setVehicle_toolName = toolFileName;
 
                         Properties.Vehicle.Default.Save();
-
-                        mc.isWorkSwitchEnabled = Properties.Vehicle.Default.setF_IsWorkSwitchEnabled;
-                        mc.isWorkSwitchActiveLow = Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow;
-                        mc.isWorkSwitchManual = Properties.Vehicle.Default.setF_IsWorkSwitchManual;
 
                         LoadTools();
 
@@ -1626,6 +1621,10 @@ namespace AgOpenGPS
                                     hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
                                     k = k - 1;
                                 }
+                                else
+                                {
+                                    bnd.bndArr[k].bndLine.CalculateRoundedCorner(0.5, true, 0.0436332);
+                                }
                             }
                             else
                             {
@@ -1645,7 +1644,6 @@ namespace AgOpenGPS
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
 
-                    bnd.bndArr[0].bndLine.CalculateRoundedCorner(0.5, true, 0.0436332);
 
 
                     turn.BuildTurnLines(-1);

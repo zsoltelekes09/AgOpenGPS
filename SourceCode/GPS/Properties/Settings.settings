@@ -176,9 +176,6 @@
     <Setting Name="setIMU_isRollFromOGI" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="setAS_isAutoSteerAutoOn" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="setDisplay_lineWidth" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>

@@ -84,11 +84,6 @@ namespace AgOpenGPS
             Properties.Settings.Default.setIMU_fusionWeight = (double)(hsbarFusion.Value) * 0.01;
             mf.ahrs.fusionWeight = (double)(hsbarFusion.Value) * 0.01;
 
-
-            if (Properties.Settings.Default.setAS_isAutoSteerAutoOn) mf.btnAutoSteer.Text = "R";
-            else mf.btnAutoSteer.Text = "M";
-
-
             Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
 

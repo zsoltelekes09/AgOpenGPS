@@ -185,6 +185,7 @@ namespace AgOpenGPS
             mc.isWorkSwitchEnabled = Vehicle.Default.setF_IsWorkSwitchEnabled;
             mc.isWorkSwitchActiveLow = Vehicle.Default.setF_IsWorkSwitchActiveLow;
             mc.isWorkSwitchManual = Vehicle.Default.setF_IsWorkSwitchManual;
+            mc.RemoteAutoSteer = Vehicle.Default.setAS_isAutoSteerAutoOn;
 
             minFixStepDist = Settings.Default.setF_minFixStep;
 
@@ -290,14 +291,9 @@ namespace AgOpenGPS
             yt.rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;
             cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
 
-            if (Properties.Settings.Default.setAS_isAutoSteerAutoOn) btnAutoSteer.Text = "R";
-            else btnAutoSteer.Text = "M";
-
-
             FixPanelsAndMenus();
 
             UpdateNtripButton();
-
 
             stripSectionColor.BackColor = sectionColorDay;
 
@@ -604,6 +600,7 @@ namespace AgOpenGPS
                         if (yt.isYouTurnTriggered)
                         {
                             yt.ResetYouTurn();
+                            CurveLines.OldHowManyPathsAway = double.NegativeInfinity;
                         }
                         else
                         {
@@ -618,6 +615,7 @@ namespace AgOpenGPS
                         if (yt.isYouTurnTriggered)
                         {
                             yt.ResetYouTurn();
+                            CurveLines.OldHowManyPathsAway = double.NegativeInfinity;
                         }
                         else
                         {

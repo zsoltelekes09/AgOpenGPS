@@ -42,6 +42,11 @@ namespace AgOpenGPS
             cboxIsSendMachineControlToAutoSteer.Text = gStr.gsMachinePGN;
             groupBox1.Text = gStr.gsHydraulicToolLift;
 
+            chkWorkSwitchManual.Text = gStr.gsWorkSwitchControlsManual;
+            chkWorkSwActiveLow.Text = gStr.gsActiveLow;
+            chkEnableWorkSwitch.Text = gStr.gsEnableWorkSwitch;
+            chkRemoteAutoSteerButton.Text = gStr.gsAutoManualAutosteerBtn;
+
             //Machine tab
             label10.Text = gStr.gsRaiseTime;
             label11.Text = gStr.gsLowerTime;
@@ -113,6 +118,10 @@ namespace AgOpenGPS
             TboxAckerman.Text = (ackerman = Properties.Vehicle.Default.setArdSteer_ackermanFix).ToString();
             TboxMaxSensorCounts.Text = (maxpulsecounts = Properties.Vehicle.Default.setArdSteer_maxPulseCounts).ToString();
 
+            chkWorkSwActiveLow.Checked = Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow;
+            chkEnableWorkSwitch.Checked = Properties.Vehicle.Default.setF_IsWorkSwitchEnabled;
+            chkWorkSwitchManual.Checked = Properties.Vehicle.Default.setF_IsWorkSwitchManual;
+            chkRemoteAutoSteerButton.Checked = Properties.Vehicle.Default.setAS_isAutoSteerAutoOn;
 
             //Machine --------------------------------------------------------------------------------------------
             sett = Properties.Vehicle.Default.setArdMac_setting0;
@@ -182,6 +191,8 @@ namespace AgOpenGPS
             if (chkBNOInstalled.Checked) sett |= 1;
             if (cboxSteerInvertRelays.Checked) sett |= 2;
 
+            if (chkWorkSwActiveLow.Checked) sett |= 4;
+            if (chkWorkSwitchManual.Checked) sett |= 8;
 
             Properties.Vehicle.Default.setArdSteer_setting1 = (byte)sett;
 
@@ -204,6 +215,13 @@ namespace AgOpenGPS
 
             byte inc = (byte)(Properties.Vehicle.Default.setArdSteer_inclinometer << 6);            
             mf.mc.Config_ardSteer[mf.mc.arIncMaxPulse] = (byte)(inc + (byte)Properties.Vehicle.Default.setArdSteer_maxPulseCounts);
+
+            //WorkSwitch settings
+
+            Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow = mf.mc.isWorkSwitchActiveLow = chkWorkSwActiveLow.Checked;
+            Properties.Vehicle.Default.setF_IsWorkSwitchEnabled = mf.mc.isWorkSwitchEnabled = chkEnableWorkSwitch.Checked;
+            Properties.Vehicle.Default.setF_IsWorkSwitchManual = mf.mc.isWorkSwitchManual = chkWorkSwitchManual.Checked;
+            Properties.Vehicle.Default.setAS_isAutoSteerAutoOn = mf.mc.RemoteAutoSteer = chkRemoteAutoSteerButton.Checked;
 
             //Machine ---------------------------------------------------------------------------------------------------
 
@@ -229,13 +247,13 @@ namespace AgOpenGPS
 
             if (tabcArduino.SelectedTab.Name == "tabAutoSteer")
             {
-                //mf.TimedMessageBox(1000, gStr.gsAutoSteerPort, gStr.gsModuleConfiguration);
+                mf.DataSend[8] = "Auto Steer: Config Settings";
                 mf.SendData(mf.mc.Config_ardSteer, true);
             }
             else if (tabcArduino.SelectedTab.Name == "tabMachine")
             {
+                mf.DataSend[8] = "Auto Steer: Config Hydraulic Lift";
                 mf.SendData(mf.mc.Config_ardMachine, false);
-                //mf.TimedMessageBox(1000, gStr.gsMachinePort, gStr.gsModuleConfiguration);
             }
         }
 

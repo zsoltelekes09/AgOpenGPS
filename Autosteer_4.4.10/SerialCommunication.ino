@@ -28,7 +28,7 @@ void ReadSerials()
       else
       {
         Recieve[Index] = Data;
-        if (Index > 2 && Index > Recieve[2])
+        if (Index > 2 && Index + 1 >= Recieve[2])
         {
           ParseData(Recieve, Recieve[2]);
           Index = 0;

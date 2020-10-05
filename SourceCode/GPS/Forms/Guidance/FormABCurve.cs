@@ -219,7 +219,8 @@ namespace AgOpenGPS
 
                         //build the tail extensions
                         mf.CurveLines.AddFirstLastPoints();
-                        mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.CalculateHeadings(mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].BoundaryMode);
+                        
+                        mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].BoundaryMode, 0.0436332);
 
                         //calculate average heading of line
                         double x = 0, y = 0;

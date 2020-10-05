@@ -57,7 +57,7 @@ namespace AgOpenGPS
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
                 if (mf.bnd.bndArr[i].isDriveThru || mf.bnd.bndArr[i].isDriveAround) continue;
-                if (mf.turn.turnArr.Count > i ) mf.FindCrossingPoints(ref Crossings1, ref mf.turn.turnArr[i].turnLine, fromPt.Northing, fromPt.Easting, s1_x, s1_y, i);
+                if (mf.turn.turnArr.Count > i ) Crossings1.FindCrossingPoints(ref mf.turn.turnArr[i].turnLine, fromPt.Northing, fromPt.Easting, s1_x, s1_y, i);
             }
 
             if (Crossings1.Count > 0)
@@ -175,6 +175,7 @@ namespace AgOpenGPS
                     turnArr[j].turnLine.Add(point);
                 }
                 turnArr[j].FixTurnLine(mf.yt.triggerDistanceOffset, ref mf.bnd.bndArr[j].bndLine);
+
                 turnArr[j].PreCalcTurnLines();
 
                 if (Num > -1) break;

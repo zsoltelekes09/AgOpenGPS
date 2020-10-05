@@ -229,192 +229,71 @@ namespace AgOpenGPS
             }
             else
             {
-                switch (Data[1])
+                if (Data[1] == 0xE6)
                 {
-                    //autosteer FD - 253
-                    case 0xFD:
+                    //quick check
+                    if (Data.Length != 10) return;
+                    checksumRecd = Data[2];
+
+                    if (Data[3] != inoVersionInt)
+                    {
+                        Form af = Application.OpenForms["FormSteer"];
+
+                        if (af != null)
                         {
-                            //quick check
-                            if (Data.Length != 10) return;
-                            //Steer angle actual
-                            actualSteerAngleDisp = (Int16)((Data[2] << 8) + Data[3]);
-
-                            if (ahrs.isHeadingCorrectionFromAutoSteer)
-                            {
-                                ahrs.correctionHeadingX16 = (Int16)((Data[4] << 8) + Data[5]);
-                            }
-
-                            if (ahrs.isRollFromAutoSteer)
-                            {
-                                ahrs.rollX16 = (Int16)((Data[6] << 8) + Data[7]);
-                            }
-
-                            if (isJobStarted && mc.isWorkSwitchEnabled)
-                            {
-                                if ((!mc.isWorkSwitchActiveLow && (Data[8] & 1) == 1) || (mc.isWorkSwitchActiveLow && (Data[8] & 1) == 0))
-                                {
-                                    if (mc.isWorkSwitchManual)
-                                    {
-                                        if (autoBtnState != FormGPS.btnStates.On)
-                                        {
-                                            autoBtnState = FormGPS.btnStates.On;
-                                            btnSection_Update();
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (autoBtnState != FormGPS.btnStates.Auto)
-                                        {
-                                            autoBtnState = FormGPS.btnStates.Auto;
-                                            btnSection_Update();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if (autoBtnState != FormGPS.btnStates.Off)
-                                    {
-                                        autoBtnState = FormGPS.btnStates.Off;
-                                        btnSection_Update();
-                                    }
-                                }
-                            }
-
-
-                            //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
-                            if (ahrs.RemoteAutoSteer)
-                            {
-                                if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLines.BtnABLineOn || ct.isContourBtnOn || CurveLines.BtnCurveLineOn))
-                                {
-                                    if ((Data[8] & 2) == 0)
-                                    {
-                                        if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                        btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
-                                    }
-                                    else
-                                    {
-                                        if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                        btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
-                                    }
-                                }
-                                else
-                                {
-                                    if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                    btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
-                                }
-                            }
-
-
-                            mc.pwmDisplay = Data[9];
-
-                            autoSteerUDPActivity++;
-
-                            return;
+                            af.Focus();
+                            af.Close();
                         }
 
-                    //From Machine Data
-                    case 0xE0:
+                        af = Application.OpenForms["FormArduinoSettings"];
+
+                        if (af != null)
                         {
-                            //quick check
-                            if (Data.Length != 10) return;
-                            //mc.recvUDPSentence = DateTime.Now.ToString() + "," + data[2].ToString();
-                            machineUDPActivity++;
-                            return;
+                            af.Focus();
+                            af.Close();
                         }
 
-                    case 230:
-
-                        //quick check
-                        if (Data.Length != 10) return;
-                        checksumRecd = Data[2];
-
-                        if (checksumRecd != checksumSent)
-                        {
-                            MessageBox.Show(
-                                "Sent: " + checksumSent + "\r\n Recieved: " + checksumRecd,
-                                    "Checksum Error",
+                        //spAutoSteer.Close();
+                        MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_" + currentVersionStr + ".ino", gStr.gsFileError,
                                             MessageBoxButtons.OK, MessageBoxIcon.Question);
-                        }
-
-                        if (Data[3] != inoVersionInt)
-                        {
-                            Form af = Application.OpenForms["FormSteer"];
-
-                            if (af != null)
-                            {
-                                af.Focus();
-                                af.Close();
-                            }
-
-                            af = Application.OpenForms["FormArduinoSettings"];
-
-                            if (af != null)
-                            {
-                                af.Focus();
-                                af.Close();
-                            }
-
-                            //spAutoSteer.Close();
-                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_UDP_" + currentVersionStr + ".ino", gStr.gsFileError,
-                                                MessageBoxButtons.OK, MessageBoxIcon.Question);
-                            Close();
-                        }
-
-                        return;
-
-                    //lidar
-                    case 0xF1:
-                        {
-                            //quick check
-                            if (Data.Length != 10) return;
-                            mc.lidarDistance = (Int16)((Data[2] << 8) + Data[3]);
-                            //mc.recvUDPSentence = DateTime.Now.ToString() + "," + mc.lidarDistance.ToString();
-                            return;
-                        }
-
-                    //Ext UDP IMU
-                    case 0xEE:
-                        {
-                            //quick check
-                            if (Data.Length != 10) return;
-                            //by Matthias Hammer Jan 2019
-                            //if ((data[0] == 127) & (data[1] == 238))
-
-                            //if (ahrs.isHeadingCorrectionFromExtUDP)
-                            //{
-                            //    ahrs.correctionHeadingX16 = (Int16)((data[4] << 8) + data[5]);
-                            //}
-
-                            if (ahrs.isRollFromOGI)
-                            {
-                                ahrs.rollX16 = (Int16)((Data[6] << 8) + Data[7]);
-                            }
-
-                            return;
-                        }
+                        Close();
+                    }
+                    else if (checksumRecd != checksumSent)
+                    {
+                        MessageBox.Show(
+                            "Sent: " + checksumSent + "\r\n Recieved: " + checksumRecd,
+                                "Checksum Error",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Question);
+                    }
+                    return;
                 }
 
-
-
-
-                while (Data[0] == 0x7F && Data.Length > 2)
+                if (Data[0] == 0x7F && Data.Length > 2)
                 {
                     if (Data.Length < Data[2]) return;
 
-                    if (Data[1] == 0xC0)
+
+                    for (int i = 7; i > 0; i--) DataRecieved[i] = DataRecieved[i - 1];
+
+
+                    if (Data[1] == 0xC0 && Data.Length > 5)
                     {
                         mc.Recieve_AutoSteer[3] = Data[3];
                         mc.Recieve_AutoSteer[4] = Data[4];
                         mc.Recieve_AutoSteer[5] = Data[5];
-                        actualSteerAngleDisp = (Int16)((Data[3] << 8) + Data[4]);
+                        int steer = (Int16)((Data[3] << 8) + Data[4]);
+                        actualSteerAngleDisp = steer;
 
                         mc.pwmDisplay = Data[5];
+                        DataRecieved[0] = "Actual Steer Angle: Steer Angle " + steer.ToString() + ", PWM " + Data[5].ToString();
                     }
-                    if (Data[1] == 0xC1)//Section Control
+                    else if (Data[1] == 0xC1 && Data.Length > 5)//Section Control
                     {
                         mc.Recieve_SectionsStatus[3] = Data[3];//tool index; do all if 255
                         mc.Recieve_SectionsStatus[4] = Data[4];//Section Index; do all if 255
                         mc.Recieve_SectionsStatus[5] = Data[5];//On Off Auto
+
+                        DataSend[8] = "Sections Control: Tool " + (Data[3] + 1).ToString() + ", Section " + (Data[4] + 1).ToString() + ", State " + ((Data[5] & 2) == 2 ? "On" : (Data[5] & 1) == 1 ? "Auto" : "Off");
 
                         for (int j = (Data[3] == 0xFF ? 0 : Data[3]); j < Tools.Count && (Data[3] == 0xFF ? true : j <= Data[3]); j++)
                         {
@@ -436,38 +315,52 @@ namespace AgOpenGPS
                             }
                         }
                     }
-                    else if (Data[1] == 0xC2)
+                    else if (Data[1] == 0xC2 && Data.Length > 6)
                     {
-                        mc.Recieve_Heading[3] = Data[3];
-                        mc.Recieve_Heading[4] = Data[4];
-                        ahrs.correctionHeadingX16 = (Int16)((Data[3] << 8) + Data[4]);
+                        int Heading = ((Data[3] << 8) + Data[4]);
+                        if (Heading != 9999)
+                        {
+                            mc.Recieve_Heading[3] = Data[3];
+                            mc.Recieve_Heading[4] = Data[4];
+                            ahrs.correctionHeadingX16 = Heading;
+                        }
+
+                        int Roll = ((Data[5] << 8) + Data[6]);
+                        if (Roll != 9999)
+                        {
+                            mc.Recieve_Roll[3] = Data[5];
+                            mc.Recieve_Roll[4] = Data[6];
+                            ahrs.rollX16 = Roll;
+                        }
+
+                        DataRecieved[0] = "Heading / Roll: Heading " + Heading.ToString() + ", Roll " + Roll.ToString();
                     }
-                    else if (Data[1] == 0xC3)
-                    {
-                        mc.Recieve_Roll[3] = Data[3];
-                        mc.Recieve_Roll[4] = Data[4];
-                        ahrs.rollX16 = (Int16)((Data[3] << 8) + Data[4]);
-                    }
-                    else if (Data[1] == 0xC4)
+                    else if (Data[1] == 0xC4 && Data.Length > 3)
                     {
                         if ((Data[3] & 16) == 16)//SteerSensorCount
                         {
+                            DataRecieved[0] = "Steer Sensor Trigger";
+
                             mc.Recieve_AutoSteerButton[3] = Data[3];
                             isAutoSteerBtnOn = false;
                             btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
                         }
-                        else if (ahrs.RemoteAutoSteer)
+                        else if (mc.RemoteAutoSteer)
                         {
+                            DataRecieved[0] = "Remote Auto Steer: State " + ((Data[3] & 2) == 2 ? "On" : "Off");
                             mc.Recieve_AutoSteerButton[3] = Data[3];
 
                             isAutoSteerBtnOn = (isJobStarted && !recPath.isDrivingRecordedPath && (ABLines.BtnABLineOn || ct.isContourBtnOn || CurveLines.BtnCurveLineOn) && (Data[3] & 2) == 2) ? true : false;
                             btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
                         }
+                        else DataRecieved[0] = "Remote Auto Steer not turned on!";
+
                     }
-                    else if (Data[1] == 0xC5)
+                    else if (Data[1] == 0xC5 && Data.Length > 3)
                     {
                         if (isJobStarted && mc.isWorkSwitchEnabled)
                         {
+                            DataRecieved[0] = "Remote Work Switch: State " + ((Data[3] & 3) == 3 ? "On" : (Data[3] & 1) == 1 ? "Auto" : "Off");
                             mc.Recieve_WorkSwitch[3] = Data[3];
                             if ((Data[3] & 3) == 3)
                             {
@@ -479,16 +372,13 @@ namespace AgOpenGPS
                             }
                             else if (autoBtnState != FormGPS.btnStates.Off) autoBtnState = FormGPS.btnStates.Off;
 
-
-                            //if ((!mc.isWorkSwitchActiveLow && (Data[3] & 1) == 1) || (mc.isWorkSwitchActiveLow && (Data[3] & 1) == 0))
-
-                            //if (mc.isWorkSwitchManual)
-
                             btnSection_Update();
                         }
+                        else DataRecieved[0] = "Remote Work Switch not turned on!";
                     }
-                    else if (Data[1] == 0xC6)
+                    else if (Data[1] == 0xC6 && Data.Length > 3)
                     {
+                        DataRecieved[0] = "Checksum";
                         mc.Recieve_Checksum[3] = Data[3];
                         checksumRecd = Data[3];
 
@@ -522,18 +412,11 @@ namespace AgOpenGPS
                         }
 
                     }
-                    else if (Data[1] == 0xC7)
+                    else if (Data[1] == 0xC7 && Data.Length > 4)
                     {
+                        DataRecieved[0] = "Lidar";
                         mc.lidarDistance = (Int16)((Data[3] << 8) + Data[4]);
                     }
-
-                    if (Data[2] <= 0) return;
-
-                    if (Data.Length - Data[2] <= 3) return;
-
-                    byte[] dst = new byte[Data.Length - Data[2]];
-                    Array.Copy(Data, Data[2], dst, 0, dst.Length);
-                    Data = dst;
                 }
                 /*
                 
@@ -732,7 +615,7 @@ namespace AgOpenGPS
             {
                 if (sim.stepDistance < 1) sim.stepDistance -= 0.04;
                 else sim.stepDistance -= 0.055;
-                if (sim.stepDistance < -6.94) sim.stepDistance = -6.94;
+                if (sim.stepDistance < -4.44) sim.stepDistance = -4.44;
                 hsbarStepDistance.Value = (int)(sim.stepDistance * 3.6);
                 return true;
             }

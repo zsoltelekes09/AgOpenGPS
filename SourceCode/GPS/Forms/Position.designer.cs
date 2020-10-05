@@ -74,7 +74,7 @@ namespace AgOpenGPS
         public Vec3[] stepFixPts = new Vec3[60];
         public double distanceCurrentStepFix = 0, fixStepDist, minFixStepDist = 0;
 
-        private double nowHz = 0;
+        public double nowHz = 0;
 
         public bool isRTK;
 
@@ -131,10 +131,8 @@ namespace AgOpenGPS
                 return;
             }
 
-
             //grab the most current fix and save the distance from the last fix
             distanceCurrentStepFix = Glm.Distance(pn.fix, stepFixPts[0]);
-
 
             #region Heading
 
@@ -151,8 +149,6 @@ namespace AgOpenGPS
             }
             else
             {
-
-
                 if (distanceCurrentStepFix > minFixStepDist / totalFixSteps)
                 {
                     for (int i = totalFixSteps - 1; i > 0; i--) stepFixPts[i] = stepFixPts[i - 1];
@@ -163,9 +159,7 @@ namespace AgOpenGPS
                     stepFixPts[0].Northing = pn.fix.Northing;
 
                     if ((fd.distanceUser += distanceCurrentStepFix) > 3000) fd.distanceUser %= 3000; ;//userDistance can be reset
-
                 }
-
 
                 fixStepDist = 0;
                 for (currentStepFix = 0; currentStepFix < totalFixSteps - 1; currentStepFix++)
@@ -183,7 +177,6 @@ namespace AgOpenGPS
                         camHeading = Math.Atan2(pn.fix.Easting - stepFixPts[camStep].Easting, pn.fix.Northing - stepFixPts[camStep].Northing);
                         if (camHeading < 0) camHeading += Glm.twoPI;
 
-
                         camHeading = Glm.ToDegrees(gpsHeading);
                         break;
                     }
@@ -192,9 +185,8 @@ namespace AgOpenGPS
             #endregion Heading
 
             #region Heading Correction
-
             //an IMU with heading correction, add the correction
-            if (ahrs.isHeadingCorrectionFromBrick | ahrs.isHeadingCorrectionFromAutoSteer) //| ahrs.isHeadingCorrectionFromExtUDP
+            if (ahrs.correctionHeadingX16 != 9999 && (ahrs.isHeadingCorrectionFromBrick || ahrs.isHeadingCorrectionFromAutoSteer)) //| ahrs.isHeadingCorrectionFromExtUDP
             {
                 //current gyro angle in radians
                 double correctionHeading = Glm.ToRadians((double)ahrs.correctionHeadingX16 * 0.0625);
@@ -244,10 +236,9 @@ namespace AgOpenGPS
             #region Roll
 
             rollUsed = 0;
-
             //used only for draft compensation in OGI Sentence
-            if (ahrs.isRollFromOGI) rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
-            else if ((ahrs.isRollFromAutoSteer || ahrs.isRollFromAVR) && !ahrs.isRollFromOGI)
+            if (ahrs.rollX16 != 9999 && ahrs.isRollFromOGI) rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
+            else if (ahrs.rollX16 != 9999 && (ahrs.isRollFromAutoSteer || ahrs.isRollFromAVR))
             {
                 rollUsed = ((double)(ahrs.rollX16 - ahrs.rollZeroX16)) * 0.0625;
 
@@ -267,7 +258,6 @@ namespace AgOpenGPS
 
             CalculatePositionHeading();
 
-
             //test if travelled far enough for new boundary point
             if (Glm.Distance(pn.fix, prevBoundaryPos) > 1) AddBoundaryPoint();
 
@@ -276,11 +266,13 @@ namespace AgOpenGPS
             {
                 treeSpacingCounter %= vehicle.treeSpacing;//keep the distance below spacing
                 mc.Send_Treeplant[3] = (treeTrigger ^= 0x01);
+                DataSend[8] = "Tree Plant: State " + ((treeTrigger == 0x01) ? "On" : "Off");
                 SendData(mc.Send_Treeplant, false);
             }
             else if (vehicle.treeSpacing == 0 && mc.Send_Treeplant[3] == 0x01)
             {
                 mc.Send_Treeplant[3] = 0;
+                DataSend[8] = "Tree Plant: State Off";
                 SendData(mc.Send_Treeplant, false);
             }
 
@@ -308,7 +300,6 @@ namespace AgOpenGPS
                     CurveLines.Lines[CurveLines.CurrentEditLine].curvePts.Add(pt);
                 }
 
-
                 // if non zero, at least one section is on.
                 int sectionCounter = 0;
 
@@ -325,8 +316,6 @@ namespace AgOpenGPS
                     }
                 }
 
-
-
                 //Build contour line if close enough to a patch
                 if (ct.isContourBtnOn) ct.BuildContourGuidanceLine(pivotAxlePos);
 
@@ -339,8 +328,6 @@ namespace AgOpenGPS
                 {
                     ct.AddPoint(pivotAxlePos, ct.isContourOn);
                 }
-
-
 
                 //grab fix and elevation
                 if (isLogElevation) sbFix.Append(pn.fix.Easting.ToString("N2") + "," + pn.fix.Northing.ToString("N2") + ","
@@ -388,19 +375,6 @@ namespace AgOpenGPS
                 }
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
             // autosteer at full speed of updates
             if (!isAutoSteerBtnOn) //32020 means auto steer is off
             {
@@ -439,6 +413,8 @@ namespace AgOpenGPS
                 mc.Send_AutoSteer[8] = unchecked((byte)(guidanceLineSteerAngle));
             }
 
+            DataSend[8] = "Auto Steer: Speed " + pn.speed.ToString("N2") + ", Distance " + guidanceLineDistanceOff.ToString() + ", Angle " + guidanceLineSteerAngle.ToString();
+
             SendData(mc.Send_AutoSteer, false);
 
             //for average cross track error
@@ -446,10 +422,7 @@ namespace AgOpenGPS
             {
                 crossTrackError = (int)((double)crossTrackError * 0.90 + Math.Abs((double)guidanceLineDistanceOff) * 0.1);
             }
-            else
-            {
-                crossTrackError = 0;
-            }
+            else crossTrackError = 0;
 
             #endregion
 
@@ -468,7 +441,7 @@ namespace AgOpenGPS
             if (bnd.bndArr.Count > 0)
             {
                 //Are we inside outer and outside inner all turn boundaries, no turn creation problems
-                if (IsInsideGeoFence() && !yt.isTurnCreationTooClose && !yt.isTurnCreationNotCrossingError)
+                if (!yt.isTurnCreationTooClose && !yt.isTurnCreationNotCrossingError && IsInsideGeoFence() )
                 {
                     NotLoadedField = true;
                     //reset critical stop for bounds violation
@@ -476,6 +449,7 @@ namespace AgOpenGPS
                     {
                         mc.Send_Uturn[3] |= 0x80;
                         mc.isOutOfBounds = false;
+                        DataSend[8] = "Uturn: " + Convert.ToString(mc.Send_Uturn[3], 2).PadLeft(6, '0');
                         SendData(mc.Send_Uturn, false);
                     }
 
@@ -549,6 +523,7 @@ namespace AgOpenGPS
                     {
                         mc.Send_Uturn[3] &= 0x7F;
                         mc.isOutOfBounds = true;
+                        DataSend[8] = "Uturn: " + Convert.ToString(mc.Send_Uturn[3], 2).PadLeft(6, '0');
                         SendData(mc.Send_Uturn, false);
                     }
 
@@ -566,6 +541,7 @@ namespace AgOpenGPS
                 {
                     mc.Send_Uturn[3] |= 0x80;
                     mc.isOutOfBounds = false;
+                    DataSend[8] = "Uturn: " + Convert.ToString(mc.Send_Uturn[3], 2).PadLeft(6, '0');
                     SendData(mc.Send_Uturn, false);
                 }
                 CheckInsideOtherBoundary();
@@ -945,53 +921,6 @@ namespace AgOpenGPS
             }
         }
 
-        public void FindCrossingPoints(ref List<Vec4> Crossings, ref List<Vec2> Tram, double Northing, double Easting, double Northing2, double Easting2, int Index)
-        {
-            if (Tram.Count > 2)
-            {
-                int k = Tram.Count - 2;
-                for (int j = -2; j < Tram.Count - 2; k = j)
-                {
-                    j += 2;
-                    if (DoLinesIntersect(Northing, Easting, Northing2, Easting2, Tram[j].Northing, Tram[j].Easting, Tram[k].Northing - Tram[j].Northing, Tram[k].Easting - Tram[j].Easting, out double t))
-                    {
-                        Crossings.Add(new Vec4(Northing + (t * Northing2), Easting + (t * Easting2), t, Index));
-                    }
-                }
-            }
-        }
-
-        public void FindCrossingPoints(ref List<Vec4> Crossings, ref List<Vec3> Bound, double Northing, double Easting, double Northing2, double Easting2, int Index)
-        {
-            if (Bound.Count > 2)
-            {
-                int k = Bound.Count - 2;
-                for (int j = -2; j < Bound.Count - 2; k = j)
-                {
-                    j += 2;
-                    if (DoLinesIntersect(Northing, Easting, Northing2, Easting2, Bound[j].Northing, Bound[j].Easting, Bound[k].Northing - Bound[j].Northing, Bound[k].Easting - Bound[j].Easting, out double t))
-                    {
-                        Crossings.Add(new Vec4(Northing + (t * Northing2), Easting + (t * Easting2), t, Index));
-                    }
-                }
-            }
-        }
-
-        public bool DoLinesIntersect(double Northing, double Easting, double Northing2, double Easting2, double Northing3, double Easting3, double Northing4, double Easting4, out double t)
-        {
-            t = -1;
-            double s = (-Easting2 * (Northing - Northing3) + Northing2 * (Easting - Easting3)) / (-Northing4 * Easting2 + Northing2 * Easting4);
-            if (s >= 0 && s <= 1)
-            {
-                t = (Northing4 * (Easting - Easting3) - Easting4 * (Northing - Northing3)) / (-Northing4 * Easting2 + Northing2 * Easting4);
-                if (t >= 0 && t <= 1)
-                {
-                    return true;
-                }
-                else return false;
-            }
-            else return false;
-        }
 
 
 // intense math section....   the lat long converted to utm   *********************************************************

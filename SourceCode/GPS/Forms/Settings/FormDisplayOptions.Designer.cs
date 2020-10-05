@@ -54,6 +54,7 @@
             // chkExtraGuides
             // 
             this.chkExtraGuides.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkExtraGuides.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkExtraGuides.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkExtraGuides.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkExtraGuides.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -102,6 +103,7 @@
             // chkCompass
             // 
             this.chkCompass.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkCompass.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkCompass.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkCompass.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkCompass.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -117,6 +119,7 @@
             // chkSky
             // 
             this.chkSky.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSky.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkSky.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkSky.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkSky.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -132,6 +135,7 @@
             // chkSpeedo
             // 
             this.chkSpeedo.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkSpeedo.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkSpeedo.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkSpeedo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkSpeedo.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -147,6 +151,7 @@
             // chkDayNight
             // 
             this.chkDayNight.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkDayNight.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkDayNight.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkDayNight.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkDayNight.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -162,6 +167,7 @@
             // chkGrid
             // 
             this.chkGrid.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkGrid.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkGrid.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkGrid.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkGrid.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -177,6 +183,7 @@
             // chkPursuitLines
             // 
             this.chkPursuitLines.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkPursuitLines.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkPursuitLines.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkPursuitLines.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkPursuitLines.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -192,6 +199,7 @@
             // chkLogNMEA
             // 
             this.chkLogNMEA.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkLogNMEA.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkLogNMEA.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkLogNMEA.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkLogNMEA.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -207,6 +215,7 @@
             // chkStartFullScreen
             // 
             this.chkStartFullScreen.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkStartFullScreen.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkStartFullScreen.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkStartFullScreen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkStartFullScreen.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -222,6 +231,7 @@
             // chkPolygons
             // 
             this.chkPolygons.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkPolygons.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkPolygons.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkPolygons.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkPolygons.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -237,6 +247,7 @@
             // chkUTurnOn
             // 
             this.chkUTurnOn.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkUTurnOn.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkUTurnOn.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkUTurnOn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkUTurnOn.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -264,6 +275,7 @@
             // rbtnImperial
             // 
             this.rbtnImperial.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbtnImperial.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.rbtnImperial.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.rbtnImperial.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rbtnImperial.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -278,6 +290,7 @@
             // rbtnMetric
             // 
             this.rbtnMetric.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbtnMetric.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.rbtnMetric.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.rbtnMetric.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rbtnMetric.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -292,6 +305,7 @@
             // chkAutoLoadFields
             // 
             this.chkAutoLoadFields.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkAutoLoadFields.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkAutoLoadFields.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkAutoLoadFields.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkAutoLoadFields.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -307,6 +321,7 @@
             // chkDrawBackBuffer
             // 
             this.chkDrawBackBuffer.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkDrawBackBuffer.FlatAppearance.BorderColor = System.Drawing.Color.Black;
             this.chkDrawBackBuffer.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.chkDrawBackBuffer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.chkDrawBackBuffer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));

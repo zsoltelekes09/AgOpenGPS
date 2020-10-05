@@ -32,7 +32,8 @@ namespace AgOpenGPS
 
         public double latitude, longitude;
 
-        private double latDeg, latMinu, longDeg, longMinu, latNMEA, longNMEA;
+        private double latDeg, latMinu, longDeg, longMinu;
+        private readonly double[] latNMEA = new double[1], longNMEA = new double[1];
         public double speed = 0.6, headingTrue, stepDistance = 1.3889, steerAngle;
         public double steerAngleScrollBar = 0;
         private double degrees;
@@ -65,9 +66,6 @@ namespace AgOpenGPS
 
             LastSteerAngle += Math.Max(Math.Min(_st - LastSteerAngle, 5), -5);
 
-
-
-            mf.actualSteerAngleDisp = LastSteerAngle * 100.0;
             steerAngle = LastSteerAngle;
             double temp = (stepDistance / mf.HzTime * Math.Tan(steerAngle * 0.0165329252) / 3.3);
             headingTrue += temp;
@@ -152,8 +150,14 @@ namespace AgOpenGPS
             latDeg *= 100.0;
             longDeg *= 100.0;
 
-            latNMEA = latMinu + latDeg;
-            longNMEA = longMinu + longDeg;
+            for (int i = latNMEA.Length - 1; i > 0; i--)
+            {
+                latNMEA[i] = latNMEA[i - 1];
+                longNMEA[i] = longNMEA[i - 1];
+            }
+
+            latNMEA[0] = latMinu + latDeg;
+            longNMEA[0] = longMinu + longDeg;
 
             if (latitude >= 0) NS = 'N';
             else NS = 'S';
@@ -186,8 +190,8 @@ namespace AgOpenGPS
             sbGGA.Clear();
             sbGGA.Append("$GPGGA,");
             sbGGA.Append(DateTime.Now.ToString("HHmmss.00,", CultureInfo.InvariantCulture));
-            sbGGA.Append(Math.Abs(latNMEA).ToString("0000.0000000", CultureInfo.InvariantCulture)).Append(',').Append(NS).Append(',');
-            sbGGA.Append(Math.Abs(longNMEA).ToString("00000.0000000", CultureInfo.InvariantCulture)).Append(',').Append(EW).Append(',');
+            sbGGA.Append(Math.Abs(latNMEA[latNMEA.Length - 1]).ToString("0000.0000000", CultureInfo.InvariantCulture)).Append(',').Append(NS).Append(',');
+            sbGGA.Append(Math.Abs(longNMEA[longNMEA.Length - 1]).ToString("00000.0000000", CultureInfo.InvariantCulture)).Append(',').Append(EW).Append(',');
             sbGGA.Append(fixQuality.ToString(CultureInfo.InvariantCulture)).Append(',').Append(sats.ToString(CultureInfo.InvariantCulture)).Append(',').Append(HDOP.ToString(CultureInfo.InvariantCulture)).Append(',').Append(altitude.ToString(CultureInfo.InvariantCulture));
             sbGGA.Append(",M,46.9,M,,,*");
 

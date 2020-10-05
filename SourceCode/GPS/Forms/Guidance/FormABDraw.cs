@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace AgOpenGPS
 {
@@ -23,7 +24,6 @@ namespace AgOpenGPS
 
         //list of coordinates of boundary line
         public List<List<Vec3>> Template = new List<List<Vec3>>();
-        public Vec3[] OldTemplate = new Vec3[0];
 
         public FormABDraw(Form callingForm, bool HeadDraw)
         {
@@ -229,6 +229,7 @@ namespace AgOpenGPS
             else lblEnd.Text = end.ToString();
             isA = true;
             isSet = false;
+            TemplateIndex = 0;
         }
 
         private void BtnDeletePoints_Click(object sender, EventArgs e)
@@ -239,7 +240,8 @@ namespace AgOpenGPS
             {
                 int start2 = start;
                 int end2 = end;
-                if (((Template[TemplateIndex].Count - end2 + start2) % Template[TemplateIndex].Count) < ((Template[TemplateIndex].Count - start2 + end2) % Template[TemplateIndex].Count)) { int index = start2; start2 = end2; end2 = index; }
+
+               if (((Template[TemplateIndex].Count - end2 + start2) % Template[TemplateIndex].Count) < ((Template[TemplateIndex].Count - start2 + end2) % Template[TemplateIndex].Count)) { int index = start2; start2 = end2; end2 = index; }
 
                 if (start2 > end2)
                 {
@@ -427,92 +429,75 @@ namespace AgOpenGPS
             ResetHeadLine = false;
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
-                int ChangeDirection = Boundary == 0 ? 1 : -1;
 
-                Vec3 Point;
-                Tess _tess = new Tess();
-                double offset = Math.Round(Offset * mf.metImp2m, 2);
-
-                if (start == 99999 || end == 99999)
+                if (Template.Count > 0 && Template.Count > TemplateIndex)
                 {
-                    for (int i = 0; i < Template.Count; i++)
-                    {
-                        for (int j = 0; j < Template[i].Count; j++)
-                        {
-                            Point = Template[i][j];
-                            Point.Northing += Math.Sin(Template[i][j].Heading) * -offset * ChangeDirection;
-                            Point.Easting += Math.Cos(Template[i][j].Heading) * offset * ChangeDirection;
-                            Point.Heading = Template[i][j].Heading;
-                            Template[i][j] = Point;
-                        }
-                        _tess.AddContour(Template[i], ContourOrientation.Clockwise);
-                    }
-                }
-                else
-                {
-                    int start2 = start;
-                    int end2 = end;
+                    double offset = Math.Round(Offset * mf.metImp2m, 2) * (Boundary == 0 ? 1 : -1);
+                    Vec3 Point;
 
-                    if (end2 > Template[TemplateIndex].Count) end2 = 0;
-                    if (((Template[TemplateIndex].Count - end2 + start2) % Template[TemplateIndex].Count) < ((Template[TemplateIndex].Count - start2 + end2) % Template[TemplateIndex].Count)) { int index = start2; start2 = end2; end2 = index; }
-                    bool Loop = start2 > end2;
+                    int Start2 = start;
+                    int End2 = end;
 
-                    for (int i = 0; i < Template.Count; i++)
+                    if (End2 > Template[TemplateIndex].Count) End2 = 0;
+                    if (((Template[TemplateIndex].Count - End2 + Start2) % Template[TemplateIndex].Count) < ((Template[TemplateIndex].Count - Start2 + End2) % Template[TemplateIndex].Count)) { int index = Start2; Start2 = End2; End2 = index; }
+
+                    int Index = (start == 99999 || end == 99999) ? -1 : TemplateIndex;
+
+                    int test = Template.Count();
+
+                    for (int i = 0; i < test; i++)
                     {
-                        if (i == TemplateIndex)
+                        Tess _tess = new Tess();
+
+                        if (Index == -1 || Index == i)
                         {
-                            for (int j = start2; j <= end2 || Loop; j++)
+                            bool Loop = Start2 > End2;
+
+                            for (int j = 0; j < Template[i].Count; j++)
                             {
-                                if (j > Template[TemplateIndex].Count)
+                                if (Index == -1 || (Loop && (j < End2 || j > Start2)) || (!Loop && (j > Start2 && j < End2)))
                                 {
-                                    j = 0;
-                                    Loop = false;
+                                    double CosHeading = Math.Cos(Template[i][j].Heading);
+                                    double SinHeading = Math.Sin(Template[i][j].Heading);
+                                    Point = Template[i][j];
+                                    Point.Northing -= SinHeading * offset;
+                                    Point.Easting += CosHeading * offset;
+                                    Template[i][j] = Point;
                                 }
-                                if (j < Template[TemplateIndex].Count)
+                            }
+                            _tess.AddContour(Template[i], ContourOrientation.Original);
+                            _tess.Tessellate(WindingRule.Positive, ElementType.BoundaryContours, 3);
+
+                            for (int h = 0; h < _tess.Elements.Length; h += 2)
+                            {
+
+                                double area = 0.0;
+                                for (int j = 0; j < _tess.Elements[h + 1]; j++)
                                 {
-                                    Point = Template[TemplateIndex][j];
-                                    Point.Northing += Math.Sin(Template[TemplateIndex][j].Heading) * -offset * ChangeDirection;
-                                    Point.Easting += Math.Cos(Template[TemplateIndex][j].Heading) * offset * ChangeDirection;
-                                    Template[TemplateIndex][j] = Point;
+                                    var v0 = _tess.Vertices[_tess.Elements[h] + j];
+                                    var v1 = _tess.Vertices[_tess.Elements[h] + (j + 1) % _tess.Elements[h + 1]];
+
+
+                                    area += (v0.Northing - v1.Northing) * (v0.Easting + v1.Easting);
+                                }
+
+                                if (area / 2 > 10)
+                                {
+                                    Template.Add(new List<Vec3>());
+                                    for (int j = 0; j < _tess.Elements[h + 1]; j++)
+                                    {
+                                        Template[Template.Count - 1].Add(_tess.Vertices[_tess.Elements[h] + j]);
+                                    }
                                 }
                             }
                         }
-                        _tess.AddContour(Template[i], ContourOrientation.Clockwise);
                     }
+                    Template.RemoveRange(0, test);
+                    
+                    isSet = false;
+                    isA = true;
+                    start = end = 99999;
                 }
-
-
-                _tess.Tessellate(WindingRule.Positive, ElementType.BoundaryContours, 3);
-
-                Template.Clear();
-                //var output = new List<Polygon>();
-                for (int i = 0; i + 1 < _tess.Elements.Length; i += 2)
-                {
-                    Template.Add(new List<Vec3>());
-                    for (int k = _tess.Elements[i]; k < _tess.Elements[i] + _tess.Elements[i + 1]; k++)
-                    {
-                        Template[i / 2].Add(_tess.Vertices[k]);
-                    }
-                }
-
-                double distance;
-                for (int i = 0; i < Template.Count; i++)
-                {
-                    for (int j = 0; j < Template[i].Count; j++)
-                    {
-                        distance = Glm.Distance(Template[i][j], Template[i][(j + 1) % Template[i].Count]);
-                        if (distance < 2)
-                        {
-                            Template[i].RemoveAt((j + 1) % Template[i].Count);
-                            j--;
-                        }
-                    }
-                }
-
-                isSet = false;
-                isA = true;
-                start = end = 99999;
-
                 if (start == 99999) lblStart.Text = "--";
                 else lblStart.Text = start.ToString();
                 if (end == 99999) lblEnd.Text = "--";
@@ -842,9 +827,7 @@ namespace AgOpenGPS
             }
 
             //who knows which way it actually goes
-            mf.CurveLines.Lines[idx].curvePts.CalculateHeadings(mf.CurveLines.Lines[idx].BoundaryMode);
-
-
+            mf.CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[idx].BoundaryMode, 0.0436332);
 
             //calculate average heading of line
             double x = 0, y = 0;
@@ -970,9 +953,8 @@ namespace AgOpenGPS
                         GL.End();
                     }
 
-
                     GL.PointSize(6);
-                    if (TemplateIndex <= Template.Count)
+                    if (TemplateIndex < Template.Count)
                     {
                         GL.Begin(PrimitiveType.Points);
                         GL.Color3(0.990, 0.00, 0.250);

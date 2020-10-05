@@ -53,7 +53,7 @@
         public int lidarDistance, pwmDisplay = 0;
 
         //for the workswitch
-        public bool isWorkSwitchActiveLow, isWorkSwitchEnabled, isWorkSwitchManual;
+        public bool isWorkSwitchActiveLow, isWorkSwitchEnabled, isWorkSwitchManual, RemoteAutoSteer;
 
         //constructor
         public CModuleComm(FormGPS _f)

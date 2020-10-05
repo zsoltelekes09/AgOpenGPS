@@ -12,7 +12,7 @@ namespace AgOpenGPS
 
         private double antennaHeight, antennaOffset, antennaPivot, wheelbase, minTurningRadius, hydliftsecs;
 
-        private bool isAutoSteerAuto, isPivotBehindAntenna, isSteerAxleAhead;
+        private bool isPivotBehindAntenna, isSteerAxleAhead;
         private int snapDistance, vehicleType, lightbarCmPerPixie, linewidth;
 
         //constructor
@@ -38,7 +38,6 @@ namespace AgOpenGPS
 
 
             groupBox2.Text = gStr.gsCmPerLightbarPixel;
-            groupBox9.Text = gStr.gsAutoManualAutosteerBtn;
             groupBox1.Text = gStr.gs____SnapDistance;
             label17.Text = gStr.gsMeasurementsIn;
             groupBox4.Text = gStr.gsGuidanceLineWidth;
@@ -91,17 +90,6 @@ namespace AgOpenGPS
             TboxLineWidth.Text = (linewidth = Properties.Settings.Default.setDisplay_lineWidth).ToString();
             TboxLineWidth.CheckValue(ref linewidth, 1, 8);
 
-            isAutoSteerAuto = Properties.Settings.Default.setAS_isAutoSteerAutoOn;
-            if (isAutoSteerAuto)
-            {
-                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOn;
-                BtnAutoSteerAuto.Text = "Remote";
-            }
-            else
-            {
-                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOff;
-                BtnAutoSteerAuto.Text = gStr.gsManual;
-            }
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
@@ -125,7 +113,6 @@ namespace AgOpenGPS
             Properties.Settings.Default.setAS_snapDistance = snapDistance;
             Properties.Settings.Default.setDisplay_lightbarCmPerPixel = mf.lightbarCmPerPixel = lightbarCmPerPixie;
             Properties.Settings.Default.setDisplay_lineWidth = mf.ABLines.lineWidth = linewidth;
-            Properties.Settings.Default.setAS_isAutoSteerAutoOn = mf.ahrs.RemoteAutoSteer = isAutoSteerAuto;
 
             Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
@@ -301,20 +288,6 @@ namespace AgOpenGPS
                 }
             }
             btnCancel.Focus();
-        }
-
-        private void BtnAutoSteerAuto_Click(object sender, EventArgs e)
-        {
-            if (isAutoSteerAuto = !isAutoSteerAuto)
-            {
-                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOn;
-                BtnAutoSteerAuto.Text = "Remote";
-            }
-            else
-            {
-                BtnAutoSteerAuto.Image = Properties.Resources.AutoSteerOff;
-                BtnAutoSteerAuto.Text = gStr.gsManual;
-            }
         }
         #endregion GuidanceTab
     }

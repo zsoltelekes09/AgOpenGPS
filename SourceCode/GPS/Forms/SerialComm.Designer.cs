@@ -28,6 +28,9 @@ namespace AgOpenGPS
         public double actualSteerAngleDisp = 0;
 
 
+        public string[] DataSend = new string[9];
+        public string[] DataRecieved = new string[9];
+
         public string[] recvSentenceSettings = new string[4];
         public string lastRecvd = "";
         //used to decide to autoconnect autosteer arduino this run
@@ -46,9 +49,15 @@ namespace AgOpenGPS
         int spAutoSteerIdx = 0;
         public byte[] spAutoSteerBytes = new byte[3] { 0x7F, 0, 0 };
 
+        int spUBXHeaderIdx = 0;
+        public byte[] spUBXMessage = new byte[3] { 0xB5, 0x62, 0x01 };
+
 
         public void SendData(byte[] Data, bool Checksum)
         {
+            for (int i = 7; i > 0; i--) DataSend[i] = DataSend[i - 1];
+            DataSend[0] = DataSend[8];
+
             if (spAutoSteer.IsOpen)
             {
                 try { spAutoSteer.Write(Data, 0, Data.Length); }
@@ -84,6 +93,7 @@ namespace AgOpenGPS
                     catch (Exception) { }
                 }
             }
+
             if (Checksum)
             {
                 int tt = Data[2];
@@ -97,153 +107,6 @@ namespace AgOpenGPS
 
 
         #region AutoSteerPort // --------------------------------------------------------------------
-        private void SerialLineReceivedAutoSteer(string sentence)
-        {
-            //spit it out no matter what it says
-            mc.serialRecvAutoSteerStr = sentence;
-            if (pbarSteer++ > 99) pbarSteer = 0;
-
-            // Find end of sentence and a comma, if not a CR, return
-            int end = sentence.IndexOf("\r");
-            if (end == -1) return;
-            end = sentence.IndexOf(",", StringComparison.Ordinal);
-            if (end == -1) return;
-
-            //the sentence to be parsed
-            string[] words = sentence.Split(',');
-
-            if (words.Length != 10) return; // check lenght: 2 byte header + 8 byte data
-
-            int incomingInt = 0;
-            int.TryParse(words[0], out incomingInt);
-
-            if (incomingInt == 127)
-            {
-                int.TryParse(words[1], out incomingInt);
-
-                switch (incomingInt)
-                {
-                    // 127,253, 2 - actual steer angle*100, 3 - setpoint steer angle*100, 4 - heading in degrees * 16, 
-                    //5 - roll in degrees * 16, 6 - steerSwitch position,pwmDisplay,,;
-                    case 253:  //PGN 127 253: AutoSteer main sentence 
-
-                        double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out actualSteerAngleDisp);
-
-                        //first 2 used for display mainly in autosteer window chart as strings
-                        //parse the values
-                        if (ahrs.isHeadingCorrectionFromAutoSteer)
-                        {
-                            int.TryParse(words[4], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.correctionHeadingX16);
-                        }
-
-                        if (ahrs.isRollFromAutoSteer) int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out ahrs.rollX16);
-
-
-                        byte.TryParse(words[6], out byte Data);
-
-
-                        if (isJobStarted && mc.isWorkSwitchEnabled)
-                        {
-                            if ((!mc.isWorkSwitchActiveLow && (Data & 1) == 1) || (mc.isWorkSwitchActiveLow && (Data & 1) == 0))
-                            {
-                                if (mc.isWorkSwitchManual)
-                                {
-                                    if (autoBtnState != FormGPS.btnStates.On)
-                                    {
-                                        autoBtnState = FormGPS.btnStates.On;
-                                        btnSection_Update();
-                                    }
-                                }
-                                else
-                                {
-                                    if (autoBtnState != FormGPS.btnStates.Auto)
-                                    {
-                                        autoBtnState = FormGPS.btnStates.Auto;
-                                        btnSection_Update();
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (autoBtnState != FormGPS.btnStates.Off)
-                                {
-                                    autoBtnState = FormGPS.btnStates.Off;
-                                    btnSection_Update();
-                                }
-                            }
-                        }
-
-
-                        //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
-                        if (ahrs.RemoteAutoSteer)
-                        {
-                            if (isJobStarted && !recPath.isDrivingRecordedPath && (ABLines.BtnABLineOn || ct.isContourBtnOn || CurveLines.BtnCurveLineOn))
-                            {
-                                if ((Data & 2) == 0)
-                                {
-                                    if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                    btnAutoSteer.BackColor = System.Drawing.Color.SkyBlue;
-                                }
-                                else
-                                {
-                                    if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                    btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
-                                }
-                            }
-                            else
-                            {
-                                if (isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                                btnAutoSteer.BackColor = System.Drawing.Color.Transparent;
-                            }
-                        }
-
-                        int.TryParse(words[7], out mc.pwmDisplay);
-
-                        break;
-
-                    // 127,230, 2=checksum, 8 = ino version
-                    case 230:
-
-                        byte.TryParse(words[2], out checksumRecd);
-
-                        if (checksumRecd != checksumSent)
-                        {
-                            MessageBox.Show(
-                                "Sent: " + checksumSent + "\r\n Recieved: " + checksumRecd,
-                                    "Checksum Error",
-                                            MessageBoxButtons.OK, MessageBoxIcon.Question);
-                        }
-
-                        if (words[3] != inoVersionStr)
-                        {
-                            Form af = Application.OpenForms["FormSteer"];
-
-                            if (af != null)
-                            {
-                                af.Focus();
-                                af.Close();
-                            }
-
-                            af = Application.OpenForms["FormArduinoSettings"];
-
-                            if (af != null)
-                            {
-                                af.Focus();
-                                af.Close();
-                            }
-
-                            //spAutoSteer.Close();
-                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_USB_" + currentVersionStr + ".ino", gStr.gsFileError,
-                                                MessageBoxButtons.OK, MessageBoxIcon.Question);
-                            Close();
-                        }
-
-                        break;
-                }
-            }
-        }
-
-        private delegate void LineReceivedEventHandlerAutoSteer(string sentence);
 
         //Arduino serial port receive in its own thread
         private void sp_DataReceivedAutoSteer(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -252,35 +115,43 @@ namespace AgOpenGPS
             {
                 try
                 {
-
-
-                    string sentence = spAutoSteer.ReadLine();
-                    this.BeginInvoke(new LineReceivedEventHandlerAutoSteer(SerialLineReceivedAutoSteer), sentence);
-
-
-                    /*
                     while (spAutoSteer.BytesToRead > 0)
                     {
-                        int test = spAutoSteer.ReadByte();
-                        if (spAutoSteerIdx == 0)
+                        int Data = spAutoSteer.ReadByte();
+
+                        if (spUBXHeaderIdx < 3)
                         {
-                            if (test == spAutoSteerBytes[spAutoSteerIdx]) spAutoSteerIdx++;
+                            if (spUBXMessage[spUBXHeaderIdx] == Data) spUBXHeaderIdx++;
+                            else spUBXHeaderIdx = 0;
+                        }
+                        if (spAutoSteerIdx == 0 && spUBXHeaderIdx < 3)
+                        {
+                            if (Data == spAutoSteerBytes[spAutoSteerIdx]) spAutoSteerIdx++;
                             else spAutoSteerIdx = 0;
                         }
-                        else
+                        else if (spUBXHeaderIdx < 3)
                         {
-                            spAutoSteerBytes[spAutoSteerIdx] = (byte)test;
+                            spAutoSteerBytes[spAutoSteerIdx] = (byte)Data;
                             if (spAutoSteerIdx == 2) Array.Resize(ref spAutoSteerBytes, Math.Max((int)spAutoSteerBytes[spAutoSteerIdx], 3));
-                            spAutoSteerIdx++;
 
-                            if (spAutoSteerIdx == spAutoSteerBytes.Length)
+                            if (++spAutoSteerIdx >= spAutoSteerBytes.Length)
                             {
                                 BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spAutoSteerBytes)));
                                 spAutoSteerIdx = 0;
                             }
                         }
+                        else
+                        {
+                            spUBXMessage[spUBXHeaderIdx] = (byte)Data;
+                            if (spUBXHeaderIdx == 5) Array.Resize(ref spUBXMessage, Math.Max((spUBXMessage[4] + (spUBXMessage[5] << 8)) + 8, 8));
+
+                            if (++spUBXHeaderIdx >= spUBXMessage.Length)
+                            {
+                                BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spUBXMessage)));
+                                spUBXHeaderIdx = 0;
+                            }
+                        }
                     }
-                    */
                 }
                 //this is bad programming, it just ignores errors until its hooked up again.
                 catch (Exception ex)

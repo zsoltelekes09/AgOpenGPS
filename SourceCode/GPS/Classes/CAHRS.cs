@@ -54,8 +54,6 @@ namespace AgOpenGPS
             rollZeroX16 = Properties.Settings.Default.setIMU_rollZeroX16;
             pitchZeroX16 = Properties.Settings.Default.setIMU_pitchZeroX16;
 
-            RemoteAutoSteer = Properties.Settings.Default.setAS_isAutoSteerAutoOn;
-
             fusionWeight = Properties.Settings.Default.setIMU_fusionWeight;
 
             //usb IMU Tinker

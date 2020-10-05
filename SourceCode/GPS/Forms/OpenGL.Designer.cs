@@ -634,7 +634,7 @@ namespace AgOpenGPS
                         else if (Tools[i].Sections[j].BtnSectionState == btnStates.Off || autoBtnState == 0)
                         {
                             Tools[i].Sections[j].SectionOnRequest = false;
-                            Tools[i].Sections[j].SectionOverlapTimer = 0;
+                            Tools[i].Sections[j].SectionOverlapTimer = 1;
                             isSuperSectionAllowedOn = false;
                         }
                         else if (Tools[i].Sections[j].BtnSectionState == btnStates.Auto)
@@ -642,7 +642,7 @@ namespace AgOpenGPS
                             if (Tools[i].Sections[j].speedPixels < Tools[i].SlowSpeedCutoff)
                             {
                                 Tools[i].Sections[j].SectionOnRequest = false;
-                                Tools[i].Sections[j].SectionOverlapTimer = 0;
+                                Tools[i].Sections[j].SectionOverlapTimer = 1;
                                 isSuperSectionAllowedOn = false;
                             }
                             else
@@ -685,43 +685,18 @@ namespace AgOpenGPS
 
                                 Tools[i].Sections[j].SectionOnRequest = Tools[i].Sections[j].IsSectionRequiredOn ? true : false;
 
-                                if ((j + 1 < Tools[i].numOfSections) && Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft)
+                                if (j + 1 < Tools[i].numOfSections)
                                 {
-
-                                    isSuperSectionAllowedOn &= (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
+                                    if (Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft)
+                                    {
+                                        isSuperSectionAllowedOn &= (Tools[i].SuperSection && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
+                                    }
+                                    else isSuperSectionAllowedOn = false;
                                 }
-                                else isSuperSectionAllowedOn = false;
                             }
                         }
                     }
-                    if (isSuperSectionAllowedOn)
-                    {
-                        for (int j = 0; j < Tools[i].numOfSections; j++)
-                        {
-                            Tools[i].Sections[j].SectionOnRequest = false;
-                            Tools[i].Sections[j].SectionOverlapTimer = 0;
-                            Tools[i].Sections[j].MappingOffTimer = 0;
-                            Tools[i].Sections[j].MappingOnTimer = 0;
-                        }
-
-                        //turn on super section
-                        Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = true;
-                        Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 1;
-                    }
-                    else if (Tools[i].Sections[Tools[i].numOfSections].IsSectionOn)
-                    {
-                        Tools[i].Sections[Tools[i].numOfSections].SectionOnRequest = false;
-                        Tools[i].Sections[Tools[i].numOfSections].SectionOverlapTimer = 0;
-                        Tools[i].Sections[Tools[i].numOfSections].MappingOffTimer = 0;
-                        Tools[i].Sections[Tools[i].numOfSections].MappingOnTimer = 0;
-
-                        for (int j = 0; j < Tools[i].numOfSections; j++)//set the timers back
-                        {
-                            Tools[i].Sections[j].MappingOffTimer = (int)(HzTime * Tools[i].MappingOffDelay + 1);
-                            Tools[i].Sections[j].SectionOverlapTimer = (int)((double)HzTime * Tools[i].TurnOffDelay + 1);
-                            Tools[i].Sections[j].MappingOnTimer = 1;
-                        }
-                    }
+                    Tools[i].SuperSection = isSuperSectionAllowedOn;
                 }
             }
 
@@ -730,17 +705,20 @@ namespace AgOpenGPS
                 if (hd.isToolUp && mc.Send_HydraulicLift[3] != 0x02)
                 {
                     mc.Send_HydraulicLift[3] = 0x02;
+                    DataSend[8] = "Hydraulic Lift: State Up";
                     SendData(mc.Send_HydraulicLift, false);
                 }
                 else if (!hd.isToolUp && mc.Send_HydraulicLift[3] != 0x01)
                 {
                     mc.Send_HydraulicLift[3] = 0x01;
+                    DataSend[8] = "Hydraulic Lift: State Down";
                     SendData(mc.Send_HydraulicLift, false);
                 }
             }
             else if(mc.Send_HydraulicLift[3] != 0x00)
             {
                 mc.Send_HydraulicLift[3] = 0x00;
+                DataSend[8] = "HydraulicLift: State Off";
                 SendData(mc.Send_HydraulicLift, false);
             }
 

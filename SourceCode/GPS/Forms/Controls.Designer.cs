@@ -132,6 +132,7 @@ namespace AgOpenGPS
                 btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
                 //if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
                 mc.Send_AutoSteerButton[3] = 0x00;
+                DataSend[8] = "Auto Steer Button: State Off";
                 SendData(mc.Send_AutoSteerButton, false);//reset pulsecount = true & Autosteer off
             }
             else
@@ -141,6 +142,7 @@ namespace AgOpenGPS
                     isAutoSteerBtnOn = true;
                     btnAutoSteer.Image = Properties.Resources.AutoSteerOn;
                     mc.Send_AutoSteerButton[3] = 0x01;
+                    DataSend[8] = "Auto Steer Button: State On";
                     SendData(mc.Send_AutoSteerButton, false);//reset pulsecount = true & Autosteer on
                 }
                 else
@@ -932,19 +934,6 @@ namespace AgOpenGPS
             form.Top = Top + Height / 2 - form.Height / 2;
         }
 
-        private void toolstripVehicleConfig_Click_1(object sender, EventArgs e)
-        {
-            using (var form = new FormSettings(this, 0))
-            {
-                var result = form.ShowDialog(this);
-                if (result == DialogResult.OK)
-                {
-                    if (Properties.Settings.Default.setAS_isAutoSteerAutoOn) btnAutoSteer.Text = "A";
-                    else btnAutoSteer.Text = "M";
-                }
-            }
-        }
-
         private void toolstripYouTurnConfig_Click_1(object sender, EventArgs e)
         {
             var form = new FormYouTurn(this);
@@ -1090,15 +1079,17 @@ namespace AgOpenGPS
 
         private void vehicleToolStripBtn_Click(object sender, EventArgs e)
         {
-            using (var form = new FormSettings(this, 0))
+            Form f = Application.OpenForms["FormSettings"];
+            if (f != null)
             {
-                var result = form.ShowDialog(this);
-                if (result == DialogResult.OK)
-                {
-                    if (Properties.Settings.Default.setAS_isAutoSteerAutoOn) btnAutoSteer.Text = "R";
-                    else btnAutoSteer.Text = "M";
-                }
+                f.Focus();
+                return;
             }
+
+            Form form = new FormSettings(this, 0);
+            form.Show(this);
+            form.Left = Left + Width / 2 - form.Width / 2;
+            form.Top = Top + Height / 2 - form.Height / 2;
         }
 
         private void toolStripBtnDrag_ButtonClick(object sender, EventArgs e)

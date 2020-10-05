@@ -22,6 +22,8 @@ namespace AgOpenGPS
 
             snapAdj = Math.Round(mf.Guidance.WidthMinusOverlap / 2 * mf.m2MetImp, mf.decimals);
 
+            TboxSnapAdj.Text = Math.Round(snapAdj, mf.decimals).ToString();
+
             btnCancel.Focus();
             CurveMode = mode;
             if (CurveMode)
@@ -131,7 +133,6 @@ namespace AgOpenGPS
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    
                     TboxSnapAdj.Text = (snapAdj = Math.Round(form.ReturnValue, mf.decimals)).ToString();
                 }
             }

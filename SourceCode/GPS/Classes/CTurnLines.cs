@@ -53,6 +53,7 @@ namespace AgOpenGPS
             }
             turnLine.CalculateHeadings(true);
         }
+
         public void PreCalcTurnLines()
         {
             if (turnLine.Count > 3)

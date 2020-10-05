@@ -10,6 +10,10 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         public bool isContourOn, isContourBtnOn, isRightPriority = true;
+        public bool OldisSameWay, isSameWay;
+        public double HowManyPathsAway, OldHowManyPathsAway;
+
+        public int Oldstrip, strip = 0, pt = 0;
 
         //used to determine if section was off and now is on or vice versa
         public bool wasSectionOn;
@@ -20,13 +24,13 @@ namespace AgOpenGPS
         public Vec2 boxE = new Vec2(4, 3), boxF = new Vec2(5, 4);
 
         //current contour patch and point closest to current fix
-        public int closestRefPatch, closestRefPoint;
+        public int closestRefPatch;
 
         //angle to path line closest point and fix
         public double refHeading, ref2;
 
         // for closest line point to current fix
-        public double minDistance = 99999.0, refX, refZ;
+        public double Distance, refEast, refNorth;
 
         //generated reference line
         public double refLineSide = 1.0;
@@ -128,220 +132,229 @@ namespace AgOpenGPS
                     //only add if inside actual field boundary
                     stripList[stripList.Count - 1].Add(point);
                 }
+
+                FixContourLine(totalHeadWidth, ref mf.bnd.bndArr[j].bndLine);
             }
         }
 
-        public void IsInsideBox(Vec2 LeftDown, Vec2 RightDown, Vec2 RightUp, Vec2 LeftUp)
+        public void FixContourLine(double totalHeadWidth, ref List<Vec3> curBnd)
         {
-            CVec pointC = new CVec();
-            int stripCount = stripList.Count;
-            for (int s = 0; s < stripCount; s++)
+            double distance;
+            for (int i = 0; i < stripList[stripList.Count - 1].Count; i++)
             {
-                int ptCount = stripList[s].Count;
-                for (int p = 0; p < ptCount; p++)
+                for (int k = 0; k < curBnd.Count; k++)
                 {
-
-                    if ((((RightDown.Easting - LeftDown.Easting) * (stripList[s][p].Northing - LeftDown.Northing))
-                            - ((RightDown.Northing - LeftDown.Northing) * (stripList[s][p].Easting - LeftDown.Easting))) < 0) { continue; }
-
-                    if ((((LeftUp.Easting - RightUp.Easting) * (stripList[s][p].Northing - RightUp.Northing))
-                            - ((LeftUp.Northing - RightUp.Northing) * (stripList[s][p].Easting - RightUp.Easting))) < 0) { continue; }
-
-                    if ((((RightUp.Easting - RightDown.Easting) * (stripList[s][p].Northing - RightDown.Northing))
-                            - ((RightUp.Northing - RightDown.Northing) * (stripList[s][p].Easting - RightDown.Easting))) < 0) { continue; }
-
-                    if ((((LeftDown.Easting - LeftUp.Easting) * (stripList[s][p].Northing - LeftUp.Northing))
-                            - ((LeftDown.Northing - LeftUp.Northing) * (stripList[s][p].Easting - LeftUp.Easting))) < 0) { continue; }
-
-                    //in the box so is it parallelish or perpedicularish to current heading
-                    ref2 = Math.PI - Math.Abs(Math.Abs(mf.fixHeading - stripList[s][p].Heading) - Math.PI);
-                    if (ref2 < 1.2 || ref2 > 1.9)
+                    //remove the points too close to boundary
+                    distance = Glm.Distance(curBnd[k], stripList[stripList.Count - 1][i]);
+                    if (distance < totalHeadWidth - 0.001)
                     {
-                        //it's in the box and parallelish so add to list
-                        pointC.x = stripList[s][p].Easting;
-                        pointC.z = stripList[s][p].Northing;
-                        pointC.h = stripList[s][p].Heading;
-                        pointC.strip = s;
-                        pointC.pt = p;
-                        conList.Add(pointC);
+                        stripList[stripList.Count - 1].RemoveAt(i);
+                        i--;
+                        break;
                     }
                 }
             }
-        }
 
+            for (int i = 0; i < stripList[stripList.Count - 1].Count; i++)
+            {
+                int j = (i == stripList[stripList.Count - 1].Count - 1) ? 0 : i + 1;
+                //make sure distance isn't too small between points on turnLine
+                distance = Glm.Distance(stripList[stripList.Count - 1][i], stripList[stripList.Count - 1][j]);
+                if (distance < 2)
+                {
+                    stripList[stripList.Count - 1].RemoveAt(j);
+                    i--;
+                }
+                else if (distance > 4)//make sure distance isn't too big between points on turnLine
+                {
+                    double northing = stripList[stripList.Count - 1][i].Northing / 2 + stripList[stripList.Count - 1][j].Northing / 2;
+                    double easting = stripList[stripList.Count - 1][i].Easting / 2 + stripList[stripList.Count - 1][j].Easting / 2;
+                    double heading = stripList[stripList.Count - 1][i].Heading / 2 + stripList[stripList.Count - 1][j].Heading / 2;
+                    if (j == 0) stripList[stripList.Count - 1].Add(new Vec3(northing, easting, heading));
+                    stripList[stripList.Count - 1].Insert(j, new Vec3(northing, easting, heading));
+                    i--;
+                }
+            }
+
+            stripList[stripList.Count - 1].CalculateHeadings(true);
+            stripList[stripList.Count - 1].CalculateRoundedCorner(0.5, true, 0.0436332);
+        }
 
         //determine closest point on left side
         public void BuildContourGuidanceLine(Vec3 pivot)
         {
-            double toolWid = mf.Guidance.GuidanceWidth;
-            double SinHeading = Math.Sin(pivot.Heading);
-            double CosHeading = Math.Cos(pivot.Heading);
-
-
-
-            //build a frustum box ahead of fix to find adjacent paths and points
-            //Center
-            boxA.Northing = pivot.Northing + CosHeading * -2;
-            boxA.Easting = pivot.Easting + SinHeading * -2; //center down
-            boxB.Northing = boxA.Northing + CosHeading * 10;
-            boxB.Easting = boxA.Easting + SinHeading * 10; //center up
-
-            //Left
-            double tools = toolWid + mf.Guidance.GuidanceOffset + 10;
-            boxC.Northing = boxB.Northing + SinHeading * -tools + CosHeading * 10;
-            boxC.Easting = boxB.Easting + CosHeading * tools + SinHeading * 10; //Right up
-            boxD.Northing = boxA.Northing + SinHeading * -tools + CosHeading * -10;
-            boxD.Easting = boxA.Easting + CosHeading * tools + SinHeading * -10; // right down
-
-            //Right
-            tools = toolWid - mf.Guidance.GuidanceOffset + 10;
-            boxE.Northing = boxB.Northing + SinHeading * tools + CosHeading * 10;
-            boxE.Easting = boxB.Easting + CosHeading * -tools + SinHeading * 10; //left up
-            boxF.Northing = boxA.Northing + SinHeading * tools + CosHeading * -10;
-            boxF.Easting = boxA.Easting + CosHeading * -tools + SinHeading * -10;//left down
-
-            conList.Clear();
-            ctList.Clear();
-            int ptCount;
-
-            //check if no strips yet, return
-            int stripCount = stripList.Count;
-            if (stripCount == 0) return;
-
-            if (isRightPriority)
-            {
-                IsInsideBox(boxA, boxD, boxC, boxB);
-
-                if (conList.Count == 0)
-                {
-                    IsInsideBox(boxF, boxA, boxB, boxE);
-                }
-            }
-            else
-            {
-                IsInsideBox(boxF, boxA, boxB, boxE);
-
-                if (conList.Count == 0)
-                {
-                    IsInsideBox(boxA, boxD, boxC, boxB);
-                }
-            }
-
-            //no points in the box, exit
-            ptCount = conList.Count;
-            if (ptCount == 0)
-            {
-                distanceFromCurrentLine = 32000;
-                mf.guidanceLineDistanceOff = 32000;
-                return;
-            }
-
-            //determine closest point
-            minDistance = 99999;
-            for (int i = 0; i < ptCount; i++)
-            {
-                double dist = ((pivot.Easting - conList[i].x) * (pivot.Easting - conList[i].x))
-                                + ((pivot.Northing - conList[i].z) * (pivot.Northing - conList[i].z));
-                if (dist < minDistance)
-                {
-                    minDistance = dist;
-                    closestRefPoint = i;
-                }
-            }
-
-            //now we have closest point, the distance squared from it, and which patch and point its from
-            int strip = conList[closestRefPoint].strip;
-            int pt = conList[closestRefPoint].pt;
-            refX = stripList[strip][pt].Easting;
-            refZ = stripList[strip][pt].Northing;
-            refHeading = stripList[strip][pt].Heading;
-
-            //which side of the patch are we on is next
-            //calculate endpoints of reference line based on closest point
-            refPoint1.Easting = refX - (Math.Sin(refHeading) * 50.0);
-            refPoint1.Northing = refZ - (Math.Cos(refHeading) * 50.0);
-
-            refPoint2.Easting = refX + (Math.Sin(refHeading) * 50.0);
-            refPoint2.Northing = refZ + (Math.Cos(refHeading) * 50.0);
-
-            //x2-x1
-            double dx = refPoint2.Easting - refPoint1.Easting;
-            //z2-z1
-            double dz = refPoint2.Northing - refPoint1.Northing;
-
-            //how far are we away from the reference line at 90 degrees - 2D cross product and distance
-            distanceFromRefLine = ((dz * mf.pn.fix.Easting) - (dx * mf.pn.fix.Northing) + (refPoint2.Easting
-                                    * refPoint1.Northing) - (refPoint2.Northing * refPoint1.Easting))
-                                        / Math.Sqrt((dz * dz) + (dx * dx));
-
-            bool isSameWay = Math.PI - Math.Abs(Math.Abs(mf.pivotAxlePos.Heading - refHeading) - Math.PI) < Glm.PIBy2;
-
-            if (isSameWay) distanceFromRefLine += mf.Guidance.GuidanceOffset;
-            else distanceFromRefLine -= mf.Guidance.GuidanceOffset;
-
-
-            double HowManyPathsAway = Math.Round(distanceFromRefLine / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
-
-            //absolute the distance
-            distanceFromRefLine = Math.Abs(distanceFromRefLine);
-
-            //make the new guidance line list called guideList
-            ptCount = stripList[strip].Count - 1;
-            int start, stop;
-
-            start = pt - 35; if (start < 0) start = 0;
-            stop = pt + 35; if (stop > ptCount) stop = ptCount + 1;
-
-            bool fail = false;
-
-            double Offset = mf.Guidance.WidthMinusOverlap * HowManyPathsAway;
-            double distSq = Offset * Offset - 10;
-
-
-
-            for (int i = start; i < stop; i++)
-            {
-                var point = new Vec3(
-                stripList[strip][i].Northing + (Math.Sin(stripList[strip][i].Heading) * -Offset),
-                    stripList[strip][i].Easting + (Math.Cos(stripList[strip][i].Heading) * Offset),
-                    stripList[strip][i].Heading);
-
-                //make sure its not closer then 1 eq width
-                for (int j = start; j < stop; j++)
-                {
-                    double check = Glm.DistanceSquared(point.Northing, point.Easting, stripList[strip][j].Northing, stripList[strip][j].Easting);
-                    if (check < distSq)
-                    {
-                        fail = true;
-                        break;
-                    }
-                }
-
-                if (!fail) ctList.Add(point);
-                fail = false;
-            }
-
-            int ctCount = ctList.Count;
-            if (ctCount < 6) return;
-
-            const double spacing = 1.0;
-            double distance;
-            for (int i = 0; i < ctCount - 1; i++)
-            {
-                distance = Glm.Distance(ctList[i], ctList[i + 1]);
-                if (distance < spacing)
-                {
-                    ctList.RemoveAt(i + 1);
-                    ctCount = ctList.Count;
-                    i--;
-                }
-            }
-            ctList.CalculateHeadings(true);
         }
 
         //determine distance from contour guidance line
         public void DistanceFromContourLine(Vec3 pivot, Vec3 steer)
         {
+            if (!mf.isAutoSteerBtnOn)
+            {
+                int closestRefPointRight = 0, ClosestStripRight = 0;
+                int closestRefPoint = 0;
+
+                double dx;
+                //z2-z1
+                double dy;
+
+                Distance = double.PositiveInfinity;
+
+                int stripCount = stripList.Count;
+                for (int s = 0; s < stripCount; s++)
+                {
+                    double MinStripDistance = double.PositiveInfinity;
+
+
+                    int StripCount = stripList[s].Count;
+                    for (int p = 0; p < StripCount; p +=4)
+                    {
+                        dx = pivot.Northing - stripList[s][p].Northing;
+                        dy = pivot.Easting - stripList[s][p].Easting;
+                        double dist = (dx * dx) + (dy * dy);
+
+                        if (dist < Distance)
+                        {
+                            if (dist < MinStripDistance)
+                            {
+                                MinStripDistance = dist;
+                                closestRefPoint = p;
+                            }
+
+                            double angle = (mf.fixHeading - stripList[s][p].Heading);
+
+                            if (angle < 0) angle += Glm.twoPI;
+                            if (angle > Glm.twoPI) angle -= Glm.twoPI;
+                            double diff = 0.436332;//25deg
+
+                            if ((angle < diff || angle > Glm.twoPI - diff) || (angle > Math.PI - diff && angle < Math.PI + diff))
+                            {
+                                if (Math.Cos(pivot.Heading) * (stripList[s][p].Easting - pivot.Easting) < Math.Sin(pivot.Heading) * (stripList[s][p].Northing - pivot.Northing))
+                                {
+                                    if (isRightPriority) dist *= 10000.0;
+                                }
+                                else if (!isRightPriority) dist *= 10000.0;
+
+                                if (dist < Distance)
+                                {
+                                    Distance = dist;
+                                    ClosestStripRight = s;
+                                    closestRefPointRight = p;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!double.IsInfinity(MinStripDistance))
+                    {
+                        if (ClosestStripRight == s) closestRefPointRight = closestRefPoint;
+                    }
+                }
+
+                if (double.IsInfinity(Distance)) return;
+
+
+                strip = ClosestStripRight;
+                pt = closestRefPointRight;
+
+                //now we have closest point, the distance squared from it, and which patch and point its from
+
+                refEast = stripList[strip][pt].Easting;
+                refNorth = stripList[strip][pt].Northing;
+                refHeading = stripList[strip][pt].Heading;
+
+                //which side of the patch are we on is next
+                //calculate endpoints of reference line based on closest point
+                refPoint1.Northing = refNorth - (Math.Cos(refHeading) * 50.0);
+                refPoint1.Easting = refEast - (Math.Sin(refHeading) * 50.0);
+
+                refPoint2.Northing = refNorth + (Math.Cos(refHeading) * 50.0);
+                refPoint2.Easting = refEast + (Math.Sin(refHeading) * 50.0);
+
+
+                //x2-x1
+                dx = refPoint2.Easting - refPoint1.Easting;
+                //z2-z1
+                dy = refPoint2.Northing - refPoint1.Northing;
+
+                if (Math.Abs(dx) < double.Epsilon && Math.Abs(dy) < double.Epsilon) return;
+
+                //how far are we away from the reference line at 90 degrees - 2D cross product and distance
+                distanceFromRefLine = ((dy * mf.pn.fix.Easting) - (dx * mf.pn.fix.Northing) + (refPoint2.Easting
+                                        * refPoint1.Northing) - (refPoint2.Northing * refPoint1.Easting))
+                                            / Math.Sqrt((dy * dy) + (dx * dx));
+
+                isSameWay = Math.PI - Math.Abs(Math.Abs(mf.pivotAxlePos.Heading - refHeading) - Math.PI) < Glm.PIBy2;
+
+                if (isSameWay) distanceFromRefLine += mf.Guidance.GuidanceOffset;
+                else distanceFromRefLine -= mf.Guidance.GuidanceOffset;
+
+
+
+                HowManyPathsAway = Math.Round(distanceFromRefLine / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+
+                //absolute the distance
+                distanceFromRefLine = Math.Abs(distanceFromRefLine);
+            }
+
+            if (OldisSameWay != isSameWay || HowManyPathsAway != OldHowManyPathsAway || strip != Oldstrip)
+            {
+                OldisSameWay = isSameWay;
+                OldHowManyPathsAway = HowManyPathsAway;
+                Oldstrip = strip;
+
+                bool fail = false;
+
+                double Offset = mf.Guidance.WidthMinusOverlap * HowManyPathsAway;
+                double distSq = Offset * Offset - 0.001;
+
+                ctList.Clear();
+
+                for (int i = 0; i < stripList[strip].Count; i++)
+                {
+                    var point = new Vec3(
+                    stripList[strip][i].Northing + (Math.Sin(stripList[strip][i].Heading) * -Offset),
+                        stripList[strip][i].Easting + (Math.Cos(stripList[strip][i].Heading) * Offset),
+                        stripList[strip][i].Heading);
+
+                    //make sure its not closer then 1 eq width
+                    for (int j = 0; j < stripList[strip].Count; j++)
+                    {
+                        double check = Glm.DistanceSquared(point.Northing, point.Easting, stripList[strip][j].Northing, stripList[strip][j].Easting);
+                        if (check < distSq)
+                        {
+                            fail = true;
+                            break;
+                        }
+                    }
+
+                    if (!fail) ctList.Add(point);
+                    fail = false;
+                }
+
+                int ctCount = ctList.Count;
+                if (ctCount < 6) return;
+
+                const double spacing = 1.0;
+                double distance;
+                for (int i = 0; i < ctCount - 1; i++)
+                {
+                    distance = Glm.Distance(ctList[i], ctList[i + 1]);
+                    if (distance < spacing)
+                    {
+                        ctList.RemoveAt(i + 1);
+                        ctCount = ctList.Count;
+                        i--;
+                    }
+                }
+
+                if (ctCount < 4) return;
+
+                distance = Glm.Distance(ctList[0], ctList[ctList.Count - 1]);
+                bool loop = distance < 3;
+
+                ctList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, loop, 0.0436332);
+            }
+
             isValid = false;
             int ptCount = ctList.Count;
             //distanceFromCurrentLine = 9999;

@@ -59,10 +59,10 @@ namespace AgOpenGPS
         public int inoVersionInt;
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
-        private readonly Stopwatch swFrame = new Stopwatch();
+        public readonly Stopwatch swFrame = new Stopwatch();
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
-        private readonly Stopwatch swHz = new Stopwatch();
+        public readonly Stopwatch swHz = new Stopwatch();
 
         //whether or not to use Stanley control
         public bool isStanleyUsed = true;
@@ -1082,7 +1082,7 @@ namespace AgOpenGPS
         {
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j< Tools[i].Sections.Count; j++)
+                for (int j = 0; j < Tools[i].numOfSections; j++)
                 {
                     //SECTIONS - 
                     if (Tools[i].Sections[j].SectionOnRequest)
@@ -1092,9 +1092,10 @@ namespace AgOpenGPS
                             mc.Send_Sections[3] = (byte)i;
                             mc.Send_Sections[4] = (byte)j;
                             mc.Send_Sections[5] = 0x01;
+                            DataSend[8] = "Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State On";
                             SendData(mc.Send_Sections, false);
+                            Tools[i].Sections[j].IsSectionOn = true;
                         }
-                        Tools[i].Sections[j].IsSectionOn = true;
                         Tools[i].Sections[j].SectionOverlapTimer = (int)(HzTime * Tools[i].TurnOffDelay + 1);
 
                         if (Tools[i].Sections[j].MappingOnTimer == 0) Tools[i].Sections[j].MappingOnTimer = (int)(HzTime * Tools[i].MappingOnDelay + 1);
@@ -1104,40 +1105,68 @@ namespace AgOpenGPS
                         if (Tools[i].Sections[j].SectionOverlapTimer > 0) Tools[i].Sections[j].SectionOverlapTimer--;
                         if (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].SectionOverlapTimer == 0)
                         {
+                            Tools[i].Sections[j].IsSectionOn = false;
+
                             mc.Send_Sections[3] = (byte)i;
                             mc.Send_Sections[4] = (byte)j;
                             mc.Send_Sections[5] = 0x00;
+                            DataSend[8] = "Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State Off";
                             SendData(mc.Send_Sections, false);
-
-                            Tools[i].Sections[j].IsSectionOn = false;
                         }
                     }
 
                     //MAPPING -
-                    if (!Tools[i].Sections[j].IsMappingOn && isMapping && Tools[i].Sections[j].MappingOnTimer > 0)
-                    {
-                        if (Tools[i].Sections[j].MappingOnTimer > 0) Tools[i].Sections[j].MappingOnTimer--;
-                        if (Tools[i].Sections[j].MappingOnTimer == 0)
-                        {
-                            Tools[i].Sections[j].TurnMappingOn();
-                        }
-                    }
 
-                    if (Tools[i].Sections[j].IsSectionOn)
+                    if (Tools[i].SuperSection)
                     {
-                        Tools[i].Sections[j].MappingOffTimer = (int)(Tools[i].MappingOffDelay * HzTime + 1);
+                        if (Tools[i].Sections[j].IsMappingOn)
+                        {
+                            Tools[i].Sections[j].TurnMappingOff();
+                            Tools[i].Sections[j].MappingOnTimer = 1;
+                        }
                     }
                     else
                     {
-                        if (Tools[i].Sections[j].MappingOffTimer > 0) Tools[i].Sections[j].MappingOffTimer--;
-                        if (Tools[i].Sections[j].MappingOffTimer == 0)
+                        if (!Tools[i].Sections[j].IsMappingOn && isMapping && Tools[i].Sections[j].MappingOnTimer > 0)
                         {
-                            if (Tools[i].Sections[j].IsMappingOn)
+                            if (Tools[i].Sections[j].MappingOnTimer > 0) Tools[i].Sections[j].MappingOnTimer--;
+                            if (Tools[i].Sections[j].MappingOnTimer == 0)
                             {
-                                Tools[i].Sections[j].TurnMappingOff();
-                                Tools[i].Sections[j].MappingOnTimer = 0;
+                                Tools[i].Sections[j].TurnMappingOn();
                             }
                         }
+
+                        if (Tools[i].Sections[j].IsSectionOn)
+                        {
+                            Tools[i].Sections[j].MappingOffTimer = (int)(Tools[i].MappingOffDelay * HzTime + 1);
+                        }
+                        else
+                        {
+                            if (Tools[i].Sections[j].MappingOffTimer > 0) Tools[i].Sections[j].MappingOffTimer--;
+                            if (Tools[i].Sections[j].MappingOffTimer == 0)
+                            {
+                                if (Tools[i].Sections[j].IsMappingOn)
+                                {
+                                    Tools[i].Sections[j].TurnMappingOff();
+                                    Tools[i].Sections[j].MappingOnTimer = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (Tools[i].SuperSection)
+                {
+                    if (!Tools[i].Sections[Tools[i].numOfSections].IsMappingOn)
+                    {
+                        Tools[i].Sections[Tools[i].numOfSections].TurnMappingOn();
+                    }
+                }
+                else
+                {
+                    if (Tools[i].Sections[Tools[i].numOfSections].IsMappingOn)
+                    {
+                        Tools[i].Sections[Tools[i].numOfSections].TurnMappingOff();
                     }
                 }
             }
@@ -1271,29 +1300,31 @@ namespace AgOpenGPS
         //All the files that need to be saved when closing field or app
         public void FileSaveEverythingBeforeClosingField()
         {
-            //turn off contour line if on
-            if (ct.isContourOn) ct.StopContourLine(pivotAxlePos);
-
-            //turn off all the sections
-
-            for (int i = 0; i < Tools.Count; i++)
+            if (isJobStarted)
             {
-                for (int j = 0; j < Tools[i].Sections.Count; j++)
+                //turn off contour line if on
+                if (ct.isContourOn) ct.StopContourLine(pivotAxlePos);
+
+                //turn off all the sections
+
+                for (int i = 0; i < Tools.Count; i++)
                 {
-                    if (Tools[i].Sections[j].IsMappingOn) Tools[i].Sections[j].TurnMappingOff();
-                    Tools[i].Sections[j].SectionOnRequest = false;
+                    for (int j = 0; j < Tools[i].Sections.Count; j++)
+                    {
+                        if (Tools[i].Sections[j].IsMappingOn) Tools[i].Sections[j].TurnMappingOff();
+                        Tools[i].Sections[j].SectionOnRequest = false;
+                    }
                 }
+
+                FileSaveSections();
+                FileSaveContour();
+                FileSaveFieldKML();
+
+                PatchDrawList.Clear();
+
+                JobClose();
+                Text = "AgOpenGPS";
             }
-
-            PatchDrawList.Clear();
-            //FileSaveHeadland();
-
-            FileSaveSections();
-            FileSaveContour();
-            FileSaveFieldKML();
-
-            JobClose();
-            Text = "AgOpenGPS";
         }
 
         public void DrawPatchList(int mipmap)
