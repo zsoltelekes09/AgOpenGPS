@@ -75,6 +75,7 @@ namespace AgOpenGPS
         //do any field initializing for form here
         private void FormToolSettings_Load(object sender, EventArgs e)
         {
+            mf.CheckToolSettings();
             //HitchTab
             TboxHitchLength.Text = (hitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].HitchLength) * mf.m2MetImp, mf.decimals)).ToString();
             TboxHitchLength.CheckValue(ref hitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
@@ -125,10 +126,6 @@ namespace AgOpenGPS
             FixRadioButtonsAndImages();
 
 
-
-
-
-
             //based on number of sections and values update the page before displaying
             UpdateNumberOfSections();
 
@@ -138,6 +135,7 @@ namespace AgOpenGPS
 
         private void BtnOK_Click(object sender, EventArgs e)
         {
+            mf.CheckToolSettings();
             double Width = 0;
             for (int i = 0; i < Section.Count; i++)
             {
@@ -147,23 +145,23 @@ namespace AgOpenGPS
             if (Width > 75) return;
 
             //Tool  ------------------------------------------------------------------------------------------
-
+            if (Here > Properties.Vehicle.Default.ToolSettings.Count) Here = 0;
             Properties.Vehicle.Default.ToolSettings[Here].LookAheadOn = toolLookAheadOn;
             Properties.Vehicle.Default.ToolSettings[Here].LookAheadOff = toolLookAheadOff;
             Properties.Vehicle.Default.ToolSettings[Here].TurnOffDelay = toolTurnOffDelay;
             Properties.Vehicle.Default.ToolSettings[Here].MappingOnDelay = MappingOnDelay;
             Properties.Vehicle.Default.ToolSettings[Here].MappingOffDelay = MappingOffDelay;
 
-            Properties.Vehicle.Default.ToolSettings[Here].TrailingHitchLength = Math.Round(toolTrailingHitchLength * -mf.metImp2m,2);
-            Properties.Vehicle.Default.ToolSettings[Here].TankTrailingHitchLength = Math.Round(tankTrailingHitchLength * -mf.metImp2m,2);
-            Properties.Vehicle.Default.ToolSettings[Here].HitchLength = Math.Round(hitchLength * mf.metImp2m * (isToolBehindPivot? -1 : 1),2);
+            Properties.Vehicle.Default.ToolSettings[Here].TrailingHitchLength = Math.Round(toolTrailingHitchLength * -mf.metImp2m, 2);
+            Properties.Vehicle.Default.ToolSettings[Here].TankTrailingHitchLength = Math.Round(tankTrailingHitchLength * -mf.metImp2m, 2);
+            Properties.Vehicle.Default.ToolSettings[Here].HitchLength = Math.Round(hitchLength * mf.metImp2m * (isToolBehindPivot ? -1 : 1), 2);
 
             Properties.Vehicle.Default.ToolSettings[Here].Trailing = isToolTrailing;
             Properties.Vehicle.Default.ToolSettings[Here].BehindPivot = isToolBehindPivot;
             Properties.Vehicle.Default.ToolSettings[Here].TBT = isToolTBT;
 
             Properties.Vehicle.Default.ToolSettings[Here].MinApplied = MinApplied;
-            Properties.Vehicle.Default.ToolSettings[Here].SlowSpeedCutoff = Math.Round(cutoffSpeed * mf.cutoffMetricImperial,2);
+            Properties.Vehicle.Default.ToolSettings[Here].SlowSpeedCutoff = Math.Round(cutoffSpeed * mf.cutoffMetricImperial, 2);
             Properties.Vehicle.Default.GuidanceOverlap = mf.Guidance.GuidanceOverlap = Math.Round(toolOverlap * mf.metImp2m,2);
             Properties.Vehicle.Default.GuidanceOffset = mf.Guidance.GuidanceOffset = Math.Round(toolOffset * mf.metImp2m,2);
             Properties.Vehicle.Default.GuidanceWidth = mf.Guidance.GuidanceWidth = Math.Round(Width, 2);

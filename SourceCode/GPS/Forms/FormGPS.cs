@@ -750,10 +750,21 @@ namespace AgOpenGPS
             sender.BackColor = Color.AliceBlue;
         }
 
+        public void CheckToolSettings()
+        {
+            if (Vehicle.Default.ToolSettings == null)
+            {
+                Vehicle.Default.ToolSettings = new List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -4.415, -1.415, 0 }, new double[] { -1.5, 1.5, 4 }, new double[] { 1.415, 4.415, 0 } } } };
+                Vehicle.Default.Save();
+            }
+        }
+
         //function to set section positions
         //function to calculate the width of each section and update
         public void LoadTools()
         {
+            CheckToolSettings();
+
             for (int i = Tools.Count - 1; i >= Vehicle.Default.ToolSettings.Count; i--)
             {
                 TotalSections -= Tools[i].numOfSections;

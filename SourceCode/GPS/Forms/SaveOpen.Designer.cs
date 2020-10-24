@@ -760,6 +760,8 @@ namespace AgOpenGPS
         //function that save vehicle and section settings
         public void FileSaveTool(string FileName)
         {
+            CheckToolSettings();
+
             toolFileName = Path.GetFileNameWithoutExtension(FileName) + " - ";
             Properties.Vehicle.Default.setVehicle_toolName = toolFileName;
             Properties.Vehicle.Default.Save();
@@ -861,7 +863,7 @@ namespace AgOpenGPS
 
                     else
                     {
-                        List<ToolSettings> test = new List<ToolSettings>();// {new ToolSettings() { Sections = { new double[] { -4.5, -1.5, 0 }, new double[] { -1.5, 1.5, 0 }, new double[] { 1.5, 4.5, 0 } } } };
+                        List<ToolSettings> test = new List<ToolSettings>();
 
                         line = reader.ReadLine(); words = line.Split(',');
                         int count = int.Parse(words[1], CultureInfo.InvariantCulture);

@@ -1439,6 +1439,7 @@ namespace AgOpenGPS
                     Settings.Default.Save();
 
                     LoadSettings();
+                    LoadTools();
                 }
             }
         }

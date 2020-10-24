@@ -694,22 +694,18 @@ namespace AgOpenGPS.Properties {
                 this["setArdSteer_setting2"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<ToolSettings> ToolSettings
-        {
-            get
-            {
-                if ((this["ToolSettings"]) == null) (this["ToolSettings"]) = new System.Collections.Generic.List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -4.415, -1.415, 0 }, new double[] { -1.5, 1.5, 4 }, new double[] { 1.415, 4.415, 0 } } } };
+        public global::System.Collections.Generic.List<ToolSettings> ToolSettings {
+            get {
                 return ((global::System.Collections.Generic.List<ToolSettings>)(this["ToolSettings"]));
             }
-            set
-            {
+            set {
                 this["ToolSettings"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("8.83")]

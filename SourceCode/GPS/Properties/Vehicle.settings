@@ -171,7 +171,7 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="ToolSettings" Type="System.Collections.Generic.List&lt;ToolSettings&gt;" Scope="User">
-      <Value Profile="(Default)">(this["ToolSettings"]) = new System.Collections.Generic.List&lt;ToolSettings&gt;() { new ToolSettings() { Sections = { new double[] { -4.415, -1.415, 0 }, new double[] { -1.5, 1.5, 4 }, new double[] { 1.415, 4.415, 0 } } } };</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="GuidanceWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">8.83</Value>
