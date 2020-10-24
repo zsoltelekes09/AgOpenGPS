@@ -74,9 +74,8 @@ namespace AgOpenGPS
             else
                 goalPointDistance += goalPointDistance * mf.vehicle.goalPointDistanceMultiplier;
 
-            if (goalPointDistance < mf.vehicle.goalPointLookAheadMinimumDistance) goalPointDistance = mf.vehicle.goalPointLookAheadMinimumDistance;
-
-            mf.lookaheadActual = goalPointDistance;
+            if (mf.pn.speed > -0.1 && goalPointDistance < mf.vehicle.goalPointLookAheadMinimumDistance) goalPointDistance = mf.vehicle.goalPointLookAheadMinimumDistance;
+            else if (mf.pn.speed < -0.09 && goalPointDistance > -mf.vehicle.goalPointLookAheadMinimumDistance) goalPointDistance = -mf.vehicle.goalPointLookAheadMinimumDistance;
 
             return goalPointDistance;
         }
@@ -84,79 +83,64 @@ namespace AgOpenGPS
         public void DrawVehicle()
         {
             //draw vehicle
-            GL.Translate(mf.pivotAxlePos.Easting, mf.pivotAxlePos.Northing, 0);
+            Vec3 pivot = mf.pivotAxlePos;
+            GL.Translate(pivot.Easting, pivot.Northing, 0);
             GL.Rotate(Glm.ToDegrees(-mf.fixHeading), 0.0, 0.0, 1.0);
             GL.PushMatrix();
 
             GL.PointSize(6.0f);
 
-            //antenna
-            GL.Color3(0.0f, 0.95f, 0.95f);
-
+            GL.Begin(PrimitiveType.Points);
+            GL.Color3(0.95f, 0.0f, 0.0f);
             for (int i = 0; i < mf.Tools.Count; i++)
             {
                 if (mf.Tools[i].isToolBehindPivot)
                 {
-                    GL.Begin(PrimitiveType.Points);
                     //hitch pin
-                    GL.Vertex3(0, antennaPivot, 0);
-                    GL.Color3(0.95f, 0.0f, 0.0f);
                     GL.Vertex3(0, mf.Tools[i].HitchLength, 0);
-                    GL.End();
                 }
             }
+            GL.End();
 
+            double A = wheelbase < 0 ? wheelbase : 0;
+            double B = wheelbase < 0 ? 0 : wheelbase;
+
+            GL.Begin(PrimitiveType.Triangles);
             if (!mf.vehicle.BtnHydLiftOn)
             {
-                GL.Color3(0.9, 0.90, 0.0);
-                GL.Begin(PrimitiveType.TriangleFan);
-                GL.Vertex3(0, antennaPivot, -0.0);
-                GL.Vertex3(1.0, -0, 0.0);
-                GL.Color3(0.0, 0.90, 0.92);
-                GL.Vertex3(0, wheelbase, 0.0);
-                GL.Color3(0.920, 0.0, 0.9);
-                GL.Vertex3(-1.0, -0, 0.0);
-                GL.Vertex3(1.0, -0, 0.0);
-                GL.End();
+                GL.Color3(0.9, 0.9, 0.0);
+                GL.Vertex3(-1.0, A, 0);
+                GL.Color3(0.0, 0.9, 0.9);
+                GL.Vertex3(1.0, A, 0);
+                GL.Color3(0.9, 0.0, 0.9);
+                GL.Vertex3(0, B, 0);
             }
             else
             {
                 if (mf.hd.isToolUp)
-                {
                     GL.Color3(0.0, 0.950, 0.0);
-                    GL.Begin(PrimitiveType.TriangleFan);
-                    GL.Vertex3(0, antennaPivot, -0.0);
-                    GL.Vertex3(1.0, -0, 0.0);
-                    GL.Vertex3(0, wheelbase, 0.0);
-                    GL.Vertex3(-1.0, -0, 0.0);
-                    GL.Vertex3(1.0, -0, 0.0);
-                    GL.End();
-                }
                 else
-                {
                     GL.Color3(0.950, 0.0, 0.0);
-                    GL.Begin(PrimitiveType.TriangleFan);
-                    GL.Vertex3(0, antennaPivot, -0.0);
-                    GL.Vertex3(1.0, -0, 0.0);
-                    GL.Vertex3(0, wheelbase, 0.0);
-                    GL.Vertex3(-1.0, -0, 0.0);
-                    GL.Vertex3(1.0, -0, 0.0);
-                    GL.End();
-                }
+                GL.Vertex3(-1.0, A, 0);
+                GL.Vertex3(1.0, A, 0);
+                GL.Vertex3(0, B, 0);
             }
-
+            GL.End();
 
             GL.LineWidth(3);
             GL.Color3(0.0, 0.0, 0.0);
             GL.Begin(PrimitiveType.LineLoop);
-            {
-                GL.Vertex3(-1.0, 0, 0);
-                GL.Vertex3(1.0, 0, 0);
-                GL.Vertex3(0, wheelbase, 0);
-            }
+            GL.Vertex3(-1.0, A, 0);
+            GL.Vertex3(1.0, A, 0);
+            GL.Vertex3(0, B, 0);
             GL.End();
 
 
+            //antenna
+            GL.Color3(0.0f, 0.95f, 0.95f);
+            GL.Begin(PrimitiveType.Points);
+            GL.Vertex3(antennaOffset, antennaPivot, 0);
+            GL.End();
 
 
             # region Front Arrow
@@ -257,8 +241,8 @@ namespace AgOpenGPS
                 if (mf.Tools[i].isToolBehindPivot)
                 {
                     GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex3(0, A, 0);
                     GL.Vertex3(0, mf.Tools[i].HitchLength, 0);
-                    GL.Vertex3(0, 0, 0);
                     GL.End();
                 }
             }

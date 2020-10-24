@@ -55,9 +55,7 @@ namespace AgOpenGPS
             mf.flagNumberPicked = 0;
             mf.FileSaveFlags();
             mf.flagDubinsList.Clear();
-
             Close();
-
         }
 
         private void BtnDeleteFlag_Click(object sender, EventArgs e)

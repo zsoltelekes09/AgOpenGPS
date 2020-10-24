@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form_About));
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -202,7 +201,7 @@
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(299, 288);
             this.label11.TabIndex = 32;
-            this.label11.Text = resources.GetString("label11.Text");
+            this.label11.Text = global::AgOpenGPS.Properties.Resources.Contributors;
             // 
             // label14
             // 

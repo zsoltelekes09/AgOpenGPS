@@ -18,12 +18,12 @@ namespace AgOpenGPS
             //this.bntOK.Text = gStr.gsForNow;
             //this.btnSave.Text = gStr.gsToFile;
 
-            this.Text = gStr.gsLoadEnvironment;
+            this.Text = String.Get("gsLoadEnvironment");
         }
 
         private void FormFlags_Load(object sender, EventArgs e)
         {
-            lblLast.Text = gStr.gsCurrent + mf.envFileName;
+            lblLast.Text = String.Get("gsCurrent") + mf.envFileName;
             DirectoryInfo dinfo = new DirectoryInfo(mf.envDirectory);
             FileInfo[] Files = dinfo.GetFiles("*.txt");
             if (Files.Length == 0)
@@ -31,7 +31,7 @@ namespace AgOpenGPS
                 DialogResult = DialogResult.Ignore;
                 Close();
 
-                mf.TimedMessageBox(2000, gStr.gsNoEnvironmentSaved, gStr.gsSaveAnEnvironmentFirst);
+                mf.TimedMessageBox(2000, String.Get("gsNoEnvironmentSaved"), String.Get("gsSaveAnEnvironmentFirst"));
             }
 
             else

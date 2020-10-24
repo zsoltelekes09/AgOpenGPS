@@ -22,7 +22,7 @@ namespace AgOpenGPS
                 {
                     //remove the points too close to boundary
                     distance = Glm.Distance(curBnd[k], turnLine[i]);
-                    if (distance < totalHeadWidth - 0.001)
+                    if (distance < totalHeadWidth)
                     {
                         turnLine.RemoveAt(i);
                         i--;
@@ -41,17 +41,8 @@ namespace AgOpenGPS
                     turnLine.RemoveAt(j);
                     i--;
                 }
-                else if (distance > 4)//make sure distance isn't too big between points on turnLine
-                {
-                    double northing = turnLine[i].Northing / 2 + turnLine[j].Northing / 2;
-                    double easting = turnLine[i].Easting / 2 + turnLine[j].Easting / 2;
-                    double heading = turnLine[i].Heading / 2 + turnLine[j].Heading / 2;
-                    if (j == 0) turnLine.Add(new Vec3(northing, easting, heading));
-                    turnLine.Insert(j, new Vec3(northing, easting, heading));
-                    i--;
-                }
             }
-            turnLine.CalculateHeadings(true);
+            turnLine.CalculateHeading(true);
         }
 
         public void PreCalcTurnLines()

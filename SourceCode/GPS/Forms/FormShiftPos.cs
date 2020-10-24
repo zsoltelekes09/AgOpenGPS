@@ -14,11 +14,11 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
-            label27.Text = gStr.gsNorth;
-            label2.Text = gStr.gsWest;
-            label3.Text = gStr.gsEast;
-            label4.Text = gStr.gsSouth;
-            this.Text = gStr.gsShiftGPSPosition;
+            label27.Text = String.Get("gsNorth");
+            label2.Text = String.Get("gsWest");
+            label3.Text = String.Get("gsEast");
+            label4.Text = String.Get("gsSouth");
+            this.Text = String.Get("gsShiftGPSPosition");
         }
 
         private void FormShiftPos_Load(object sender, EventArgs e)

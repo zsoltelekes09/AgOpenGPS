@@ -10,9 +10,10 @@ namespace AgOpenGPS
     {
         private readonly double max;
         private readonly double min;
-        private bool isFirstKey, WholeNumbers;
-        private int Decimals = 0;
-        private decimal Divisible = 1;
+        private bool isFirstKey;
+        private readonly bool WholeNumbers;
+        private readonly int Decimals = 0;
+        private readonly decimal Divisible = 1;
 
         public double ReturnValue { get; set; }
 
@@ -25,7 +26,7 @@ namespace AgOpenGPS
             min = _min;
             InitializeComponent();
             Divisible = divisible;
-            Text = gStr.gsEnteraValue;
+            Text = String.Get("gsEnteraValue");
             //fill in the display
             tboxNumber.Text = currentValue.ToString();
 
@@ -54,7 +55,7 @@ namespace AgOpenGPS
             }
 
             //clear the error as user entered new values
-            if (tboxNumber.Text == gStr.gsError)
+            if (tboxNumber.Text == String.Get("gsError"))
             {
                 tboxNumber.Text = "";
                 lblMin.ForeColor = SystemColors.ControlText;
@@ -158,12 +159,12 @@ namespace AgOpenGPS
                 //test if above or below min/max
                 if (tryNumber < min)
                 {
-                    tboxNumber.Text = gStr.gsError;
+                    tboxNumber.Text = String.Get("gsError");
                     lblMin.ForeColor = Color.Red;
                 }
                 else if (tryNumber > max)
                 {
-                    tboxNumber.Text = gStr.gsError;
+                    tboxNumber.Text = String.Get("gsError");
                     lblMax.ForeColor = Color.Red;
                 }
                 else
@@ -175,9 +176,7 @@ namespace AgOpenGPS
                 }
             }
 
-            bool Add = (decSeparator < 0 || tboxNumber.Text.Length - decSeparator <= Decimals) ? true : false;
-
-
+            bool Add = (decSeparator < 0 || tboxNumber.Text.Length - decSeparator <= Decimals);
 
             byte[] ttt = new byte[] { 14, 15, 5, 6, 7, 8, 9, 10, 11, 12 };
             for (int i = 0; i < ttt.Length; i++)
@@ -187,7 +186,6 @@ namespace AgOpenGPS
                 keypad1.Controls[ttt[i]].Enabled = Add && (Divisible < 0 || tryNumber % Divisible == 0);
             }
 
-
             //Show the cursor
             tboxNumber.SelectionStart = tboxNumber.Text.Length;
             tboxNumber.SelectionLength = 0;
@@ -196,7 +194,7 @@ namespace AgOpenGPS
 
         private void BtnDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
-            if (tboxNumber.Text == "" || tboxNumber.Text == "-" || tboxNumber.Text == gStr.gsError) tboxNumber.Text = "0";
+            if (tboxNumber.Text == "" || tboxNumber.Text == "-" || tboxNumber.Text == String.Get("gsError")) tboxNumber.Text = "0";
             double tryNumber = double.Parse(tboxNumber.Text, CultureInfo.CurrentCulture);
 
 
@@ -211,7 +209,7 @@ namespace AgOpenGPS
 
         private void BtnDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            if (tboxNumber.Text == "" || tboxNumber.Text == "-" || tboxNumber.Text == gStr.gsError) tboxNumber.Text = "0";
+            if (tboxNumber.Text == "" || tboxNumber.Text == "-" || tboxNumber.Text == String.Get("gsError")) tboxNumber.Text = "0";
             double tryNumber = double.Parse(tboxNumber.Text, CultureInfo.CurrentCulture);
 
             tryNumber--;

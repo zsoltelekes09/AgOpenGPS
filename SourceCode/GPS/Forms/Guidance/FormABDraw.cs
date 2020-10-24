@@ -14,13 +14,10 @@ namespace AgOpenGPS
         //access to the main GPS form and all its variables
         private readonly FormGPS mf;
 
-        private double fieldCenterX, fieldCenterY, maxFieldDistance;
-
-        private bool isA = true, isSet = false, HeadLand, ResetHeadLine = false;
-        private int start = 99999, end = 99999;
-        private int Boundary = -1, TemplateIndex;
-        private bool isDrawSections = false;
-        private double Offset;
+        private double fieldCenterX, fieldCenterY, maxFieldDistance, Offset;
+        private bool isA = true, isSet = false, ResetHeadLine = false, isDrawSections = false;
+        private readonly bool HeadLand;
+        private int start = 99999, end = 99999, Boundary = -1, TemplateIndex;
 
         //list of coordinates of boundary line
         public List<List<Vec3>> Template = new List<List<Vec3>>();
@@ -32,10 +29,10 @@ namespace AgOpenGPS
 
             InitializeComponent();
             //lblPick.Text = gStr.gsSelectALine;
-            label3.Text = gStr.gsCreate;
-            label4.Text = gStr.gsSelect;
+            label3.Text = String.Get("gsCreate");
+            label4.Text = String.Get("gsSelect");
 
-            Offset1.Text = Offset2.Text = gStr.gsOffset;
+            Offset1.Text = Offset2.Text = String.Get("gsOffset");
 
 
 
@@ -48,7 +45,7 @@ namespace AgOpenGPS
             {
                 HeadLandBox.Visible = true;
                 ABDrawBox.Visible = false;
-                Text = gStr.gsHeadlandForm;
+                Text = String.Get("gsHeadlandForm");
                 RebuildHeadLineTemplate(false);
                 HeadLandBox.Location = new Point(710, 85);
             }
@@ -57,7 +54,7 @@ namespace AgOpenGPS
                 Offset /= 2;
                 HeadLandBox.Visible = false;
                 ABDrawBox.Visible = true;
-                Text = gStr.gsClick2Pointsontheboundary;
+                Text = String.Get("gsClick2Pointsontheboundary");
                 UpdateBoundary();
             }
             TboxOffset1.Text = TboxOffset2.Text = Offset.ToString();
@@ -211,7 +208,7 @@ namespace AgOpenGPS
                 Template.Clear();
                 if (!Reset && mf.hd.headArr[Boundary].HeadLine.Count > 0)
                 {
-                    Template = mf.hd.headArr[Boundary].HeadLine;
+                    Template.AddRange(mf.hd.headArr[Boundary].HeadLine);
 
                     ResetHeadLine = false;
                 }
@@ -280,6 +277,7 @@ namespace AgOpenGPS
         {
             if (ResetHeadLine && mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
+                mf.hd.headArr[Boundary].Indexer.Clear();
                 mf.hd.headArr[Boundary].HeadLine.Clear();
             }
             ResetHeadLine = false;
@@ -292,8 +290,10 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
-                if (ResetHeadLine) mf.hd.headArr[Boundary].HeadLine.Clear();
-                else mf.hd.headArr[Boundary].HeadLine = Template;
+                mf.hd.headArr[Boundary].HeadLine.Clear();
+                if (!ResetHeadLine)
+                    mf.hd.headArr[Boundary].HeadLine.AddRange(Template);
+
                 mf.hd.headArr[Boundary].PreCalcHeadArea();
                 ResetHeadLine = false;
             }
@@ -430,7 +430,7 @@ namespace AgOpenGPS
             if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
             {
 
-                if (Template.Count > 0 && Template.Count > TemplateIndex)
+                if (Template.Count > 0 && Template.Count > TemplateIndex && Template[TemplateIndex].Count > 0)
                 {
                     double offset = Math.Round(Offset * mf.metImp2m, 2) * (Boundary == 0 ? 1 : -1);
                     Vec3 Point;
@@ -447,50 +447,37 @@ namespace AgOpenGPS
 
                     for (int i = 0; i < test; i++)
                     {
-                        Tess _tess = new Tess();
+                        bool Loop = Start2 > End2;
 
-                        if (Index == -1 || Index == i)
+                        List<Vec3> Template2 = new List<Vec3>();
+
+                        for (int j = 0; j < Template[i].Count; j++)
                         {
-                            bool Loop = Start2 > End2;
-
-                            for (int j = 0; j < Template[i].Count; j++)
+                            Point = Template[i][j];
+                            if (Index == -1 || (Index == i && (Loop && (j < End2 || j > Start2)) || (!Loop && j > Start2 && j < End2)))
                             {
-                                if (Index == -1 || (Loop && (j < End2 || j > Start2)) || (!Loop && (j > Start2 && j < End2)))
-                                {
-                                    double CosHeading = Math.Cos(Template[i][j].Heading);
-                                    double SinHeading = Math.Sin(Template[i][j].Heading);
-                                    Point = Template[i][j];
-                                    Point.Northing -= SinHeading * offset;
-                                    Point.Easting += CosHeading * offset;
-                                    Template[i][j] = Point;
-                                }
+                                double CosHeading = Math.Cos(Template[i][j].Heading);
+                                double SinHeading = Math.Sin(Template[i][j].Heading);
+                                Point.Northing += SinHeading * -offset;
+                                Point.Easting += CosHeading * offset;
                             }
-                            _tess.AddContour(Template[i], ContourOrientation.Original);
-                            _tess.Tessellate(WindingRule.Positive, ElementType.BoundaryContours, 3);
-
-                            for (int h = 0; h < _tess.Elements.Length; h += 2)
-                            {
-
-                                double area = 0.0;
-                                for (int j = 0; j < _tess.Elements[h + 1]; j++)
-                                {
-                                    var v0 = _tess.Vertices[_tess.Elements[h] + j];
-                                    var v1 = _tess.Vertices[_tess.Elements[h] + (j + 1) % _tess.Elements[h + 1]];
-
-
-                                    area += (v0.Northing - v1.Northing) * (v0.Easting + v1.Easting);
-                                }
-
-                                if (area / 2 > 10)
-                                {
-                                    Template.Add(new List<Vec3>());
-                                    for (int j = 0; j < _tess.Elements[h + 1]; j++)
-                                    {
-                                        Template[Template.Count - 1].Add(_tess.Vertices[_tess.Elements[h] + j]);
-                                    }
-                                }
-                            }
+                            Template2.Add(Point);
                         }
+
+                        List<List<Vec3>> finalPoly = Template2.ClipPolyLine(null, true, offset);
+
+                        for (int j = 0; j < finalPoly.Count; j++)
+                        {
+                            double Area = finalPoly[j].PolygonArea();
+                            if (Area > -25)
+                            {
+                                finalPoly.RemoveAt(j);
+                                j--;
+                            }
+                            else
+                                finalPoly[j].CalculateRoundedCorner(0.25,true, 0.04, 5);
+                        }
+                        Template.AddRange(finalPoly);
                     }
                     Template.RemoveRange(0, test);
                     
@@ -512,7 +499,7 @@ namespace AgOpenGPS
             {
                 if (end != 99999)
                 {
-                       end = (end + 1) % Template[TemplateIndex].Count;
+                    end = (end + 1).Clamp(Template[TemplateIndex].Count);
                 }
                 if (end == 99999) lblEnd.Text = "--";
                 else lblEnd.Text = end.ToString();
@@ -527,7 +514,7 @@ namespace AgOpenGPS
             {
                 if (end != 99999)
                 {
-                    end = (Template[TemplateIndex].Count + end - 1) % Template[TemplateIndex].Count;
+                    end = (end - 1).Clamp(Template[TemplateIndex].Count);
                 }
                 if (end == 99999) lblEnd.Text = "--";
                 else lblEnd.Text = end.ToString();
@@ -541,7 +528,7 @@ namespace AgOpenGPS
             {
                 if (start != 99999)
                 {
-                    start = (start + 1) % Template[TemplateIndex].Count;
+                    start = (start + 1).Clamp(Template[TemplateIndex].Count);
                 }
                 if (start == 99999) lblStart.Text = "--";
                 else lblStart.Text = start.ToString();
@@ -555,7 +542,7 @@ namespace AgOpenGPS
             {
                 if (start != 99999)
                 {
-                    start = (Template[TemplateIndex].Count + start - 1) % Template[TemplateIndex].Count;
+                    start = (start - 1).Clamp(Template[TemplateIndex].Count);
                 }
 
                 if (start == 99999) lblStart.Text = "--";
@@ -691,8 +678,10 @@ namespace AgOpenGPS
                 {
                     if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
                     {
-                        if (ResetHeadLine) mf.hd.headArr[Boundary].HeadLine.Clear();
-                        else mf.hd.headArr[Boundary].HeadLine = Template;
+                        mf.hd.headArr[Boundary].HeadLine.Clear();
+                        if (!ResetHeadLine)
+                            mf.hd.headArr[Boundary].HeadLine.AddRange(Template);
+
                         mf.hd.headArr[Boundary].PreCalcHeadArea();
                         ResetHeadLine = false;
                     }
@@ -728,8 +717,10 @@ namespace AgOpenGPS
                 {
                     if (mf.bnd.bndArr.Count > Boundary && Boundary >= 0)
                     {
-                        if (ResetHeadLine) mf.hd.headArr[Boundary].HeadLine.Clear();
-                        else mf.hd.headArr[Boundary].HeadLine = Template;
+                        mf.hd.headArr[Boundary].HeadLine.Clear();
+                        if (!ResetHeadLine)
+                            mf.hd.headArr[Boundary].HeadLine.AddRange(Template);
+                    
                         mf.hd.headArr[Boundary].PreCalcHeadArea();
                         ResetHeadLine = false;
                     }
@@ -827,7 +818,7 @@ namespace AgOpenGPS
             }
 
             //who knows which way it actually goes
-            mf.CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[idx].BoundaryMode, 0.0436332);
+            mf.CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[idx].BoundaryMode, 0.0436332, 5);
 
             //calculate average heading of line
             double x = 0, y = 0;
@@ -936,7 +927,8 @@ namespace AgOpenGPS
             GL.PointSize(8.0f);
             GL.Begin(PrimitiveType.Points);
             GL.Color3(0.95f, 0.90f, 0.0f);
-            GL.Vertex3(mf.pivotAxlePos.Easting, mf.pivotAxlePos.Northing, 0.0);
+            Vec3 pivot = mf.pivotAxlePos;
+            GL.Vertex3(pivot.Easting, pivot.Northing, 0.0);
             GL.End();
 
             if (HeadLand)

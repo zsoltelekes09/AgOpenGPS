@@ -20,6 +20,19 @@ namespace AgOpenGPS
             this.Heading = heading;
         }
 
+        public static Vec3 operator *(Vec3 self, double s)
+        {
+            return new Vec3(self.Northing * s, self.Easting * s, 0);
+        }
+
+        public static Vec3 operator +(Vec3 lhs, Vec3 rhs)
+        {
+            return new Vec3(lhs.Northing + rhs.Northing, lhs.Easting + rhs.Easting, 0);
+        }
+        public static Vec3 operator -(Vec3 lhs, Vec3 rhs)
+        {
+            return new Vec3(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting, 0);
+        }
     }
 
     //

@@ -91,7 +91,6 @@ namespace AgOpenGPS
             GL.Begin(PrimitiveType.Points);
             GL.Vertex3(closestBoundaryPt.Easting, closestBoundaryPt.Northing, 0);
             GL.End();
-
         }
     }
 }

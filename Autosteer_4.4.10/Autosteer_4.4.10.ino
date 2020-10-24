@@ -135,7 +135,7 @@ byte serialResetTimer = 100; //if serial buffer is getting full, empty it
   #endif
 
   #include "etherCard_AOG.h"
-  #include <IPAddress.h> 
+  #include <IPAddress.h>
 
   // ethernet interface ip address
   static byte myip[] = { 192,168,1,2 };
@@ -149,7 +149,7 @@ byte serialResetTimer = 100; //if serial buffer is getting full, empty it
   unsigned int portMy = 5577; 
   
   //sending back to where and which port
-  static byte ipDestination[] = {192, 168, 1, 1};
+  static byte ipDestination[] = {192, 168, 1, 255};
   unsigned int portDestination = 9999; //AOG port that listens
 
   // ethernet mac address - must be unique on your network
@@ -371,7 +371,7 @@ void setup()
       else Serial.println("MMA init fails!!");
   }
 
-  
+
  #if (Enable_UDP)
   if (ether.begin(sizeof Ethernet::buffer, mymac, CS_Pin) == 0)
   Serial.println("Failed to access Ethernet controller");
@@ -549,39 +549,25 @@ void loop()
 
     //if (steerAngleActual < 0) steerAngleActual = ackermanAngle-degrees(asin(2.*Alpha - sin(radians(ackermanAngle + steerAngleActual))));
 
-
     //RealisticAngle = ackermanAngle+degrees(asin(2.*Alpha - sin(radians(ackermanAngle + steerAngleSetPoint))));//right wheel sensor
     //RealisticAngle = -ackermanAngle+degrees(asin(2.*Alpha - sin(radians(ackermanAngle + -steerAngleSetPoint))));//left wheel sensor
 
-    
-    
     #if (Enable_Hydraulic_Lift)
-      if (HydrLiftWatchdog > 11) HydrLiftWatchdog = 11;
+      //if (HydrLiftWatchdog++ > 11) HydrLiftWatchdog = 11;
       if (RaiseTimer)
       {
-        if (HydrLiftWatchdog > 10) RaiseTimer = 1;
+        //if (HydrLiftWatchdog > 10) RaiseTimer = 1;
         RaiseTimer--;
-        if (RaiseTimer)
-        {
-          if (HydraulicLift.IsRelayActiveHigh) digitalWrite(RAISE,LOW);
-          else digitalWrite(RAISE,HIGH);
-        }
-        else
-        {
+        if (!RaiseTimer)
           if (HydraulicLift.IsRelayActiveHigh) digitalWrite(RAISE,HIGH);
           else digitalWrite(RAISE,LOW);
         }
       }
       if (LowerTimer)
       {
-        if (HydrLiftWatchdog > 10) LowerTimer = 1;
+        //if (HydrLiftWatchdog > 10) LowerTimer = 1;
         LowerTimer--;
-        if (LowerTimer)
-        {
-          if (HydraulicLift.IsRelayActiveHigh) digitalWrite(LOWER,LOW);
-          else digitalWrite(LOWER,HIGH);
-        }
-        else
+        if (!LowerTimer)
         {
           if (HydraulicLift.IsRelayActiveHigh) digitalWrite(LOWER,HIGH);
           else digitalWrite(LOWER,LOW);

@@ -17,10 +17,10 @@ namespace AgOpenGPS
 
             InitializeComponent();
 
-            this.Text = gStr.gsTramLines;
-            lblSmallSnapRight.Text = gStr.gsWidth;
-            label1.Text = gStr.gsTrack;
-            label3.Text = gStr.gsPasses;
+            this.Text = String.Get("gsTramLines");
+            lblSmallSnapRight.Text = String.Get("gsWidth");
+            label1.Text = String.Get("gsTrack");
+            label3.Text = String.Get("gsPasses");
 
             CurveMode = mode;
 

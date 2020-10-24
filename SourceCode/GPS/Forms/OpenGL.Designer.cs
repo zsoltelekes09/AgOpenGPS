@@ -18,7 +18,6 @@ namespace AgOpenGPS
         private bool isMapping = true;
         int mouseX = 0, mouseY = 0;
         public double offX, offY;
-        public double lookaheadActual, test2;
         private bool zoomUpdateCounter = false;
 
 
@@ -284,29 +283,31 @@ namespace AgOpenGPS
                     else if (ABLines.BtnABLineOn) ABLines.DrawABLines();
                     else if (CurveLines.BtnCurveLineOn) CurveLines.DrawCurve();
 
-                    
 
 
 
-                    if (flagPts.Count > 0) DrawFlags();
 
-                    //Direct line to flag if flag selected
-                    if (flagNumberPicked > 0 && flagNumberPicked < 255)
+                    if (flagPts.Count > 0)
                     {
-                        if (flagPts[flagNumberPicked - 1].Easting < worldGrid.EastingMax || flagPts[flagNumberPicked - 1].Easting > worldGrid.EastingMin && flagPts[flagNumberPicked - 1].Northing < worldGrid.NorthingMax || flagPts[flagNumberPicked - 1].Northing > worldGrid.NorthingMin)
+                        DrawFlags();
+
+                        //Direct line to flag if flag selected
+                        if (flagNumberPicked > 0 && flagNumberPicked < 255)
                         {
-                            GL.LineWidth(ABLines.lineWidth);
-                            GL.Enable(EnableCap.LineStipple);
-                            GL.LineStipple(1, 0x0707);
-                            GL.Begin(PrimitiveType.Lines);
-                            GL.Color3(0.930f, 0.72f, 0.32f);
-                            GL.Vertex3(pivotAxlePos.Easting, pivotAxlePos.Northing, 0);
-                            GL.Vertex3(flagPts[flagNumberPicked - 1].Easting, flagPts[flagNumberPicked - 1].Northing, 0);
-                            GL.End();
-                            GL.Disable(EnableCap.LineStipple);
+                            if (flagPts[flagNumberPicked - 1].Easting < worldGrid.EastingMax || flagPts[flagNumberPicked - 1].Easting > worldGrid.EastingMin && flagPts[flagNumberPicked - 1].Northing < worldGrid.NorthingMax || flagPts[flagNumberPicked - 1].Northing > worldGrid.NorthingMin)
+                            {
+                                GL.LineWidth(ABLines.lineWidth);
+                                GL.Enable(EnableCap.LineStipple);
+                                GL.LineStipple(1, 0x0707);
+                                GL.Begin(PrimitiveType.Lines);
+                                GL.Color3(0.930f, 0.72f, 0.32f);
+                                GL.Vertex3(pivotAxlePos.Easting, pivotAxlePos.Northing, 0);
+                                GL.Vertex3(flagPts[flagNumberPicked - 1].Easting, flagPts[flagNumberPicked - 1].Northing, 0);
+                                GL.End();
+                                GL.Disable(EnableCap.LineStipple);
+                            }
                         }
                     }
-
 
                     //Quick fix for drawing the vehicle if all boundaries are off the plane
                     GL.Begin(PrimitiveType.LineLoop);
@@ -683,11 +684,11 @@ namespace AgOpenGPS
                                     Tools[i].Sections[j].IsSectionRequiredOn = false;
                                 }
 
-                                Tools[i].Sections[j].SectionOnRequest = Tools[i].Sections[j].IsSectionRequiredOn ? true : false;
+                                Tools[i].Sections[j].SectionOnRequest = Tools[i].Sections[j].IsSectionRequiredOn;
 
-                                if (j + 1 < Tools[i].numOfSections)
+                                if (j < Tools[i].numOfSections)
                                 {
-                                    if (Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft)
+                                    if (j+1 == Tools[i].numOfSections || Tools[i].Sections[j].positionRight == Tools[i].Sections[j + 1].positionLeft)
                                     {
                                         isSuperSectionAllowedOn &= (Tools[i].SuperSection && Tools[i].Sections[j].SectionOnRequest) || (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].IsMappingOn);
                                     }
@@ -753,14 +754,13 @@ namespace AgOpenGPS
 
         private void oglZoom_Paint(object sender, PaintEventArgs e)
         {
-
             if (isJobStarted)
             {
                 if (oglZoom.Width != 400)
                 {
                     oglZoom.MakeCurrent();
 
-                    GL.Disable(EnableCap.Blend);
+                    GL.Enable(EnableCap.Blend);
 
                     GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
                     GL.LoadIdentity();                  // Reset The View
@@ -782,7 +782,57 @@ namespace AgOpenGPS
                     else GL.Color4(sectionColorDay.R, sectionColorDay.G, sectionColorDay.B, (byte)(152 * 0.5));
 
                     DrawSectionsPatchList(false);
+                    /*
+                    if (true)
+                    {
+                        GL.Finish();
 
+                        int grnHeight = oglZoom.Height;
+                        int grnWidth = oglZoom.Width;
+                        byte[] overPix = new byte[grnHeight * grnWidth + 1];
+
+                        GL.ReadPixels(0, 0, grnWidth, grnWidth, OpenTK.Graphics.OpenGL.PixelFormat.Green, PixelType.UnsignedByte, overPix);
+
+                        int once = 0;
+                        int twice = 0;
+                        int more = 0;
+                        int level = 0;
+                        double total = 0;
+                        double total2 = 0;
+
+                        //50, 96, 112
+                        for (int i = 0; i < grnHeight * grnWidth; i++)
+                        {
+                            once++;
+
+                            if (overPix[i] > 105)
+                            {
+                                more++;
+                                level = overPix[i];
+                            }
+                            else if (overPix[i] > 85)
+                            {
+                                twice++;
+                                level = overPix[i];
+                            }
+                            else if (overPix[i] > 50)
+                            {
+                            }
+                        }
+                        total = once + twice + more;
+                        total2 = total + twice + more + more;
+
+                        if (total2 > 0)
+                        {
+                            fd.actualAreaCovered = (total / total2 * fd.workedAreaTotal);
+                            fd.overlapPercent = Math.Round(((1 - total / total2) * 100), 2);
+                        }
+                        else
+                        {
+                            fd.actualAreaCovered = fd.overlapPercent = 0;
+                        }
+                    }
+                    */
 
                     //draw the ABLine
                     if (ABLines.BtnABLineOn)
@@ -823,7 +873,7 @@ namespace AgOpenGPS
 
                             double Offset = Guidance.WidthMinusOverlap * ABLines.HowManyPathsAway;
 
-                            if (ABLines.isABSameAsVehicleHeading) Offset -= Guidance.GuidanceOffset;
+                            if (isABSameAsVehicleHeading) Offset -= Guidance.GuidanceOffset;
                             else Offset += Guidance.GuidanceOffset;
 
                             GL.Vertex2(ABLines.ABLines[ABLines.CurrentLine].ref1.Easting + cosHeading * Offset + sinHeading * 4000, ABLines.ABLines[ABLines.CurrentLine].ref1.Northing + sinHeading * Offset - cosHeading * 4000);
@@ -1110,40 +1160,39 @@ namespace AgOpenGPS
             //Are you on the right side of line? So its green.
             //GL.Translate(0, 0, 0.01);
             if ((offlineDistance) < 0.0)
-                {
-                    int dots = (dotDistance * -1 / lightbarCmPerPixel);
+            {
+                int dots = (dotDistance * -1 / lightbarCmPerPixel);
 
-                    GL.PointSize(24.0f);
-                    GL.Color3(0.0f, 0.0f, 0.0f);
-                    GL.Begin(PrimitiveType.Points);
-                    for (int i = 1; i < dots + 1; i++) GL.Vertex2((i * 32), down);
-                    GL.End();
+                GL.PointSize(24.0f);
+                GL.Color3(0.0f, 0.0f, 0.0f);
+                GL.Begin(PrimitiveType.Points);
+                for (int i = 1; i < dots + 1; i++) GL.Vertex2((i * 32), down);
+                GL.End();
 
-                    GL.PointSize(16.0f);
-                    GL.Color3(0.0f, 0.980f, 0.0f);
-                    GL.Begin(PrimitiveType.Points);
-                    for (int i = 0; i < dots; i++) GL.Vertex2((i * 32 + 32), down);
-                    GL.End();
-                    //return;
-                }
+                GL.PointSize(16.0f);
+                GL.Color3(0.0f, 0.980f, 0.0f);
+                GL.Begin(PrimitiveType.Points);
+                for (int i = 0; i < dots; i++) GL.Vertex2((i * 32 + 32), down);
+                GL.End();
+                //return;
+            }
+            else
+            {
+                int dots = (int)(dotDistance / lightbarCmPerPixel);
 
-                else
-                {
-                    int dots = (int)(dotDistance / lightbarCmPerPixel);
+                GL.PointSize(24.0f);
+                GL.Color3(0.0f, 0.0f, 0.0f);
+                GL.Begin(PrimitiveType.Points);
+                for (int i = 1; i < dots + 1; i++) GL.Vertex2((i * -32), down);
+                GL.End();
 
-                    GL.PointSize(24.0f);
-                    GL.Color3(0.0f, 0.0f, 0.0f);
-                    GL.Begin(PrimitiveType.Points);
-                    for (int i = 1; i < dots + 1; i++) GL.Vertex2((i * -32), down);
-                    GL.End();
-
-                    GL.PointSize(16.0f);
-                    GL.Color3(0.980f, 0.30f, 0.0f);
-                    GL.Begin(PrimitiveType.Points);
-                    for (int i = 0; i < dots; i++) GL.Vertex2((i * -32 - 32), down);
-                    GL.End();
-                    //return;
-                }
+                GL.PointSize(16.0f);
+                GL.Color3(0.980f, 0.30f, 0.0f);
+                GL.Begin(PrimitiveType.Points);
+                for (int i = 0; i < dots; i++) GL.Vertex2((i * -32 - 32), down);
+                GL.End();
+                //return;
+            }
             
             //yellow center dot
             if (dotDistance >= -lightbarCmPerPixel && dotDistance <= lightbarCmPerPixel)
@@ -1162,10 +1211,8 @@ namespace AgOpenGPS
                 //GL.Vertex(0, down + 50);
                 GL.End();
             }
-
             else
             {
-
                 GL.PointSize(12.0f);
                 GL.Color3(0.0f, 0.0f, 0.0f);
                 GL.Begin(PrimitiveType.Points);
@@ -1184,7 +1231,6 @@ namespace AgOpenGPS
 
         private void DrawLightBarText()
         {
-
             GL.Disable(EnableCap.DepthTest);
 
             if (ct.isContourBtnOn || ABLines.BtnABLineOn || CurveLines.BtnCurveLineOn)

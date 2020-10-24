@@ -68,6 +68,11 @@
             this.lblSimGGA = new System.Windows.Forms.Label();
             this.cboxIsRTK = new System.Windows.Forms.CheckBox();
             this.tabHeading = new System.Windows.Forms.TabPage();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.TboxDualAntennaDistance = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.TBoxHeadingCorrection = new System.Windows.Forms.TextBox();
             this.lblFusionIMU = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -85,6 +90,7 @@
             this.tabFix.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.tabHeading.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.tabRoll.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -108,9 +114,9 @@
             // 
             this.label13.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label13.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label13.Location = new System.Drawing.Point(160, 233);
+            this.label13.Location = new System.Drawing.Point(166, 216);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(162, 43);
+            this.label13.Size = new System.Drawing.Size(129, 43);
             this.label13.TabIndex = 88;
             this.label13.Text = "Dual Antenna";
             this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -119,9 +125,9 @@
             // 
             this.label12.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label12.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label12.Location = new System.Drawing.Point(160, 144);
+            this.label12.Location = new System.Drawing.Point(166, 144);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(162, 43);
+            this.label12.Size = new System.Drawing.Size(129, 43);
             this.label12.TabIndex = 87;
             this.label12.Text = "From VTG or RMC ";
             this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -130,9 +136,9 @@
             // 
             this.label11.Font = new System.Drawing.Font("Tahoma", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label11.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label11.Location = new System.Drawing.Point(160, 55);
+            this.label11.Location = new System.Drawing.Point(166, 58);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(162, 43);
+            this.label11.Size = new System.Drawing.Size(129, 43);
             this.label11.TabIndex = 86;
             this.label11.Text = "Fix to Fix";
             this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -143,9 +149,9 @@
             this.rbtnHeadingHDT.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.rbtnHeadingHDT.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rbtnHeadingHDT.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbtnHeadingHDT.Location = new System.Drawing.Point(6, 233);
+            this.rbtnHeadingHDT.Location = new System.Drawing.Point(15, 216);
             this.rbtnHeadingHDT.Name = "rbtnHeadingHDT";
-            this.rbtnHeadingHDT.Size = new System.Drawing.Size(137, 43);
+            this.rbtnHeadingHDT.Size = new System.Drawing.Size(137, 50);
             this.rbtnHeadingHDT.TabIndex = 2;
             this.rbtnHeadingHDT.Text = "Dual";
             this.rbtnHeadingHDT.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -158,9 +164,9 @@
             this.rbtnHeadingGPS.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
             this.rbtnHeadingGPS.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.rbtnHeadingGPS.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbtnHeadingGPS.Location = new System.Drawing.Point(6, 144);
+            this.rbtnHeadingGPS.Location = new System.Drawing.Point(6, 137);
             this.rbtnHeadingGPS.Name = "rbtnHeadingGPS";
-            this.rbtnHeadingGPS.Size = new System.Drawing.Size(137, 43);
+            this.rbtnHeadingGPS.Size = new System.Drawing.Size(137, 50);
             this.rbtnHeadingGPS.TabIndex = 1;
             this.rbtnHeadingGPS.Text = "GPS";
             this.rbtnHeadingGPS.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -175,7 +181,7 @@
             this.rbtnHeadingFix.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rbtnHeadingFix.Location = new System.Drawing.Point(6, 55);
             this.rbtnHeadingFix.Name = "rbtnHeadingFix";
-            this.rbtnHeadingFix.Size = new System.Drawing.Size(137, 43);
+            this.rbtnHeadingFix.Size = new System.Drawing.Size(137, 50);
             this.rbtnHeadingFix.TabIndex = 0;
             this.rbtnHeadingFix.Text = "Fix";
             this.rbtnHeadingFix.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -346,7 +352,7 @@
             this.groupBoxHeadingCorrection.Controls.Add(this.rbtnHeadingCorrAutoSteer);
             this.groupBoxHeadingCorrection.Controls.Add(this.rbtnHeadingCorrNone);
             this.groupBoxHeadingCorrection.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBoxHeadingCorrection.Location = new System.Drawing.Point(395, 20);
+            this.groupBoxHeadingCorrection.Location = new System.Drawing.Point(361, 20);
             this.groupBoxHeadingCorrection.Name = "groupBoxHeadingCorrection";
             this.groupBoxHeadingCorrection.Size = new System.Drawing.Size(288, 307);
             this.groupBoxHeadingCorrection.TabIndex = 81;
@@ -617,6 +623,7 @@
             // tabHeading
             // 
             this.tabHeading.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.tabHeading.Controls.Add(this.groupBox2);
             this.tabHeading.Controls.Add(this.lblFusionIMU);
             this.tabHeading.Controls.Add(this.label6);
             this.tabHeading.Controls.Add(this.label5);
@@ -635,6 +642,72 @@
             this.tabHeading.Size = new System.Drawing.Size(886, 515);
             this.tabHeading.TabIndex = 1;
             this.tabHeading.Text = "Heading";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.label8);
+            this.groupBox2.Controls.Add(this.TboxDualAntennaDistance);
+            this.groupBox2.Controls.Add(this.label7);
+            this.groupBox2.Controls.Add(this.TBoxHeadingCorrection);
+            this.groupBox2.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox2.Location = new System.Drawing.Point(672, 20);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(210, 213);
+            this.groupBox2.TabIndex = 296;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Dual Heading";
+            // 
+            // label8
+            // 
+            this.label8.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label8.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold);
+            this.label8.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label8.Location = new System.Drawing.Point(8, 123);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(190, 30);
+            this.label8.TabIndex = 92;
+            this.label8.Text = "Distance (Cm)";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TboxDualAntennaDistance
+            // 
+            this.TboxDualAntennaDistance.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxDualAntennaDistance.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TboxDualAntennaDistance.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxDualAntennaDistance.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxDualAntennaDistance.Location = new System.Drawing.Point(10, 158);
+            this.TboxDualAntennaDistance.Name = "TboxDualAntennaDistance";
+            this.TboxDualAntennaDistance.Size = new System.Drawing.Size(190, 40);
+            this.TboxDualAntennaDistance.TabIndex = 91;
+            this.TboxDualAntennaDistance.Text = "100";
+            this.TboxDualAntennaDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxDualAntennaDistance.Enter += new System.EventHandler(this.TboxDualAntennaDistance_Enter);
+            // 
+            // label7
+            // 
+            this.label7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label7.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Bold);
+            this.label7.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label7.Location = new System.Drawing.Point(10, 40);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(190, 30);
+            this.label7.TabIndex = 90;
+            this.label7.Text = "Degrees";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TBoxHeadingCorrection
+            // 
+            this.TBoxHeadingCorrection.BackColor = System.Drawing.SystemColors.Control;
+            this.TBoxHeadingCorrection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TBoxHeadingCorrection.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TBoxHeadingCorrection.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TBoxHeadingCorrection.Location = new System.Drawing.Point(10, 80);
+            this.TBoxHeadingCorrection.Name = "TBoxHeadingCorrection";
+            this.TBoxHeadingCorrection.Size = new System.Drawing.Size(190, 40);
+            this.TBoxHeadingCorrection.TabIndex = 89;
+            this.TBoxHeadingCorrection.Text = "-90.00";
+            this.TBoxHeadingCorrection.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TBoxHeadingCorrection.Enter += new System.EventHandler(this.TBoxHeadingCorrection_Enter);
             // 
             // lblFusionIMU
             // 
@@ -751,6 +824,8 @@
             this.groupBox4.ResumeLayout(false);
             this.tabHeading.ResumeLayout(false);
             this.tabHeading.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.tabRoll.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -806,5 +881,10 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label lblFusionIMU;
         private System.Windows.Forms.TextBox TboxFixStepDistance;
+        private System.Windows.Forms.TextBox TBoxHeadingCorrection;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox TboxDualAntennaDistance;
     }
 }

@@ -2,7 +2,6 @@
 
 using AgOpenGPS.Properties;
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -22,7 +21,7 @@ namespace AgOpenGPS
             InitializeComponent();
 
             //Language keys
-            this.Text = gStr.gsColors;
+            this.Text = String.Get("gsColors");
         }
         private void FormDisplaySettings_Load(object sender, EventArgs e)
         {

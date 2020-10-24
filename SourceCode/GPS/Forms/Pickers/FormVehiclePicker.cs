@@ -19,18 +19,18 @@ namespace AgOpenGPS
             //this.bntOK.Text = gStr.gsForNow;
             //this.btnSave.Text = gStr.gsToFile;
 
-            this.Text = gStr.gsLoadVehicle;
+            this.Text = String.Get("gsLoadVehicle");
         }
 
         private void FormFlags_Load(object sender, EventArgs e)
         {
-            lblLast.Text = gStr.gsCurrent + mf.vehicleFileName;
+            lblLast.Text = String.Get("gsCurrent") + mf.vehicleFileName;
             DirectoryInfo dinfo = new DirectoryInfo(mf.vehiclesDirectory);
             FileInfo[] Files = dinfo.GetFiles("*.txt");
             if (Files.Length == 0)
             {
                 Close();
-                mf.TimedMessageBox(2000, gStr.gsNoVehiclesSaved, gStr.gsSaveAVehicleFirst);
+                mf.TimedMessageBox(2000, String.Get("gsNoVehiclesSaved"), String.Get("gsSaveAVehicleFirst"));
 
             }
 

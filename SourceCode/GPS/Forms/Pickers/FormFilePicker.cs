@@ -20,8 +20,8 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
-            btnByDistance.Text = gStr.gsSort;
-            btnOpenExistingLv.Text = gStr.gsUseSelected;
+            btnByDistance.Text = String.Get("gsSort");
+            btnOpenExistingLv.Text = String.Get("gsUseSelected");
         }
         private void FormFilePicker_Load(object sender, EventArgs e)
         {
@@ -74,7 +74,7 @@ namespace AgOpenGPS
                             }
                             else
                             {
-                                MessageBox.Show(fieldDirectory + " is Damaged, Please Delete This Field", gStr.gsFileError,
+                                MessageBox.Show(fieldDirectory + " is Damaged, Please Delete This Field", String.Get("gsFileError"),
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                                 FileList.Add(fieldDirectory);
@@ -83,7 +83,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            MessageBox.Show(fieldDirectory + " is Damaged, Please Delete, Field.txt is Broken", gStr.gsFileError,
+                            MessageBox.Show(fieldDirectory + " is Damaged, Please Delete, Field.txt is Broken", String.Get("gsFileError"),
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             FileList.Add(fieldDirectory);
@@ -175,7 +175,7 @@ namespace AgOpenGPS
                 {
                     FileList.Add("Error");
                     MessageBox.Show(fieldDirectory + " is Damaged, Missing Boundary.Txt " +
-                        "               \r\n Delete Field or Fix ", gStr.gsFileError,
+                        "               \r\n Delete Field or Fix ", String.Get("gsFileError"),
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
@@ -284,7 +284,7 @@ namespace AgOpenGPS
                     lvLines.SelectedItems[0].SubItems[1].Text == "Error" ||
                     lvLines.SelectedItems[0].SubItems[2].Text == "Error")
                 {
-                    MessageBox.Show("This Field is Damaged, Please Delete \r\n ALREADY TOLD YOU THAT :)", gStr.gsFileError,
+                    MessageBox.Show("This Field is Damaged, Please Delete \r\n ALREADY TOLD YOU THAT :)", String.Get("gsFileError"),
                                         MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 }

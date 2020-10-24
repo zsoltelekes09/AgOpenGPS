@@ -16,32 +16,32 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
-            this.btnFreeDrive.Text = gStr.gsDrive;
-            this.tabGain.Text = gStr.gsGain;
-            this.label29.Text = gStr.gsSidehillDraftGain;
+            this.btnFreeDrive.Text = String.Get("gsDrive");
+            this.tabGain.Text = String.Get("gsGain");
+            this.label29.Text = String.Get("gsSidehillDraftGain");
             //this.label22.Text = gStr.gsOutputGain;
-            this.label41.Text = gStr.gsMinimumPWMDrive;
-            this.label7.Text = gStr.gsProportionalGain;
-            label1.Text = gStr.gsChooseType;
+            this.label41.Text = String.Get("gsMinimumPWMDrive");
+            this.label7.Text = String.Get("gsProportionalGain");
+            label1.Text = String.Get("gsChooseType");
 
-            this.tabSteer.Text = gStr.gsSteer;
-            this.label25.Text = gStr.gsCountsPerDegree;
+            this.tabSteer.Text = String.Get("gsSteer");
+            this.label25.Text = String.Get("gsCountsPerDegree");
             //this.label45.Text = gStr.gsMaxIntegralValue;
-            this.label19.Text = gStr.gsMaxSteerAngleInDegrees;
+            this.label19.Text = String.Get("gsMaxSteerAngleInDegrees");
             //this.label33.Text = gStr.gsIntegralGain;
-            this.label10.Text = gStr.gsWheelAngleSensorZero;
+            this.label10.Text = String.Get("gsWheelAngleSensorZero");
 
             this.tabLook.Text = "Pure P";
-            this.label2.Text = gStr.gsUTurnLookAheadMultiplier;
-            this.label37.Text = gStr.gsLookAheadInSeconds;
-            this.label4.Text = gStr.gsLookAheadOfflineMultiplier;
-            this.label6.Text = gStr.gsMinLookAheadInMeters;
+            this.label2.Text = String.Get("gsUTurnLookAheadMultiplier");
+            this.label37.Text = String.Get("gsLookAheadInSeconds");
+            this.label4.Text = String.Get("gsLookAheadOfflineMultiplier");
+            this.label6.Text = String.Get("gsMinLookAheadInMeters");
 
             this.tabStan.Text = "Stanley";
-            this.btnChart.Text = gStr.gsSteerChart;
-            this.label3.Text = gStr.gsAgressiveness;
-            this.label5.Text = gStr.gsOvershootReduction;
-            this.Text = gStr.gsAutoSteerConfiguration;
+            this.btnChart.Text = String.Get("gsSteerChart");
+            this.label3.Text = String.Get("gsAgressiveness");
+            this.label5.Text = String.Get("gsOvershootReduction");
+            this.Text = String.Get("gsAutoSteerConfiguration");
         }
 
         private void FormSteer_Load(object sender, EventArgs e)
@@ -321,9 +321,10 @@ namespace AgOpenGPS
                 lblSent.BackColor = Color.Salmon;
                 lblRecd.BackColor = Color.Salmon;
             }
-
-            lblSent.Text = mf.checksumSent.ToString();
-            lblRecd.Text = mf.checksumRecd.ToString();
+            byte text1 = mf.checksumSent;
+            byte text2 = mf.checksumRecd;
+            lblSent.Text = text1.ToString();
+            lblRecd.Text = text2.ToString();
 
             if (hsbarMinPWM.Value > hsbarLowSteerPWM.Value) lblMinPWM.ForeColor = Color.Red;
             else lblMinPWM.ForeColor = Color.Black;

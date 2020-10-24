@@ -49,7 +49,6 @@ namespace AgOpenGPS
             mf = _f;
             latitude = Properties.Settings.Default.setGPS_SimLatitude;
             longitude = Properties.Settings.Default.setGPS_SimLongitude;
-            LastSteerAngle = 0;
         }
 
         // Instantiate random number generator.  
@@ -63,10 +62,7 @@ namespace AgOpenGPS
 
         public void DoSimTick(double _st)
         {
-
-            LastSteerAngle += Math.Max(Math.Min(_st - LastSteerAngle, 5), -5);
-
-            steerAngle = LastSteerAngle;
+            steerAngle = _st;
             double temp = (stepDistance / mf.HzTime * Math.Tan(steerAngle * 0.0165329252) / 3.3);
             headingTrue += temp;
             if (headingTrue > Glm.twoPI) headingTrue -= Glm.twoPI;
@@ -78,8 +74,8 @@ namespace AgOpenGPS
 
             if (mf.isSimNoisy)
             {
-                double noiseLat = RandomNumber(-3, 3) * 0.0000001295;
-                double noiseLon = RandomNumber(-3, 3) * 0.0000001295;
+                double noiseLat = RandomNumber(-1, 1) * 0.0000001295;
+                double noiseLon = RandomNumber(-1, 1) * 0.0000001295;
                 CalculateNewPostionFromBearingDistance(latitude + noiseLat, longitude + noiseLon, degrees, (stepDistance / mf.HzTime) / 1000.0);
                 latitude -= noiseLat;
                 longitude -= noiseLon;
@@ -88,6 +84,7 @@ namespace AgOpenGPS
             {
                 CalculateNewPostionFromBearingDistance(latitude, longitude, degrees, (stepDistance / mf.HzTime) / 1000.0);
             }
+
             //calc the speed
             speed = Math.Round(1.944 * stepDistance, 1);
             //lblSpeed.Text = (Math.Round(1.852 * speed, 1)).ToString();
@@ -125,14 +122,14 @@ namespace AgOpenGPS
         {
             const double R = 6371; // Earth Radius in Km
 
-            double lat2 = Math.Asin((Math.Sin(Math.PI / 180 * lat) * Math.Cos(distance / R))
-                + (Math.Cos(Math.PI / 180 * lat) * Math.Sin(distance / R) * Math.Cos(Math.PI / 180 * bearing)));
+            double lat2 = Math.Asin((Math.Sin(Glm.ToRadians(lat)) * Math.Cos(distance / R))
+                + (Math.Cos(Glm.ToRadians(lat)) * Math.Sin(distance / R) * Math.Cos(Glm.ToRadians(bearing))));
 
-            double lon2 = (Math.PI / 180 * lng) + Math.Atan2(Math.Sin(Math.PI / 180 * bearing) * Math.Sin(distance / R)
-                * Math.Cos(Math.PI / 180 * lat), Math.Cos(distance / R) - (Math.Sin(Math.PI / 180 * lat) * Math.Sin(lat2)));
+            double lon2 = Glm.ToRadians(lng) + Math.Atan2(Math.Sin(Glm.ToRadians(bearing)) * Math.Sin(distance / R)
+                * Math.Cos(Glm.ToRadians(lat)), Math.Cos(distance / R) - (Math.Sin(Glm.ToRadians(lat)) * Math.Sin(lat2)));
 
-            latitude = 180 / Math.PI * lat2;
-            longitude = 180 / Math.PI * lon2;
+            latitude = Glm.ToDegrees(lat2);
+            longitude = Glm.ToDegrees(lon2);
 
             //convert to DMS from Degrees
             latMinu = latitude;
@@ -182,7 +179,7 @@ namespace AgOpenGPS
                 sum ^= tmp;    // Build checksum
             }
             // Calculated checksum converted to a 2 digit hex string
-            sumStr = String.Format("{0:X2}", sum);
+            sumStr = string.Format("{0:X2}", sum);
         }
 
         private void BuildGGA()

@@ -18,13 +18,13 @@ namespace AgOpenGPS
 
             InitializeComponent();
 
-            btnJobOpen.Text = gStr.gsOpen;
-            btnJobNew.Text = gStr.gsNew;
-            btnJobResume.Text = gStr.gsResume;
+            btnJobOpen.Text = String.Get("gsOpen");
+            btnJobNew.Text = String.Get("gsNew");
+            btnJobResume.Text = String.Get("gsResume");
 
-            label1.Text = gStr.gsLastFieldUsed;
+            label1.Text = String.Get("gsLastFieldUsed");
 
-            this.Text = gStr.gsStartNewField;
+            this.Text = String.Get("gsStartNewField");
         }
 
         private void BtnJobNew_Click(object sender, EventArgs e)
@@ -47,7 +47,7 @@ namespace AgOpenGPS
         private void FormJob_Load(object sender, EventArgs e)
         {
             //check if directory and file exists, maybe was deleted etc
-            if (String.IsNullOrEmpty(mf.currentFieldDirectory)) btnJobResume.Enabled = false;
+            if (string.IsNullOrEmpty(mf.currentFieldDirectory)) btnJobResume.Enabled = false;
             string directoryName = mf.fieldsDirectory + mf.currentFieldDirectory + "\\";
 
             string fileAndDirectory = directoryName + "Field.txt";
@@ -128,7 +128,7 @@ namespace AgOpenGPS
                         }
                         catch (Exception)
                         {
-                            mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                            mf.TimedMessageBox(2000, String.Get("gsFieldFileIsCorrupt"), String.Get("gsChooseADifferentField"));
                         }
                     }
 
@@ -249,7 +249,7 @@ namespace AgOpenGPS
             }
             else //no fields found
             {
-                mf.TimedMessageBox(2000, gStr.gsNoFieldsFound, gStr.gsFieldNotOpen);
+                mf.TimedMessageBox(2000, String.Get("gsNoFieldsFound"), String.Get("gsFieldNotOpen"));
             }
 
         }

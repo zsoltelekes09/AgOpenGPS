@@ -6,6 +6,7 @@ namespace AgOpenGPS
 {
     public class Trams
     {
+        public int tramint = -1;
         public List<Vec2> Left = new List<Vec2>();
         public List<Vec2> Right = new List<Vec2>();
     }
@@ -15,9 +16,7 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         public List<Trams> TramList = new List<Trams>();
-
         public List<List<Vec2>> calcList = new List<List<Vec2>>();
-        List<double[]> MaxBound = new List<double[]>();
 
         //tram settings
         public double wheelTrack, WheelWidth;
@@ -149,7 +148,7 @@ namespace AgOpenGPS
                 {
 
                     TramList.Add(new Trams());
-                    BuildLeft.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, true, false, true, halfWheelTrack);
+                    BuildLeft.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, 5, true, false, true, halfWheelTrack);
 
                     BuildLeft.Add(BuildLeft[0]);
 
@@ -170,7 +169,7 @@ namespace AgOpenGPS
 
                     BuildRight.Add(BuildRight[0]);
 
-                    BuildRight.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, true, false, false, halfWheelTrack);
+                    BuildRight.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, 5, true, false, false, halfWheelTrack);
 
                     BuildRight.Add(BuildRight[0]);
 
@@ -190,93 +189,6 @@ namespace AgOpenGPS
                     }
                 }
             }
-
-            //PreCalcTurnLines();
-        }
-
-        public void PreCalcTurnLines()
-        {
-            calcList.Clear();
-            MaxBound.Clear();
-            for (int i = 0; i < TramList.Count; i++)
-            {
-                calcList.Add(new List<Vec2>());
-
-                if (TramList[i].Left.Count > 3)
-                {
-                    int j = TramList[i].Left.Count - 2;
-
-                    Vec2 constantMultiple = new Vec2(0, 0);
-
-                    MaxBound.Add(new double[4] { TramList[i].Left[0].Northing, TramList[i].Left[0].Northing, TramList[i].Left[0].Easting, TramList[i].Left[0].Easting });
-
-                    for (int k = -2; k + 2 < TramList[i].Left.Count; j = k)
-                    {
-                        k += 2;
-                        if (MaxBound[i][0] < TramList[i].Left[k].Northing) MaxBound[i][0] = TramList[i].Left[k].Northing;
-                        if (MaxBound[i][1] > TramList[i].Left[k].Northing) MaxBound[i][1] = TramList[i].Left[k].Northing;
-                        if (MaxBound[i][2] < TramList[i].Left[k].Easting) MaxBound[i][2] = TramList[i].Left[k].Easting;
-                        if (MaxBound[i][3] > TramList[i].Left[k].Easting) MaxBound[i][3] = TramList[i].Left[k].Easting;
-
-                        //check for divide by zero
-                        if (Math.Abs(TramList[i].Left[k].Northing - TramList[i].Left[j].Northing) < double.Epsilon)
-                        {
-                            constantMultiple.Easting = TramList[i].Left[k].Easting;
-                            constantMultiple.Northing = 0;
-                            calcList[i].Add(constantMultiple);
-                        }
-                        else
-                        {
-                            //determine constant and multiple and add to list
-                            constantMultiple.Easting = TramList[i].Left[k].Easting - ((TramList[i].Left[k].Northing * TramList[i].Left[j].Easting)
-                                            / (TramList[i].Left[j].Northing - TramList[i].Left[k].Northing)) + ((TramList[i].Left[k].Northing * TramList[i].Left[k].Easting)
-                                                / (TramList[i].Left[j].Northing - TramList[i].Left[k].Northing));
-                            constantMultiple.Northing = (TramList[i].Left[j].Easting - TramList[i].Left[k].Easting) / (TramList[i].Left[j].Northing - TramList[i].Left[k].Northing);
-                            calcList[i].Add(constantMultiple);
-                        }
-                    }
-                }
-            }
-        }
-
-        public bool IsPointInsideTrams(Vec3 pt)
-        {
-            //if inside outer boundary, then potentially add
-            if (calcList.Count > 0 && IsPointInGeoFenceArea(0 , pt))
-            {
-                for (int b = 1; b < calcList.Count; b++)
-                {
-                    if (IsPointInGeoFenceArea(b, pt))
-                    {
-                        //point is in an inner turn area but inside outer
-                        return false;
-                    }
-                }
-                return true;
-            }
-            else return false;
-        }
-
-        public bool IsPointInGeoFenceArea(int idx, Vec3 TestPoint)
-        {
-            if (calcList[idx].Count < 3) return false;
-            int j = TramList[idx].Left.Count - 2;
-            bool oddNodes = false;
-
-            if (TestPoint.Northing > MaxBound[idx][1] || TestPoint.Northing < MaxBound[idx][0] || TestPoint.Easting > MaxBound[idx][3] || TestPoint.Easting < MaxBound[idx][2])
-            {
-                //test against the constant and multiples list the test point
-                for (int k = -2; k + 2 < TramList[idx].Left.Count; j = k)
-                {
-                    k += 2;
-                    if ((TramList[idx].Left[k].Northing < TestPoint.Northing && TramList[idx].Left[j].Northing >= TestPoint.Northing)
-                    || (TramList[idx].Left[j].Northing < TestPoint.Northing && TramList[idx].Left[k].Northing >= TestPoint.Northing))
-                    {
-                        oddNodes ^= ((TestPoint.Northing * calcList[idx][k/2].Northing) + calcList[idx][k/2].Easting < TestPoint.Easting);
-                    }
-                }
-            }
-            return oddNodes; //true means inside.
         }
     }
 }

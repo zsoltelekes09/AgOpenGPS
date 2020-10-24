@@ -18,16 +18,16 @@ namespace AgOpenGPS
             //winform initialization
             InitializeComponent();
 
-            this.Text = gStr.gsTreePlantControl;
+            this.Text = String.Get("gsTreePlantControl");
 
             //Label
-            label12.Text = gStr.gsSpacing;
-            label1.Text = gStr.gsStep;
-            label3.Text = gStr.gsTrees;
+            label12.Text = String.Get("gsSpacing");
+            label1.Text = String.Get("gsStep");
+            label3.Text = String.Get("gsTrees");
 
             //Button
-            btnZeroDistance.Text = gStr.gsBegin;
-            btnStop.Text = gStr.gsDone;
+            btnZeroDistance.Text = String.Get("gsBegin");
+            btnStop.Text = String.Get("gsDone");
         }
 
         private void BtnStop_Click(object sender, EventArgs e)

@@ -12,8 +12,8 @@ void ParseData(byte* Data, int len)
     steerAngleSetPoint = ((float)(Data[7] << 8 | Data[8])); //high low bytes
     steerAngleSetPoint *= 0.01;
 
-    if (distanceFromLine == 32020 | distanceFromLine == 32000 
-        | gpsSpeed < aogSettings.minSteerSpeed | gpsSpeed > aogSettings.maxSteerSpeed | steerSwitch == 1 )
+    if (!distanceFromLine == 32030 && (distanceFromLine == 32020 || distanceFromLine == 32000 
+        || gpsSpeed < aogSettings.minSteerSpeed || gpsSpeed > aogSettings.maxSteerSpeed || steerSwitch == 1 ))
     {
          watchdogTimer = 12;//turn off steering motor
     }
@@ -109,15 +109,19 @@ void ParseData(byte* Data, int len)
 #if (Enable_Hydraulic_Lift)
   else if (Data[0] == 0x7F && Data[1] == 0x73) //Send_HydraulicLift
   {
-    HydrLiftWatchdog = 0;
+    //HydrLiftWatchdog = 0;
     if (Data[3] == 0x02)//Up
     {
       RaiseTimer = HydraulicLift.raiseTime * 2;
+      if (aogConfig.isRelayActiveHigh) digitalWrite(RAISE,LOW);
+      else digitalWrite(RAISE,HIGH);
       LowerTimer = 1;
     }
     else if (Data[3] == 0x01)//Down
     {
       LowerTimer = HydraulicLift.lowerTime * 2;
+      if (aogConfig.isRelayActiveHigh) digitalWrite(LOWER,LOW);
+      else digitalWrite(LOWER,HIGH);
       RaiseTimer = 1;
     }
     else//Off
@@ -133,10 +137,6 @@ void ParseData(byte* Data, int len)
   else if (Data[0] == 0x7F && Data[1] == 0x75) //Send_Treeplant
   {
   }
-
-
-
-  
   else if (Data[0] == 0x7F && Data[1] == 0xF8) //Machine Data Config
   {
     HydraulicLift.RaiseTime = Data[3];

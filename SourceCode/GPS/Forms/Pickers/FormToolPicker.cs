@@ -16,19 +16,19 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
-            this.Text = gStr.gsLoadTool;
+            this.Text = String.Get("gsLoadTool");
         }
 
         private void FormFlags_Load(object sender, EventArgs e)
         {
-            lblLast.Text = gStr.gsCurrent + mf.toolFileName;
+            lblLast.Text = String.Get("gsCurrent") + mf.toolFileName;
 
             DirectoryInfo dinfo = new DirectoryInfo(mf.toolsDirectory);
             FileInfo[] Files = dinfo.GetFiles("*.txt");
             if (Files.Length == 0)
             {
                 Close();
-                mf.TimedMessageBox(2000, gStr.gsNoToolSaved, gStr.gsSaveAToolFirst);
+                mf.TimedMessageBox(2000, String.Get("gsNoToolSaved"), String.Get("gsSaveAToolFirst"));
 
             }
 

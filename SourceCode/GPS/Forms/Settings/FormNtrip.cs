@@ -21,28 +21,28 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
-            this.groupBox2.Text = gStr.gsNetworking;
-            this.cboxIsNTRIPOn.Text = gStr.gsNTRIPOn;
-            this.label6.Text = gStr.gsPort;
-            this.label4.Text = gStr.gsEnterBroadcasterURLOrIP;
-            this.label7.Text = gStr.gsToUDPPort;
+            this.groupBox2.Text = String.Get("gsNetworking");
+            this.cboxIsNTRIPOn.Text = String.Get("gsNTRIPOn");
+            this.label6.Text = String.Get("gsPort");
+            this.label4.Text = String.Get("gsEnterBroadcasterURLOrIP");
+            this.label7.Text = String.Get("gsToUDPPort");
 
-            this.label3.Text = gStr.gsUsername;
-            this.label12.Text = gStr.gsPassword;
-            this.label13.Text = gStr.gsMount;
-            this.label15.Text = gStr.gsGGAIntervalSecs;
-            this.btnGetIP.Text = gStr.gsConfirmIP;
+            this.label3.Text = String.Get("gsUsername");
+            this.label12.Text = String.Get("gsPassword");
+            this.label13.Text = String.Get("gsMount");
+            this.label15.Text = String.Get("gsGGAIntervalSecs");
+            this.btnGetIP.Text = String.Get("gsConfirmIP");
 
-            this.label9.Text = gStr.gsCurrentGPSFix;
-            this.label17.Text = gStr.gsSendToManualFix;
-            this.btnSetManualPosition.Text = gStr.gsSendToManualFix;
-            this.label18.Text = gStr.gsSetToZeroForSerial;
-            this.btnGetSourceTable.Text = gStr.gsGetSourceTable;
+            this.label9.Text = String.Get("gsCurrentGPSFix");
+            this.label17.Text = String.Get("gsSendToManualFix");
+            this.btnSetManualPosition.Text = String.Get("gsSendToManualFix");
+            this.label18.Text = String.Get("gsSetToZeroForSerial");
+            this.btnGetSourceTable.Text = String.Get("gsGetSourceTable");
 
-            this.label1.Text = gStr.gsRestartRequired;
-            this.label19.Text = gStr.gsZeroEqualsOff;
+            this.label1.Text = String.Get("gsRestartRequired");
+            this.label19.Text = String.Get("gsZeroEqualsOff");
 
-            this.Text = gStr.gsNTRIPClientSettings;
+            this.Text = String.Get("gsNTRIPClientSettings");
 
         }
 
@@ -91,7 +91,7 @@ namespace AgOpenGPS
         //get the ipv4 address only
         public static string GetIP4Address()
         {
-            string IP4Address = String.Empty;
+            string IP4Address = string.Empty;
 
             foreach (IPAddress IPA in Dns.GetHostAddresses(Dns.GetHostName()))
             {
@@ -120,7 +120,7 @@ namespace AgOpenGPS
             }
         }
 
-        public Boolean CheckIPValid(String strIP)
+        public bool CheckIPValid(string strIP)
         {
             //  Split string by ".", check that array length is 3
             string[] arrOctets = strIP.Split('.');
@@ -129,9 +129,9 @@ namespace AgOpenGPS
             if (arrOctets.Length != 4) return false;
 
             //  Check each substring checking that the int value is less than 255 and that is char[] length is !> 2
-            const Int16 MAXVALUE = 255;
-            Int32 temp; // Parse returns Int32
-            foreach (String strOctet in arrOctets)
+            const short MAXVALUE = 255;
+            int temp; // Parse returns Int32
+            foreach (string strOctet in arrOctets)
             {
                 //check if at least 3 digits but not more OR 0 length
                 if (strOctet.Length > 3 || strOctet.Length == 0) return false;
@@ -219,7 +219,7 @@ namespace AgOpenGPS
                 sckt.Send(data);
                 int bytes = 0;
                 byte[] bytesReceived = new byte[1024];
-                string page = String.Empty;
+                string page = string.Empty;
                 Thread.Sleep(200);
 
                 do

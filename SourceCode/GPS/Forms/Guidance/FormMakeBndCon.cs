@@ -14,10 +14,10 @@ namespace AgOpenGPS
             Owner = mf = _mf as FormGPS;
             InitializeComponent();
 
-            lblHz.Text = gStr.gsPass;
-            label1.Text = gStr.gsSpacing;
+            lblHz.Text = String.Get("gsPass");
+            label1.Text = String.Get("gsSpacing");
 
-            Text = gStr.gsMakeBoundaryContours;
+            Text = String.Get("gsMakeBoundaryContours");
             TboxPasses.Text = passes.ToString();
             TboxSpacing.Text = spacing.ToString();
         }

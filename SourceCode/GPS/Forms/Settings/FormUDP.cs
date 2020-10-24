@@ -16,21 +16,21 @@ namespace AgOpenGPS
             //get copy of the calling main form
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
-            groupBox4.Text = gStr.gsAgOpenGPSServer;
-            label11.Text = gStr.gsAllmodulessendto;
-            tboxHostName.Text = gStr.gsHostName;
-            label14.Text = gStr.gsHost;
-            label1.Text = gStr.gsThisComputer;
-            label9.Text = gStr.gsPort;
-            label7.Text = gStr.gsYoumustRESTARTAgOpenGPS + "\r\n";
-            btnSerialOK.Text = gStr.gsSave;
-            label4.Text = gStr.gsModulePort;
-            label6.Text = gStr.gsPort;
-            groupBox1.Text = gStr.gsModuleAdressandPorts;
-            label8.Text = gStr.gsAllmodulesuse;
-            cboxIsUDPOn.Text = gStr.gsUDPOn;
-            groupBox2.Text = gStr.gsNetworking;
-            this.Text = gStr.gsEthernetConfiguration;
+            groupBox4.Text = String.Get("gsAgOpenGPSServer");
+            label11.Text = String.Get("gsAllmodulessendto");
+            tboxHostName.Text = String.Get("gsHostName");
+            label14.Text = String.Get("gsHost");
+            label1.Text = String.Get("gsThisComputer");
+            label9.Text = String.Get("gsPort");
+            label7.Text = String.Get("gsYoumustRESTARTAgOpenGPS") + "\r\n";
+            btnSerialOK.Text = String.Get("gsSave");
+            label4.Text = String.Get("gsModulePort");
+            label6.Text = String.Get("gsPort");
+            groupBox1.Text = String.Get("gsModuleAdressandPorts");
+            label8.Text = String.Get("gsAllmodulesuse");
+            cboxIsUDPOn.Text = String.Get("gsUDPOn");
+            groupBox2.Text = String.Get("gsNetworking");
+            this.Text = String.Get("gsEthernetConfiguration");
         }
 
         private void BtnSerialOK_Click(object sender, EventArgs e)
@@ -75,7 +75,7 @@ namespace AgOpenGPS
         //get the ipv4 address only
         public static string GetIP4Address()
         {
-            string IP4Address = String.Empty;
+            string IP4Address = string.Empty;
 
             foreach (IPAddress IPA in Dns.GetHostAddresses(Dns.GetHostName()))
             {
@@ -89,7 +89,7 @@ namespace AgOpenGPS
             return IP4Address;
         }
 
-        public Boolean CheckIPValid(String strIP)
+        public Boolean CheckIPValid(string strIP)
         {
             //  Split string by ".", check that array length is 3
             string[] arrOctets = strIP.Split('.');
@@ -100,7 +100,7 @@ namespace AgOpenGPS
             //  Check each substring checking that the int value is less than 255 and that is char[] length is !> 2
             const Int16 MAXVALUE = 255;
             Int32 temp; // Parse returns Int32
-            foreach (String strOctet in arrOctets)
+            foreach (string strOctet in arrOctets)
             {
                 //check if at least 3 digits but not more OR 0 length
                 if (strOctet.Length > 3 | strOctet.Length == 0) return false;

@@ -15,15 +15,15 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
-            this.label18.Text = gStr.gsLatitude;
-            this.label1.Text = gStr.gsLongitude;
+            this.label18.Text = String.Get("gsLatitude");
+            this.label1.Text = String.Get("gsLongitude");
 
-            this.btnGetFieldFix.Text = gStr.gsUseField;
-            this.label7.Text = gStr.gsFieldOrigin;
-            this.label5.Text = gStr.gsGPSCurrentFix;
-            this.btnLoadGPSFix.Text = gStr.gsUseGPS;
+            this.btnGetFieldFix.Text = String.Get("gsUseField");
+            this.label7.Text = String.Get("gsFieldOrigin");
+            this.label5.Text = String.Get("gsGPSCurrentFix");
+            this.btnLoadGPSFix.Text = String.Get("gsUseGPS");
 
-            this.Text = gStr.gsEnterCoordinatesForSimulator;
+            this.Text = String.Get("gsEnterCoordinatesForSimulator");
         }
 
         private void FormSimCoords_Load(object sender, EventArgs e)

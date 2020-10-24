@@ -23,27 +23,27 @@ namespace AgOpenGPS
             InitializeComponent();
 
             //Language keys
-            tabSettings.Text = gStr.gsAntenna;
-            tabVehicle.Text = gStr.gsVehicle;
-            gboxAttachment.Text = gStr.gsVehicleType;
-            label6.Text = gStr.gsTurnRadius;
-            label26.Text = gStr.gsWheelbase;
-            label9.Text = gStr.gsLeftIs_;
-            label15.Text = gStr.gsHeight;
-            label7.Text = gStr.gsOffset;
-            label18.Text = gStr.gsDistance;
-            groupBox3.Text = gStr.gsHydraulicLiftLookAhead;
-            tabConfig.Text = gStr.gsType;
-            tabGuidance.Text = gStr.gsGuidance;
+            tabSettings.Text = String.Get("gsAntenna");
+            tabVehicle.Text = String.Get("gsVehicle");
+            gboxAttachment.Text = String.Get("gsVehicleType");
+            label6.Text = String.Get("gsTurnRadius");
+            label26.Text = String.Get("gsWheelbase");
+            label9.Text = String.Get("gsLeftIs_");
+            label15.Text = String.Get("gsHeight");
+            label7.Text = String.Get("gsOffset");
+            label18.Text = String.Get("gsDistance");
+            groupBox3.Text = String.Get("gsHydraulicLiftLookAhead");
+            tabConfig.Text = String.Get("gsType");
+            tabGuidance.Text = String.Get("gsGuidance");
 
 
-            groupBox2.Text = gStr.gsCmPerLightbarPixel;
-            groupBox1.Text = gStr.gs____SnapDistance;
-            label17.Text = gStr.gsMeasurementsIn;
-            groupBox4.Text = gStr.gsGuidanceLineWidth;
-            Text = gStr.gsVehicleSettings;
+            groupBox2.Text = String.Get("gsCmPerLightbarPixel");
+            groupBox1.Text = String.Get("gs<<>>SnapDistance");
+            label17.Text = String.Get("gsMeasurementsIn");
+            groupBox4.Text = String.Get("gsGuidanceLineWidth");
+            Text = String.Get("gsVehicleSettings");
 
-            lblInchesCm.Text = mf.isMetric? gStr.gsCentimeters : gStr.gsInches;
+            lblInchesCm.Text = mf.isMetric? String.Get("gsCentimeters") : String.Get("gsInches");
 
             //select the page as per calling menu or button from mainGPS form
             tabControl1.SelectedIndex = page;
@@ -100,9 +100,9 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.setVehicle_vehicleType = mf.vehicle.vehicleType = vehicleType;
 
             //SettingsTab
-            Properties.Vehicle.Default.setVehicle_antennaPivot = mf.vehicle.antennaPivot = Math.Round(antennaPivot * mf.metImp2m, 2);
+            Properties.Vehicle.Default.setVehicle_antennaPivot = mf.vehicle.antennaPivot = Math.Round(antennaPivot * mf.metImp2m, 2) * (isPivotBehindAntenna ? 1 : -1);
             Properties.Vehicle.Default.setVehicle_antennaHeight = mf.vehicle.antennaHeight = Math.Round(antennaHeight * mf.metImp2m, 2);
-            Properties.Vehicle.Default.setVehicle_wheelbase = mf.vehicle.wheelbase = Math.Round(wheelbase * mf.metImp2m, 2);
+            Properties.Vehicle.Default.setVehicle_wheelbase = mf.vehicle.wheelbase = Math.Round(wheelbase * mf.metImp2m, 2) * (isSteerAxleAhead ? 1 : -1);
             Properties.Vehicle.Default.setVehicle_antennaOffset = mf.vehicle.antennaOffset = Math.Round(antennaOffset * mf.metImp2m, 2);
 
             //VehicleTab
@@ -133,7 +133,7 @@ namespace AgOpenGPS
             btnNext.Focus();
 
             isPivotBehindAntenna = vehicleType != 2;//4WD
-            isSteerAxleAhead = vehicleType != 1;//harvestor
+            isSteerAxleAhead = vehicleType == 0;//harvestor
         }
 
 
@@ -167,6 +167,11 @@ namespace AgOpenGPS
                 vehicleType = 2;
                 tabSettings.BackgroundImage = Properties.Resources.VehicleSettings4WD;
             }
+        }
+
+        private void BtnCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         #region SettingsTab

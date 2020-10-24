@@ -67,7 +67,7 @@ namespace AgOpenGPS
             }
             catch (Exception)
             {
-                TimedMessageBox(2500, gStr.gsNoIPLocated, gStr.gsCannotFind + Properties.Settings.Default.setNTRIP_casterURL);
+                TimedMessageBox(2500, String.Get("gsNoIPLocated"), String.Get("gsCannotFind") + Properties.Settings.Default.setNTRIP_casterURL);
             }
 
             broadCasterPort = Properties.Settings.Default.setNTRIP_casterPort; //Select correct port (usually 80 or 2101)
@@ -115,7 +115,7 @@ namespace AgOpenGPS
             }
             catch (Exception)
             {
-                TimedMessageBox(1000, gStr.gsNTRIPNotConnectedRetrying, gStr.gsAtSocketConnect);
+                TimedMessageBox(1000, String.Get("gsNTRIPNotConnectedRetrying"), String.Get("gsAtSocketConnect"));
                 ReconnectRequest();
                 return;
             }
@@ -134,7 +134,7 @@ namespace AgOpenGPS
             // Check we are connected
             if (clientSocket == null || !clientSocket.Connected)
             {
-                TimedMessageBox(2000, gStr.gsNTRIPNotConnected, " At the StartNTRIP() ");
+                TimedMessageBox(2000, String.Get("gsNTRIPNotConnected"), " At the StartNTRIP() ");
                 ReconnectRequest();
                 return;
             }
@@ -233,7 +233,7 @@ namespace AgOpenGPS
             // Check we are connected
             if (clientSocket == null || !clientSocket.Connected)
             {
-                TimedMessageBox(1000, gStr.gsNTRIPNotConnectedToSendGGA, gStr.gsRestartingAndReconnectingToCaster);
+                TimedMessageBox(1000, String.Get("gsNTRIPNotConnectedToSendGGA"), String.Get("gsRestartingAndReconnectingToCaster"));
                 ReconnectRequest();
 
                 return;
@@ -350,13 +350,13 @@ namespace AgOpenGPS
             NTRIPStartStopStrip.Visible = true;
             if (isNTRIP_TurnedOn)
             {
-                NTRIPStartStopStrip.Text = gStr.gsConnectingIn + "\n" + (Math.Abs(NtripCounter - 21));
+                NTRIPStartStopStrip.Text = String.Get("gsConnectingIn") + "\n" + (Math.Abs(NtripCounter - 21));
                 NTRIPBytesMenu.Visible = true;
                 pbarNtripMenu.Visible = true;
             }
             else
             {
-                NTRIPStartStopStrip.Text = gStr.gsNTRIPOff + "\n";
+                NTRIPStartStopStrip.Text = String.Get("gsNTRIPOff") + "\n";
                 NTRIPBytesMenu.Visible = false;
                 pbarNtripMenu.Visible = false;
             }
@@ -379,7 +379,7 @@ namespace AgOpenGPS
                 sum ^= tmp;    // Build checksum
             }
             // Calculated checksum converted to a 2 digit hex string
-            return String.Format("{0:X2}", sum);
+            return string.Format("{0:X2}", sum);
         }
 
         private readonly StringBuilder sbGGA = new StringBuilder();

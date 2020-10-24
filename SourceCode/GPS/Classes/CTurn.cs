@@ -39,8 +39,6 @@ namespace AgOpenGPS
         {
             //initial scan is straight ahead of pivot point of vehicle to find the right turnLine/boundary
 
-            Vec3 rayPt = new Vec3();
-
             int closestTurnNum = int.MinValue;
 
 
@@ -49,15 +47,16 @@ namespace AgOpenGPS
 
             List<Vec4> Crossings1 = new List<Vec4>();
 
-            double s1_x, s1_y;
+            Vec3 rayPt = fromPt;
+            rayPt.Northing += CosHead * mf.maxCrossFieldLength;
+            rayPt.Easting += SinHead * mf.maxCrossFieldLength;
 
-            s1_x = CosHead * mf.maxCrossFieldLength;
-            s1_y = SinHead * mf.maxCrossFieldLength;
+
 
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
                 if (mf.bnd.bndArr[i].isDriveThru || mf.bnd.bndArr[i].isDriveAround) continue;
-                if (mf.turn.turnArr.Count > i ) Crossings1.FindCrossingPoints(ref mf.turn.turnArr[i].turnLine, fromPt.Northing, fromPt.Easting, s1_x, s1_y, i);
+                if (mf.turn.turnArr.Count > i ) Crossings1.FindCrossingPoints(ref mf.turn.turnArr[i].turnLine, fromPt, rayPt, i);
             }
 
             if (Crossings1.Count > 0)

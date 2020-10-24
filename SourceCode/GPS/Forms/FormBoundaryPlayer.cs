@@ -17,14 +17,11 @@ namespace AgOpenGPS
             InitializeComponent();
 
             //btnStop.Text = gStr.gsDone;
-            btnPausePlay.Text = gStr.gsRecord;
-            label1.Text = gStr.gsArea + ":";
-            this.Text = gStr.gsStopRecordPauseBoundary;
-            lblOffset.Text = gStr.gsOffset;
+            btnPausePlay.Text = String.Get("gsRecord");
+            label1.Text = String.Get("gsArea") + ":";
+            this.Text = String.Get("gsStopRecordPauseBoundary");
+            lblOffset.Text = String.Get("gsOffset");
 
-
-
-            //mf.bnd.isOkToAddPoints = false;
             btnPausePlay.Image = Properties.Resources.BoundaryRecord;
             TboxBndOffset.Text = mf.bnd.createBndOffset.ToString("N2");
             mf.Focus();
@@ -53,8 +50,6 @@ namespace AgOpenGPS
 
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine();
                 mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryWinding();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].PreCalcBoundaryLines();
 
 
                 mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
@@ -85,22 +80,13 @@ namespace AgOpenGPS
         //actually the record button
         private void BtnPausePlay_Click(object sender, EventArgs e)
         {
-            if (mf.bnd.isOkToAddPoints)
-            {
-                mf.bnd.isOkToAddPoints = false;
-                btnPausePlay.Image = Properties.Resources.BoundaryRecord;
-                btnPausePlay.Text = gStr.gsRecord;
-                btnAddPoint.Enabled = true;
-                btnDeleteLast.Enabled = true;
-            }
-            else
-            {
-                mf.bnd.isOkToAddPoints = true;
-                btnPausePlay.Image = Properties.Resources.boundaryPause;
-                btnPausePlay.Text = gStr.gsPause;
-                btnAddPoint.Enabled = false;
-                btnDeleteLast.Enabled = false;
-            }
+            mf.bnd.isOkToAddPoints = !mf.bnd.isOkToAddPoints;
+            btnAddPoint.Enabled = !mf.bnd.isOkToAddPoints;
+            btnDeleteLast.Enabled = !mf.bnd.isOkToAddPoints;
+
+            btnPausePlay.Image = mf.bnd.isOkToAddPoints ? Properties.Resources.boundaryPause : Properties.Resources.BoundaryRecord;
+            btnPausePlay.Text = mf.bnd.isOkToAddPoints ? String.Get("gsPause") : String.Get("gsRecord");
+
             mf.Focus();
         }
 
@@ -152,8 +138,8 @@ namespace AgOpenGPS
 
         private void BtnRestart_Click(object sender, EventArgs e)
         {
-            DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
-                                    gStr.gsDeleteForSure,
+            DialogResult result3 = MessageBox.Show(String.Get("gsCompletelyDeleteBoundary"),
+                                    String.Get("gsDeleteForSure"),
                                     MessageBoxButtons.YesNo,
                                     MessageBoxIcon.Question,
                                     MessageBoxDefaultButton.Button2);

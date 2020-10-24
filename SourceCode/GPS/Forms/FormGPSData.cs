@@ -37,7 +37,7 @@ namespace AgOpenGPS
 
             lblHDOP.Text = mf.pn.hdop.ToString();
             tboxNMEASerial.Lines = mf.recvSentenceSettings;
-            lblSpeed.Text = mf.pn.speed.ToString();
+            lblSpeed.Text = mf.pn.speed.ToString("N2");
 
             lblUturnByte.Text = Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
 
@@ -69,9 +69,13 @@ namespace AgOpenGPS
 
             if (mf.isUDPSendConnected)
             {
-                tboxUDPSteer.Text = mf.autoSteerUDPActivity.ToString();
-                tboxUDPMachine.Text = mf.machineUDPActivity.ToString();
-                tboxUDPSwitch.Text = mf.switchUDPActivity.ToString();
+                int text1 = mf.autoSteerUDPActivity;
+                int text2 = mf.machineUDPActivity;
+                int text3 = mf.switchUDPActivity;
+
+                tboxUDPSteer.Text = text1.ToString();
+                tboxUDPMachine.Text = text2.ToString();
+                tboxUDPSwitch.Text = text3.ToString();
             }
             else
             {
@@ -88,8 +92,10 @@ namespace AgOpenGPS
         private void FormGPSData_Load(object sender, EventArgs e)
         {
             lblConvergenceAngle.Text = Math.Round(Glm.ToDegrees(mf.pn.convergenceAngle), 3).ToString();
-            lblSunrise.Text = mf.sunrise.ToString("HH:mm");
-            lblSunset.Text = mf.sunset.ToString("HH:mm");
+            DateTime text1 = mf.sunrise;
+            DateTime text2 = mf.sunset;
+            lblSunrise.Text = text1.ToString("HH:mm");
+            lblSunset.Text = text2.ToString("HH:mm");
 
         }
     }

@@ -204,14 +204,36 @@ namespace AgOpenGPS
 
         #endregion // Class Props and instances
 
+        private void Draggable()
+        {
+            ControlExtension.Draggable(oglZoom, true);
+            ControlExtension.Draggable(oglBack, true);
+        }
+
         // Constructor, Initializes a new instance of the "FormGPS" class.
         public FormGPS()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                string resourceName = new AssemblyName(args.Name).Name + ".dll";
+                string resource = Array.Find(this.GetType().Assembly.GetManifestResourceNames(), element => element.EndsWith(resourceName));
+
+                if (resource != "" && resource != null)
+                {
+                    using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
+                    {
+                        byte[] assemblyData = new byte[stream.Length];
+                        stream.Read(assemblyData, 0, assemblyData.Length);
+                        return Assembly.Load(assemblyData);
+                    }
+                }
+                else return null;
+            };
+
             //winform initialization
             InitializeComponent();
 
-            ControlExtension.Draggable(oglZoom, true);
-            ControlExtension.Draggable(oglBack, true);
+            Draggable();
 
             //build the gesture structures
             SetupStructSizes();
@@ -282,65 +304,65 @@ namespace AgOpenGPS
 
         private void UpdateGuiText()
         {
-            setWorkingDirectoryToolStripMenuItem.Text = gStr.gsDirectories;
-            enterSimCoordsToolStripMenuItem.Text = gStr.gsEnterSimCoords;
-            topMenuLoadVehicle.Text = gStr.gsLoadVehicle;
-            topMenuSaveVehicle.Text = gStr.gsSaveVehicle;
-            aboutToolStripMenuItem.Text = gStr.gsAbout;
-            shortcutKeysToolStripMenuItem.Text = gStr.gsShortcutKeys;
-            menustripLanguage.Text = gStr.gsLanguage;
-            topMenuLoadTool.Text = gStr.gsLoadTool;
-            topMenuSaveTool.Text = gStr.gsSaveTool;
-            topMenuLoadEnvironment.Text = gStr.gsLoadEnvironment;
-            topMenuSaveEnvironment.Text = gStr.gsSaveEnvironment;
-            gPSInfoToolStripMenuItem.Text = gStr.gsModuleInfo;
-            showStartScreenToolStripMenuItem.Text = gStr.gsShowStartScreen;
+            setWorkingDirectoryToolStripMenuItem.Text = String.Get("gsDirectories");
+            enterSimCoordsToolStripMenuItem.Text = String.Get("gsEnterSimCoords");
+            topMenuLoadVehicle.Text = String.Get("gsLoadVehicle");
+            topMenuSaveVehicle.Text = String.Get("gsSaveVehicle");
+            aboutToolStripMenuItem.Text = String.Get("gsAbout");
+            shortcutKeysToolStripMenuItem.Text = String.Get("gsShortcutKeys");
+            menustripLanguage.Text = String.Get("gsLanguage");
+            topMenuLoadTool.Text = String.Get("gsLoadTool");
+            topMenuSaveTool.Text = String.Get("gsSaveTool");
+            topMenuLoadEnvironment.Text = String.Get("gsLoadEnvironment");
+            topMenuSaveEnvironment.Text = String.Get("gsSaveEnvironment");
+            gPSInfoToolStripMenuItem.Text = String.Get("gsModuleInfo");
+            showStartScreenToolStripMenuItem.Text = String.Get("gsShowStartScreen");
             //Display Menu
 
             //settingsToolStripMenuItem.Text = gStr.gsDisplay;
-            topMenuFileExplorer.Text = gStr.gsWindowsFileExplorer;
-            optionsToolStripMenuItem.Text = gStr.gsOptions;
+            topMenuFileExplorer.Text = String.Get("gsWindowsFileExplorer");
+            optionsToolStripMenuItem.Text = String.Get("gsOptions");
 
-            simulatorOnToolStripMenuItem.Text = gStr.gsSimulatorOn;
+            simulatorOnToolStripMenuItem.Text = String.Get("gsSimulatorOn");
 
-            resetALLToolStripMenuItem.Text = gStr.gsResetAll;
-            colorsToolStripMenuItem.Text = gStr.gsColors;
-            lightbarToolStripMenuItem.Text = gStr.gsLightbarOn;
-            topFieldViewToolStripMenuItem.Text = gStr.gsTopFieldView;
-            toolToolStripMenu.Text = gStr.gsTool;
+            resetALLToolStripMenuItem.Text = String.Get("gsResetAll");
+            colorsToolStripMenuItem.Text = String.Get("gsColors");
+            lightbarToolStripMenuItem.Text = String.Get("gsLightbarOn");
+            topFieldViewToolStripMenuItem.Text = String.Get("gsTopFieldView");
+            toolToolStripMenu.Text = String.Get("gsTool");
 
-            resetEverythingToolStripMenuItem.Text = gStr.gsResetAllForSure;
-            fileExplorerToolStripMenuItem.Text = gStr.gsWindowsFileExplorer;
+            resetEverythingToolStripMenuItem.Text = String.Get("gsResetAllForSure");
+            fileExplorerToolStripMenuItem.Text = String.Get("gsWindowsFileExplorer");
 
             //Settings Menu
-            toolstripYouTurnConfig.Text = gStr.gsUTurn;
-            toolstripAutoSteerConfig.Text = gStr.gsAutoSteer;
-            steerChartStripMenu.Text = gStr.gsSteerChart;
-            toolstripVehicleConfig.Text = gStr.gsVehicle;
-            toolstripDisplayConfig.Text = gStr.gsDataSources;
-            toolstripUSBPortsConfig.Text = gStr.gsSerialPorts;
-            toolstripUDPConfig.Text = gStr.gsUDP;
-            toolStripNTRIPConfig.Text = gStr.gsNTRIP;
+            toolstripYouTurnConfig.Text = String.Get("gsUTurn");
+            toolstripAutoSteerConfig.Text = String.Get("gsAutoSteer");
+            steerChartStripMenu.Text = String.Get("gsSteerChart");
+            toolstripVehicleConfig.Text = String.Get("gsVehicle");
+            toolstripDisplayConfig.Text = String.Get("gsDataSources");
+            toolstripUSBPortsConfig.Text = String.Get("gsSerialPorts");
+            toolstripUDPConfig.Text = String.Get("gsUDP");
+            toolStripNTRIPConfig.Text = String.Get("gsNTRIP");
 
             //Tools Menu
-            treePlantToolStrip.Text = gStr.gsTreePlanter;
-            SmoothABtoolStripMenu.Text = gStr.gsSmoothABCurve;
-            toolStripBtnMakeBndContour.Text = gStr.gsMakeBoundaryContours;
-            boundariesToolStripMenuItem.Text = gStr.gsBoundary;
-            headlandToolStripMenuItem.Text = gStr.gsHeadland;
-            deleteContourPathsToolStripMenuItem.Text = gStr.gsDeleteContourPaths;
-            deleteAppliedAreaToolStripMenuItem.Text = gStr.gsDeleteAppliedArea;
-            deleteForSureToolStripMenuItem.Text = gStr.gsAreYouSure;
-            webcamToolStrip.Text = gStr.gsWebCam;
-            googleEarthFlagsToolStrip.Text = gStr.gsGoogleEarth;
-            offsetFixToolStrip.Text = gStr.gsOffsetFix;
-            moduleConfigToolStripMenuItem.Text = gStr.gsModuleConfiguration;
+            treePlantToolStrip.Text = String.Get("gsTreePlanter");
+            SmoothABtoolStripMenu.Text = String.Get("gsSmoothABCurve");
+            toolStripBtnMakeBndContour.Text = String.Get("gsMakeBoundaryContours");
+            boundariesToolStripMenuItem.Text = String.Get("gsBoundary");
+            headlandToolStripMenuItem.Text = String.Get("gsHeadland");
+            deleteContourPathsToolStripMenuItem.Text = String.Get("gsDeleteContourPaths");
+            deleteAppliedAreaToolStripMenuItem.Text = String.Get("gsDeleteAppliedArea");
+            deleteForSureToolStripMenuItem.Text = String.Get("gsAreYouSure");
+            webcamToolStrip.Text = String.Get("gsWebCam");
+            googleEarthFlagsToolStrip.Text = String.Get("gsGoogleEarth");
+            offsetFixToolStrip.Text = String.Get("gsOffsetFix");
+            moduleConfigToolStripMenuItem.Text = String.Get("gsModuleConfiguration");
 
             //Recorded Path
-            deletePathMenu.Text = gStr.gsDeletePath;
-            recordPathMenu.Text = gStr.gsRecordStop;
-            goPathMenu.Text = gStr.gsGoStop;
-            pausePathMenu.Text = gStr.gsPauseResume;
+            deletePathMenu.Text = String.Get("gsDeletePath");
+            recordPathMenu.Text = String.Get("gsRecordStop");
+            goPathMenu.Text = String.Get("gsGoStop");
+            pausePathMenu.Text = String.Get("gsPauseResume");
 
 
             stripSectionColor.Text = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
@@ -348,10 +370,10 @@ namespace AgOpenGPS
 
             if (isNTRIP_TurnedOn)
             {
-                if (NtripCounter > 20) NTRIPStartStopStrip.Text = (isNTRIP_Connecting ? gStr.gsAuthourizing : isNTRIP_Sending ? gStr.gsSendingGGA : (NTRIP_Watchdog > 10 ? gStr.gsWaiting : gStr.gsListening)) + "\n" + string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
-                else NTRIPStartStopStrip.Text = gStr.gsConnectingIn + "\n" + (Math.Abs(NtripCounter - 21));
+                if (NtripCounter > 20) NTRIPStartStopStrip.Text = (isNTRIP_Connecting ? String.Get("gsAuthourizing") : isNTRIP_Sending ? String.Get("gsSendingGGA") : (NTRIP_Watchdog > 10 ? String.Get("gsWaiting") : String.Get("gsListening"))) + "\n" + string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
+                else NTRIPStartStopStrip.Text = String.Get("gsConnectingIn") + "\n" + (Math.Abs(NtripCounter - 21));
             }
-            else NTRIPStartStopStrip.Text = gStr.gsNTRIPOff + "\n";
+            else NTRIPStartStopStrip.Text = String.Get("gsNTRIPOff") + "\n";
         }
 
 
@@ -427,10 +449,11 @@ namespace AgOpenGPS
 
             if (Settings.Default.setDisplay_isTermsOn)
             {
+                SetLanguage((object)Settings.Default.setF_culture, null);
+
                 Form form = new Form_First(this);
                 form.ShowDialog(this);
             }
-
 
             // load all the gui settings in gui.designer.cs
             LoadSettings();
@@ -514,294 +537,140 @@ namespace AgOpenGPS
         public void LoadGLTextures()
         {
             GL.Enable(EnableCap.Texture2D);
-            try
+
+            using (Bitmap bitmap = Resources.Landscape)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "Landscape.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[0]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[0]);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-                        BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
-                        bitmap.UnlockBits(bitmapData);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File LANDSCAPE.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[0]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[0]);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
+                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
+                bitmap.UnlockBits(bitmapData);
             }
 
-            try
+            using (Bitmap bitmap2 = Resources.Floor)
             {
-                string text2 = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Dependencies\\Images", "Floor.png");
-                if (File.Exists(text2))
-                {
-                    using (Bitmap bitmap2 = new Bitmap(text2))
-                    {
-                        GL.GenTextures(1, out texture[1]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[1]);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-                        BitmapData bitmapData2 = bitmap2.LockBits(new Rectangle(0, 0, bitmap2.Width, bitmap2.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData2.Width, bitmapData2.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData2.Scan0);
-                        bitmap2.UnlockBits(bitmapData2);
-                    }
-                }
-            }
-            catch (Exception ex2)
-            {
-                //WriteErrorLog("Loading Floor Texture" + ex2);
-                MessageBox.Show("Texture File FLOOR.PNG is Missing", ex2.Message);
+                GL.GenTextures(1, out texture[1]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[1]);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
+                BitmapData bitmapData2 = bitmap2.LockBits(new Rectangle(0, 0, bitmap2.Width, bitmap2.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData2.Width, bitmapData2.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData2.Scan0);
+                bitmap2.UnlockBits(bitmapData2);
             }
 
-            try
+            using (Bitmap bitmap = Resources.Font)
             {
-                string text2 = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Dependencies\\Images", "Font.png");
-                if (File.Exists(text2))
-                {
-                    using (Bitmap bitmap = new Bitmap(text2))
-                    {
-                        GL.GenTextures(1, out texture[2]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[2]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
+                GL.GenTextures(1, out texture[2]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[2]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
 
-                        font.textureWidth = bitmap.Width; font.textureHeight = bitmap.Height;
-                    }
-                }
-            }
-            catch (Exception ex2)
-            {
-                //WriteErrorLog("Loading Floor Texture" + ex2);
-                MessageBox.Show("Texture File Font.PNG is Missing", ex2.Message);
+                font.textureWidth = bitmap.Width; font.textureHeight = bitmap.Height;
             }
 
-            try
+            using (Bitmap bitmap = Resources.Turn)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "Turn.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[3]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[3]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File TURN.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[3]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[3]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             }
 
-            try
+            using (Bitmap bitmap = Resources.TurnCancel)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "TurnCancel.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[4]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[4]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File TURNCANCEL.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[4]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[4]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             }
 
-            try
+            using (Bitmap bitmap = Resources.TurnManual)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "TurnManual.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[5]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[5]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File TURNManual.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[5]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[5]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             }
 
-            try
+            using (Bitmap bitmap = Resources.Compass)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "Compass.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[6]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[6]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9726);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File Compass.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[6]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[6]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9726);
             }
 
-            try
+            using (Bitmap bitmap = Resources.Speedo)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "Speedo.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[7]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[7]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File Speedo.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[7]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[7]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
             }
 
-            try
+            using (Bitmap bitmap = Resources.SpeedoNeedle)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "SpeedoNedle.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[8]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[8]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File SpeedoNeedle.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[8]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[8]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             }
 
-            try
+            using (Bitmap bitmap = Resources.Lift)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "Lift.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[9]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[9]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File Lift.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[9]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[9]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             }
 
-            try
+            using (Bitmap bitmap = Resources.LandscapeNight)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "LandscapeNight.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[10]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[10]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File LAndscapeNight.PNG is Missing", ex.Message);
+                GL.GenTextures(1, out texture[10]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[10]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
             }
 
-            try
+            using (Bitmap bitmap = Resources.Steer)
             {
-                string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string text = Path.Combine(directoryName, "Dependencies\\images", "Steer.png");
-                if (File.Exists(text))
-                {
-                    using (Bitmap bitmap = new Bitmap(text))
-                    {
-                        GL.GenTextures(1, out texture[11]);
-                        GL.BindTexture(TextureTarget.Texture2D, texture[11]);
-                        BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                        bitmap.UnlockBits(data);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-                    }
-                }
+                GL.GenTextures(1, out texture[11]);
+                GL.BindTexture(TextureTarget.Texture2D, texture[11]);
+                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                bitmap.UnlockBits(data);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
             }
-            catch (Exception ex)
-            {
-                //WriteErrorLog("Loading Landscape Textures" + ex);
-                MessageBox.Show("Texture File Steer.PNG is Missing", ex.Message);
-            }
-
         }// Load Bitmaps And Convert To Textures
 
         public void StartLocalUDPServer()
@@ -1196,12 +1065,12 @@ namespace AgOpenGPS
                 case 3: //Machine 1
                     if (action == 0)
                     {
-                        TimedMessageBox(1000, seq.pos3, gStr.gsTurnOff);
+                        TimedMessageBox(1000, seq.pos3, String.Get("gsTurnOff"));
                         mc.Send_Uturn[3] &= 0b11111110;
                     }
                     else
                     {
-                        TimedMessageBox(1000, seq.pos3, gStr.gsTurnOn);
+                        TimedMessageBox(1000, seq.pos3, String.Get("gsTurnOn"));
                         mc.Send_Uturn[3] |= 0b00000001;
                     }
                     break;
@@ -1209,12 +1078,12 @@ namespace AgOpenGPS
                 case 4: //Machine 2
                     if (action == 0)
                     {
-                        TimedMessageBox(1000, seq.pos4, gStr.gsTurnOff);
+                        TimedMessageBox(1000, seq.pos4, String.Get("gsTurnOff"));
                         mc.Send_Uturn[3] &= 0b11111101;
                     }
                     else
                     {
-                        TimedMessageBox(1000, seq.pos4, gStr.gsTurnOn);
+                        TimedMessageBox(1000, seq.pos4, String.Get("gsTurnOn"));
                         mc.Send_Uturn[3] |= 0b00000010;
                     }
                     break;
@@ -1222,12 +1091,12 @@ namespace AgOpenGPS
                 case 5: //Machine 3
                     if (action == 0)
                     {
-                        TimedMessageBox(1000, seq.pos5, gStr.gsTurnOff);
+                        TimedMessageBox(1000, seq.pos5, String.Get("gsTurnOff"));
                         mc.Send_Uturn[3] &= 0b11111011;
                     }
                     else
                     {
-                        TimedMessageBox(1000, seq.pos5, gStr.gsTurnOn);
+                        TimedMessageBox(1000, seq.pos5, String.Get("gsTurnOn"));
                         mc.Send_Uturn[3] |= 0b00000100;
                     }
                     break;
@@ -1235,12 +1104,12 @@ namespace AgOpenGPS
                 case 6: //Machine 4
                     if (action == 0)
                     {
-                        TimedMessageBox(1000, seq.pos6, gStr.gsTurnOff);
+                        TimedMessageBox(1000, seq.pos6, String.Get("gsTurnOff"));
                         mc.Send_Uturn[3] &= 0b11110111;
                     }
                     else
                     {
-                        TimedMessageBox(1000, seq.pos6, gStr.gsTurnOn);
+                        TimedMessageBox(1000, seq.pos6, String.Get("gsTurnOn"));
                         mc.Send_Uturn[3] |= 0b00001000;
                     }
                     break;
@@ -1248,12 +1117,12 @@ namespace AgOpenGPS
                 case 7: //Machine 5
                     if (action == 0)
                     {
-                        TimedMessageBox(1000, seq.pos7, gStr.gsTurnOff);
+                        TimedMessageBox(1000, seq.pos7, String.Get("gsTurnOff"));
                         mc.Send_Uturn[3] &= 0b11101111;
                     }
                     else
                     {
-                        TimedMessageBox(1000, seq.pos7, gStr.gsTurnOn);
+                        TimedMessageBox(1000, seq.pos7, String.Get("gsTurnOn"));
                         mc.Send_Uturn[3] |= 0b00010000;
                     }
                     break;
@@ -1261,12 +1130,12 @@ namespace AgOpenGPS
                 case 8: //Machine 6
                     if (action == 0)
                     {
-                        TimedMessageBox(1000, seq.pos8, gStr.gsTurnOff);
+                        TimedMessageBox(1000, seq.pos8, String.Get("gsTurnOff"));
                         mc.Send_Uturn[3] &= 0b11011111;
                     }
                     else
                     {
-                        TimedMessageBox(1000, seq.pos8, gStr.gsTurnOn);
+                        TimedMessageBox(1000, seq.pos8, String.Get("gsTurnOn"));
                         mc.Send_Uturn[3] |= 0b00100000;
                     }
                     break;

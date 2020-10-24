@@ -7,10 +7,6 @@ namespace AgOpenGPS
     {
         public bool BtnHeadLand = false;
         public bool isToolUp = true;
-
-        /// <summary>
-        /// array of turns
-        /// </summary>
         public List<CHeadLines> headArr = new List<CHeadLines>();
     }
 
@@ -18,9 +14,7 @@ namespace AgOpenGPS
     {
         //list of coordinates of boundary line
         public List<List<Vec3>> HeadLine = new List<List<Vec3>>();
-        
-        public Vec3[] HeadVertices;
-        public int[] HeadIndexer;
+        public List<List<int>> Indexer = new List<List<int>>();
 
         public void DrawHeadLine(int linewidth)
         {
@@ -41,28 +35,25 @@ namespace AgOpenGPS
 
         public void DrawHeadBackBuffer()
         {
-            int ptCount = HeadIndexer.Length;
-            if (ptCount < 3) return;
             GL.Begin(PrimitiveType.Triangles);
-            for (int h = 0; h < ptCount; h++)
+            for (int i = 0; i < Indexer.Count; i++)
             {
-                GL.Vertex3(HeadVertices[HeadIndexer[h]].Easting, HeadVertices[HeadIndexer[h]].Northing, 0);
+                for (int j = Indexer[i].Count-1; j > -1; j--)
+                {
+                    GL.Vertex3(HeadLine[i][Indexer[i][j]].Easting, HeadLine[i][Indexer[i][j]].Northing, 0);
+                }
             }
             GL.End();
         }
 
         public void PreCalcHeadArea()
         {
-            Tess _tess = new Tess();
+            Indexer.Clear();
             for (int i = 0; i < HeadLine.Count; i++)
             {
-                _tess.AddContour(HeadLine[i], ContourOrientation.CounterClockwise);
+                HeadLine[i].PolygonArea(true);
+                Indexer.Add(HeadLine[i].TriangulatePolygon());
             }
-            _tess.Tessellate(WindingRule.Positive, ElementType.Polygons, 3);
-
-            //Tess tess = new Tess(HeadLine);
-            HeadIndexer = _tess.Elements;
-            HeadVertices = _tess.Vertices;
         }
     }
 }

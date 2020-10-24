@@ -1,11 +1,9 @@
 ﻿using AgOpenGPS.Properties;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Media;
-using System.Reflection;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -73,8 +71,6 @@ namespace AgOpenGPS
             }
 
 
-
-
             if (Settings.Default.setF_workingDirectory == "Default")
                 baseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\AgOpenGPS\\";
             else baseDirectory = Settings.Default.setF_workingDirectory + "\\AgOpenGPS\\";
@@ -115,16 +111,10 @@ namespace AgOpenGPS
                 }
             }
 
-            string directoryName = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string wave = Path.Combine(directoryName, "Dependencies\\Audio", "Boundary.Wav");
-            if (File.Exists(wave))
-            {
-                SndBoundaryAlarm = new SoundPlayer(wave);
-            }
-            else
-            {
-                SndBoundaryAlarm = new SoundPlayer(Resources.Alarm10);
-            }
+            //set the language to last used
+            SetLanguage((object)Settings.Default.setF_culture, null);
+
+            SndBoundaryAlarm = new SoundPlayer(Resources.Alarm10);
 
             //grab the current vehicle filename - make sure it exists
             envFileName = Vehicle.Default.setVehicle_envName;
@@ -188,19 +178,22 @@ namespace AgOpenGPS
             mc.RemoteAutoSteer = Vehicle.Default.setAS_isAutoSteerAutoOn;
 
             minFixStepDist = Settings.Default.setF_minFixStep;
+            HeadingCorrection = Settings.Default.HeadingCorrection;
+            DualAntennaDistance = Settings.Default.DualAntennaDistance;
 
             fd.workedAreaTotalUser = Settings.Default.setF_UserTotalArea;
             fd.userSquareMetersAlarm = Settings.Default.setF_UserTripAlarm;
 
-            //space between points while recording a boundary
-            //boundaryTriggerDistance = Settings.Default.setF_boundaryTriggerDistance;
-
-            //load the last used auto turn shape
-            string fileAndDir = @".\Dependencies\YouTurnShapes\" + Settings.Default.setAS_youTurnShape;
-            yt.LoadYouTurnShapeFromFile(fileAndDir);
-
-            //sim.latitude = Settings.Default.setSim_lastLat;
-            //sim.longitude = Settings.Default.setSim_lastLong;
+            if (Settings.Default.setAS_youTurnShape == "Custom")
+                yt.LoadYouTurnShapeFromData(Settings.Default.Custom);
+            else if (Settings.Default.setAS_youTurnShape == "KeyHole")
+                yt.LoadYouTurnShapeFromData(Settings.Default.KeyHole);
+            else if (Settings.Default.setAS_youTurnShape == "SemiCircle")
+                yt.LoadYouTurnShapeFromData(Settings.Default.SemiCircle);
+            else if (Settings.Default.setAS_youTurnShape == "WideReturn")
+                yt.LoadYouTurnShapeFromData(Settings.Default.WideReturn);
+            else
+                yt.LoadYouTurnShapeFromData(Settings.Default.KeyHole);
 
             //load th elightbar resolution
             lightbarCmPerPixel = Settings.Default.setDisplay_lightbarCmPerPixel;
@@ -224,9 +217,6 @@ namespace AgOpenGPS
             isUTurnAlwaysOn = Settings.Default.setMenu_isUTurnAlwaysOn;
             isAutoLoadFields = Settings.Default.AutoLoadFields;
             DrawBackBuffer = Settings.Default.DrawBackBuffer;
-            //set the language to last used
-            SetLanguage((object)Settings.Default.setF_culture, null);
-
 
             simulatorOnToolStripMenuItem.Checked = Settings.Default.setMenu_isSimulatorOn;
             if (simulatorOnToolStripMenuItem.Checked)
@@ -426,10 +416,7 @@ namespace AgOpenGPS
                 this.BackColor = dayColor;
                 foreach (Control c in this.Controls)
                 {
-                    //if (c is Label || c is Button)
-                    {
                         c.ForeColor = Color.Black;
-                    }
                 }
             }
             else //nightmode
@@ -440,9 +427,7 @@ namespace AgOpenGPS
 
                 foreach (Control c in this.Controls)
                 {
-                    {
-                        c.ForeColor = Color.White;
-                    }
+                    c.ForeColor = Color.White;
                 }
             }
             LineUpManualBtns();
@@ -509,37 +494,37 @@ namespace AgOpenGPS
 
             if (heading > 337.5 || heading < 22.5)
             {
-                return (" " +  gStr.gsNorth + " ");
+                return (" " +  String.Get("gsNorth") + " ");
             }
             if (heading > 22.5 && heading < 67.5)
             {
-                return (" " +  gStr.gsN_East + " ");
+                return (" " +  String.Get("gsN_East") + " ");
             }
             if (heading > 67.5 && heading < 111.5)
             {
-                return (" " +  gStr.gsEast + " ");
+                return (" " +  String.Get("gsEast") + " ");
             }
             if (heading > 111.5 && heading < 157.5)
             {
-                return (" " +  gStr.gsS_East + " ");
+                return (" " +  String.Get("gsS_East") + " ");
             }
             if (heading > 157.5 && heading < 202.5)
             {
-                return (" " +  gStr.gsSouth + " ");
+                return (" " +  String.Get("gsSouth") + " ");
             }
             if (heading > 202.5 && heading < 247.5)
             {
-                return (" " +  gStr.gsS_West + " ");
+                return (" " +  String.Get("gsS_West") + " ");
             }
             if (heading > 247.5 && heading < 292.5)
             {
-                return (" " +  gStr.gsWest + " ");
+                return (" " +  String.Get("gsWest") + " ");
             }
             if (heading > 292.5 && heading < 337.5)
             {
-                return (" " +  gStr.gsN_West + " ");
+                return (" " +  String.Get("gsN_West") + " ");
             }
-            return (" " +  gStr.gsLost + " ");
+            return (" " +  String.Get("gsLost") + " ");
         }
 
         //line up section On Off Auto buttons based on how many there are
@@ -692,20 +677,18 @@ namespace AgOpenGPS
 
             AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
 
-
             lblSpeed.Text = Math.Round(avgSpeed / cutoffMetricImperial, 1).ToString();
-
 
             if (isMetric)  //metric or imperial
             {
-                btnContour.Text = (crossTrackError / 10 + gStr.gsCM); //cross track error
+                btnContour.Text = (crossTrackError / 10 + String.Get("gsCM")); //cross track error
             }
             else  //Imperial Measurements
             {
                 btnContour.Text = ((int)(crossTrackError / 25.54) + " in"); //cross track errorss
             }
 
-            lblHz.Text = Math.Round(HzTime, 1, MidpointRounding.AwayFromZero) + " Hz " + (int)(FrameTime) + "\r\n" + FixQuality;
+            lblHz.Text = Math.Round(HzTime, 1) + " Hz " + Math.Round(FrameTime, 0) + " ms\r\n" + FixQuality;
 
             if (OneSecondUpdateBool = !OneSecondUpdateBool)
             {
@@ -742,7 +725,7 @@ namespace AgOpenGPS
                     {
                         if (NtripCounter > 25)//give it 5 seconds
                         {
-                            TimedMessageBox(2000, gStr.gsSocketConnectionProblem, gStr.gsNotConnectingToCaster);
+                            TimedMessageBox(2000, String.Get("gsSocketConnectionProblem"), String.Get("gsNotConnectingToCaster"));
                             ReconnectRequest();
                         }
                         if (clientSocket != null && clientSocket.Connected)
@@ -752,8 +735,8 @@ namespace AgOpenGPS
                     }
 
                     //update byte counter and up counter
-                    if (NtripCounter > 20) NTRIPStartStopStrip.Text = (isNTRIP_Connecting ? gStr.gsAuthourizing : isNTRIP_Sending ? gStr.gsSendingGGA : (NTRIP_Watchdog > 10 ? gStr.gsWaiting : gStr.gsListening)) + "\n" + string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
-                    else NTRIPStartStopStrip.Text = gStr.gsConnectingIn + "\n" + (Math.Abs(NtripCounter - 21));
+                    if (NtripCounter > 20) NTRIPStartStopStrip.Text = (isNTRIP_Connecting ? String.Get("gsAuthourizing") : isNTRIP_Sending ? String.Get("gsSendingGGA") : (NTRIP_Watchdog > 10 ? String.Get("gsWaiting") : String.Get("gsListening"))) + "\n" + string.Format("{0:00}:{1:00}", ((NtripCounter - 21) / 60), (Math.Abs(NtripCounter - 21)) % 60);
+                    else NTRIPStartStopStrip.Text = String.Get("gsConnectingIn") + "\n" + (Math.Abs(NtripCounter - 21));
 
                     pbarNtripMenu.Value = unchecked((byte)(tripBytes * 0.02));
                     NTRIPBytesMenu.Text = ((tripBytes) * 0.001).ToString("###,###,###") + " kb";

@@ -116,7 +116,7 @@ namespace AgOpenGPS
 
             if (Data[0] == 0xB5 && Data[1] == 0x62 && Data[2] == 0x01)//Daniel P
             {
-                if (Data[3] == 0x07 && Data.Length == 100)//UBX-NAV-PVT
+                if (Data[3] == 0x07 && Data.Length > 99)//UBX-NAV-PVT
                 {
                     int CK_A = 0;
                     int CK_B = 0;
@@ -151,6 +151,10 @@ namespace AgOpenGPS
 
                         pn.longitude = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.0000001;//to deg
                         pn.latitude = (Data[34] | (Data[35] << 8) | (Data[36] << 16) | (Data[37] << 24)) * 0.0000001;//to deg
+
+                        //Height above ellipsoid
+                        pn.altitude = (Data[38] | (Data[39] << 8) | (Data[40] << 16) | (Data[41] << 24)) * 0.001;//to meters
+                        // Height above mean sea level
                         pn.altitude = (Data[42] | (Data[43] << 8) | (Data[44] << 16) | (Data[45] << 24)) * 0.001;//to meters
 
                         pn.hdop = (Data[46] | (Data[47] << 8) | (Data[48] << 16) | (Data[49] << 24)) * 0.01;
@@ -165,7 +169,7 @@ namespace AgOpenGPS
                             pn.AverageTheSpeed();
 
                             recvSentenceSettings[2] = recvSentenceSettings[0];
-                            recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + pn.longitude.ToString("N7", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N7", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
+                            recvSentenceSettings[0] = "$UBX-PVT, Longitude = " + pn.longitude.ToString("N8", CultureInfo.InvariantCulture) + ", Latitude = " + pn.latitude.ToString("N8", CultureInfo.InvariantCulture) + ", Altitude = " + pn.altitude.ToString("N3", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
                         }
                         else
                         {
@@ -176,7 +180,7 @@ namespace AgOpenGPS
                         }
                     }
                 }
-                else if (Data[3] == 0x3C && Data.Length == 72)//Daniel P
+                else if (Data[3] == 0x3C && Data.Length > 71)//Daniel P
                 {
                     int CK_A = 0;
                     int CK_B = 0;
@@ -193,15 +197,16 @@ namespace AgOpenGPS
                         {
                             int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
 
-                            if (pn.DualAntennaDistance - 5 < relposlength && relposlength < pn.DualAntennaDistance + 5)
+                            if (DualAntennaDistance - 5 < relposlength && relposlength < DualAntennaDistance + 5)
                             {
-                                //save dist?
                                 double RelPosN = ((Data[14] | (Data[15] << 8) | (Data[16] << 16) | (Data[17] << 24)) + Data[38] * 0.01);
                                 double RelPosE = ((Data[18] | (Data[19] << 8) | (Data[20] << 16) | (Data[21] << 24)) + Data[39] * 0.01);
-                                ahrs.rollX16 = (int)(Math.Atan2(((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01), Math.Sqrt(RelPosN * RelPosN + RelPosE * RelPosE)) / 0.27925268016f);
+                                double relPosD = ((Data[22] | (Data[23] << 8) | (Data[24] << 16) | (Data[25] << 24)) + Data[40] * 0.01);
+
+                                ahrs.rollX16 = (int)(Math.Atan2(relPosD, Math.Sqrt(RelPosN * RelPosN + RelPosE * RelPosE)) * 916.732472209);
                             }
 
-                            pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001;
+                            pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001 + HeadingCorrection;
 
                             recvSentenceSettings[3] = recvSentenceSettings[1];
                             recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + (ahrs.rollX16 / 16.0).ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
@@ -254,7 +259,7 @@ namespace AgOpenGPS
                         }
 
                         //spAutoSteer.Close();
-                        MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_" + currentVersionStr + ".ino", gStr.gsFileError,
+                        MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_" + currentVersionStr + ".ino", String.Get("gsFileError"),
                                             MessageBoxButtons.OK, MessageBoxIcon.Question);
                         Close();
                     }
@@ -278,6 +283,7 @@ namespace AgOpenGPS
 
                     if (Data[1] == 0xC0 && Data.Length > 5)
                     {
+                        if (port != 5) autoSteerUDPActivity++;
                         mc.Recieve_AutoSteer[3] = Data[3];
                         mc.Recieve_AutoSteer[4] = Data[4];
                         mc.Recieve_AutoSteer[5] = Data[5];
@@ -289,6 +295,7 @@ namespace AgOpenGPS
                     }
                     else if (Data[1] == 0xC1 && Data.Length > 5)//Section Control
                     {
+                        if (port != 5) machineUDPActivity++;
                         mc.Recieve_SectionsStatus[3] = Data[3];//tool index; do all if 255
                         mc.Recieve_SectionsStatus[4] = Data[4];//Section Index; do all if 255
                         mc.Recieve_SectionsStatus[5] = Data[5];//On Off Auto
@@ -337,6 +344,7 @@ namespace AgOpenGPS
                     }
                     else if (Data[1] == 0xC4 && Data.Length > 3)
                     {
+                        if (port != 5) switchUDPActivity++;
                         if ((Data[3] & 16) == 16)//SteerSensorCount
                         {
                             DataRecieved[0] = "Steer Sensor Trigger";
@@ -358,6 +366,7 @@ namespace AgOpenGPS
                     }
                     else if (Data[1] == 0xC5 && Data.Length > 3)
                     {
+                        if (port != 5) switchUDPActivity++;
                         if (isJobStarted && mc.isWorkSwitchEnabled)
                         {
                             DataRecieved[0] = "Remote Work Switch: State " + ((Data[3] & 3) == 3 ? "On" : (Data[3] & 1) == 1 ? "Auto" : "Off");
@@ -406,7 +415,7 @@ namespace AgOpenGPS
                             }
 
                             //spAutoSteer.Close();
-                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_UDP_" + currentVersionStr + ".ino", gStr.gsFileError,
+                            MessageBox.Show("Arduino INO Is Wrong Version \r\n Upload AutoSteer_UDP_" + currentVersionStr + ".ino", String.Get("gsFileError"),
                                                 MessageBoxButtons.OK, MessageBoxIcon.Question);
                             Close();
                         }

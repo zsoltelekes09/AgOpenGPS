@@ -12,9 +12,9 @@ namespace AgOpenGPS
             Owner = callingForm;
             InitializeComponent();
 
-            this.label7.Text = gStr.gsReturn;
-            this.label1.Text = gStr.gsSaveAndExit;
-            this.label3.Text = gStr.gsSaveAs;
+            this.label7.Text = String.Get("gsReturn");
+            this.label1.Text = String.Get("gsSaveAndExit");
+            this.label3.Text = String.Get("gsSaveAs");
 
             if (closing) btnSaveAs.Enabled = false;
         }

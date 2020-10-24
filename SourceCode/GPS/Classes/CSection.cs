@@ -1,6 +1,7 @@
 ﻿//Please, if you use this, share the improvements
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -78,8 +79,8 @@ namespace AgOpenGPS
 
                 //starting a new patch chunk so create a new triangle list
                 triangleList = new List<Vec3>();
-
-                Vec3 colur = new Vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
+                Color t1 = mf.sectionColorDay;
+                Vec3 colur = new Vec3(t1.R, t1.G, t1.B);
                 triangleList.Add(colur);
 
                 //left side of triangle
@@ -172,7 +173,8 @@ namespace AgOpenGPS
                 triangleList = new List<Vec3>();
 
                 //Add Patch colour
-                Vec3 colur = new Vec3(mf.sectionColorDay.R, mf.sectionColorDay.G, mf.sectionColorDay.B);
+                Color t1 = mf.sectionColorDay;
+                Vec3 colur = new Vec3(t1.R, t1.G, t1.B);
                 triangleList.Add(colur);
 
                 //add the points to List, yes its more points, but breaks up patches for culling

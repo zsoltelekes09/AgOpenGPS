@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AgOpenGPS.Properties;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -14,10 +15,10 @@ namespace AgOpenGPS
         {
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
-            btnStop.Text = gStr.gsDone;
-            btnRecord.Text = gStr.gsRecord;
-            label1.Text = gStr.gsTurnRIGHTwhilerecording;
-            this.Text = gStr.gsYouTurnRecorder;
+            btnStop.Text = String.Get("gsDone");
+            btnRecord.Text = String.Get("gsRecord");
+            label1.Text = String.Get("gsTurnRIGHTwhilerecording");
+            this.Text = String.Get("gsYouTurnRecorder");
         }
 
         private void BtnRecord_Click(object sender, EventArgs e)
@@ -67,7 +68,9 @@ namespace AgOpenGPS
 
             //scale the drawing to match exactly the ABLine width
             double adjustFactor = pt[pt.Length - 1].Easting;
+
             adjustFactor = (mf.Guidance.WidthMinusOverlap + mf.Guidance.GuidanceOffset) / adjustFactor;
+
             for (i = 0; i < pt.Length; i++)
             {
                 pt[i].Easting *= adjustFactor;
@@ -85,17 +88,16 @@ namespace AgOpenGPS
                 mf.yt.youFileList.Add(pt[i]);
             }
 
-            //create the file.
-            string dir = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            dir = System.IO.Path.GetDirectoryName(dir);
-            dir += @"\Dependencies\YouTurnShapes\Custom.txt";
-            using (StreamWriter writer = new StreamWriter(dir))
-            {
-                writer.WriteLine(pt.Length);
-                for (i = 0; i < mf.yt.youFileList.Count; i++)
-                    writer.WriteLine(mf.yt.youFileList[i].Easting + "," + mf.yt.youFileList[i].Northing);
-            }
+            //Save the file.
+            string Data = "";
+            Data += mf.yt.youFileList[0].Easting + "," + mf.yt.youFileList[0].Northing;
+            for (i = 1; i < mf.yt.youFileList.Count; i++)
+                Data += "\r\n" + mf.yt.youFileList[i].Easting + "," + mf.yt.youFileList[i].Northing;
 
+            Settings.Default.Custom = Data;
+            Settings.Default.Save();
+
+            mf.yt.LoadYouTurnShapeFromData(Settings.Default.Custom);
             Close();
         }
 

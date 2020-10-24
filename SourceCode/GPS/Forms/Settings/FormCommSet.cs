@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -15,22 +14,22 @@ namespace AgOpenGPS
             //get copy of the calling main form
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
-            btnOpenSerial.Text = gStr.gsConnect;
-            btnOpenSerialArduino.Text = gStr.gsConnect;
-            btnOpenSerialAutoSteer.Text = gStr.gsConnect;
-            btnCloseSerial.Text = gStr.gsDisconnect;
-            btnCloseSerialArduino.Text = gStr.gsDisconnect;
-            btnCloseSerialAutoSteer.Text = gStr.gsDisconnect;
-            btnRescan.Text = gStr.gsRescanPorts;
+            btnOpenSerial.Text = String.Get("gsConnect");
+            btnOpenSerialArduino.Text = String.Get("gsConnect");
+            btnOpenSerialAutoSteer.Text = String.Get("gsConnect");
+            btnCloseSerial.Text = String.Get("gsDisconnect");
+            btnCloseSerialArduino.Text = String.Get("gsDisconnect");
+            btnCloseSerialAutoSteer.Text = String.Get("gsDisconnect");
+            btnRescan.Text = String.Get("gsRescanPorts");
 
-            groupBox1.Text = gStr.gsGPSPort;
-            groupBox3.Text = gStr.gsAutoSteerPort;
-            groupBox2.Text = gStr.gsMachinePort;
+            groupBox1.Text = String.Get("gsGPSPort");
+            groupBox3.Text = String.Get("gsAutoSteerPort");
+            groupBox2.Text = String.Get("gsMachinePort");
 
-            lblCurrentArduinoPort.Text = gStr.gsPort;
-            lblCurrentPort.Text = gStr.gsPort;
-            lblCurrentAutoSteerPort.Text = gStr.gsPort;
-            lblCurrentBaud.Text = gStr.gsBaud;
+            lblCurrentArduinoPort.Text = String.Get("gsPort");
+            lblCurrentPort.Text = String.Get("gsPort");
+            lblCurrentAutoSteerPort.Text = String.Get("gsPort");
+            lblCurrentBaud.Text = String.Get("gsBaud");
 
         }
 
@@ -84,7 +83,7 @@ namespace AgOpenGPS
             cboxPort.Items.Clear();
             cboxArdPort.Items.Clear();
             cboxASPort.Items.Clear();
-            foreach (String s in System.IO.Ports.SerialPort.GetPortNames())
+            foreach (string s in System.IO.Ports.SerialPort.GetPortNames())
             {
                 cboxPort.Items.Add(s);
                 cboxArdPort.Items.Add(s);
@@ -203,7 +202,7 @@ namespace AgOpenGPS
         {
             if (Properties.Settings.Default.setMenu_isSimulatorOn)
             {
-                MessageBox.Show(gStr.gsGotoTopMenuDisplayTouchSimulator + "\n\r" + gStr.gsApplicationWillRestart, gStr.gsSimulatorOnMustbeOFF, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(String.Get("gsGotoTopMenuDisplayTouchSimulator") + "\n\r" + String.Get("gsApplicationWillRestart"), String.Get("gsSimulatorOnMustbeOFF"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             else
             {
@@ -249,13 +248,13 @@ namespace AgOpenGPS
         private void BtnRescan_Click(object sender, EventArgs e)
         {
             cboxASPort.Items.Clear();
-            foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) { cboxASPort.Items.Add(s); }
+            foreach (string s in System.IO.Ports.SerialPort.GetPortNames()) { cboxASPort.Items.Add(s); }
 
             cboxArdPort.Items.Clear();
-            foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) { cboxArdPort.Items.Add(s); }
+            foreach (string s in System.IO.Ports.SerialPort.GetPortNames()) { cboxArdPort.Items.Add(s); }
 
             cboxPort.Items.Clear();
-            foreach (String s in System.IO.Ports.SerialPort.GetPortNames()) { cboxPort.Items.Add(s); }
+            foreach (string s in System.IO.Ports.SerialPort.GetPortNames()) { cboxPort.Items.Add(s); }
         }
 
         #endregion PortSettings //----------------------------------------------------------------

@@ -30,43 +30,43 @@ namespace AgOpenGPS
             InitializeComponent();
 
             //Language keys
-            gboxAttachment.Text = gStr.gsAttachmentStyle;
-            tabHitch.Text = gStr.gsHitch;
-            tabConfig.Text = gStr.gsConfiguration;
-            tabSections.Text = gStr.gsSection;
-            tabSettings.Text = gStr.gsSettings;
+            gboxAttachment.Text = String.Get("gsAttachmentStyle");
+            tabHitch.Text = String.Get("gsHitch");
+            tabConfig.Text = String.Get("gsConfiguration");
+            tabSections.Text = String.Get("gsSection");
+            tabSettings.Text = String.Get("gsSettings");
 
-            label23.Text = gStr.gsTurnOffDelaySecs;
-            label8.Text = gStr.gsTurnOffAheadSecs;
-            label3.Text = gStr.gsTurnOnAheadSecs;
-            label41.Text = gStr.gsMinUnapplied;
-            label2.Text = gStr.gs_OfSections;
-            label4.Text = gStr.gsSectionWidth;
+            label23.Text = String.Get("gsTurnOffDelaySecs");
+            label8.Text = String.Get("gsTurnOffAheadSecs");
+            label3.Text = String.Get("gsTurnOnAheadSecs");
+            label41.Text = String.Get("gsMinUnapplied");
+            label2.Text = String.Get("gs#OfSections");
+            label4.Text = String.Get("gsSectionWidth");
 
-            label30.Text = gStr.gsSectionsTurnOffBelow;
+            label30.Text = String.Get("gsSectionsTurnOffBelow");
 
-            label17.Text = gStr.gsMeasurementsIn;
-            label16.Text = gStr.gsToolWidth;
+            label17.Text = String.Get("gsMeasurementsIn");
+            label16.Text = String.Get("gsToolWidth");
 
-            Text = gStr.gsToolSettings;
+            Text = String.Get("gsToolSettings");
 
             if (mf.isMetric)
             {
-                lblInchesCm.Text = gStr.gsCentimeters;
+                lblInchesCm.Text = String.Get("gsCentimeters");
                 lblSecTotalWidthFeet.Visible = false;
                 lblSecTotalWidthInches.Visible = false;
                 lblSecTotalWidthMeters.Visible = true;
                 lblDoNotExceed.Text = "* < 7500 cm*";
-                lblTurnOffBelowUnits.Text = gStr.gsKMH;
+                lblTurnOffBelowUnits.Text = String.Get("gsKMH");
             }
             else
             {
-                lblInchesCm.Text = gStr.gsInches;
+                lblInchesCm.Text = String.Get("gsInches");
                 lblSecTotalWidthFeet.Visible = true;
                 lblSecTotalWidthInches.Visible = true;
                 lblSecTotalWidthMeters.Visible = false;
                 lblDoNotExceed.Text = "* < 2952,7559 inches *";
-                lblTurnOffBelowUnits.Text = gStr.gsMPH;
+                lblTurnOffBelowUnits.Text = String.Get("gsMPH");
             }
             //select the page as per calling menu or button from mainGPS form
             tabControl1.SelectedIndex = page;

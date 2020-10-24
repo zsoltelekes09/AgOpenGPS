@@ -387,8 +387,8 @@ namespace AgOpenGPS
             distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
 
             //every guidance method dumps into these that are used and sent everywhere, last one wins
-            mf.guidanceLineDistanceOff = mf.distanceFromCurrentLine = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
-            mf.guidanceLineSteerAngle = (Int16)(steerAngleRP * 100);
+            mf.guidanceLineDistanceOff = mf.distanceDisplay = (short)distanceFromCurrentLine;
+            mf.guidanceLineSteerAngle = (short)(steerAngleRP * 100);
         }
 
         private void StanleyDubinsPath(int ptCount)
@@ -471,8 +471,8 @@ namespace AgOpenGPS
             distanceFromCurrentLine = Math.Round(distanceFromCurrentLine * 1000.0, MidpointRounding.AwayFromZero);
 
             //every guidance method dumps into these that are used and sent everywhere, last one wins
-            mf.guidanceLineDistanceOff = mf.distanceFromCurrentLine = mf.distanceDisplay = (Int16)distanceFromCurrentLine;
-            mf.guidanceLineSteerAngle = (Int16)(steerAngleRP * 100);
+            mf.guidanceLineDistanceOff = mf.distanceDisplay = (short)distanceFromCurrentLine;
+            mf.guidanceLineSteerAngle = (short)(steerAngleRP * 100);
         }
 
         public void DrawRecordedLine()

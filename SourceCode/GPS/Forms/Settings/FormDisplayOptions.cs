@@ -17,23 +17,23 @@ namespace AgOpenGPS
             InitializeComponent();
 
             //Language keys
-            this.Text = gStr.gsOptions;
+            Text = String.Get("gsOptions");
 
-            chkExtraGuides.Text = gStr.gsExtraGuides;
-            chkGrid.Text = gStr.gsGridOn;
-            chkLogNMEA.Text = gStr.gsLogNMEA;
-            chkPolygons.Text = gStr.gsPolygonsOn;
-            chkPursuitLines.Text = gStr.gsPursuitLine;
-            chkSky.Text = gStr.gsSkyOn;
-            chkUTurnOn.Text = gStr.gsUTurnAlwaysOn;
-            chkCompass.Text = gStr.gsCompassOn;
-            chkSpeedo.Text = gStr.gsSpeedoOn;
-            chkStartFullScreen.Text = gStr.gsStartFullScreen;
-            chkDayNight.Text = gStr.gsAutoDayNightMode;
-            chkAutoLoadFields.Text = gStr.gsAutoLoadFields;
-            rbtnMetric.Text = gStr.gsMetric;
-            rbtnImperial.Text = gStr.gsImperial;
-            unitsGroupBox.Text = gStr.gsUnits;
+            chkExtraGuides.Text = String.Get("gsExtraGuides");
+            chkGrid.Text = String.Get("gsGridOn");
+            chkLogNMEA.Text = String.Get("gsLogNMEA");
+            chkPolygons.Text = String.Get("gsPolygonsOn");
+            chkPursuitLines.Text = String.Get("gsPursuitLine");
+            chkSky.Text = String.Get("gsSkyOn");
+            chkUTurnOn.Text = String.Get("gsUTurnAlwaysOn");
+            chkCompass.Text = String.Get("gsCompassOn");
+            chkSpeedo.Text = String.Get("gsSpeedoOn");
+            chkStartFullScreen.Text = String.Get("gsStartFullScreen");
+            chkDayNight.Text = String.Get("gsAutoDayNightMode");
+            chkAutoLoadFields.Text = String.Get("gsAutoLoadFields");
+            rbtnMetric.Text = String.Get("gsMetric");
+            rbtnImperial.Text = String.Get("gsImperial");
+            unitsGroupBox.Text = String.Get("gsUnits");
 
         }
 

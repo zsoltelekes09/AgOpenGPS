@@ -20,12 +20,12 @@ namespace AgOpenGPS
             //this.bntOK.Text = gStr.gsForNow;
             //this.btnSave.Text = gStr.gsToFile;
 
-            this.Text = gStr.gsSaveVehicle;
+            this.Text = String.Get("gsSaveVehicle");
         }
 
         private void FormFlags_Load(object sender, EventArgs e)
         {
-            lblLast.Text = gStr.gsCurrent + mf.vehicleFileName;
+            lblLast.Text = String.Get("gsCurrent") + mf.vehicleFileName;
             DirectoryInfo dinfo = new DirectoryInfo(mf.vehiclesDirectory);
             FileInfo[] Files = dinfo.GetFiles("*.txt");
 
@@ -41,7 +41,7 @@ namespace AgOpenGPS
         {
             DialogResult result3 = MessageBox.Show(
                 "Overwrite: " + cboxVeh.SelectedItem.ToString() + ".txt",
-                gStr.gsSaveAndReturn,
+                String.Get("gsSaveAndReturn"),
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button2);

@@ -18,19 +18,19 @@ namespace AgOpenGPS
 
             InitializeComponent();
 
-            label1.Text = gStr.gsEnterFieldName;
-            label2.Text = gStr.gsDateWillBeAdded;
-            label3.Text = gStr.gsBasedOnField;
-            label4.Text = gStr.gsEnterTask;
-            label5.Text = gStr.gsEnterVehicleUsed;
+            label1.Text = String.Get("gsEnterFieldName");
+            label2.Text = String.Get("gsDateWillBeAdded");
+            label3.Text = String.Get("gsBasedOnField");
+            label4.Text = String.Get("gsEnterTask");
+            label5.Text = String.Get("gsEnterVehicleUsed");
 
-            chkHeadland.Text = gStr.gsHeadland;
-            chkFlags.Text = gStr.gsFlags;
-            chkGuidanceLines.Text = gStr.gsGuidance;
-            chkApplied.Text = gStr.gsMapping;
+            chkHeadland.Text = String.Get("gsHeadland");
+            chkFlags.Text = String.Get("gsFlags");
+            chkGuidanceLines.Text = String.Get("gsGuidance");
+            chkApplied.Text = String.Get("gsMapping");
 
-            this.Text = gStr.gsSaveAs;
-            lblTemplateChosen.Text = gStr.gsNoneUsed;
+            this.Text = String.Get("gsSaveAs");
+            lblTemplateChosen.Text = String.Get("gsNoneUsed");
         }
 
         private void FormSaveAs_Load(object sender, EventArgs e)
@@ -48,7 +48,7 @@ namespace AgOpenGPS
             textboxSender.Text = Regex.Replace(textboxSender.Text, Glm.fileRegex, "");
             textboxSender.SelectionStart = cursorPosition;
 
-            if (String.IsNullOrEmpty(tboxFieldName.Text.Trim()))
+            if (string.IsNullOrEmpty(tboxFieldName.Text.Trim()))
             {
                 btnSave.Enabled = false;
             }
@@ -91,7 +91,7 @@ namespace AgOpenGPS
         private void BtnSave_Click(object sender, EventArgs e)
         {
             //fill something in
-            if (String.IsNullOrEmpty(tboxFieldName.Text.Trim()))
+            if (string.IsNullOrEmpty(tboxFieldName.Text.Trim()))
             {
                 Close();
                 return;
@@ -102,13 +102,13 @@ namespace AgOpenGPS
             mf.currentFieldDirectory = tboxFieldName.Text.Trim() + " ";
 
             //task
-            if (!String.IsNullOrEmpty(tboxTask.Text.Trim())) mf.currentFieldDirectory += tboxTask.Text.Trim() + " ";
+            if (!string.IsNullOrEmpty(tboxTask.Text.Trim())) mf.currentFieldDirectory += tboxTask.Text.Trim() + " ";
 
             //vehicle
-            if (!String.IsNullOrEmpty(tboxVehicle.Text.Trim())) mf.currentFieldDirectory += tboxVehicle.Text.Trim() + " ";
+            if (!string.IsNullOrEmpty(tboxVehicle.Text.Trim())) mf.currentFieldDirectory += tboxVehicle.Text.Trim() + " ";
 
             //date
-            mf.currentFieldDirectory += String.Format("{0}", DateTime.Now.ToString("yyyy.MMM.dd HH_mm", CultureInfo.InvariantCulture));
+            mf.currentFieldDirectory += string.Format("{0}", DateTime.Now.ToString("yyyy.MMM.dd HH_mm", CultureInfo.InvariantCulture));
 
             //get the directory and make sure it exists, create if not
             string dirNewField = mf.fieldsDirectory + mf.currentFieldDirectory + "\\";
@@ -119,7 +119,7 @@ namespace AgOpenGPS
 
             if ((!string.IsNullOrEmpty(directoryName)) && (Directory.Exists(directoryName)))
             {
-                MessageBox.Show(gStr.gsChooseADifferentName, gStr.gsDirectoryExists, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show(String.Get("gsChooseADifferentName"), String.Get("gsDirectoryExists"), MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return;
             }
             else
@@ -154,7 +154,7 @@ namespace AgOpenGPS
                 {
                     mf.WriteErrorLog("While Opening Field" + ex);
 
-                        mf.TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                        mf.TimedMessageBox(2000, String.Get("gsFieldFileIsCorrupt"), String.Get("gsChooseADifferentField"));
                         mf.JobClose();
                         return;
                     }

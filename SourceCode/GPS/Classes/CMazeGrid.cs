@@ -9,7 +9,7 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         public bool[] mazeArr;
-        public int mazeScale = 1;
+        public double mazeScale = 1;
         public int mazeRowYDim;
         public int mazeColXDim;
         //public List<vec3> mazePathList = new List<vec3>();
@@ -29,10 +29,9 @@ namespace AgOpenGPS
             mazeScale = (mazeY > mazeX) ? (int)(mazeY / 150) : (int)(mazeX / 150);
 
             if (mazeScale < 4) mazeScale = 4;
-            //mazeScale = 4;
 
-            mazeRowYDim = (int)(mazeY / mazeScale) + 1;
-            mazeColXDim = (int)(mazeX / mazeScale) + 2;
+            mazeRowYDim = (int)Math.Ceiling(mazeY / mazeScale);
+            mazeColXDim = (int)Math.Ceiling(mazeX / mazeScale);
             mazeArr = new bool[mazeRowYDim * mazeColXDim];
 
             //row is Y, col is X   int[Y,X] [i,j] [row,col]
@@ -115,7 +114,7 @@ namespace AgOpenGPS
             Vec3[] arr = new Vec3[cnt];
 
             //how many samples
-            int smPts = mazeScale;
+            int smPts = (int)mazeScale;
 
             //read the points before and after the setpoint
             for (int s = 0; s < smPts; s++)
@@ -148,7 +147,7 @@ namespace AgOpenGPS
             //clear the list and reload with calc headings - first and last droppped
             mazeList.Clear();
 
-            for (int i = mazeScale; i < cnt - mazeScale; i++)
+            for (int i = (int)mazeScale; i < cnt - mazeScale; i++)
             {
                 Vec3 pt3 = arr[i];
                 pt3.Heading = Math.Atan2(arr[i + 1].Easting - arr[i].Easting, arr[i + 1].Northing - arr[i].Northing);

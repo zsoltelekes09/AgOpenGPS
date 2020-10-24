@@ -16,10 +16,10 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
-            btnCancel.Text = gStr.gsForNow;
-            btnSave.Text = gStr.gsToFile;
+            btnCancel.Text = String.Get("gsForNow");
+            btnSave.Text = String.Get("gsToFile");
 
-            Text = gStr.gsSmoothABCurve;
+            Text = String.Get("gsSmoothABCurve");
             mf.CurveLines.CurrentEditLine = mf.CurveLines.CurrentLine;
         }
 

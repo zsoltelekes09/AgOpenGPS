@@ -20,38 +20,38 @@ namespace AgOpenGPS
             InitializeComponent();
 
             //Language keys
-            this.Text = gStr.gsModuleConfiguration;
+            this.Text = String.Get("gsModuleConfiguration");
 
             //Steer Tab
-            tabAutoSteer.Text = gStr.gsAutoSteer;
-            label1.Text = gStr.gsMotorDriver;
-            label6.Text = gStr.gsMMAAxis;
-            label3.Text = gStr.gsA2DConvertor;
-            label5.Text = gStr.gsSteerEnable;
-            label8.Text = gStr.gsMinSpeed;
-            label4.Text = gStr.gsMaxSpeed;
-            label2.Text = gStr.gsInclinometer;
-            chkInvertWAS.Text = gStr.gsInvertWAS;
-            chkInvertSteer.Text = gStr.gsInvertSteerDirection;
-            chkInvertRoll.Text = gStr.gsInvertRoll;
-            chkBNOInstalled.Text = gStr.gsBNOInstalled;
-            cboxEncoder.Text = gStr.gsEncoder;
-            label7.Text = gStr.gsEncoderCounts;
-            label9.Text = gStr.gsSendToModule;
-            groupBox5.Text = gStr.gsToAutoSteer;
-            cboxIsSendMachineControlToAutoSteer.Text = gStr.gsMachinePGN;
-            groupBox1.Text = gStr.gsHydraulicToolLift;
+            tabAutoSteer.Text = String.Get("gsAutoSteer");
+            label1.Text = String.Get("gsMotorDriver");
+            label6.Text = String.Get("gsMMAAxis");
+            label3.Text = String.Get("gsA2DConvertor");
+            label5.Text = String.Get("gsSteerEnable");
+            label8.Text = String.Get("gsMinSpeed");
+            label4.Text = String.Get("gsMaxSpeed");
+            label2.Text = String.Get("gsInclinometer");
+            chkInvertWAS.Text = String.Get("gsInvertWAS");
+            chkInvertSteer.Text = String.Get("gsInvertSteerDirection");
+            chkInvertRoll.Text = String.Get("gsInvertRoll");
+            chkBNOInstalled.Text = String.Get("gsBNOInstalled");
+            cboxEncoder.Text = String.Get("gsEncoder");
+            label7.Text = String.Get("gsEncoderCounts");
+            label9.Text = String.Get("gsSendToModule");
+            groupBox5.Text = String.Get("gsToAutoSteer");
+            cboxIsSendMachineControlToAutoSteer.Text = String.Get("gsMachinePGN");
+            groupBox1.Text = String.Get("gsHydraulicToolLift");
 
-            chkWorkSwitchManual.Text = gStr.gsWorkSwitchControlsManual;
-            chkWorkSwActiveLow.Text = gStr.gsActiveLow;
-            chkEnableWorkSwitch.Text = gStr.gsEnableWorkSwitch;
-            chkRemoteAutoSteerButton.Text = gStr.gsAutoManualAutosteerBtn;
+            chkWorkSwitchManual.Text = String.Get("gsWorkSwitchControlsManual");
+            chkWorkSwActiveLow.Text = String.Get("gsActiveLow");
+            chkEnableWorkSwitch.Text = String.Get("gsEnableWorkSwitch");
+            chkRemoteAutoSteerButton.Text = String.Get("gsAutoManualAutosteerBtn");
 
             //Machine tab
-            label10.Text = gStr.gsRaiseTime;
-            label11.Text = gStr.gsLowerTime;
-            cboxIsHydOn.Text = gStr.gsEnableHydraulics;
-            tabMachine.Text = gStr.gsMachine;
+            label10.Text = String.Get("gsRaiseTime");
+            label11.Text = String.Get("gsLowerTime");
+            cboxIsHydOn.Text = String.Get("gsEnableHydraulics");
+            tabMachine.Text = String.Get("gsMachine");
         }
 
         //do any field initializing for form here
@@ -278,8 +278,10 @@ namespace AgOpenGPS
                 lblRecd.BackColor = Color.Salmon;
             }
 
-            lblSent.Text = mf.checksumSent.ToString();
-            lblRecd.Text = mf.checksumRecd.ToString();
+            byte text1 = mf.checksumSent;
+            byte text2 = mf.checksumRecd;
+            lblSent.Text = text1.ToString();
+            lblRecd.Text = text2.ToString();
         }
 
         private void TboxMinSpeed_Enter(object sender, EventArgs e)
@@ -297,7 +299,7 @@ namespace AgOpenGPS
 
         private void TboxLowerTime_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 20, lowertime, this, false, 1))
+            using (var form = new FormNumeric(0, 20, lowertime, this, false, 1))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -310,7 +312,7 @@ namespace AgOpenGPS
 
         private void TboxRaiseTime_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 20, raisetime, this, false,1))
+            using (var form = new FormNumeric(0, 20, raisetime, this, false,1))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)

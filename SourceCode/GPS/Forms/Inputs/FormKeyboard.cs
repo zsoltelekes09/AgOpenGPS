@@ -15,7 +15,7 @@ namespace AgOpenGPS
             Owner = callingForm;
             InitializeComponent();
 
-            this.Text = gStr.gsEnteraValue;
+            this.Text = String.Get("gsEnteraValue");
             //fill in the display
             keyboardString.Text = currentString.ToString();
         }
@@ -26,8 +26,7 @@ namespace AgOpenGPS
             keyboardString.SelectionLength = 0;
             keyboard1.Focus();
 
-            string language = Properties.Settings.Default.setF_culture;
-            if (language == "fr")
+            if (Properties.Settings.Default.setF_culture == "fr")
             {
                 this.Height = 570;
             }
@@ -47,7 +46,7 @@ namespace AgOpenGPS
             //}
 
             //clear the error as user entered new values
-            if (keyboardString.Text == gStr.gsError)
+            if (keyboardString.Text == String.Get("gsError"))
             {
                 keyboardString.Text = "";
             }

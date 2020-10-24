@@ -26,7 +26,6 @@ namespace AgOpenGPS
             //winform initialization
             InitializeComponent();
 
-
             scrollmaxheight = button4.Size.Height;
             startscrollY = button4.Location.Y;
             startscrollX = button4.Location.X;
@@ -34,21 +33,20 @@ namespace AgOpenGPS
             items = (int)(tableLayoutPanel1.Height / rowheight + 0.5);
 
             UpdateScroll(-1);
-
-            this.Text = gStr.gsStartDeleteABoundary;
+            Text = String.Get("gsStartDeleteABoundary");
 
             //Column Header
-            Boundary.Text = gStr.gsBounds;
-            Thru.Text = gStr.gsDriveThru;
-            Area.Text = gStr.gsArea;
-            Around.Text = gStr.gsAround;
+            Boundary.Text = String.Get("gsBounds");
+            Thru.Text = String.Get("gsDriveThru");
+            Area.Text = String.Get("gsArea");
+            Around.Text = String.Get("gsAround");
 
             //Bouton
             //btnDelete.Text = gStr.gsDelete;
             //btnSerialCancel.Text = gStr.gsSaveAndReturn;
             //btnDeleteAll.Text = gStr.gsDeleteAll;
-            btnGo.Text = gStr.gsGo;
-            lblOffset.Text = gStr.gsOffset;
+            btnGo.Text = String.Get("gsGo");
+            lblOffset.Text = String.Get("gsOffset");
 
             btnLoadBoundaryFromGE.Visible = false;
             btnLoadMultiBoundaryFromGE.Visible = false;
@@ -109,7 +107,7 @@ namespace AgOpenGPS
                         var c = new Button
                         {
                             Margin = new Padding(0),
-                            Size = new System.Drawing.Size(80, 50),
+                            Size = new Size(80, 50),
                             Name = string.Format("{0}", i - Position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
@@ -117,7 +115,7 @@ namespace AgOpenGPS
                         var d = new Button
                         {
                             Margin = new Padding(0),
-                            Size = new System.Drawing.Size(80, 50),
+                            Size = new Size(80, 50),
                             Name = string.Format("{0}", i - Position),
                             TextAlign = ContentAlignment.MiddleCenter
                         };
@@ -159,24 +157,24 @@ namespace AgOpenGPS
 
                         if (i == 0)
                         {
-                            aa.Text = string.Format(gStr.gsOuter + " {0}", field);
+                            aa.Text = string.Format(String.Get("gsOuter") + " {0}", field);
                             cc.Enabled = false;
                             dd.Enabled = false;
 
                             mf.bnd.bndArr[i].isDriveThru = false;
                             mf.bnd.bndArr[i].isDriveAround = false;
-                            cc.Text = gStr.gsNo;
-                            dd.Text = gStr.gsNo;
+                            cc.Text = String.Get("gsNo");
+                            dd.Text = String.Get("gsNo");
 
                         }
                         else
                         {
-                            aa.Text = string.Format(gStr.gsInner + " {0}", inner);
+                            aa.Text = string.Format(String.Get("gsInner") + " {0}", inner);
                             inner += 1;
                             cc.Enabled = true;
                             dd.Enabled = true;
-                            cc.Text = mf.bnd.bndArr[i].isDriveThru ? gStr.gsYes : gStr.gsNo;
-                            dd.Text = mf.bnd.bndArr[i].isDriveAround ? gStr.gsYes : gStr.gsNo;
+                            cc.Text = String.Get(mf.bnd.bndArr[i].isDriveThru ? "gsYes" : "gsNo");
+                            dd.Text = String.Get(mf.bnd.bndArr[i].isDriveAround ? "gsYes" : "gsNo");
                         }
 
                         aa.Font = backupfont;
@@ -285,8 +283,8 @@ namespace AgOpenGPS
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
-            DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
-                gStr.gsDeleteForSure,
+            DialogResult result3 = MessageBox.Show(String.Get("gsCompletelyDeleteBoundary"),
+                String.Get("gsDeleteForSure"),
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button2);
@@ -321,7 +319,7 @@ namespace AgOpenGPS
             }
             else
             {
-                mf.TimedMessageBox(1500, gStr.gsNothingDeleted, gStr.gsActionHasBeenCancelled);
+                mf.TimedMessageBox(1500, String.Get("gsNothingDeleted"), String.Get("gsActionHasBeenCancelled"));
             }
         }
 
@@ -366,8 +364,8 @@ namespace AgOpenGPS
 
         private void BtnDeleteAll_Click(object sender, EventArgs e)
         {
-            DialogResult result3 = MessageBox.Show(gStr.gsCompletelyDeleteBoundary,
-                gStr.gsDeleteForSure,
+            DialogResult result3 = MessageBox.Show(String.Get("gsCompletelyDeleteBoundary"),
+                String.Get("gsDeleteForSure"),
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button2);
@@ -587,8 +585,6 @@ namespace AgOpenGPS
                                         //fix the points if there are gaps bigger then
                                         mf.bnd.bndArr[i].FixBoundaryLine();
                                         mf.bnd.bndArr[i].CalculateBoundaryArea();
-                                        mf.bnd.bndArr[i].CalculateBoundaryWinding();
-                                        mf.bnd.bndArr[i].PreCalcBoundaryLines();
 
                                         mf.turn.BuildTurnLines(i);
                                         mf.gf.BuildGeoFenceLines(i);
@@ -606,7 +602,7 @@ namespace AgOpenGPS
                                 }
                                 else
                                 {
-                                    mf.TimedMessageBox(2000, gStr.gsErrorreadingKML, gStr.gsChooseBuildDifferentone);
+                                    mf.TimedMessageBox(2000, String.Get("gsErrorreadingKML"), String.Get("gsChooseBuildDifferentone"));
                                 }
                                 if (button.Name == "btnLoadBoundaryFromGE")
                                 {

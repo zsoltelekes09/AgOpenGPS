@@ -18,10 +18,10 @@ namespace AgOpenGPS
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
 
-            this.label5.Text = gStr.gsSetPoint;
-            this.label1.Text = gStr.gsActual;
+            this.label5.Text = String.Get("gsSetPoint");
+            this.label1.Text = String.Get("gsActual");
 
-            this.Text = gStr.gsSteerChart;
+            this.Text = String.Get("gsSteerChart");
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
@@ -33,8 +33,10 @@ namespace AgOpenGPS
         private void DrawChart()
         {
             //word 0 - steerangle, 1 - pwmDisplay
-            dataSteerAngle = mf.actualSteerAngleDisp.ToString();
-            dataPWM = mf.guidanceLineSteerAngle.ToString();
+            double SteerAngleDisp = mf.actualSteerAngleDisp;
+            dataSteerAngle = SteerAngleDisp.ToString();
+            double LineSteerAngle = mf.guidanceLineSteerAngle;
+            dataPWM = LineSteerAngle.ToString();
 
             lblSteerAng.Text = mf.ActualSteerAngle;
             lblPWM.Text = mf.SetSteerAngle;

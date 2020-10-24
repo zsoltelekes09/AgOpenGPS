@@ -8,7 +8,8 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        private double minFixStepDistance;
+        private double minFixStepDistance, HeadingCorrection;
+        private int DualAntennaDistance;
 
         public FormIMU(Form callingForm)
         {
@@ -17,36 +18,36 @@ namespace AgOpenGPS
 
             //Languages
 
-            groupBox4.Text = gStr.gsFixFrom;
+            groupBox4.Text = String.Get("gsFixFrom");
 
-            this.headingGroupBox.Text = gStr.gsGPSHeadingFrom;
-            this.label13.Text = gStr.gsDualAntenna;
-            this.label12.Text = gStr.gsFromVTGorRMC;
-            this.label11.Text = gStr.gsFixToFixCalc;
-            this.btnRollZero.Text = gStr.gsRollZero;
-            this.btnRemoveZeroOffset.Text = gStr.gsRemoveOffset;
-            this.label10.Text = gStr.gsALLSettingsRequireRestart;
+            this.headingGroupBox.Text = String.Get("gsGPSHeadingFrom");
+            this.label13.Text = String.Get("gsDualAntenna");
+            this.label12.Text = String.Get("gsFromVTGorRMC");
+            this.label11.Text = String.Get("gsFixToFixCalc");
+            this.btnRollZero.Text = String.Get("gsRollZero");
+            this.btnRemoveZeroOffset.Text = String.Get("gsRemoveOffset");
+            this.label10.Text = String.Get("gsALLSettingsRequireRestart");
 
-            this.groupBox6.Text = gStr.gsRollSource;
-            this.rbtnRollAVR.Text = gStr.gsFromGPS;
-            this.rbtnRollAutoSteer.Text = gStr.gsFromAutoSteer;
+            this.groupBox6.Text = String.Get("gsRollSource");
+            this.rbtnRollAVR.Text = String.Get("gsFromGPS");
+            this.rbtnRollAutoSteer.Text = String.Get("gsFromAutoSteer");
             rbtnRollOGI.Text = "OGI";
 
-            this.groupBoxHeadingCorrection.Text = gStr.gsHeadingCorrectionSource;
-            this.rbtnHeadingCorrAutoSteer.Text = gStr.gsFromAutoSteer;
+            this.groupBoxHeadingCorrection.Text = String.Get("gsHeadingCorrectionSource");
+            this.rbtnHeadingCorrAutoSteer.Text = String.Get("gsFromAutoSteer");
             //rbtnHeadingCorrUDP.Text = "UDP";
-            rbtnHeadingCorrNone.Text = gStr.gsNone;
-            rbtnRollNone.Text = gStr.gsNone;
+            rbtnHeadingCorrNone.Text = String.Get("gsNone");
+            rbtnRollNone.Text = String.Get("gsNone");
 
-            this.groupBox1.Text = gStr.gsFixToFixDistance;
-            this.label35.Text = gStr.gsMeters;
-            this.lblSimGGA.Text = gStr.gsUseGGAForSimulator;
+            this.groupBox1.Text = String.Get("gsFixToFixDistance");
+            this.label35.Text = String.Get("gsMeters");
+            this.lblSimGGA.Text = String.Get("gsUseGGAForSimulator");
 
-            this.Text = gStr.gsDataSources;
+            this.Text = String.Get("gsDataSources");
 
-            tabHeading.Text = gStr.gsHeading;
-            tabFix.Text = gStr.gsFix;
-            tabRoll.Text = gStr.gsRoll;
+            tabHeading.Text = String.Get("gsHeading");
+            tabFix.Text = String.Get("gsFix");
+            tabRoll.Text = String.Get("gsRoll");
         }
 
         #region EntryExit
@@ -56,9 +57,11 @@ namespace AgOpenGPS
             ////Display ---load the delay slides --------------------------------------------------------------------
             Properties.Settings.Default.setIMU_UID = tboxTinkerUID.Text.Trim();
 
-            
-            Properties.Settings.Default.setF_minFixStep = mf.minFixStepDist = minFixStepDistance;
 
+            Properties.Settings.Default.setF_minFixStep = mf.minFixStepDist = minFixStepDistance;
+            Properties.Settings.Default.HeadingCorrection = mf.HeadingCorrection = HeadingCorrection;
+            Properties.Settings.Default.DualAntennaDistance = mf.DualAntennaDistance = DualAntennaDistance;
+            
             Properties.Settings.Default.setIMU_isHeadingCorrectionFromAutoSteer = rbtnHeadingCorrAutoSteer.Checked;
             mf.ahrs.isHeadingCorrectionFromAutoSteer =  rbtnHeadingCorrAutoSteer.Checked;
 
@@ -100,6 +103,12 @@ namespace AgOpenGPS
         {
             TboxFixStepDistance.Text = (minFixStepDistance = Properties.Settings.Default.setF_minFixStep).ToString("0.0#");
             TboxFixStepDistance.CheckValue(ref minFixStepDistance, 0.1, 5);
+
+            TBoxHeadingCorrection.Text = (HeadingCorrection = Properties.Settings.Default.HeadingCorrection).ToString("0.0#");
+            TBoxHeadingCorrection.CheckValue(ref HeadingCorrection, -180, 180);
+
+            TboxDualAntennaDistance.Text = (DualAntennaDistance = Properties.Settings.Default.DualAntennaDistance).ToString();
+            TboxDualAntennaDistance.CheckValue(ref DualAntennaDistance, 0, 500);
 
             tboxTinkerUID.Text = Properties.Settings.Default.setIMU_UID;
 
@@ -144,7 +153,6 @@ namespace AgOpenGPS
             Properties.Settings.Default.setIMU_rollZeroX16 = 0;
             Properties.Settings.Default.Save();
         }
-
 
         private void BtnZeroRoll_Click(object sender, EventArgs e)
         {
@@ -200,6 +208,32 @@ namespace AgOpenGPS
                 if (result == DialogResult.OK)
                 {
                     TboxFixStepDistance.Text = (minFixStepDistance = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxDualAntennaDistance_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, 500, DualAntennaDistance, this, true, 0))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxDualAntennaDistance.Text = (DualAntennaDistance = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TBoxHeadingCorrection_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(-180, 180, HeadingCorrection, this, false, 2))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TBoxHeadingCorrection.Text = (HeadingCorrection = Math.Round(form.ReturnValue, 2)).ToString("0.0#");
                 }
             }
             btnCancel.Focus();

@@ -135,7 +135,6 @@ Field	Meaning
         public double actualEasting, actualNorthing, zone;
         public double centralMeridian, convergenceAngle;
 
-        public int DualAntennaDistance = 140;
         public bool UpdatedLatLon, EnableHeadRoll;
         public string rawBuffer = "";
         private string[] words;
@@ -153,9 +152,6 @@ Field	Meaning
         public double altitude, speed;
 
         public double HeadingForced = 9999, hdop, ageDiff;
-
-        //BaselineData
-        public double upProjection, baselineLength, baselineCourse;
 
         //imu
         public double nRoll, nYaw, nAngularVelocity;
@@ -283,7 +279,7 @@ Field	Meaning
 
         private void ParseAVR()
         {
-            if (!String.IsNullOrEmpty(words[1]))
+            if (!string.IsNullOrEmpty(words[1]))
             {
                 if (words[8] == "Roll")
                     double.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out nRoll);
@@ -340,8 +336,8 @@ Field	Meaning
             //        Time      Lat       Lon
 
             //is the sentence GGA
-            if (!String.IsNullOrEmpty(words[2]) && !String.IsNullOrEmpty(words[3])
-                && !String.IsNullOrEmpty(words[4]) && !String.IsNullOrEmpty(words[5]))
+            if (!string.IsNullOrEmpty(words[2]) && !string.IsNullOrEmpty(words[3])
+                && !string.IsNullOrEmpty(words[4]) && !string.IsNullOrEmpty(words[5]))
             {
                 if (fixFrom == "GGA")
                 {
@@ -397,11 +393,11 @@ Field	Meaning
         {
             //$GPVTG,054.7,T,034.4,M,005.5,N,010.2,K*48
             //is the sentence GGA
-            if (!String.IsNullOrEmpty(words[1]) && !String.IsNullOrEmpty(words[5]))
+            if (!string.IsNullOrEmpty(words[1]) && !string.IsNullOrEmpty(words[5]))
             {
                 //kph for speed - knots read
                 double.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
-                speed = Math.Round(speed * 1.852, 1);
+                speed = Math.Round(speed * 1.852, 3);
 
                 //True heading
                 double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
@@ -416,8 +412,8 @@ Field	Meaning
         {
             //PAOGI parsing of the sentence
             //make sure there aren't missing coords in sentence
-            if (!String.IsNullOrEmpty(words[2]) && !String.IsNullOrEmpty(words[3])
-                && !String.IsNullOrEmpty(words[4]) && !String.IsNullOrEmpty(words[5]))
+            if (!string.IsNullOrEmpty(words[2]) && !string.IsNullOrEmpty(words[3])
+                && !string.IsNullOrEmpty(words[4]) && !string.IsNullOrEmpty(words[5]))
             {
                 if (fixFrom == "OGI")
                 {
@@ -462,7 +458,7 @@ Field	Meaning
 
                 //kph for speed - knots read
                 double.TryParse(words[11], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
-                speed = Math.Round(speed * 1.852, 1);
+                speed = Math.Round(speed * 1.852, 3);
 
                 //Dual antenna derived heading
                 double.TryParse(words[12], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
@@ -539,7 +535,7 @@ Field	Meaning
             3   The checksum data, always begins with *
                 */
 
-            if (!String.IsNullOrEmpty(words[1]))
+            if (!string.IsNullOrEmpty(words[1]))
             {
                 //True heading
                 double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
@@ -548,18 +544,18 @@ Field	Meaning
 
         private void ParseSTI032() //heading and roll from SkyTraQ receiver
         {
-            if (!String.IsNullOrEmpty(words[10]))
+            if (!string.IsNullOrEmpty(words[10]))
             {
                 //baselineCourse: angle between baseline vector (from kinematic base to rover) and north direction, degrees
-                double.TryParse(words[10], NumberStyles.Float, CultureInfo.InvariantCulture, out baselineCourse);
-                HeadingForced = (baselineCourse < 270) ? (double)(baselineCourse + 90) : (double)(baselineCourse - 270); //Rover Antenna on the left, kinematic base on the right!!!
+                double.TryParse(words[10], NumberStyles.Float, CultureInfo.InvariantCulture, out double baselineCourse);
+                HeadingForced = (baselineCourse < 270) ? (baselineCourse + 90.0) : (baselineCourse - 270.0); //Rover Antenna on the left, kinematic base on the right!!!
             }
 
-            if (!String.IsNullOrEmpty(words[8]) && !String.IsNullOrEmpty(words[9]))
+            if (!string.IsNullOrEmpty(words[8]) && !string.IsNullOrEmpty(words[9]))
             {
-                double.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out upProjection); //difference in hight of both antennas (rover - kinematic base)
-                double.TryParse(words[9], NumberStyles.Float, CultureInfo.InvariantCulture, out baselineLength); //distance between kinematic base and rover
-                nRoll = Math.Atan(upProjection / baselineLength) * 180 / Math.PI; //roll to the right is positiv (rover left, kinematic base right!)
+                double.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out double upProjection); //difference in hight of both antennas (rover - kinematic base)
+                double.TryParse(words[9], NumberStyles.Float, CultureInfo.InvariantCulture, out double baselineLength); //distance between kinematic base and rover
+                nRoll = Glm.ToDegrees(Math.Atan(upProjection / baselineLength)); //roll to the right is positiv (rover left, kinematic base right!)
 
                 if (mf.ahrs.isRollFromAVR)
                 //input to the kalman filter
@@ -601,7 +597,7 @@ Field	Meaning
 
         private void ParseTRA()  //tra contains hdt and roll for the ub482 receiver
         {
-            if (!String.IsNullOrEmpty(words[1]))
+            if (!string.IsNullOrEmpty(words[1]))
             {
 
                 double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
@@ -613,7 +609,7 @@ Field	Meaning
                 if (trasolution != 4) nRoll = 0;
 
                 if (mf.ahrs.isRollFromAVR)
-                mf.ahrs.rollX16 =  (int)(nRoll * 16);
+                    mf.ahrs.rollX16 =  (int)(nRoll * 16);
             }
         }
 
@@ -621,8 +617,8 @@ Field	Meaning
         {
             //GPRMC parsing of the sentence
             //make sure there aren't missing coords in sentence
-            if (!String.IsNullOrEmpty(words[3]) && !String.IsNullOrEmpty(words[4])
-                && !String.IsNullOrEmpty(words[5]) && !String.IsNullOrEmpty(words[6]))
+            if (!string.IsNullOrEmpty(words[3]) && !string.IsNullOrEmpty(words[4])
+                && !string.IsNullOrEmpty(words[5]) && !string.IsNullOrEmpty(words[6]))
             {
                 if (fixFrom == "RMC")
                 {
@@ -651,13 +647,13 @@ Field	Meaning
 
                 //Convert from knots to kph for speed
                 double.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
-                speed = Math.Round(speed * 1.852, 1);
+                speed = Math.Round(speed * 1.852, 3);
 
                 //True heading
                 double.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
 
                 //Status
-                if (String.IsNullOrEmpty(words[2]))
+                if (string.IsNullOrEmpty(words[2]))
                 {
                     status = "z";
                 }
@@ -686,7 +682,7 @@ Field	Meaning
         public void ToUTM_FixConvergenceAngle()
         {
             #region Convergence
-
+            
             double[] xy = DecDeg2UTM(latitude, longitude);
             //keep a copy of actual easting and northings
             actualEasting = xy[0];
@@ -733,7 +729,7 @@ Field	Meaning
                     sum ^= tmp;    // Build checksum
                 }
                 // Calculated checksum converted to a 2 digit hex string
-                string sumStr = String.Format("{0:X2}", sum);
+                string sumStr = string.Format("{0:X2}", sum);
 
                 // Compare to checksum in sentence
                 return sumStr.Equals(Sentence.Substring(inx + 1, 2));

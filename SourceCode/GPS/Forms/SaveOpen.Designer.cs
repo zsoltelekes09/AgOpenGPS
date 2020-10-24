@@ -100,7 +100,7 @@ namespace AgOpenGPS
 
             if (!File.Exists(filename))
             {
-                TimedMessageBox(2000, gStr.gsFileError, gStr.gsMissingABCurveFile);
+                TimedMessageBox(2000, String.Get("gsFileError"), String.Get("gsMissingABCurveFile"));
             }
             else
             {
@@ -166,7 +166,7 @@ namespace AgOpenGPS
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
                                     CurveLines.Lines[idx].curvePts.Add(vecPt);
                                 }
-                                CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, CurveLines.Lines[idx].BoundaryMode, 0.0436332);
+                                CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, CurveLines.Lines[idx].BoundaryMode, 0.0436332, 5);
                             }
                             else
                             {
@@ -180,7 +180,7 @@ namespace AgOpenGPS
                     }
                     catch (Exception er)
                     {
-                        TimedMessageBox(2000, gStr.gsCurveLineFileIsCorrupt, gStr.gsButFieldIsLoaded);
+                        TimedMessageBox(2000, String.Get("gsCurveLineFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
                         WriteErrorLog("Load Curve Line" + er.ToString());
                     }
                 }
@@ -242,7 +242,7 @@ namespace AgOpenGPS
 
             if (!File.Exists(filename))
             {
-                TimedMessageBox(2000, gStr.gsFileError, gStr.gsMissingABLinesFile);
+                TimedMessageBox(2000, String.Get("gsFileError"), String.Get("gsMissingABLinesFile"));
             }
             else
             {
@@ -275,7 +275,7 @@ namespace AgOpenGPS
                     }
                     catch (Exception er)
                     {
-                        TimedMessageBox(2000, gStr.gsABLineFileIsCorrupt, "Please delete it!!!");
+                        TimedMessageBox(2000, String.Get("gsABLineFileIsCorrupt"), "Please delete it!!!");
                         WriteErrorLog("FieldOpen, Loading ABLine, Corrupt ABLine File" + er);
                     }
                 }
@@ -303,8 +303,8 @@ namespace AgOpenGPS
                 writer.WriteLine("MinFixStep," + Properties.Settings.Default.setF_minFixStep.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("VehicleType," + Properties.Vehicle.Default.setVehicle_vehicleType.ToString(CultureInfo.InvariantCulture));
 
-                writer.WriteLine("Empty," + "10");
-                writer.WriteLine("Empty," + "10");
+                writer.WriteLine("HeadingCorrection," + Properties.Settings.Default.HeadingCorrection.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("DualAntennaDistance," + Properties.Settings.Default.DualAntennaDistance.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("Empty," + "10");
                 writer.WriteLine("Empty," + "10");
 
@@ -404,7 +404,7 @@ namespace AgOpenGPS
             }
 
                 //little show to say saved and where
-                TimedMessageBox(3000, gStr.gsSavedInFolder, vehiclesDirectory);
+                TimedMessageBox(3000, String.Get("gsSavedInFolder"), vehiclesDirectory);
             }
 
         //function to open a previously saved field
@@ -456,7 +456,7 @@ namespace AgOpenGPS
 
                     if (fileVersion < appVersion)
                     {
-                        TimedMessageBox(5000, gStr.gsVehicleFileIsWrongVersion, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
+                        TimedMessageBox(5000, String.Get("gsVehicleFileIsWrongVersion"), String.Get("gsMustBeVersion") + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                         return false;
                     }
                     else
@@ -481,8 +481,10 @@ namespace AgOpenGPS
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.setVehicle_vehicleType = int.Parse(words[1], CultureInfo.InvariantCulture);
 
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
+                        line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Settings.Default.HeadingCorrection = double.Parse(words[1], CultureInfo.InvariantCulture);
+                        line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Settings.Default.DualAntennaDistance = int.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine();
                         line = reader.ReadLine();
 
@@ -644,6 +646,9 @@ namespace AgOpenGPS
                         vehicle.wheelbase = Properties.Vehicle.Default.setVehicle_wheelbase;
                         vehicle.minTurningRadius = Properties.Vehicle.Default.setVehicle_minTurningRadius;
                         minFixStepDist = Properties.Settings.Default.setF_minFixStep;
+                        HeadingCorrection = Properties.Settings.Default.HeadingCorrection;
+                        DualAntennaDistance = Properties.Settings.Default.DualAntennaDistance;
+
                         vehicle.vehicleType = Properties.Vehicle.Default.setVehicle_vehicleType;
 
                         yt.geoFenceDistance = Properties.Vehicle.Default.set_geoFenceDistance;
@@ -744,7 +749,7 @@ namespace AgOpenGPS
                     Properties.Vehicle.Default.Save();
                     Properties.Settings.Default.Reset();
                     Properties.Settings.Default.Save();
-                    MessageBox.Show(gStr.gsProgramWillResetToRecoverPleaseRestart, gStr.gsVehicleFileIsCorrupt, MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    MessageBox.Show(String.Get("gsProgramWillResetToRecoverPleaseRestart"), String.Get("gsVehicleFileIsCorrupt"), MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     Application.Restart();
                     Environment.Exit(0);
                     return false;
@@ -822,7 +827,7 @@ namespace AgOpenGPS
             }
 
                 //little show to say saved and where
-                TimedMessageBox(3000, gStr.gsSavedInFolder, toolsDirectory);
+                TimedMessageBox(3000, String.Get("gsSavedInFolder"), toolsDirectory);
             }
 
         //function to open a previously saved field
@@ -850,7 +855,7 @@ namespace AgOpenGPS
 
                     if (fileVersion < appVersion)
                     {
-                        TimedMessageBox(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
+                        TimedMessageBox(5000, String.Get("gsFileError"), String.Get("gsMustBeVersion") + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                         return false;
                     }
 
@@ -954,7 +959,7 @@ namespace AgOpenGPS
                 {
                     WriteErrorLog("pen Tool" + e.ToString());
 
-                    TimedMessageBox(3000, gStr.gsFileError, gStr.gsVehicleFileIsCorrupt);
+                    TimedMessageBox(3000, String.Get("gsFileError"), String.Get("gsVehicleFileIsCorrupt"));
 
                     return false;
                 }
@@ -1048,7 +1053,7 @@ namespace AgOpenGPS
             }
 
                 //little show to say saved and where
-                TimedMessageBox(3000, gStr.gsSavedInFolder, envDirectory);
+                TimedMessageBox(3000, String.Get("gsSavedInFolder"), envDirectory);
         }
 
         //function to open a previously saved field
@@ -1077,7 +1082,7 @@ namespace AgOpenGPS
 
                     if (fileVersion < appVersion)
                     {
-                        TimedMessageBox(5000, gStr.gsFileError, gStr.gsMustBeVersion + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
+                        TimedMessageBox(5000, String.Get("gsFileError"), String.Get("gsMustBeVersion") + Application.ProductVersion.ToString(CultureInfo.InvariantCulture) + " or higher");
                         return DialogResult.Abort;
                     }
 
@@ -1225,7 +1230,7 @@ namespace AgOpenGPS
                     Properties.Settings.Default.Reset();
                     Properties.Settings.Default.Save();
 
-                    TimedMessageBox(3000, gStr.gsFileError, gStr.gsVehicleFileIsCorrupt);
+                    TimedMessageBox(3000, String.Get("gsFileError"), String.Get("gsVehicleFileIsCorrupt"));
                     return DialogResult.Cancel;
                 }
             }
@@ -1341,7 +1346,7 @@ namespace AgOpenGPS
                 {
                     WriteErrorLog("While Opening Field" + e.ToString());
 
-                    TimedMessageBox(2000, gStr.gsFieldFileIsCorrupt, gStr.gsChooseADifferentField);
+                    TimedMessageBox(2000, String.Get("gsFieldFileIsCorrupt"), String.Get("gsChooseADifferentField"));
 
                     JobClose();
                     return;
@@ -1358,7 +1363,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Sections.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                TimedMessageBox(2000, gStr.gsMissingSectionFile, gStr.gsButFieldIsLoaded);
+                TimedMessageBox(2000, String.Get("gsMissingSectionFile"), String.Get("gsButFieldIsLoaded"));
                 //return;
             }
             else
@@ -1415,7 +1420,7 @@ namespace AgOpenGPS
                     {
                         WriteErrorLog("Section file" + e.ToString());
 
-                        TimedMessageBox(2000, gStr.gsSectionFileIsCorrupt, gStr.gsButFieldIsLoaded);
+                        TimedMessageBox(2000, String.Get("gsSectionFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
                     }
 
                 }
@@ -1435,7 +1440,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Contour.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                TimedMessageBox(2000, gStr.gsMissingContourFile, gStr.gsButFieldIsLoaded);
+                TimedMessageBox(2000, String.Get("gsMissingContourFile"), String.Get("gsButFieldIsLoaded"));
                 //return;
             }
             
@@ -1474,7 +1479,7 @@ namespace AgOpenGPS
                     {
                         WriteErrorLog("Loading Contour file" + e.ToString());
 
-                        TimedMessageBox(2000, gStr.gsContourFileIsCorrupt, gStr.gsButFieldIsLoaded);
+                        TimedMessageBox(2000, String.Get("gsContourFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
                     }
                 }
             }
@@ -1486,7 +1491,7 @@ namespace AgOpenGPS
             fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Flags.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                TimedMessageBox(2000, gStr.gsMissingFlagsFile, gStr.gsButFieldIsLoaded);
+                TimedMessageBox(2000, String.Get("gsMissingFlagsFile"), String.Get("gsButFieldIsLoaded"));
             }
 
             else
@@ -1549,7 +1554,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        TimedMessageBox(2000, gStr.gsFlagFileIsCorrupt, gStr.gsButFieldIsLoaded);
+                        TimedMessageBox(2000, String.Get("gsFlagFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
                         WriteErrorLog("FieldOpen, Loading Flags, Corrupt Flag File" + e.ToString());
                     }
                 }
@@ -1557,10 +1562,10 @@ namespace AgOpenGPS
 
             //Boundaries
             //Either exit or update running save
-                fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Boundary.txt";
+            fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Boundary.txt";
             if (!File.Exists(fileAndDirectory))
             {
-                TimedMessageBox(2000, gStr.gsMissingBoundaryFile, gStr.gsButFieldIsLoaded);
+                TimedMessageBox(2000, String.Get("gsMissingBoundaryFile"), String.Get("gsButFieldIsLoaded"));
             }
             else
             {
@@ -1611,19 +1616,13 @@ namespace AgOpenGPS
 
                                 bnd.bndArr[k].FixBoundaryLine();
                                 bnd.bndArr[k].CalculateBoundaryArea();
-                                bnd.bndArr[k].CalculateBoundaryWinding();
-                                bnd.bndArr[k].PreCalcBoundaryLines();
-                                if (bnd.bndArr[k].area == 0)
+                                if (bnd.bndArr[k].area < 100)
                                 {
                                     bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
                                     turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
                                     gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
                                     hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
                                     k = k - 1;
-                                }
-                                else
-                                {
-                                    bnd.bndArr[k].bndLine.CalculateRoundedCorner(0.5, true, 0.0436332);
                                 }
                             }
                             else
@@ -1640,11 +1639,9 @@ namespace AgOpenGPS
                     }
                     catch (Exception e)
                     {
-                        TimedMessageBox(2000, gStr.gsBoundaryLineFilesAreCorrupt, gStr.gsButFieldIsLoaded);
+                        TimedMessageBox(2000, String.Get("gsBoundaryLineFilesAreCorrupt"), String.Get("gsButFieldIsLoaded"));
                         WriteErrorLog("Load Boundary Line" + e.ToString());
                     }
-
-
 
                     turn.BuildTurnLines(-1);
                     gf.BuildGeoFenceLines(-1);
@@ -1734,7 +1731,7 @@ namespace AgOpenGPS
 
                     catch (Exception e)
                     {
-                        TimedMessageBox(2000, gStr.gsRecordedPathFileIsCorrupt, gStr.gsButFieldIsLoaded);
+                        TimedMessageBox(2000, String.Get("gsRecordedPathFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
                         WriteErrorLog("Load Recorded Path" + e.ToString());
                     }
                 }
@@ -1754,7 +1751,7 @@ namespace AgOpenGPS
 
             if (!isJobStarted)
             {
-                TimedMessageBox(3000, gStr.gsFieldNotOpen, gStr.gsCreateNewField);
+                TimedMessageBox(3000, String.Get("gsFieldNotOpen"), String.Get("gsCreateNewField"));
                 return;
             }
             string myFileName, dirField;

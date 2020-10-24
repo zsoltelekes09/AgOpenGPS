@@ -16,9 +16,9 @@ namespace AgOpenGPS
 
             InitializeComponent();
 
-            this.Text = gStr.gsEditABLine;
-            label2.Text = gStr.gsABHeading;
-            label5.Text = gStr.gsOffset;
+            this.Text = String.Get("gsEditABLine");
+            label2.Text = String.Get("gsABHeading");
+            label5.Text = String.Get("gsOffset");
 
             snapAdj = Math.Round(mf.Guidance.WidthMinusOverlap / 2 * mf.m2MetImp, mf.decimals);
 
@@ -147,26 +147,26 @@ namespace AgOpenGPS
 
         private void BtnRightHalfWidth_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
-            else mf.ABLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
+            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
+            else mf.ABLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
         }
 
         private void BtnLeftHalfWidth_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
-            else mf.ABLines.MoveLine(Math.Round(mf.ABLines.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
+            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
+            else mf.ABLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
         }
 
         private void BtnAdjRight_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? 0.1 : -0.11);
-            else mf.ABLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? 0.1 : -0.1);
+            if (CurveMode) mf.CurveLines.MoveLine(mf.isABSameAsVehicleHeading ? 0.1 : -0.11);
+            else mf.ABLines.MoveLine(mf.isABSameAsVehicleHeading ? 0.1 : -0.1);
         }
 
         private void BtnAdjLeft_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? -0.1 : 0.1);
-            else mf.ABLines.MoveLine(mf.ABLines.isABSameAsVehicleHeading ? -0.1 : 0.1);
+            if (CurveMode) mf.CurveLines.MoveLine(mf.isABSameAsVehicleHeading ? -0.1 : 0.1);
+            else mf.ABLines.MoveLine(mf.isABSameAsVehicleHeading ? -0.1 : 0.1);
         }
     }
 }

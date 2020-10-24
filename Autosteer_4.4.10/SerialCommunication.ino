@@ -50,7 +50,7 @@ void ReadSerials()
         PVTBuffer[Index1] = Data;
         if (Index1 >= 99)
         {
-          SendData(PVTBuffer, 100);
+          SendData(PVTBuffer, 101);
           Index1 = 0;
         }
         else Index1++;

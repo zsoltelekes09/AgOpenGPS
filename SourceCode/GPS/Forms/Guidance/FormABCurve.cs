@@ -18,10 +18,10 @@ namespace AgOpenGPS
             Owner = mf = _mf as FormGPS;
             InitializeComponent();
 
-            btnPausePlay.Text = gStr.gsPause;
+            btnPausePlay.Text = String.Get("gsPause");
 
             CurveMode = mode;
-            Text = CurveMode ? gStr.gsABCurve : gStr.gsABline;
+            Text = CurveMode ? String.Get("gsABCurve") : String.Get("gsABline");
             tboxHeading.Text = "0";
         }
 
@@ -112,7 +112,7 @@ namespace AgOpenGPS
                     btnNewLine.Enabled = true;
                 }
             }
-            else mf.TimedMessageBox(2000, gStr.gsNoNameEntered, gStr.gsEnterLineName);
+            else mf.TimedMessageBox(2000, String.Get("gsNoNameEntered"), String.Get("gsEnterLineName"));
         }
 
         private void BtnNewLine_Click(object sender, EventArgs e)
@@ -130,7 +130,7 @@ namespace AgOpenGPS
                 mf.CurveLines.Lines.Add(new CCurveLines());
                 mf.CurveLines.CurrentEditLine = mf.CurveLines.Lines.Count - 1;
                 mf.CurveLines.isOkToAddPoints = true;
-                lblCurveExists.Text = gStr.gsDriving;
+                lblCurveExists.Text = String.Get("gsDriving");
                 btnBPoint.Enabled = true;
             }
             else
@@ -139,9 +139,10 @@ namespace AgOpenGPS
                 mf.ABLines.CurrentEditLine = mf.ABLines.ABLines.Count - 1;
                 tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.fixHeading), 6).ToString();
 
-                mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].ref1.Easting = mf.pivotAxlePos.Easting;
-                mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].ref1.Northing = mf.pivotAxlePos.Northing;
-                mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].Heading = mf.pivotAxlePos.Heading;
+                Vec3 pivot = mf.pivotAxlePos;
+                mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].ref1.Easting = pivot.Easting;
+                mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].ref1.Northing = pivot.Northing;
+                mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].Heading = pivot.Heading;
                 timer1.Enabled = true;
             }
             btnPausePlay.Enabled = true;
@@ -182,11 +183,12 @@ namespace AgOpenGPS
                         }
                         else
                         {
-                            mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.Add(new Vec3(mf.pivotAxlePos.Northing, mf.pivotAxlePos.Easting, 0));
+                            Vec3 pivot = mf.pivotAxlePos;
+                            mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.Add(new Vec3(pivot.Northing, pivot.Easting, 0));
                         }
                         mf.YouTurnButtons(true);
                         //mf.FileSaveCurveLine();
-                        lblCurveExists.Text = gStr.gsCurveSet;
+                        lblCurveExists.Text = String.Get("gsCurveSet");
 
 
                         btnAddAndGo.Enabled = true;
@@ -220,7 +222,7 @@ namespace AgOpenGPS
                         //build the tail extensions
                         mf.CurveLines.AddFirstLastPoints();
                         
-                        mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].BoundaryMode, 0.0436332);
+                        mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].BoundaryMode, 0.0436332, 5);
 
                         //calculate average heading of line
                         double x = 0, y = 0;
@@ -474,12 +476,12 @@ namespace AgOpenGPS
             if (mf.CurveLines.isOkToAddPoints = !mf.CurveLines.isOkToAddPoints)
             {
                 btnPausePlay.Image = Properties.Resources.BoundaryRecord;
-                btnPausePlay.Text = gStr.gsRecord;
+                btnPausePlay.Text = String.Get("gsRecord");
             }
             else
             {
                 btnPausePlay.Image = Properties.Resources.boundaryPause;
-                btnPausePlay.Text = gStr.gsPause;
+                btnPausePlay.Text = String.Get("gsPause");
             }
         }
 
