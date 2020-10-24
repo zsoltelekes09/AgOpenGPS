@@ -805,5 +805,53 @@ namespace AgOpenGPS.Properties {
                 this["setAS_isAutoSteerAutoOn"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.9")]
+        public double setSteer_averageXTE {
+            get {
+                return ((double)(this["setSteer_averageXTE"]));
+            }
+            set {
+                this["setSteer_averageXTE"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double setSteer_integralGain {
+            get {
+                return ((double)(this["setSteer_integralGain"]));
+            }
+            set {
+                this["setSteer_integralGain"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public double setSteer_integralHeading {
+            get {
+                return ((double)(this["setSteer_integralHeading"]));
+            }
+            set {
+                this["setSteer_integralHeading"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public double setSteer_integralDistanceAway {
+            get {
+                return ((double)(this["setSteer_integralDistanceAway"]));
+            }
+            set {
+                this["setSteer_integralDistanceAway"] = value;
+            }
+        }
     }
 }

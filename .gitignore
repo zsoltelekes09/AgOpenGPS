@@ -16,6 +16,9 @@
 # Mono auto generated files
 mono_crash.*
 
+SourceCode/GPS/Forms/*.resx
+SourceCode/GPS/Forms/**/*.resx
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

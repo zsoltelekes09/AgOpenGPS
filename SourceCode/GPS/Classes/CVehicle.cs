@@ -23,12 +23,10 @@ namespace AgOpenGPS
         //autosteer values
         public double goalPointLookAheadSeconds, goalPointLookAheadMinimumDistance, goalPointDistanceMultiplier, goalPointLookAheadUturnMult;
 
-        public double stanleyGain, stanleyHeadingErrorGain;
-        public double minLookAheadDistance = 2.0;
-        public double maxSteerAngle;
-        public double maxAngularVelocity;
-        public double treeSpacing = 0;
-        public double hydLiftLookAheadTime;
+        public double stanleyGain, stanleyHeadingErrorGain, inty, avgDist;
+        public double avgXTE, integralDistanceAway, integralHeadingLimit, stanleyIntegralGain;
+        public double minLookAheadDistance = 2.0, maxSteerAngle, maxAngularVelocity;
+        public double treeSpacing = 0, hydLiftLookAheadTime;
         
         public double hydLiftLookAheadDistanceLeft, hydLiftLookAheadDistanceRight;
 
@@ -55,6 +53,11 @@ namespace AgOpenGPS
 
             stanleyGain = Properties.Vehicle.Default.setVehicle_stanleyGain;
             stanleyHeadingErrorGain = Properties.Vehicle.Default.setVehicle_stanleyHeadingErrorGain;
+
+            integralDistanceAway = (double)Properties.Vehicle.Default.setSteer_integralDistanceAway * 0.01;
+            integralHeadingLimit = Properties.Vehicle.Default.setSteer_integralHeading;
+            stanleyIntegralGain = Properties.Vehicle.Default.setSteer_integralGain;
+            avgXTE = Properties.Vehicle.Default.setSteer_averageXTE;
 
             maxAngularVelocity = Properties.Vehicle.Default.setVehicle_maxAngularVelocity;
             maxSteerAngle = Properties.Vehicle.Default.setVehicle_maxSteerAngle;

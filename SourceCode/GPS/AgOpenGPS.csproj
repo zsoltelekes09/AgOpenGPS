@@ -66,9 +66,6 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\Settings\FormIMU.resx">
-      <DependentUpon>FormIMU.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Language\Stringaf.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>

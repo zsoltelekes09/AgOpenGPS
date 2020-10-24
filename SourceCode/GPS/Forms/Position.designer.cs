@@ -672,18 +672,37 @@ namespace AgOpenGPS
                     if (abFixHeadingDelta > 0.74) abFixHeadingDelta = 0.74;
                     if (abFixHeadingDelta < -0.74) abFixHeadingDelta = -0.74;
 
-                    steerAngle = Math.Atan((distanceFromCurrentLine * vehicle.stanleyGain)
-                        / ((Math.Abs(pn.speed) * 0.277777) + 1));
+                    vehicle.avgDist = (1 - vehicle.avgXTE) * distanceFromCurrentLine + vehicle.avgXTE * vehicle.avgDist;
+                    distanceFromCurrentLine = vehicle.avgDist;
 
-                    if (steerAngle > 0.74) steerAngle = 0.74;
-                    if (steerAngle < -0.74) steerAngle = -0.74;
+                    double xTrackCorrection = Math.Atan((distanceFromCurrentLine * vehicle.stanleyGain)
+                        / ((Math.Abs(pn.speed * 0.277777)) + 2));
 
-                    steerAngle = Glm.ToDegrees((steerAngle + (pn.speed > -0.1 ? abFixHeadingDelta : -abFixHeadingDelta)) * -1.0);
-
+                    steerAngle = Glm.ToDegrees((xTrackCorrection + (pn.speed > -0.1 ? abFixHeadingDelta : -abFixHeadingDelta)) * -1.0);
 
                     if (steerAngle < -vehicle.maxSteerAngle) steerAngle = -vehicle.maxSteerAngle;
                     if (steerAngle > vehicle.maxSteerAngle) steerAngle = vehicle.maxSteerAngle;
 
+                    //Integral
+                    double deltaDeg = Math.Abs(Glm.ToDegrees(abFixHeadingDelta));
+                    double integralSpeed = (pn.speed) / 10;
+
+                    double distErr = Math.Abs(distanceFromCurrentLine);
+
+                    if (deltaDeg < vehicle.integralHeadingLimit && distErr < vehicle.integralDistanceAway && pn.speed > 0.5 && isAutoSteerBtnOn)
+                    {
+                        if ((vehicle.inty < 0 && distanceFromCurrentLine < 0) || (vehicle.inty > 0 && distanceFromCurrentLine > 0))
+                            vehicle.inty += distanceFromCurrentLine * -vehicle.stanleyIntegralGain * 3 * integralSpeed;
+                        else vehicle.inty += distanceFromCurrentLine * -vehicle.stanleyIntegralGain
+                                * integralSpeed * ((vehicle.integralHeadingLimit - deltaDeg) / vehicle.integralHeadingLimit);
+
+                        if (vehicle.stanleyIntegralGain > 0) steerAngle += vehicle.inty;
+                        else vehicle.inty = 0;
+                    }
+                    else
+                    {
+                        vehicle.inty = 0;
+                    }
                 }
                 else
                 {

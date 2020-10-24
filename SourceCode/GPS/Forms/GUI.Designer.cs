@@ -825,7 +825,16 @@ namespace AgOpenGPS
                 else return "-";
             }
         }
-        public string SetSteerAngle { get { return ((double)(guidanceLineSteerAngle) * 0.01).ToString("N2") + "\u00B0"; } }
+        public string SetSteerAngle
+        {
+            get {
+
+                if (TestAutoSteer)
+                    return ((double)(TestAutoSteerAngle)).ToString("N2") + "\u00B0";
+                else
+                    return ((double)(guidanceLineSteerAngle) * 0.01).ToString("N2") + "\u00B0";
+            }
+        }
         public string ActualSteerAngle { get { return ((double)(actualSteerAngleDisp) * 0.01).ToString("N2") + "\u00B0"; } }
         public string Altitude { get { return Convert.ToString(Math.Round(pn.altitude,1)); } }
         public string AltitudeFeet { get { return Convert.ToString((Math.Round((pn.altitude * 3.28084),1))); } }
