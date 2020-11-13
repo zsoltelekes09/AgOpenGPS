@@ -24,22 +24,32 @@ namespace AgOpenGPS
         private void FormFlags_Load(object sender, EventArgs e)
         {
             lblLast.Text = String.Get("gsCurrent") + mf.envFileName;
-            DirectoryInfo dinfo = new DirectoryInfo(mf.envDirectory);
-            FileInfo[] Files = dinfo.GetFiles("*.txt");
-            if (Files.Length == 0)
+
+            string dir = Path.GetDirectoryName(mf.envDirectory);
+            if (Directory.Exists(dir))
+            {
+                DirectoryInfo dinfo = new DirectoryInfo(mf.envDirectory);
+                FileInfo[] Files = dinfo.GetFiles("*.txt");
+
+                if (Files.Length > 0)
+                {
+                    foreach (FileInfo file in Files)
+                    {
+                        cboxEnv.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
+                    }
+                }
+                else
+                {
+                    DialogResult = DialogResult.Ignore;
+                    Close();
+                    mf.TimedMessageBox(2000, String.Get("gsNoEnvironmentSaved"), String.Get("gsSaveAnEnvironmentFirst"));
+                }
+            }
+            else
             {
                 DialogResult = DialogResult.Ignore;
                 Close();
-
                 mf.TimedMessageBox(2000, String.Get("gsNoEnvironmentSaved"), String.Get("gsSaveAnEnvironmentFirst"));
-            }
-
-            else
-            {
-                foreach (FileInfo file in Files)
-                {
-                    cboxEnv.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
-                }
             }
         }
 

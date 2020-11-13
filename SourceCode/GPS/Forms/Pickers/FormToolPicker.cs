@@ -23,18 +23,29 @@ namespace AgOpenGPS
         {
             lblLast.Text = String.Get("gsCurrent") + mf.toolFileName;
 
-            DirectoryInfo dinfo = new DirectoryInfo(mf.toolsDirectory);
-            FileInfo[] Files = dinfo.GetFiles("*.txt");
-            if (Files.Length == 0)
+            string dir = Path.GetDirectoryName(mf.toolsDirectory);
+            if (Directory.Exists(dir))
+            {
+                DirectoryInfo dinfo = new DirectoryInfo(mf.toolsDirectory);
+                FileInfo[] Files = dinfo.GetFiles("*.txt");
+                if (Files.Length == 0)
+                {
+                    Close();
+                    mf.TimedMessageBox(2000, String.Get("gsNoToolSaved"), String.Get("gsSaveAToolFirst"));
+
+                }
+                else
+                {
+                    foreach (FileInfo file in Files)
+                    {
+                        cboxTool.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
+                    }
+                }
+            }
+            else
             {
                 Close();
                 mf.TimedMessageBox(2000, String.Get("gsNoToolSaved"), String.Get("gsSaveAToolFirst"));
-
-            }
-
-            foreach (FileInfo file in Files)
-            {
-                cboxTool.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
             }
         }
 

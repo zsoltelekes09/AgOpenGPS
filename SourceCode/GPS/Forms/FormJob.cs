@@ -29,17 +29,12 @@ namespace AgOpenGPS
 
         private void BtnJobNew_Click(object sender, EventArgs e)
         {
-            //back to FormGPS
-            DialogResult = DialogResult.Yes;
+            DialogResult = DialogResult.Retry;
             Close();
         }
 
         private void BtnJobResume_Click(object sender, EventArgs e)
         {
-            //open the Resume.txt and continue from last exit
-            mf.FileOpenField("Resume");
-
-            //back to FormGPS
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -77,12 +72,8 @@ namespace AgOpenGPS
                 //returns full field.txt file dir name
                 if (result == DialogResult.Yes)
                 {
-                    mf.FileOpenField(mf.filePickerFileAndDirectory);
+                    DialogResult = result;
                     Close();
-                }
-                else
-                {
-                    return;
                 }
             }
         }
@@ -134,6 +125,9 @@ namespace AgOpenGPS
 
                     //grab the boundary
                     filename = dir + "\\Boundary.txt";
+
+                    if (!File.Exists(filename))
+                        filename = dir + "\\Boundary.Tmp";
 
                     if (File.Exists(filename))
                     {
@@ -224,26 +218,20 @@ namespace AgOpenGPS
 
                 if (numFields > 1)
                 {
-                    using (var form = new FormDrivePicker(mf, infieldList))
+                    using (var form = new FormDrivePicker(mf, this, infieldList))
                     {
                         var result = form.ShowDialog(this);
-
-                        //returns full field.txt file dir name
                         if (result == DialogResult.Yes)
                         {
-                            mf.FileOpenField(mf.filePickerFileAndDirectory);
+                            DialogResult = DialogResult.Yes;
                             Close();
-                        }
-                        else
-                        {
-                            return;
                         }
                     }
                 }
                 else // 1 field found
                 {
                     mf.filePickerFileAndDirectory = mf.fieldsDirectory + infieldList + "\\Field.txt";
-                    mf.FileOpenField(mf.filePickerFileAndDirectory);
+                    DialogResult = DialogResult.Yes;
                     Close();
                 }
             }
@@ -251,7 +239,6 @@ namespace AgOpenGPS
             {
                 mf.TimedMessageBox(2000, String.Get("gsNoFieldsFound"), String.Get("gsFieldNotOpen"));
             }
-
         }
     }
 }

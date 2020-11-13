@@ -25,18 +25,29 @@ namespace AgOpenGPS
         private void FormFlags_Load(object sender, EventArgs e)
         {
             lblLast.Text = String.Get("gsCurrent") + mf.vehicleFileName;
-            DirectoryInfo dinfo = new DirectoryInfo(mf.vehiclesDirectory);
-            FileInfo[] Files = dinfo.GetFiles("*.txt");
-            if (Files.Length == 0)
+
+            string dir = Path.GetDirectoryName(mf.vehiclesDirectory);
+            if (Directory.Exists(dir))
+            {
+                DirectoryInfo dinfo = new DirectoryInfo(mf.vehiclesDirectory);
+                FileInfo[] Files = dinfo.GetFiles("*.txt");
+                if (Files.Length == 0)
+                {
+                    Close();
+                    mf.TimedMessageBox(2000, String.Get("gsNoVehiclesSaved"), String.Get("gsSaveAVehicleFirst"));
+                }
+                else
+                {
+                    foreach (FileInfo file in Files)
+                    {
+                        cboxVeh.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
+                    }
+                }
+            }
+            else
             {
                 Close();
                 mf.TimedMessageBox(2000, String.Get("gsNoVehiclesSaved"), String.Get("gsSaveAVehicleFirst"));
-
-            }
-
-            foreach (FileInfo file in Files)
-            {
-                cboxVeh.Items.Add(Path.GetFileNameWithoutExtension(file.Name));
             }
         }
 

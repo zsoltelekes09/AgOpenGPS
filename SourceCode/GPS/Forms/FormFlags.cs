@@ -33,7 +33,8 @@ namespace AgOpenGPS
         }
         private void FormFlags_Load(object sender, EventArgs e)
         {
-            UpdateLabels(); }
+            UpdateLabels();
+        }
 
         private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
         {

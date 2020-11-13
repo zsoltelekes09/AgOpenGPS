@@ -154,10 +154,10 @@ namespace AgOpenGPS
                 {
                     mf.WriteErrorLog("While Opening Field" + ex);
 
-                        mf.TimedMessageBox(2000, String.Get("gsFieldFileIsCorrupt"), String.Get("gsChooseADifferentField"));
-                        mf.JobClose();
-                        return;
-                    }
+                    mf.TimedMessageBox(2000, String.Get("gsFieldFileIsCorrupt"), String.Get("gsChooseADifferentField"));
+                    mf.StartTasks(null, 0, TaskName.CloseJob);
+                    return;
+                }
 
                 const string myFileName = "Field.txt";
 
@@ -208,6 +208,8 @@ namespace AgOpenGPS
 
                  fileToCopy = templateDirectoryName + "\\Boundary.txt";
                  destinationDirectory = directoryName + "\\Boundary.txt";
+                if (!File.Exists(fileToCopy))
+                    fileToCopy = templateDirectoryName + "\\Boundary.Tmp";
                 if (File.Exists(fileToCopy))
                     File.Copy(fileToCopy, destinationDirectory);
 
@@ -244,23 +246,20 @@ namespace AgOpenGPS
                 {
                     mf.FileSaveABLines();
                     mf.FileSaveCurveLines();
-                    mf.FileSaveRecPath();                    
+                    mf.FileSaveRecPath();
                 }
 
                 if (chkHeadland.Checked)
                 {
                     fileToCopy = templateDirectoryName + "\\Headland.txt";
                     destinationDirectory = directoryName + "\\Headland.txt";
+                    if (!File.Exists(fileToCopy))
+                        fileToCopy = templateDirectoryName + "\\Headland.Tmp";
                     if (File.Exists(fileToCopy))
-                        File.Copy(fileToCopy, destinationDirectory);
+                            File.Copy(fileToCopy, destinationDirectory);
                 }
                 else
                     mf.FileSaveHeadland();
-
-                //fileToCopy = templateDirectoryName + "\\Elevation.txt";
-                //destinationDirectory = directoryName + "\\Elevation.txt";
-                //if (File.Exists(fileToCopy))
-                //    File.Copy(fileToCopy, destinationDirectory);
 
                 //now open the newly cloned field
                 mf.FileOpenField(dirNewField + myFileName);

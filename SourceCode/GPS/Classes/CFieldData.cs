@@ -112,7 +112,9 @@ namespace AgOpenGPS
                 {
                     var timeSpan = TimeSpan.FromHours(((areaBoundaryOuterLessInner - workedAreaTotal) * Glm.m2ha
                         / (mf.Guidance.GuidanceWidth * mf.pn.speed * 0.1)));
-                    return timeSpan.Hours.ToString("00") + ":" + timeSpan.Minutes.ToString("00");
+
+                    if (timeSpan.Days > 0) return timeSpan.TotalDays.ToString("N0") + " \n Days";
+                    else return timeSpan.Hours.ToString("00") + ":" + timeSpan.Minutes.ToString("00");
                 }
                 else return "\u221E Hrs";
             }
@@ -134,12 +136,12 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndArr.Count > 0)
             {
-                areaOuterBoundary = mf.bnd.bndArr[0].area;
+                areaOuterBoundary = mf.bnd.bndArr[0].Area;
                 areaBoundaryOuterLessInner = areaOuterBoundary;
 
                 for (int i = 1; i < mf.bnd.bndArr.Count; i++)
                 {
-                    areaBoundaryOuterLessInner -= mf.bnd.bndArr[i].area;
+                    areaBoundaryOuterLessInner -= mf.bnd.bndArr[i].Area;
                 }
             }
             else

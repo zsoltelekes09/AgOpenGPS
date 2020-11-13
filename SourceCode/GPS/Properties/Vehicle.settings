@@ -83,8 +83,8 @@
     <Setting Name="setVehicle_minTurningRadius" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5.85</Value>
     </Setting>
-    <Setting Name="set_youUseDubins" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="Youturn_Type" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="setVehicle_antennaOffset" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>

@@ -11,11 +11,6 @@ namespace AgOpenGPS
 
         private readonly double boxLength = 2000;
 
-        /// <summary>
-        /// array of turns
-        /// </summary>
-        public List<CTurnLines> turnArr = new List<CTurnLines>();
-
         //constructor
         public CTurn(FormGPS _f)
         {
@@ -25,8 +20,9 @@ namespace AgOpenGPS
         // the list of possible bounds points
         public List<Vec3> turnClosestList = new List<Vec3>();
 
-        public int turnSelected = 0, closestTurnNum;
+        public List<List<Vec3>> BoxList = new List<List<Vec3>>();
 
+        public int turnSelected = 0, closestTurnNum;
         //generated box for finding closest point
         public Vec2 boxA = new Vec2(9000, 9000), boxB = new Vec2(9002, 9000);
 
@@ -51,17 +47,15 @@ namespace AgOpenGPS
             rayPt.Northing += CosHead * mf.maxCrossFieldLength;
             rayPt.Easting += SinHead * mf.maxCrossFieldLength;
 
-
-
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
                 if (mf.bnd.bndArr[i].isDriveThru || mf.bnd.bndArr[i].isDriveAround) continue;
-                if (mf.turn.turnArr.Count > i ) Crossings1.FindCrossingPoints(ref mf.turn.turnArr[i].turnLine, fromPt, rayPt, i);
+                if (mf.bnd.bndArr.Count > i ) Crossings1.FindCrossingPoints(mf.bnd.bndArr[i].turnLine, fromPt, rayPt, i);
             }
 
             if (Crossings1.Count > 0)
             {
-                Crossings1.Sort((x, y) => x.Heading.CompareTo(y.Heading));
+                Crossings1.Sort((x, y) => x.Time.CompareTo(y.Time));
 
                 rayPt.Easting = Crossings1[0].Easting;
                 rayPt.Northing = Crossings1[0].Northing;
@@ -70,7 +64,7 @@ namespace AgOpenGPS
 
             //second scan is straight ahead of outside of tool based on turn direction
             double scanWidthL, scanWidthR;
-            if (isYouTurnRight)// not sure why you qwant to do it a second time if none found ?
+            if (isYouTurnRight)// not sure why you want to do it a second time if none found ?
             {
                 scanWidthL = 0;//mf.Guidance.GuidanceWidth * 0.25;
                 scanWidthR = mf.Guidance.GuidanceWidth * 0.75;//mf.Guidance.GuidanceWidth * 0.5;
@@ -100,25 +94,25 @@ namespace AgOpenGPS
             mf.turn.closestTurnNum = closestTurnNum;
             Vec3 inBox;
 
-            int ptCount = turnArr[closestTurnNum].turnLine.Count;
+            int ptCount = mf.bnd.bndArr[closestTurnNum].turnLine.Count;
             for (int p = 0; p < ptCount; p++)
             {
-                if ((((boxB.Easting - boxA.Easting) * (turnArr[closestTurnNum].turnLine[p].Northing - boxA.Northing))
-                        - ((boxB.Northing - boxA.Northing) * (turnArr[closestTurnNum].turnLine[p].Easting - boxA.Easting))) < 0) { continue; }
+                if ((((boxB.Easting - boxA.Easting) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Northing - boxA.Northing))
+                        - ((boxB.Northing - boxA.Northing) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Easting - boxA.Easting))) < 0) { continue; }
 
-                if ((((boxD.Easting - boxC.Easting) * (turnArr[closestTurnNum].turnLine[p].Northing - boxC.Northing))
-                        - ((boxD.Northing - boxC.Northing) * (turnArr[closestTurnNum].turnLine[p].Easting - boxC.Easting))) < 0) { continue; }
+                if ((((boxD.Easting - boxC.Easting) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Northing - boxC.Northing))
+                        - ((boxD.Northing - boxC.Northing) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Easting - boxC.Easting))) < 0) { continue; }
 
-                if ((((boxC.Easting - boxB.Easting) * (turnArr[closestTurnNum].turnLine[p].Northing - boxB.Northing))
-                        - ((boxC.Northing - boxB.Northing) * (turnArr[closestTurnNum].turnLine[p].Easting - boxB.Easting))) < 0) { continue; }
+                if ((((boxC.Easting - boxB.Easting) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Northing - boxB.Northing))
+                        - ((boxC.Northing - boxB.Northing) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Easting - boxB.Easting))) < 0) { continue; }
 
-                if ((((boxA.Easting - boxD.Easting) * (turnArr[closestTurnNum].turnLine[p].Northing - boxD.Northing))
-                        - ((boxA.Northing - boxD.Northing) * (turnArr[closestTurnNum].turnLine[p].Easting - boxD.Easting))) < 0) { continue; }
+                if ((((boxA.Easting - boxD.Easting) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Northing - boxD.Northing))
+                        - ((boxA.Northing - boxD.Northing) * (mf.bnd.bndArr[closestTurnNum].turnLine[p].Easting - boxD.Easting))) < 0) { continue; }
 
                 //it's in the box, so add to list
-                inBox.Easting = turnArr[closestTurnNum].turnLine[p].Easting;
-                inBox.Northing = turnArr[closestTurnNum].turnLine[p].Northing;
-                inBox.Heading = turnArr[closestTurnNum].turnLine[p].Heading;
+                inBox.Easting = mf.bnd.bndArr[closestTurnNum].turnLine[p].Easting;
+                inBox.Northing = mf.bnd.bndArr[closestTurnNum].turnLine[p].Northing;
+                inBox.Heading = mf.bnd.bndArr[closestTurnNum].turnLine[p].Heading;
 
                 //which turn/headland is it from
                 turnClosestList.Add(inBox);
@@ -150,35 +144,97 @@ namespace AgOpenGPS
             }
         }
 
-        public void BuildTurnLines(int Num)
+        public bool FindClosestTurnPointinBox(bool isYouTurnRight, Vec3 fromPt)
         {
-            if (mf.bnd.bndArr.Count == 0) return;
-            //to fill the list of line points
-            Vec3 point = new Vec3();
+            double CosHead = Math.Cos(fromPt.Heading);
+            double SinHead = Math.Sin(fromPt.Heading);
 
-            //inside boundaries
-            for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
+            double scanWidthL, scanWidthR;
+
+            if (isYouTurnRight)
             {
-                turnArr[j].turnLine.Clear();
-
-                int ChangeDirection = j == 0 ? 1 : -1;
-
-                int ptCount = mf.bnd.bndArr[j].bndLine.Count;
-
-                for (int i = 0; i < ptCount; i++)
-                {
-                    //calculate the point outside the boundary
-                    point.Northing = mf.bnd.bndArr[j].bndLine[i].Northing + Math.Sin(mf.bnd.bndArr[j].bndLine[i].Heading) * (-mf.yt.triggerDistanceOffset * ChangeDirection);
-                    point.Easting = mf.bnd.bndArr[j].bndLine[i].Easting + Math.Cos(mf.bnd.bndArr[j].bndLine[i].Heading) * (mf.yt.triggerDistanceOffset * ChangeDirection);
-                    point.Heading = mf.bnd.bndArr[j].bndLine[i].Heading;
-                    turnArr[j].turnLine.Add(point);
-                }
-                turnArr[j].FixTurnLine(mf.yt.triggerDistanceOffset, ref mf.bnd.bndArr[j].bndLine);
-
-                turnArr[j].PreCalcTurnLines();
-
-                if (Num > -1) break;
+                scanWidthL = -(mf.Guidance.GuidanceWidth * 0.5 - mf.Guidance.GuidanceOffset);
+                scanWidthR = mf.Guidance.GuidanceWidth * (0.5 + mf.yt.rowSkipsWidth) + mf.Guidance.GuidanceOffset;
             }
+            else
+            {
+                scanWidthL = -(mf.Guidance.GuidanceWidth * (0.5 + mf.yt.rowSkipsWidth) - mf.Guidance.GuidanceOffset);
+                scanWidthR = (mf.Guidance.GuidanceWidth * 0.5 + mf.Guidance.GuidanceOffset);
+            }
+
+            double NorthingMax = boxA.Northing = fromPt.Northing + SinHead * -scanWidthL;
+            double EastingMax = boxA.Easting = fromPt.Easting + CosHead * scanWidthL;
+            double NorthingMin = NorthingMax;
+            double EastingMin = EastingMax;
+
+            boxB.Northing = fromPt.Northing + SinHead * -scanWidthR;
+
+
+            if (boxB.Northing > NorthingMax) NorthingMax = boxB.Northing;
+            if (boxB.Northing < NorthingMin) NorthingMin = boxB.Northing;
+            boxB.Easting = fromPt.Easting + CosHead * scanWidthR;
+            if (boxB.Easting > EastingMax) EastingMax = boxB.Easting;
+            if (boxB.Easting < EastingMin) EastingMin = boxB.Easting;
+            boxC.Northing = boxB.Northing + CosHead * mf.maxCrossFieldLength;
+            if (boxC.Northing > NorthingMax) NorthingMax = boxC.Northing;
+            if (boxC.Northing < NorthingMin) NorthingMin = boxC.Northing;
+            boxC.Easting = boxB.Easting + SinHead * mf.maxCrossFieldLength;
+            if (boxC.Easting > EastingMax) EastingMax = boxC.Easting;
+            if (boxC.Easting < EastingMin) EastingMin = boxC.Easting;
+
+            boxD.Northing = boxA.Northing + CosHead * mf.maxCrossFieldLength;
+            if (boxD.Northing > NorthingMax) NorthingMax = boxD.Northing;
+            if (boxD.Northing < NorthingMin) NorthingMin = boxD.Northing;
+            boxD.Easting = boxA.Easting + SinHead * mf.maxCrossFieldLength;
+            if (boxD.Easting > EastingMax) EastingMax = boxD.Easting;
+            if (boxD.Easting < EastingMin) EastingMin = boxD.Easting;
+
+
+            Vec2 BoxBA = boxB - boxA;
+            Vec2 BoxDC = boxD - boxC;
+            Vec2 BoxCB = boxC - boxB;
+            Vec2 BoxAD = boxA - boxD;
+
+            BoxList.Clear();
+            Vec3 inBox;
+            int lasti = -1;
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+            {
+                if (mf.bnd.bndArr[i].isDriveThru || mf.bnd.bndArr[i].isDriveAround) continue;
+                if (mf.bnd.bndArr.Count > i)
+                {
+                    int ptCount = mf.bnd.bndArr[i].turnLine.Count;
+                    for (int p = 0; p < ptCount; p++)
+                    {
+                        if (mf.bnd.bndArr[i].turnLine[p].Northing > NorthingMax || mf.bnd.bndArr[i].turnLine[p].Northing < NorthingMin) continue;
+                        if (mf.bnd.bndArr[i].turnLine[p].Easting > EastingMax || mf.bnd.bndArr[i].turnLine[p].Easting < EastingMin) continue;
+
+                        if (((BoxBA.Easting * (mf.bnd.bndArr[i].turnLine[p].Northing - boxA.Northing))
+                                - (BoxBA.Northing * (mf.bnd.bndArr[i].turnLine[p].Easting - boxA.Easting))) < 0) continue;
+
+                        if (((BoxDC.Easting * (mf.bnd.bndArr[i].turnLine[p].Northing - boxC.Northing))
+                                - (BoxDC.Northing * (mf.bnd.bndArr[i].turnLine[p].Easting - boxC.Easting))) < 0) continue;
+
+                        if (((BoxCB.Easting * (mf.bnd.bndArr[i].turnLine[p].Northing - boxB.Northing))
+                                - (BoxCB.Northing * (mf.bnd.bndArr[i].turnLine[p].Easting - boxB.Easting))) < 0) continue;
+
+                        if (((BoxAD.Easting * (mf.bnd.bndArr[i].turnLine[p].Northing - boxD.Northing))
+                                - (BoxAD.Northing * (mf.bnd.bndArr[i].turnLine[p].Easting - boxD.Easting))) < 0) continue;
+
+                        inBox.Northing = mf.bnd.bndArr[i].turnLine[p].Northing;
+                        inBox.Easting = mf.bnd.bndArr[i].turnLine[p].Easting;
+                        inBox.Heading = p;
+
+                        if (i != lasti)
+                        {
+                            BoxList.Add(new List<Vec3>());
+                            lasti = i;
+                        }
+                        BoxList[BoxList.Count-1].Add(inBox);
+                    }
+                }
+            }
+            return BoxList.Count > 0;
         }
 
         public void DrawTurnLines()
@@ -192,35 +248,15 @@ namespace AgOpenGPS
                 if (mf.bnd.bndArr[i].isDriveAround || mf.bnd.bndArr[i].isDriveThru) continue;
 
                 ////draw the turn line oject
-                int ptCount = mf.turn.turnArr[i].turnLine.Count;
-                if (ptCount < 1) return;
+                if (mf.bnd.bndArr[i].turnLine.Count < 1) return;
 
                 if (mf.bnd.bndArr[i].Northingmin > mf.worldGrid.NorthingMax || mf.bnd.bndArr[i].Northingmax < mf.worldGrid.NorthingMin) continue;
                 if (mf.bnd.bndArr[i].Eastingmin > mf.worldGrid.EastingMax || mf.bnd.bndArr[i].Eastingmax < mf.worldGrid.EastingMin) continue;
 
                 GL.Begin(PrimitiveType.LineLoop);
-                for (int h = 0; h < ptCount; h++) GL.Vertex3(mf.turn.turnArr[i].turnLine[h].Easting, mf.turn.turnArr[i].turnLine[h].Northing, 0);
+                for (int h = 0; h < mf.bnd.bndArr[i].turnLine.Count; h++) GL.Vertex3(mf.bnd.bndArr[i].turnLine[h].Easting, mf.bnd.bndArr[i].turnLine[h].Northing, 0);
                 GL.End();
             }
-        }
-
-        //draws the derived closest point
-        public void DrawClosestPoint()
-        {
-            //GL.PointSize(6.0f);
-            //GL.Color3(0.219f, 0.932f, 0.070f);
-            //GL.Begin(PrimitiveType.Points);
-            //GL.Vertex3(closestTurnPt.Easting, closestTurnPt.Northing, 0);
-            //GL.End();
-
-            //GL.LineWidth(1);
-            //GL.Color3(0.92f, 0.62f, 0.42f);
-            //GL.Begin(PrimitiveType.LineStrip);
-            //GL.Vertex3(boxD.Easting, boxD.Northing, 0);
-            //GL.Vertex3(boxA.Easting, boxA.Northing, 0);
-            //GL.Vertex3(boxB.Easting, boxB.Northing, 0);
-            //GL.Vertex3(boxC.Easting, boxC.Northing, 0);
-            //GL.End();
         }
     }
 }

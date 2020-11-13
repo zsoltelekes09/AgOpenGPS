@@ -17,8 +17,10 @@ namespace AgOpenGPS
         public List<CSection> Sections = new List<CSection>();
 
         public Vec2 HitchPos;
-        public Vec3 ToolPos;
-        public Vec3 TankPos;
+        public Vec3 ToolWheelPos;
+        public Vec2 ToolHitchPos;
+        public Vec3 TankWheelPos;
+        public Vec2 TankHitchPos;
 
         public double HitchLength;
         public int ToolNum;
@@ -26,7 +28,7 @@ namespace AgOpenGPS
         public double ToolFarLeftSpeed = 0;
         public double ToolFarRightSpeed = 0;
 
-        public double toolTrailingHitchLength, toolTankTrailingHitchLength;
+        public double ToolWheelLength, TankWheelLength, ToolHitchLength, TankHitchLength;
         public double ToolOffset, SlowSpeedCutoff;
 
         public double LookAheadOffSetting, LookAheadOnSetting;
@@ -70,12 +72,16 @@ namespace AgOpenGPS
 
             SetSections();
 
-            ToolPos = new Vec3(0, 0, 0);
-            TankPos = new Vec3(0, 0, 0);
+            ToolWheelPos = new Vec3(0, 0, 0);
+            ToolHitchPos = new Vec2(0, 0);
+            TankWheelPos = new Vec3(0, 0, 0);
+            TankHitchPos = new Vec2(0, 0);
             HitchPos = new Vec2(0, 0);
 
-            toolTrailingHitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].TrailingHitchLength;
-            toolTankTrailingHitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].TankTrailingHitchLength;
+            ToolWheelLength = Properties.Vehicle.Default.ToolSettings[ToolNum].ToolWheelLength;
+            TankWheelLength = Properties.Vehicle.Default.ToolSettings[ToolNum].TankWheelLength;
+            ToolHitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].ToolHitchLength;
+            TankHitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].TankHitchLength;
             HitchLength = Properties.Vehicle.Default.ToolSettings[ToolNum].HitchLength;
 
             isToolBehindPivot = Properties.Vehicle.Default.ToolSettings[ToolNum].BehindPivot;
@@ -128,7 +134,6 @@ namespace AgOpenGPS
                 else if (j == numOfSections)
                 {
                     mf.Controls.Remove(Sections[j].SectionButton);
-                    //Sections[j].SectionButton.Dispose();
                 }
             }
 
@@ -173,6 +178,12 @@ namespace AgOpenGPS
 
                             SectionButtonColor(j);
                         }
+                        else
+                        {
+                            Sections[j].BtnSectionState = mf.autoBtnState;
+                            Sections[j].SectionButton.Enabled = (mf.autoBtnState != 0);
+                            SectionButtonColor(j);
+                        }
                     }
                 }
 
@@ -206,50 +217,80 @@ namespace AgOpenGPS
             //translate down to the hitch pin
             GL.Translate(0.0, HitchLength, 0.0);
 
-            //there is a trailing tow between hitch
-            if (isToolTrailing)
+            if (numOfSections > 0)
             {
-                if (isToolTBT)
+                //there is a trailing tow between hitch
+                if (isToolTrailing)
                 {
-                    //rotate to tank heading
-                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.Heading), 0.0, 0.0, 1.0);
+                    if (isToolTBT)
+                    {
+                        //rotate to tank heading
+                        GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankWheelPos.Heading), 0.0, 0.0, 1.0);
 
-                    //draw the tank hitch
-                    GL.LineWidth(2f);
+                        //draw the tank
+                        GL.LineWidth(2f);
+                        GL.Color3(0.7f, 0.7f, 0.97f);
+                        GL.Begin(PrimitiveType.Lines);
+                        GL.Vertex3(0, 0, 0);
+                        GL.Vertex3(0, TankWheelLength, 0);
+                        GL.End();
+
+                        //Hitch
+                        GL.LineWidth(1f);
+                        GL.Color3(0.37f, 0.37f, 0.97f);
+                        GL.Begin(PrimitiveType.Lines);
+                        GL.Vertex3(0, TankWheelLength, 0);
+                        GL.Vertex3(0, TankWheelLength + TankHitchLength, 0);
+                        GL.End();
+
+                        //pivot markers
+                        GL.Color3(0.95f, 0.95f, 0f);
+                        GL.PointSize(6f);
+                        GL.Begin(PrimitiveType.Points);
+                        GL.Vertex3(0.0, TankWheelLength, 0.0);
+                        if (TankHitchLength != 0)
+                        {
+                            GL.Color3(0.95f, 0.0f, 0.0f);
+                            GL.Vertex3(0.0, TankWheelLength + TankHitchLength, 0.0);
+                        }
+                        GL.End();
+
+                        //move down the tank hitch, unwind, rotate to section heading
+                        GL.Translate(0.0, TankWheelLength + TankHitchLength, 0.0);
+                    }
+
+                    GL.Rotate(Glm.ToDegrees(TankWheelPos.Heading - ToolWheelPos.Heading), 0.0, 0.0, 1.0);
+
+                    //draw the hitch
+                    GL.LineWidth(2);
                     GL.Color3(0.7f, 0.7f, 0.97f);
                     GL.Begin(PrimitiveType.Lines);
-                    GL.Vertex3(0.0, toolTankTrailingHitchLength, 0.0);
+                    GL.Vertex3(0.0, ToolWheelLength, 0.0);
                     GL.Vertex3(0, 0, 0);
                     GL.End();
 
-                    //pivot markers
-                    GL.Color3(0.95f, 0.95f, 0f);
-                    GL.PointSize(6f);
-                    GL.Begin(PrimitiveType.Points);
-                    GL.Vertex3(0.0, toolTankTrailingHitchLength, 0.0);
+                    //Hitch
+                    GL.LineWidth(1f);
+                    GL.Color3(0.37f, 0.37f, 0.97f);
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex3(0, ToolWheelLength, 0);
+                    GL.Vertex3(0, ToolWheelLength + ToolHitchLength, 0);
                     GL.End();
 
-                    //move down the tank hitch, unwind, rotate to section heading
-                    GL.Translate(0.0, toolTankTrailingHitchLength, 0.0);
+
+
+                    if (ToolHitchLength != 0)
+                    {
+                        //pivot marker
+                        GL.Color3(0.95f, 0.95f, 0f);
+                        GL.PointSize(6f);
+                        GL.Begin(PrimitiveType.Points);
+                        GL.Vertex3(0.0, ToolWheelLength, 0.0);
+                        GL.End();
+                    }
+
+                    GL.Translate(0.0, ToolWheelLength + ToolHitchLength, 0.0);
                 }
-
-
-                GL.Rotate(Glm.ToDegrees(TankPos.Heading - ToolPos.Heading), 0.0, 0.0, 1.0);
-
-                //draw the hitch
-                GL.LineWidth(2);
-                GL.Color3(0.7f, 0.7f, 0.97f);
-                GL.Begin(PrimitiveType.Lines);
-                GL.Vertex3(0.0, toolTrailingHitchLength, 0.0);
-                GL.Vertex3(0, 0, 0);
-                GL.End();
-
-                GL.Translate(0.0, toolTrailingHitchLength, 0.0);
-
-
-            }
-            if (numOfSections > 0)
-            {
                 //look ahead lines
                 GL.LineWidth(1);
                 GL.Begin(PrimitiveType.Lines);
@@ -295,7 +336,7 @@ namespace AgOpenGPS
             GL.LineWidth(2);
 
             double hite = mf.camera.camSetDistance / -100;
-            if (hite > 1.3) hite = 1.0;
+            if (hite > 1.3) hite = 1.3;
             if (hite < 0.5) hite = 0.5;
 
             for (int j = 0; j < numOfSections; j++)
@@ -319,10 +360,6 @@ namespace AgOpenGPS
                 }
 
                 double mid = (Sections[j].positionLeft + Sections[j].positionRight) /2;
-
-
-
-                
 
                 GL.Begin(PrimitiveType.TriangleFan);
                 {
@@ -364,23 +401,18 @@ namespace AgOpenGPS
                 GL.End();
             }
 
-
             if (isToolTrailing)
             {
-                GL.Translate(0.0, -toolTrailingHitchLength, 0.0);
-                GL.Rotate(Glm.ToDegrees(TankPos.Heading - ToolPos.Heading), 0.0, 0.0, -1.0);
+                GL.Translate(0.0, -(ToolWheelLength + ToolHitchLength), 0.0);
+                GL.Rotate(Glm.ToDegrees(TankWheelPos.Heading - ToolWheelPos.Heading), 0.0, 0.0, -1.0);
 
                 if (isToolTBT)
                 {
-                    GL.Translate(0.0, -toolTankTrailingHitchLength, 0.0);
-                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankPos.Heading), 0.0, 0.0, -1.0);
+                    GL.Translate(0.0, -(TankWheelLength + TankHitchLength), 0.0);
+                    GL.Rotate(Glm.ToDegrees(mf.fixHeading - TankWheelPos.Heading), 0.0, 0.0, -1.0);
                 }
-
             }
             GL.Translate(0.0, -HitchLength, 0.0);
-
-
-
         }
     }
 }

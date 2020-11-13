@@ -12,11 +12,11 @@ namespace AgOpenGPS
 
         public ListViewItem Itm { get; set; }
 
-        public FormDrivePicker(Form callingForm, string _fileList)
+        public FormDrivePicker(FormGPS _mf, Form callingForm, string _fileList)
         {
             //get copy of the calling main form
-            Owner = mf = callingForm as FormGPS;
-
+            mf = _mf;
+            Owner = callingForm;
             InitializeComponent();
 
             string[] fileList = _fileList.Split(',');

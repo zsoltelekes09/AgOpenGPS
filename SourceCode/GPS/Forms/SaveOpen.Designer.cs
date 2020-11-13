@@ -7,10 +7,11 @@ using System.Globalization;
 using System.Drawing;
 using System.Xml;
 using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace AgOpenGPS
 {
-    
     public partial class FormGPS
     {
         //list of the list of patch data individual triangles for field sections
@@ -155,7 +156,7 @@ namespace AgOpenGPS
                             line = reader.ReadLine();
                             int numPoints = int.Parse(line);
 
-                            if (numPoints > 1)
+                            if (numPoints > 0)
                             {
                                 for (int i = 0; i < numPoints; i++)
                                 {
@@ -166,7 +167,7 @@ namespace AgOpenGPS
                                         double.Parse(words[2], CultureInfo.InvariantCulture));
                                     CurveLines.Lines[idx].curvePts.Add(vecPt);
                                 }
-                                CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, CurveLines.Lines[idx].BoundaryMode, 0.0436332, 5);
+                                CurveLines.Lines[idx].curvePts.CalculateRoundedCorner(0.5, CurveLines.Lines[idx].BoundaryMode, 0.0436332, CancellationToken.None);
                             }
                             else
                             {
@@ -285,6 +286,9 @@ namespace AgOpenGPS
         //function that save vehicle and section settings
         public void FileSaveVehicle(string FileName)
         {
+            string dir = Path.GetDirectoryName(vehiclesDirectory);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
+
             vehicleFileName = Path.GetFileNameWithoutExtension(FileName) + " - ";
             Properties.Vehicle.Default.setVehicle_vehicleName = vehicleFileName;
             Properties.Vehicle.Default.Save();
@@ -312,7 +316,7 @@ namespace AgOpenGPS
                 writer.WriteLine("UTurnSkipWidth," + Properties.Vehicle.Default.set_youSkipWidth.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("YouTurnDistance," + Properties.Vehicle.Default.set_youTurnDistance.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("youTriggerDistance," + Properties.Vehicle.Default.set_youTriggerDistance.ToString(CultureInfo.InvariantCulture));
-                writer.WriteLine("YouTurnUseDubins," + Properties.Vehicle.Default.set_youUseDubins.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("YouTurnUseDubins," + Properties.Vehicle.Default.Youturn_Type.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("IsMachineControlToAS," + Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer.ToString(CultureInfo.InvariantCulture));
 
                 //AutoSteer
@@ -403,9 +407,9 @@ namespace AgOpenGPS
                 writer.WriteLine("Empty," + "10");
             }
 
-                //little show to say saved and where
-                TimedMessageBox(3000, String.Get("gsSavedInFolder"), vehiclesDirectory);
-            }
+            //little show to say saved and where
+            TimedMessageBox(3000, String.Get("gsSavedInFolder"), vehiclesDirectory);
+        }
 
         //function to open a previously saved field
         public bool FileOpenVehicle(string filename)
@@ -445,14 +449,14 @@ namespace AgOpenGPS
                     line = reader.ReadLine(); words = line.Split(',');
 
                     //file version
-                    string []fullVers = words[1].Split('.');
+                    string[] fullVers = words[1].Split('.');
                     string vers = fullVers[0] + fullVers[1];
                     int fileVersion = int.Parse(vers, CultureInfo.InvariantCulture);
 
                     //assembly version
                     string assemblyVersion = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
                     fullVers = assemblyVersion.Split('.');
-                    int appVersion = int.Parse(fullVers[0]+fullVers[1], CultureInfo.InvariantCulture);
+                    int appVersion = int.Parse(fullVers[0] + fullVers[1], CultureInfo.InvariantCulture);
 
                     if (fileVersion < appVersion)
                     {
@@ -497,7 +501,7 @@ namespace AgOpenGPS
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.set_youTriggerDistance = double.Parse(words[1], CultureInfo.InvariantCulture);
                         line = reader.ReadLine(); words = line.Split(',');
-                        Properties.Vehicle.Default.set_youUseDubins = bool.Parse(words[1]);
+                        Properties.Vehicle.Default.Youturn_Type = byte.Parse(words[1]);
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer = bool.Parse(words[1]);
 
@@ -655,7 +659,7 @@ namespace AgOpenGPS
                         yt.rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;
                         yt.youTurnStartOffset = Properties.Vehicle.Default.set_youTurnDistance;
                         yt.triggerDistanceOffset = Properties.Vehicle.Default.set_youTriggerDistance;
-                        yt.isUsingDubinsTurn = Properties.Vehicle.Default.set_youUseDubins;
+                        yt.YouTurnType = Properties.Vehicle.Default.Youturn_Type;
                         mc.isMachineDataSentToAutoSteer = Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer;
 
                         mc.Config_AutoSteer[mc.ssKp] = Properties.Vehicle.Default.setAS_Kp;
@@ -762,6 +766,9 @@ namespace AgOpenGPS
         {
             CheckToolSettings();
 
+            string dir = Path.GetDirectoryName(toolsDirectory);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
+
             toolFileName = Path.GetFileNameWithoutExtension(FileName) + " - ";
             Properties.Vehicle.Default.setVehicle_toolName = toolFileName;
             Properties.Vehicle.Default.Save();
@@ -780,9 +787,11 @@ namespace AgOpenGPS
                     writer.WriteLine("MappingOnDelay," + Properties.Vehicle.Default.ToolSettings[i].MappingOnDelay.ToString(CultureInfo.InvariantCulture));
                     writer.WriteLine("MappingOffDelay," + Properties.Vehicle.Default.ToolSettings[i].MappingOffDelay.ToString(CultureInfo.InvariantCulture));
 
-                    writer.WriteLine("ToolTrailingHitchLength," + Properties.Vehicle.Default.ToolSettings[i].TrailingHitchLength.ToString(CultureInfo.InvariantCulture));
-                    writer.WriteLine("TankTrailingHitchLength," + Properties.Vehicle.Default.ToolSettings[i].TankTrailingHitchLength.ToString(CultureInfo.InvariantCulture));
                     writer.WriteLine("HitchLength," + Properties.Vehicle.Default.ToolSettings[i].HitchLength.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("TankWheelLength," + Properties.Vehicle.Default.ToolSettings[i].TankWheelLength.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("TankHitchLength," + Properties.Vehicle.Default.ToolSettings[i].TankHitchLength.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("ToolWheelLength," + Properties.Vehicle.Default.ToolSettings[i].ToolWheelLength.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("ToolHitchLength," + Properties.Vehicle.Default.ToolSettings[i].ToolHitchLength.ToString(CultureInfo.InvariantCulture));
 
                     writer.WriteLine("IsToolBehindPivot," + Properties.Vehicle.Default.ToolSettings[i].BehindPivot.ToString(CultureInfo.InvariantCulture));
                     writer.WriteLine("IsToolTrailing," + Properties.Vehicle.Default.ToolSettings[i].Trailing.ToString(CultureInfo.InvariantCulture));
@@ -793,7 +802,7 @@ namespace AgOpenGPS
                     writer.WriteLine("Sections," + Properties.Vehicle.Default.ToolSettings[i].Sections.Count.ToString());
                     for (int j = 0; j < Properties.Vehicle.Default.ToolSettings[i].Sections.Count; j++)
                     {
-                        writer.WriteLine("Section"+ (j + 1).ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][0].ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][1].ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][2].ToString());
+                        writer.WriteLine("Section" + (j + 1).ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][0].ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][1].ToString() + "," + Properties.Vehicle.Default.ToolSettings[i].Sections[j][2].ToString());
                     }
                 }
 
@@ -828,9 +837,9 @@ namespace AgOpenGPS
                 writer.WriteLine("Empty," + "10");
             }
 
-                //little show to say saved and where
-                TimedMessageBox(3000, String.Get("gsSavedInFolder"), toolsDirectory);
-            }
+            //little show to say saved and where
+            TimedMessageBox(3000, String.Get("gsSavedInFolder"), toolsDirectory);
+        }
 
         //function to open a previously saved field
         public bool FileOpenTool(string fileName)
@@ -882,11 +891,15 @@ namespace AgOpenGPS
                             line = reader.ReadLine(); words = line.Split(',');
                             test[i].MappingOffDelay = double.Parse(words[1], CultureInfo.InvariantCulture);
                             line = reader.ReadLine(); words = line.Split(',');
-                            test[i].TrailingHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
-                            line = reader.ReadLine(); words = line.Split(',');
-                            test[i].TankTrailingHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
-                            line = reader.ReadLine(); words = line.Split(',');
                             test[i].HitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].TankWheelLength = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].TankHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].ToolWheelLength = double.Parse(words[1], CultureInfo.InvariantCulture);
+                            line = reader.ReadLine(); words = line.Split(',');
+                            test[i].ToolHitchLength = double.Parse(words[1], CultureInfo.InvariantCulture);
 
                             line = reader.ReadLine(); words = line.Split(',');
                             test[i].BehindPivot = bool.Parse(words[1]);
@@ -902,7 +915,7 @@ namespace AgOpenGPS
                             for (int j = 0; j < count2; j++)
                             {
                                 line = reader.ReadLine(); words = line.Split(',');
-                                test[i].Sections.Add(new double[] { double.Parse(words[1], CultureInfo.InvariantCulture) , double.Parse(words[2], CultureInfo.InvariantCulture) , double.Parse(words[3], CultureInfo.InvariantCulture) });
+                                test[i].Sections.Add(new double[] { double.Parse(words[1], CultureInfo.InvariantCulture), double.Parse(words[2], CultureInfo.InvariantCulture), double.Parse(words[3], CultureInfo.InvariantCulture) });
                             }
                         }
                         Properties.Vehicle.Default.ToolSettings = test;
@@ -971,9 +984,12 @@ namespace AgOpenGPS
         //function that save vehicle and section settings
         public void FileSaveEnvironment(string FileName)
         {
-                envFileName = Path.GetFileNameWithoutExtension(FileName);
-                Properties.Vehicle.Default.setVehicle_envName = envFileName;
-                Properties.Vehicle.Default.Save();
+            string dir = Path.GetDirectoryName(envDirectory);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
+
+            envFileName = Path.GetFileNameWithoutExtension(FileName);
+            Properties.Vehicle.Default.setVehicle_envName = envFileName;
+            Properties.Vehicle.Default.Save();
 
             using (StreamWriter writer = new StreamWriter(FileName))
             {
@@ -1054,8 +1070,8 @@ namespace AgOpenGPS
                 writer.WriteLine("Empty," + "10");
             }
 
-                //little show to say saved and where
-                TimedMessageBox(3000, String.Get("gsSavedInFolder"), envDirectory);
+            //little show to say saved and where
+            TimedMessageBox(3000, String.Get("gsSavedInFolder"), envDirectory);
         }
 
         //function to open a previously saved field
@@ -1284,462 +1300,461 @@ namespace AgOpenGPS
 
             if (fileAndDirectory == "Cancel") return;
 
-            //and open a new job
-            JobNew();
+            isJobStarted = true;
 
-            //Saturday, February 11, 2017  -->  7:26:52 AM
-            //$FieldDir
-            //Bob_Feb11
-            //$Offsets
-            //533172,5927719,12 - offset easting, northing, zone
-
-            //start to read the file
-            string line;
-            using (StreamReader reader = new StreamReader(fileAndDirectory))
+            List<Task> tasks = new List<Task>();
+            for (int j = 0; j < TaskList.Count; j++)
             {
-                try
+                if (TaskList[j].Task.IsCompleted)
                 {
-                    //Date time line
-                    line = reader.ReadLine();
-
-                    //dir header $FieldDir
-                    line = reader.ReadLine();
-
-                    //read field directory
-                    line = reader.ReadLine();
-
-                    currentFieldDirectory = line.Trim();
-
-                    //Offset header
-                    line = reader.ReadLine();
-
-                    //read the Offsets 
-                    line = reader.ReadLine();
-                    string[] offs = line.Split(',');
-
-                    pn.utmEast = int.Parse(offs[0]);
-                    pn.utmNorth = int.Parse(offs[1]);
-                    pn.zone = int.Parse(offs[2]);
-
-                    //create a new grid
-                    worldGrid.CheckWorldGrid(pn.actualNorthing - pn.utmNorth, pn.actualEasting - pn.utmEast);
-
-                    //convergence angle update
-                    if (!reader.EndOfStream)
-                    {
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        pn.convergenceAngle = double.Parse(line, CultureInfo.InvariantCulture);
-                    }
-
-                    //start positions
-                    if (!reader.EndOfStream)
-                    {
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        offs = line.Split(',');
-
-                        pn.latStart = double.Parse(offs[0], CultureInfo.InvariantCulture);
-                        pn.lonStart = double.Parse(offs[1], CultureInfo.InvariantCulture);
-                    }
+                    TaskList.RemoveAt(j);
+                    j--;
                 }
-
-                catch (Exception e)
+                else if (TaskList[j].TaskName == TaskName.OpenJob || TaskList[j].TaskName == TaskName.CloseJob || TaskList[j].TaskName == TaskName.Save || TaskList[j].TaskName == TaskName.FixBnd || TaskList[j].TaskName == TaskName.FixHead || TaskList[j].TaskName == TaskName.Delete)
                 {
-                    WriteErrorLog("While Opening Field" + e.ToString());
-
-                    TimedMessageBox(2000, String.Get("gsFieldFileIsCorrupt"), String.Get("gsChooseADifferentField"));
-
-                    JobClose();
-                    return;
+                    tasks.Add(TaskList[j].Task);
+                }
+                else
+                {
+                    TaskList[j].Token.Cancel();
                 }
             }
 
-            // ABLine -------------------------------------------------------------------------------------------------
-            FileLoadABLines();
-
-            //CurveLines
-            FileLoadCurveLines();
-
-            //section patches
-            fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Sections.txt";
-            if (!File.Exists(fileAndDirectory))
+            Task NewTask = Task_JobNew(fileAndDirectory, tasks);
+            TaskList.Add(new TaskClass(NewTask, null, TaskName.OpenJob, new CancellationTokenSource()));
+            tasks.Add(NewTask);
+        }
+        
+        public void FileOpenField2(string fileAndDirectory)
+        {
+            try
             {
-                TimedMessageBox(2000, String.Get("gsMissingSectionFile"), String.Get("gsButFieldIsLoaded"));
-                //return;
-            }
-            else
-            {
-                bool isv3 = false;
+                //start to read the file
+                string line;
                 using (StreamReader reader = new StreamReader(fileAndDirectory))
                 {
                     try
                     {
-                        fd.workedAreaTotal = 0;
-                        fd.distanceUser = 0;
-                        Vec3 vecFix = new Vec3();
+                        //Date time line
+                        line = reader.ReadLine();
 
-                        //read header
-                        while (!reader.EndOfStream)
+                        //dir header $FieldDir
+                        line = reader.ReadLine();
+
+                        //read field directory
+                        line = reader.ReadLine();
+
+                        currentFieldDirectory = line.Trim();
+
+                        //Offset header
+                        line = reader.ReadLine();
+
+                        //read the Offsets 
+                        line = reader.ReadLine();
+                        string[] offs = line.Split(',');
+
+                        pn.utmEast = int.Parse(offs[0]);
+                        pn.utmNorth = int.Parse(offs[1]);
+                        pn.zone = int.Parse(offs[2]);
+
+                        //create a new grid
+                        worldGrid.CheckWorldGrid(pn.actualNorthing - pn.utmNorth, pn.actualEasting - pn.utmEast);
+
+                        //convergence angle update
+                        if (!reader.EndOfStream)
                         {
                             line = reader.ReadLine();
-                            if (line.Contains("ect"))
-                            {
-                                isv3 = true;
-                                break;
-                            }
-                            int verts = int.Parse(line);
+                            line = reader.ReadLine();
+                            pn.convergenceAngle = double.Parse(line, CultureInfo.InvariantCulture);
+                        }
 
+                        //start positions
+                        if (!reader.EndOfStream)
+                        {
+                            line = reader.ReadLine();
+                            line = reader.ReadLine();
+                            offs = line.Split(',');
 
-                            PatchDrawList.Add(new List<Vec3>());
-                            int idx = PatchDrawList.Count - 1;
-                            for (int v = 0; v < verts; v++)
+                            pn.latStart = double.Parse(offs[0], CultureInfo.InvariantCulture);
+                            pn.lonStart = double.Parse(offs[1], CultureInfo.InvariantCulture);
+                        }
+                    }
+
+                    catch (Exception e)
+                    {
+                        WriteErrorLog("While Opening Field" + e.ToString());
+                        TimedMessageBox(2000, String.Get("gsFieldFileIsCorrupt"), String.Get("gsChooseADifferentField"));
+
+                        StartTasks(null, 0, TaskName.CloseJob);
+                        return;
+                    }
+                }
+
+                // ABLine -------------------------------------------------------------------------------------------------
+                FileLoadABLines();
+
+                //CurveLines
+                FileLoadCurveLines();
+
+                //section patches
+                fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Sections.txt";
+                if (!File.Exists(fileAndDirectory))
+                {
+                    TimedMessageBox(2000, String.Get("gsMissingSectionFile"), String.Get("gsButFieldIsLoaded"));
+                    //return;
+                }
+                else
+                {
+                    bool isv3 = false;
+                    using (StreamReader reader = new StreamReader(fileAndDirectory))
+                    {
+                        try
+                        {
+                            fd.workedAreaTotal = 0;
+                            fd.distanceUser = 0;
+                            Vec3 vecFix = new Vec3();
+
+                            //read header
+                            while (!reader.EndOfStream)
                             {
                                 line = reader.ReadLine();
-                                string[] words = line.Split(',');
-                                vecFix.Easting = double.Parse(words[0], CultureInfo.InvariantCulture);
-                                vecFix.Northing = double.Parse(words[1], CultureInfo.InvariantCulture);
-                                vecFix.Heading = double.Parse(words[2], CultureInfo.InvariantCulture);
-                                PatchDrawList[idx].Add(vecFix);
-                            }
-                            //calculate area of this patch - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
-                            verts -= 2;
-                            if (verts >= 2)
-                            {
-                                for (int j = 1; j < verts; j++)
+                                if (line.Contains("ect"))
                                 {
-                                    double temp = 0;
-                                    temp = PatchDrawList[idx][j].Easting * (PatchDrawList[idx][j + 1].Northing - PatchDrawList[idx][j + 2].Northing) +
-                                           PatchDrawList[idx][j + 1].Easting * (PatchDrawList[idx][j + 2].Northing - PatchDrawList[idx][j].Northing) +
-                                           PatchDrawList[idx][j + 2].Easting * (PatchDrawList[idx][j].Northing - PatchDrawList[idx][j + 1].Northing);
+                                    isv3 = true;
+                                    break;
+                                }
+                                int verts = int.Parse(line);
 
-                                    fd.workedAreaTotal += Math.Abs((temp * 0.5));
+
+                                PatchDrawList.Add(new List<Vec3>());
+                                int idx = PatchDrawList.Count - 1;
+                                for (int v = 0; v < verts; v++)
+                                {
+                                    line = reader.ReadLine();
+                                    string[] words = line.Split(',');
+                                    vecFix.Easting = double.Parse(words[0], CultureInfo.InvariantCulture);
+                                    vecFix.Northing = double.Parse(words[1], CultureInfo.InvariantCulture);
+                                    vecFix.Heading = double.Parse(words[2], CultureInfo.InvariantCulture);
+                                    PatchDrawList[idx].Add(vecFix);
+                                }
+                                //calculate area of this patch - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
+                                verts -= 2;
+                                if (verts >= 2)
+                                {
+                                    for (int j = 1; j < verts; j++)
+                                    {
+                                        double temp = 0;
+                                        temp = PatchDrawList[idx][j].Easting * (PatchDrawList[idx][j + 1].Northing - PatchDrawList[idx][j + 2].Northing) +
+                                               PatchDrawList[idx][j + 1].Easting * (PatchDrawList[idx][j + 2].Northing - PatchDrawList[idx][j].Northing) +
+                                               PatchDrawList[idx][j + 2].Easting * (PatchDrawList[idx][j].Northing - PatchDrawList[idx][j + 1].Northing);
+
+                                        fd.workedAreaTotal += Math.Abs((temp * 0.5));
+                                    }
                                 }
                             }
                         }
+                        catch (Exception e)
+                        {
+                            WriteErrorLog("Section file" + e.ToString());
+
+                            TimedMessageBox(2000, String.Get("gsSectionFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
+                        }
+
                     }
-                    catch (Exception e)
+
+                    //was old version prior to v4
+                    if (isv3)
                     {
-                        WriteErrorLog("Section file" + e.ToString());
-
-                        TimedMessageBox(2000, String.Get("gsSectionFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
-                    }
-
-                }
-
-                //was old version prior to v4
-                if (isv3)
-                {
                         //Append the current list to the field file
                         using (StreamWriter writer = new StreamWriter((fieldsDirectory + currentFieldDirectory + "\\Sections.txt"), false))
                         {
                         }
-                }
-            }
-
-            // Contour points ----------------------------------------------------------------------------
-
-            fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Contour.txt";
-            if (!File.Exists(fileAndDirectory))
-            {
-                TimedMessageBox(2000, String.Get("gsMissingContourFile"), String.Get("gsButFieldIsLoaded"));
-                //return;
-            }
-            
-            //Points in Patch followed by easting, heading, northing, altitude
-            else
-            {
-                using (StreamReader reader = new StreamReader(fileAndDirectory))
-                {
-                    try
-                    {
-                        //read header
-                        line = reader.ReadLine();
-
-                        while (!reader.EndOfStream)
-                        {
-                            //read how many vertices in the following patch
-                            line = reader.ReadLine();
-                            int verts = int.Parse(line);
-
-                            Vec3 vecFix = new Vec3(0, 0, 0);
-
-                            ct.stripList.Add(new List<Vec3>());
-
-                            for (int v = 0; v < verts; v++)
-                            {
-                                line = reader.ReadLine();
-                                string[] words = line.Split(',');
-                                vecFix.Easting = double.Parse(words[0], CultureInfo.InvariantCulture);
-                                vecFix.Northing = double.Parse(words[1], CultureInfo.InvariantCulture);
-                                vecFix.Heading = double.Parse(words[2], CultureInfo.InvariantCulture);
-                                ct.stripList[ct.stripList.Count-1].Add(vecFix);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        WriteErrorLog("Loading Contour file" + e.ToString());
-
-                        TimedMessageBox(2000, String.Get("gsContourFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
                     }
                 }
-            }
 
+                // Contour points ----------------------------------------------------------------------------
 
-            // Flags -------------------------------------------------------------------------------------------------
-
-            //Either exit or update running save
-            fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Flags.txt";
-            if (!File.Exists(fileAndDirectory))
-            {
-                TimedMessageBox(2000, String.Get("gsMissingFlagsFile"), String.Get("gsButFieldIsLoaded"));
-            }
-
-            else
-            {
-                flagPts.Clear();
-                using (StreamReader reader = new StreamReader(fileAndDirectory))
+                fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Contour.txt";
+                if (!File.Exists(fileAndDirectory))
                 {
-                    try
-                    {
-                        //read header
-                        line = reader.ReadLine();
-
-                        //number of flags
-                        line = reader.ReadLine();
-                        int points = int.Parse(line);
-
-                        if (points > 0)
-                        {
-                            double lat;
-                            double longi;
-                            double east;
-                            double nort;
-                            double head;
-                            int color, ID;
-                            string notes;
-
-                            for (int v = 0; v < points; v++)
-                            {
-                                line = reader.ReadLine();
-                                string[] words = line.Split(',');
-
-                                if (words.Length == 8)
-                                {
-                                    lat = double.Parse(words[0], CultureInfo.InvariantCulture);
-                                    longi = double.Parse(words[1], CultureInfo.InvariantCulture);
-                                    east = double.Parse(words[2], CultureInfo.InvariantCulture);
-                                    nort = double.Parse(words[3], CultureInfo.InvariantCulture);
-                                    head = double.Parse(words[4], CultureInfo.InvariantCulture);
-                                    color = int.Parse(words[5]);
-                                    ID = int.Parse(words[6]);
-                                    notes = words[7].Trim();
-                                }
-                                else
-                                {
-                                    lat = double.Parse(words[0], CultureInfo.InvariantCulture);
-                                    longi = double.Parse(words[1], CultureInfo.InvariantCulture);
-                                    east = double.Parse(words[2], CultureInfo.InvariantCulture);
-                                    nort = double.Parse(words[3], CultureInfo.InvariantCulture);
-                                    head = 0;
-                                    color = int.Parse(words[4]);
-                                    ID = int.Parse(words[5]);
-                                    notes = "";
-                                }
-
-                                CFlag flagPt = new CFlag(lat, longi, east, nort, head, color, ID, notes);
-                                flagPts.Add(flagPt);
-                            }
-                        }
-                    }
-
-                    catch (Exception e)
-                    {
-                        TimedMessageBox(2000, String.Get("gsFlagFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
-                        WriteErrorLog("FieldOpen, Loading Flags, Corrupt Flag File" + e.ToString());
-                    }
+                    TimedMessageBox(2000, String.Get("gsMissingContourFile"), String.Get("gsButFieldIsLoaded"));
+                    //return;
                 }
-            }
 
-            //Boundaries
-            //Either exit or update running save
-            fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Boundary.txt";
-            if (!File.Exists(fileAndDirectory))
-            {
-                TimedMessageBox(2000, String.Get("gsMissingBoundaryFile"), String.Get("gsButFieldIsLoaded"));
-            }
-            else
-            {
-                using (StreamReader reader = new StreamReader(fileAndDirectory))
+                //Points in Patch followed by easting, heading, northing, altitude
+                else
                 {
-                    try
+                    using (StreamReader reader = new StreamReader(fileAndDirectory))
                     {
-                        //read header
-                        line = reader.ReadLine();//Boundary
-
-                        for (int k = 0; true; k++)
+                        try
                         {
-                            if (reader.EndOfStream) break;
-
-                            bnd.bndArr.Add(new CBoundaryLines());
-                            turn.turnArr.Add(new CTurnLines());
-                            gf.geoFenceArr.Add(new CGeoFenceLines());
-                            hd.headArr.Add(new CHeadLines());
-
-                            //True or False OR points from older boundary files
+                            //read header
                             line = reader.ReadLine();
 
-                            //Check for older boundary files, then above line string is num of points
-                            if (line == "True" || line == "False")
+                            while (!reader.EndOfStream)
                             {
-                                bnd.bndArr[k].isDriveThru = bool.Parse(line);
-                                line = reader.ReadLine(); //number of points
+                                //read how many vertices in the following patch
+                                line = reader.ReadLine();
+                                int verts = int.Parse(line);
 
-                                bnd.bndArr[k].isDriveAround = bool.Parse(line);
-                                line = reader.ReadLine(); //number of points
-                            }
+                                Vec3 vecFix = new Vec3(0, 0, 0);
 
-                            int numPoints = int.Parse(line);
+                                ct.stripList.Add(new List<Vec3>());
 
-                            if (numPoints > 0)
-                            {
-                                //load the line
-                                for (int i = 0; i < numPoints; i++)
+                                for (int v = 0; v < verts; v++)
                                 {
                                     line = reader.ReadLine();
                                     string[] words = line.Split(',');
-                                    Vec3 vecPt = new Vec3(
-                                    double.Parse(words[1], CultureInfo.InvariantCulture),
-                                        double.Parse(words[0], CultureInfo.InvariantCulture),
-                                        double.Parse(words[2], CultureInfo.InvariantCulture));
-                                    bnd.bndArr[k].bndLine.Add(vecPt);
-                                }
-
-                                bnd.bndArr[k].FixBoundaryLine();
-                                bnd.bndArr[k].CalculateBoundaryArea();
-                                if (bnd.bndArr[k].area < 100)
-                                {
-                                    bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
-                                    hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
-                                    k = k - 1;
+                                    vecFix.Easting = double.Parse(words[0], CultureInfo.InvariantCulture);
+                                    vecFix.Northing = double.Parse(words[1], CultureInfo.InvariantCulture);
+                                    vecFix.Heading = double.Parse(words[2], CultureInfo.InvariantCulture);
+                                    ct.stripList[ct.stripList.Count - 1].Add(vecFix);
                                 }
                             }
-                            else
-                            {
-                                bnd.bndArr.RemoveAt(bnd.bndArr.Count - 1);
-                                turn.turnArr.RemoveAt(bnd.bndArr.Count - 1);
-                                gf.geoFenceArr.RemoveAt(bnd.bndArr.Count - 1);
-                                hd.headArr.RemoveAt(bnd.bndArr.Count - 1); ;
-                                k = k - 1;
-                            }
-                            if (reader.EndOfStream) break;
                         }
-
-                    }
-                    catch (Exception e)
-                    {
-                        TimedMessageBox(2000, String.Get("gsBoundaryLineFilesAreCorrupt"), String.Get("gsButFieldIsLoaded"));
-                        WriteErrorLog("Load Boundary Line" + e.ToString());
-                    }
-
-                    turn.BuildTurnLines(-1);
-                    gf.BuildGeoFenceLines(-1);
-                    fd.UpdateFieldBoundaryGUIAreas();
-                }
-            }
-
-            // Headland  -------------------------------------------------------------------------------------------------
-            fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Headland.txt";
-
-            if (File.Exists(fileAndDirectory))
-            {
-                using (StreamReader reader = new StreamReader(fileAndDirectory))
-                {
-                    try
-                    {
-                        //read header
-                        line = reader.ReadLine();//writer.WriteLine("$Headland");
-                        line = reader.ReadLine();
-                        int headArr = int.Parse(line);
-
-                        for (int i = 0; i < headArr; i++)//hd.headArr.Count
+                        catch (Exception e)
                         {
-                            line = reader.ReadLine();
-                            int numHeadLine = int.Parse(line);
-                            for (int j = 0; j < numHeadLine; j++)//hd.headArr[i].HeadLine.Count
-                            {
-                                hd.headArr[i].HeadLine.Add(new List<Vec3>());
-                                line = reader.ReadLine();
-                                int numHeadLinecount = int.Parse(line);//hd.headArr[i].HeadLine[j].Count
+                            WriteErrorLog("Loading Contour file" + e.ToString());
 
-                                for (int k = 0; k < numHeadLinecount; k++)
+                            TimedMessageBox(2000, String.Get("gsContourFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
+                        }
+                    }
+                }
+
+
+                // Flags -------------------------------------------------------------------------------------------------
+
+                //Either exit or update running save
+                fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Flags.txt";
+                if (File.Exists(fileAndDirectory))
+                {
+                    flagPts.Clear();
+                    using (StreamReader reader = new StreamReader(fileAndDirectory))
+                    {
+                        try
+                        {
+                            //read header
+                            line = reader.ReadLine();
+
+                            //number of flags
+                            line = reader.ReadLine();
+                            int points = int.Parse(line);
+
+                            if (points > 0)
+                            {
+                                double lat;
+                                double longi;
+                                double east;
+                                double nort;
+                                double head;
+                                int color, ID;
+                                string notes;
+
+                                for (int v = 0; v < points; v++)
                                 {
                                     line = reader.ReadLine();
                                     string[] words = line.Split(',');
-                                    Vec3 vecPt = new Vec3(
+
+                                    if (words.Length == 8)
+                                    {
+                                        lat = double.Parse(words[0], CultureInfo.InvariantCulture);
+                                        longi = double.Parse(words[1], CultureInfo.InvariantCulture);
+                                        east = double.Parse(words[2], CultureInfo.InvariantCulture);
+                                        nort = double.Parse(words[3], CultureInfo.InvariantCulture);
+                                        head = double.Parse(words[4], CultureInfo.InvariantCulture);
+                                        color = int.Parse(words[5]);
+                                        ID = int.Parse(words[6]);
+                                        notes = words[7].Trim();
+                                    }
+                                    else
+                                    {
+                                        lat = double.Parse(words[0], CultureInfo.InvariantCulture);
+                                        longi = double.Parse(words[1], CultureInfo.InvariantCulture);
+                                        east = double.Parse(words[2], CultureInfo.InvariantCulture);
+                                        nort = double.Parse(words[3], CultureInfo.InvariantCulture);
+                                        head = 0;
+                                        color = int.Parse(words[4]);
+                                        ID = int.Parse(words[5]);
+                                        notes = "";
+                                    }
+
+                                    CFlag flagPt = new CFlag(lat, longi, east, nort, head, color, ID, notes);
+                                    flagPts.Add(flagPt);
+                                }
+                            }
+                        }
+
+                        catch (Exception e)
+                        {
+                            TimedMessageBox(2000, String.Get("gsFlagFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
+                            WriteErrorLog("FieldOpen, Loading Flags, Corrupt Flag File" + e.ToString());
+                        }
+                    }
+                }
+
+                //Boundaries
+                //Either exit or update running save
+                fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Boundary.txt";
+                if (!File.Exists(fileAndDirectory))
+                    fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Boundary.Tmp";
+
+                if (!File.Exists(fileAndDirectory))
+                {
+                    TimedMessageBox(2000, String.Get("gsMissingBoundaryFile"), String.Get("gsButFieldIsLoaded"));
+                }
+                else
+                {
+                    using (StreamReader reader = new StreamReader(fileAndDirectory))
+                    {
+                        try
+                        {
+                            //read header
+                            line = reader.ReadLine();//Boundary
+
+                            while (true)
+                            {
+                                if (reader.EndOfStream) break;
+                                CBoundaryLines newbnd = new CBoundaryLines();
+
+                                //True or False OR points from older boundary files
+                                line = reader.ReadLine();
+
+                                //Check for older boundary files, then above line string is num of points
+                                if (line == "True" || line == "False")
+                                {
+                                    newbnd.isDriveThru = bool.Parse(line);
+                                    line = reader.ReadLine(); //number of points
+
+                                    newbnd.isDriveAround = bool.Parse(line);
+                                    line = reader.ReadLine(); //number of points
+                                }
+
+                                int numPoints = int.Parse(line);
+
+                                if (numPoints > 0)
+                                {
+                                    //load the line
+                                    for (int i = 0; i < numPoints; i++)
+                                    {
+                                        line = reader.ReadLine();
+                                        if (line == null) break;
+                                        string[] words = line.Split(',');
+                                        Vec3 vecPt = new Vec3(
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
-                                        double.Parse(words[0], CultureInfo.InvariantCulture),
-                                        double.Parse(words[2], CultureInfo.InvariantCulture));
-                                    hd.headArr[i].HeadLine[j].Add(vecPt);
+                                            double.Parse(words[0], CultureInfo.InvariantCulture),
+                                            double.Parse(words[2], CultureInfo.InvariantCulture));
+                                        newbnd.bndLine.Add(vecPt);
+                                    }
+
+                                    bnd.bndArr.Add(newbnd);
+
+                                    StartTasks(newbnd, bnd.bndArr.Count - 1, TaskName.Boundary);
                                 }
+                                if (reader.EndOfStream) break;
                             }
-                            hd.headArr[i].PreCalcHeadArea();
+                        }
+                        catch (Exception e)
+                        {
+                            TimedMessageBox(2000, String.Get("gsBoundaryLineFilesAreCorrupt"), String.Get("gsButFieldIsLoaded"));
+                            WriteErrorLog("Load Boundary Line" + e.ToString());
                         }
                     }
-
-                    catch (Exception e)
-                    {
-                        TimedMessageBox(2000, "Headland File is Corrupt", "But Field is Loaded");
-                        WriteErrorLog("Load Headland Loop" + e.ToString());
-                    }
                 }
-            }
 
-            //Recorded Path
-            fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\RecPath.txt";
-            if (File.Exists(fileAndDirectory))
-            {
-                using (StreamReader reader = new StreamReader(fileAndDirectory))
+                // Headland  -------------------------------------------------------------------------------------------------
+                fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Headland.txt";
+
+                if (!File.Exists(fileAndDirectory)) fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\Headland.Tmp";
+                if (File.Exists(fileAndDirectory))
                 {
-                    try
+                    using (StreamReader reader = new StreamReader(fileAndDirectory))
                     {
-                        //read header
-                        line = reader.ReadLine();
-                        line = reader.ReadLine();
-                        int numPoints = int.Parse(line);
-                        recPath.recList.Clear();
-
-                        while (!reader.EndOfStream)
+                        try
                         {
-                            for (int v = 0; v < numPoints; v++)
+                            //read header
+                            line = reader.ReadLine();//writer.WriteLine("$Headland");
+                            line = reader.ReadLine();
+                            int headArr = int.Parse(line);
+
+                            for (int i = 0; i < headArr && i < bnd.bndArr.Count; i++)//hd.headArr.Count
                             {
                                 line = reader.ReadLine();
-                                string[] words = line.Split(',');
-                                CRecPathPt point = new CRecPathPt(
-                                    double.Parse(words[0], CultureInfo.InvariantCulture),
-                                    double.Parse(words[1], CultureInfo.InvariantCulture),
-                                    double.Parse(words[2], CultureInfo.InvariantCulture),
-                                    double.Parse(words[3], CultureInfo.InvariantCulture),
-                                    bool.Parse(words[4]));
+                                int numHeadLine = int.Parse(line);
+                                for (int j = 0; j < numHeadLine; j++)//hd.headArr[i].HeadLine.Count
+                                {
+                                    bnd.bndArr[i].HeadLine.Add(new List<Vec3>());
+                                    line = reader.ReadLine();
+                                    int numHeadLinecount = int.Parse(line);//hd.headArr[i].HeadLine[j].Count
 
-                                //add the point
-                                recPath.recList.Add(point);
+                                    for (int k = 0; k < numHeadLinecount; k++)
+                                    {
+                                        line = reader.ReadLine();
+                                        string[] words = line.Split(',');
+                                        Vec3 vecPt = new Vec3(
+                                            double.Parse(words[1], CultureInfo.InvariantCulture),
+                                            double.Parse(words[0], CultureInfo.InvariantCulture),
+                                            double.Parse(words[2], CultureInfo.InvariantCulture));
+                                        bnd.bndArr[i].HeadLine[j].Add(vecPt);
+                                    }
+                                }
+
+                                StartTasks(bnd.bndArr[i], i, TaskName.HeadLand);
                             }
                         }
+                        catch (Exception e)
+                        {
+                            TimedMessageBox(2000, "Headland File is Corrupt", "But Field is Loaded");
+                            WriteErrorLog("Load Headland Loop" + e.ToString());
+                        }
                     }
+                }
 
-                    catch (Exception e)
+                //Recorded Path
+                fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\RecPath.txt";
+                if (File.Exists(fileAndDirectory))
+                {
+                    using (StreamReader reader = new StreamReader(fileAndDirectory))
                     {
-                        TimedMessageBox(2000, String.Get("gsRecordedPathFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
-                        WriteErrorLog("Load Recorded Path" + e.ToString());
+                        try
+                        {
+                            //read header
+                            line = reader.ReadLine();
+                            line = reader.ReadLine();
+                            int numPoints = int.Parse(line);
+                            recPath.recList.Clear();
+
+                            while (!reader.EndOfStream)
+                            {
+                                for (int v = 0; v < numPoints; v++)
+                                {
+                                    line = reader.ReadLine();
+                                    string[] words = line.Split(',');
+                                    CRecPathPt point = new CRecPathPt(
+                                        double.Parse(words[0], CultureInfo.InvariantCulture),
+                                        double.Parse(words[1], CultureInfo.InvariantCulture),
+                                        double.Parse(words[2], CultureInfo.InvariantCulture),
+                                        double.Parse(words[3], CultureInfo.InvariantCulture),
+                                        bool.Parse(words[4]));
+
+                                    //add the point
+                                    recPath.recList.Add(point);
+                                }
+                            }
+                        }
+
+                        catch (Exception e)
+                        {
+                            TimedMessageBox(2000, String.Get("gsRecordedPathFileIsCorrupt"), String.Get("gsButFieldIsLoaded"));
+                            WriteErrorLog("Load Recorded Path" + e.ToString());
+                        }
                     }
                 }
             }
-
-
+            catch (Exception)
+            {
+            
+            
+            }
         }//end of open file
 
         //creates the field file when starting new field
@@ -1786,7 +1801,6 @@ namespace AgOpenGPS
 
                 writer.WriteLine("StartFix");
                 writer.WriteLine(pn.latitude.ToString(CultureInfo.InvariantCulture) + "," + pn.longitude.ToString(CultureInfo.InvariantCulture));
-
             }
         }
 
@@ -1853,8 +1867,8 @@ namespace AgOpenGPS
                         writer.WriteLine(count2.ToString(CultureInfo.InvariantCulture));
 
                         for (int i = 0; i < count2; i++)
-                            writer.WriteLine((Math.Round(triList[i].Easting,3)).ToString(CultureInfo.InvariantCulture) +
-                                "," + (Math.Round(triList[i].Northing,3)).ToString(CultureInfo.InvariantCulture) +
+                            writer.WriteLine((Math.Round(triList[i].Easting, 3)).ToString(CultureInfo.InvariantCulture) +
+                                "," + (Math.Round(triList[i].Northing, 3)).ToString(CultureInfo.InvariantCulture) +
                                  "," + (Math.Round(triList[i].Heading, 3)).ToString(CultureInfo.InvariantCulture));
                     }
                 }
@@ -1957,7 +1971,7 @@ namespace AgOpenGPS
                         for (int i = 0; i < count2; i++)
                         {
                             writer.WriteLine(Math.Round((triList[i].Easting), 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                Math.Round(triList[i].Northing, 3).ToString(CultureInfo.InvariantCulture)+ "," +
+                                Math.Round(triList[i].Northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
                                 Math.Round(triList[i].Heading, 3).ToString(CultureInfo.InvariantCulture));
                         }
                     }
@@ -1979,7 +1993,7 @@ namespace AgOpenGPS
             { Directory.CreateDirectory(directoryName); }
 
             //write out the file
-            using (StreamWriter writer = new StreamWriter(dirField + "Boundary.Txt"))
+            using (StreamWriter writer = new StreamWriter(dirField + "Boundary.Tmp"))
             {
                 writer.WriteLine("$Boundary");
                 for (int i = 0; i < bnd.bndArr.Count; i++)
@@ -1991,12 +2005,17 @@ namespace AgOpenGPS
                     if (bnd.bndArr[i].bndLine.Count > 0)
                     {
                         for (int j = 0; j < bnd.bndArr[i].bndLine.Count; j++)
+                        {
                             writer.WriteLine(Math.Round(bnd.bndArr[i].bndLine[j].Easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
                                                 Math.Round(bnd.bndArr[i].bndLine[j].Northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
                                                     Math.Round(bnd.bndArr[i].bndLine[j].Heading, 5).ToString(CultureInfo.InvariantCulture));
+                        }
                     }
                 }
             }
+            if (File.Exists(dirField + "Boundary.Txt"))
+                File.Delete(dirField + "Boundary.Txt");
+            File.Move(dirField + "Boundary.Tmp", dirField + "Boundary.Txt");
         }
 
         //save the headland
@@ -2009,27 +2028,30 @@ namespace AgOpenGPS
             { Directory.CreateDirectory(directoryName); }
 
             //write out the file
-            using (StreamWriter writer = new StreamWriter(dirField + "Headland.Txt"))
+            using (StreamWriter writer = new StreamWriter(dirField + "Headland.Tmp"))
             {
                 writer.WriteLine("$Headland");
 
-                writer.WriteLine(hd.headArr.Count.ToString(CultureInfo.InvariantCulture));
-                for (int i = 0; i < hd.headArr.Count; i++)
+                writer.WriteLine(bnd.bndArr.Count.ToString(CultureInfo.InvariantCulture));
+                for (int i = 0; i < bnd.bndArr.Count; i++)
                 {
-                    writer.WriteLine(hd.headArr[i].HeadLine.Count.ToString(CultureInfo.InvariantCulture));
-                    for (int j = 0; j < hd.headArr[i].HeadLine.Count; j++)
+                    writer.WriteLine(bnd.bndArr[i].HeadLine.Count.ToString(CultureInfo.InvariantCulture));
+                    for (int j = 0; j < bnd.bndArr[i].HeadLine.Count; j++)
                     {
-                        writer.WriteLine(hd.headArr[i].HeadLine[j].Count.ToString(CultureInfo.InvariantCulture));
-                        for (int k = 0; k < hd.headArr[i].HeadLine[j].Count; k++)
+                        writer.WriteLine(bnd.bndArr[i].HeadLine[j].Count.ToString(CultureInfo.InvariantCulture));
+                        for (int k = 0; k < bnd.bndArr[i].HeadLine[j].Count; k++)
                         {
-                            writer.WriteLine(Math.Round(hd.headArr[i].HeadLine[j][k].Easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                             Math.Round(hd.headArr[i].HeadLine[j][k].Northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
-                                             Math.Round(hd.headArr[i].HeadLine[j][k].Heading, 3).ToString(CultureInfo.InvariantCulture));
+                            writer.WriteLine(Math.Round(bnd.bndArr[i].HeadLine[j][k].Easting, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                                             Math.Round(bnd.bndArr[i].HeadLine[j][k].Northing, 3).ToString(CultureInfo.InvariantCulture) + "," +
+                                             Math.Round(bnd.bndArr[i].HeadLine[j][k].Heading, 3).ToString(CultureInfo.InvariantCulture));
                         }
 
                     }
                 }
             }
+            if (File.Exists(dirField + "Headland.Txt"))
+                File.Delete(dirField + "Headland.Txt");
+            File.Move(dirField + "Headland.Tmp", dirField + "Headland.Txt");
         }
 
         //Create contour file
@@ -2063,11 +2085,12 @@ namespace AgOpenGPS
             if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
             { Directory.CreateDirectory(directoryName); }
 
-            //string fileAndDirectory = fieldsDirectory + currentFieldDirectory + "\\RecPath.txt";
-            //if (!File.Exists(fileAndDirectory)) FileCreateRecPath();
+
+
+            if (!File.Exists(dirField + "RecPath.txt")) FileCreateRecPath();
 
             //write out the file
-            using (StreamWriter writer = new StreamWriter((dirField + "RecPath.Txt")))
+            using (StreamWriter writer = new StreamWriter((dirField + "RecPath.Tmp")))
             {
                 writer.WriteLine("$RecPath");
                 writer.WriteLine(recPath.recList.Count.ToString(CultureInfo.InvariantCulture));
@@ -2085,6 +2108,9 @@ namespace AgOpenGPS
                     //recPath.recList.Clear();
                 }
             }
+            if (File.Exists(dirField + "RecPath.Txt"))
+                File.Delete(dirField + "RecPath.Txt");
+            File.Move(dirField + "RecPath.Tmp", dirField + "RecPath.Txt");
         }
 
         //save all the flag markers
@@ -2104,7 +2130,7 @@ namespace AgOpenGPS
             { Directory.CreateDirectory(directoryName); }
 
             //use Streamwriter to create and overwrite existing flag file
-            using (StreamWriter writer = new StreamWriter(dirField + "Flags.txt"))
+            using (StreamWriter writer = new StreamWriter(dirField + "Flags.Tmp"))
             {
                 try
                 {
@@ -2134,6 +2160,9 @@ namespace AgOpenGPS
                     return;
                 }
             }
+            if (File.Exists(dirField + "Flags.txt"))
+                File.Delete(dirField + "Flags.txt");
+            File.Move(dirField + "Flags.Tmp", dirField + "Flags.txt");
         }
 
         //save nmea sentences
@@ -2149,6 +2178,9 @@ namespace AgOpenGPS
         //save nmea sentences
         public void FileSaveElevation()
         {
+            if (!File.Exists(fieldsDirectory + currentFieldDirectory + "\\Elevation.txt"))
+                FileCreateElevation();
+
             using (StreamWriter writer = new StreamWriter((fieldsDirectory + currentFieldDirectory + "\\Elevation.txt"), true))
             {
                 writer.Write(sbFix.ToString());
@@ -2219,7 +2251,7 @@ namespace AgOpenGPS
 
             }
         }
-                                   
+
         //generate KML file from flag
         public void FileSaveSingleFlagKML(int flagNumber)
         {
@@ -2245,20 +2277,20 @@ namespace AgOpenGPS
 
                 writer.WriteLine(@"<Document>");
 
-                    writer.WriteLine(@"  <Placemark>                                  ");
-                    writer.WriteLine(@"<Style> <IconStyle>");
-                    if (flagPts[flagNumber - 1].color == 0)  //red - xbgr
-                        writer.WriteLine(@"<color>ff4400ff</color>");
-                    if (flagPts[flagNumber - 1].color == 1)  //grn - xbgr
-                        writer.WriteLine(@"<color>ff44ff00</color>");
-                    if (flagPts[flagNumber - 1].color == 2)  //yel - xbgr
-                        writer.WriteLine(@"<color>ff44ffff</color>");
-                    writer.WriteLine(@"</IconStyle> </Style>");
-                    writer.WriteLine(@" <name> " + flagNumber.ToString(CultureInfo.InvariantCulture) + @"</name>");
-                    writer.WriteLine(@"<Point><coordinates> " +
-                                    flagPts[flagNumber-1].Longitude.ToString(CultureInfo.InvariantCulture) + "," + flagPts[flagNumber-1].Latitude.ToString(CultureInfo.InvariantCulture) + ",0" +
-                                    @"</coordinates> </Point> ");
-                    writer.WriteLine(@"  </Placemark>                                 ");
+                writer.WriteLine(@"  <Placemark>                                  ");
+                writer.WriteLine(@"<Style> <IconStyle>");
+                if (flagPts[flagNumber - 1].color == 0)  //red - xbgr
+                    writer.WriteLine(@"<color>ff4400ff</color>");
+                if (flagPts[flagNumber - 1].color == 1)  //grn - xbgr
+                    writer.WriteLine(@"<color>ff44ff00</color>");
+                if (flagPts[flagNumber - 1].color == 2)  //yel - xbgr
+                    writer.WriteLine(@"<color>ff44ffff</color>");
+                writer.WriteLine(@"</IconStyle> </Style>");
+                writer.WriteLine(@" <name> " + flagNumber.ToString(CultureInfo.InvariantCulture) + @"</name>");
+                writer.WriteLine(@"<Point><coordinates> " +
+                                flagPts[flagNumber - 1].Longitude.ToString(CultureInfo.InvariantCulture) + "," + flagPts[flagNumber - 1].Latitude.ToString(CultureInfo.InvariantCulture) + ",0" +
+                                @"</coordinates> </Point> ");
+                writer.WriteLine(@"  </Placemark>                                 ");
                 writer.WriteLine(@"</Document>");
                 writer.WriteLine(@"</kml>                                         ");
 
@@ -2274,7 +2306,6 @@ namespace AgOpenGPS
             string directoryName = Path.GetDirectoryName(dirField);
             if ((directoryName.Length > 0) && (!Directory.Exists(directoryName)))
             { Directory.CreateDirectory(directoryName); }
-
 
             using (StreamWriter writer = new StreamWriter(dirField + "CurrentPosition.kml"))
             {
@@ -2312,7 +2343,7 @@ namespace AgOpenGPS
             { Directory.CreateDirectory(directoryName); }
 
             string myFileName;
-            myFileName = "Field.kml";
+            myFileName = "Field.Tmp";
 
             XmlTextWriter kml = new XmlTextWriter(dirField + myFileName, Encoding.UTF8);
 
@@ -2549,6 +2580,10 @@ namespace AgOpenGPS
 
             //Write the XML to file and close the kml
             kml.Close();
+
+            if (File.Exists(dirField + "Field.kml"))
+                File.Delete(dirField + "Field.kml");
+            File.Move(dirField + "Field.Tmp", dirField + "Field.kml");
         }
 
         public string GetUTMToLatLon(double easting, double northing)

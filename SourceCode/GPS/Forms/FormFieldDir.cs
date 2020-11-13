@@ -140,13 +140,7 @@ namespace AgOpenGPS
                         //create the field file header info
                         mf.FileCreateField();
                         mf.FileCreateSections();
-                        mf.FileCreateRecPath();
                         mf.FileCreateContour();
-                        mf.FileCreateElevation();
-                        mf.FileSaveFlags();
-                        //mf.FileSaveABLine();
-                        //mf.FileSaveCurveLine();
-                        //mf.FileSaveHeadland();
                     }
                 }
                 catch (Exception ex)

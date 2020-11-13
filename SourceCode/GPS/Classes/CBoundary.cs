@@ -4,16 +4,13 @@ using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
-    public class CBoundary
+    public partial class CBoundary
     {
         //copy of the mainform address
         private readonly FormGPS mf;
 
-        /// <summary>
-        /// array of boundaries
-        /// </summary>
-        ///
         public List<CBoundaryLines> bndArr = new List<CBoundaryLines>();
+
         public List<Vec3> bndBeingMadePts = new List<Vec3>();
 
         public double createBndOffset;
@@ -23,8 +20,8 @@ namespace AgOpenGPS
 
         public int boundarySelected = -1, closestBoundaryNum;
 
-        //point at the farthest boundary segment from pivotAxle
-        public Vec3 closestBoundaryPt = new Vec3(-10000, -10000, 9);
+        public bool BtnHeadLand = false;
+        public bool isToolUp = true;
 
         //constructor
         public CBoundary(FormGPS _f)
@@ -81,16 +78,6 @@ namespace AgOpenGPS
                 for (int h = 0; h < bndBeingMadePts.Count; h++) GL.Vertex3(bndBeingMadePts[h].Easting, bndBeingMadePts[h].Northing, 0);
                 GL.End();
             }
-        }
-
-        //draws the derived closest point
-        public void DrawClosestPoint()
-        {
-            GL.PointSize(4.0f);
-            GL.Color3(0.919f, 0.932f, 0.070f);
-            GL.Begin(PrimitiveType.Points);
-            GL.Vertex3(closestBoundaryPt.Easting, closestBoundaryPt.Northing, 0);
-            GL.End();
         }
     }
 }

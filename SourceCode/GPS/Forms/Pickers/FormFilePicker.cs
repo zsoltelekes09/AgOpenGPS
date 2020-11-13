@@ -94,6 +94,10 @@ namespace AgOpenGPS
 
                 //grab the boundary area
                 filename = dir + "\\Boundary.txt";
+
+                if (!File.Exists(filename))
+                    filename = dir + "\\Boundary.Tmp";
+
                 if (File.Exists(filename))
                 {
                     List<Vec3> pointList = new List<Vec3>();
@@ -131,6 +135,7 @@ namespace AgOpenGPS
                                     for (int i = 0; i < numPoints; i++)
                                     {
                                         line = reader.ReadLine();
+                                        if (line == null) break;
                                         string[] words = line.Split(',');
                                         Vec3 vecPt = new Vec3(
                                         double.Parse(words[1], CultureInfo.InvariantCulture),
@@ -292,6 +297,7 @@ namespace AgOpenGPS
                 {
                     if (order == 0) mf.filePickerFileAndDirectory = (mf.fieldsDirectory + lvLines.SelectedItems[0].SubItems[0].Text + "\\Field.txt");
                     else mf.filePickerFileAndDirectory = (mf.fieldsDirectory + lvLines.SelectedItems[0].SubItems[1].Text + "\\Field.txt");
+                    DialogResult = DialogResult.Yes;
                     Close();
                 }
             }

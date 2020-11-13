@@ -120,7 +120,7 @@ namespace AgOpenGPS
             }
             else
             {
-                if (mf.hd.isToolUp)
+                if (mf.bnd.isToolUp)
                     GL.Color3(0.0, 0.950, 0.0);
                 else
                     GL.Color3(0.950, 0.0, 0.0);

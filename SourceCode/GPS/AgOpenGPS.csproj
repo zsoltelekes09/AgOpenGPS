@@ -102,12 +102,6 @@
       <Private>False</Private>
     </Reference>
     <EmbeddedResource Include="References\Control.Draggable.dll" />
-    <Reference Include="Keypad, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>References\Keypad.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <EmbeddedResource Include="References\Keypad.dll" />
     <Reference Include="OpenTK">
       <HintPath>References\OpenTK.dll</HintPath>
       <Private>False</Private>
@@ -149,6 +143,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CHeadLand.cs" />
     <Compile Include="Language\Language.cs" />
     <Compile Include="Classes\CAutoLoadField.cs" />
     <Compile Include="Classes\Guidance.cs" />
@@ -159,7 +154,6 @@
     <Compile Include="Classes\CAHRS.cs" />
     <Compile Include="Classes\CABCurve.cs" />
     <Compile Include="Classes\CFont.cs" />
-    <Compile Include="Classes\CHeadLines.cs" />
     <Compile Include="Classes\CGeoFence.cs" />
     <Compile Include="Classes\CGeoFenceLines.cs" />
     <Compile Include="Classes\CMazeGrid.cs" />
@@ -494,6 +488,10 @@
       <SubType>Form</SubType>
       <DependentUpon>FormGPS.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Tasks.Designer.cs">
+      <SubType>Form</SubType>
+      <DependentUpon>FormGPS.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SerialComm.Designer.cs">
       <SubType>Form</SubType>
       <DependentUpon>FormGPS.cs</DependentUpon>
@@ -574,6 +572,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="aChangeLog.txt" />
+    <None Include="btnImages\ColorPicker.png" />
     <None Include="btnImages\AppIcon.ico" />
     <None Include="btnImages\Reload.png" />
     <None Include="btnImages\Alarm10.wav" />

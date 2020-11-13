@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace AgOpenGPS
 {
@@ -15,19 +16,8 @@ namespace AgOpenGPS
 
         public int Oldstrip, strip = 0, pt = 0;
 
-        //used to determine if section was off and now is on or vice versa
-        public bool wasSectionOn;
-
-        //generated box for finding closest point
-        public Vec2 boxA = new Vec2(0, 0), boxB = new Vec2(2, 0);
-        public Vec2 boxC = new Vec2(1, 1), boxD = new Vec2(3, 2);
-        public Vec2 boxE = new Vec2(4, 3), boxF = new Vec2(5, 4);
-
-        //current contour patch and point closest to current fix
-        public int closestRefPatch;
-
         //angle to path line closest point and fix
-        public double refHeading, ref2;
+        public double refHeading;
 
         // for closest line point to current fix
         public double Distance, refEast, refNorth;
@@ -175,13 +165,21 @@ namespace AgOpenGPS
                 }
             }
 
-            stripList[stripList.Count - 1].CalculateRoundedCorner(0.5, true, 0.0436332, 5);
+            stripList[stripList.Count - 1].CalculateRoundedCorner(0.5, true, 0.0436332, CancellationToken.None);
         }
 
         //determine distance from contour guidance line
-        public void DistanceFromContourLine(Vec3 pivot)
+        public void DistanceFromContourLine(Vec3 PivotAxlePos, Vec3 SteerAxlePos)
         {
-            if (!mf.isAutoSteerBtnOn)
+            bool UseSteer = mf.isStanleyUsed;
+
+            if (!mf.vehicle.isSteerAxleAhead) UseSteer = !UseSteer;
+            bool isreversedriving = mf.pn.speed < -0.09;
+            if (isreversedriving) UseSteer = !UseSteer;
+
+            Vec3 Point = (UseSteer) ? SteerAxlePos : PivotAxlePos;
+
+            if (!mf.isAutoSteerBtnOn || ctList.Count < 5)
             {
                 int closestRefPointRight = 0, ClosestStripRight = 0;
                 int closestRefPoint = 0;
@@ -201,8 +199,8 @@ namespace AgOpenGPS
                     int StripCount = stripList[s].Count;
                     for (int p = 0; p < StripCount; p +=4)
                     {
-                        dx = pivot.Northing - stripList[s][p].Northing;
-                        dy = pivot.Easting - stripList[s][p].Easting;
+                        dx = Point.Northing - stripList[s][p].Northing;
+                        dy = Point.Easting - stripList[s][p].Easting;
                         double dist = (dx * dx) + (dy * dy);
 
                         if (dist < Distance)
@@ -221,7 +219,7 @@ namespace AgOpenGPS
 
                             if ((angle < diff || angle > Glm.twoPI - diff) || (angle > Math.PI - diff && angle < Math.PI + diff))
                             {
-                                if (Math.Cos(pivot.Heading) * (stripList[s][p].Easting - pivot.Easting) < Math.Sin(pivot.Heading) * (stripList[s][p].Northing - pivot.Northing))
+                                if (Math.Cos(Point.Heading) * (stripList[s][p].Easting - Point.Easting) < Math.Sin(Point.Heading) * (stripList[s][p].Northing - Point.Northing))
                                 {
                                     if (isRightPriority) dist *= 10000.0;
                                 }
@@ -244,7 +242,6 @@ namespace AgOpenGPS
                 }
 
                 if (double.IsInfinity(Distance)) return;
-
 
                 strip = ClosestStripRight;
                 pt = closestRefPointRight;
@@ -276,7 +273,7 @@ namespace AgOpenGPS
                                         * refPoint1.Northing) - (refPoint2.Northing * refPoint1.Easting))
                                             / Math.Sqrt((dy * dy) + (dx * dx));
 
-                isSameWay = Math.PI - Math.Abs(Math.Abs(pivot.Heading - refHeading) - Math.PI) < Glm.PIBy2;
+                isSameWay = Math.PI - Math.Abs(Math.Abs(Point.Heading - refHeading) - Math.PI) < Glm.PIBy2;
 
                 if (isSameWay) distanceFromRefLine += mf.Guidance.GuidanceOffset;
                 else distanceFromRefLine -= mf.Guidance.GuidanceOffset;
@@ -300,13 +297,11 @@ namespace AgOpenGPS
                 double Offset = mf.Guidance.WidthMinusOverlap * HowManyPathsAway;
                 double distSq = Offset * Offset - 0.001;
 
-
-
                 List<Vec3> CurrentBuild = new List<Vec3>();
 
                 for (int i = 0; i < stripList[strip].Count; i++)
                 {
-                    stripList[strip].PolygonArea(true);
+                    stripList[strip].PolygonArea(CancellationToken.None, true);
 
                     var point = new Vec3(
                     stripList[strip][i].Northing + (Math.Sin(stripList[strip][i].Heading) * -Offset),
@@ -322,7 +317,7 @@ namespace AgOpenGPS
 
 
                 CurrentBuilds.Clear();
-                CurrentBuilds.AddRange(CurrentBuild.ClipPolyLine(null, true, distSq));
+                CurrentBuilds.AddRange(CurrentBuild.ClipPolyLine(null, true, distSq, CancellationToken.None));
 
                 if (CurrentBuilds.Count < 1) return;
 
@@ -339,8 +334,8 @@ namespace AgOpenGPS
                     int StripCount = CurrentBuilds[s].Count;
                     for (int p = 0; p < StripCount; p += 4)
                     {
-                        dx = pivot.Northing - CurrentBuilds[s][p].Northing;
-                        dy = pivot.Easting - CurrentBuilds[s][p].Easting;
+                        dx = Point.Northing - CurrentBuilds[s][p].Northing;
+                        dy = Point.Easting - CurrentBuilds[s][p].Easting;
                         double dist = (dx * dx) + (dy * dy);
 
                         if (dist < Distance)
@@ -377,10 +372,10 @@ namespace AgOpenGPS
                 distance = Glm.Distance(ctList[0], ctList[ctList.Count - 1]);
                 bool loop = distance < 5;
 
-                ctList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, loop, 0.0436332, 5);
+                ctList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, loop, 0.0436332, CancellationToken.None);
             }
 
-            mf.CalculateSteerAngle(ref ctList);
+            mf.CalculateSteerAngle(ref ctList, isSameWay);
         }
 
         //draw the red follow me line
@@ -397,19 +392,6 @@ namespace AgOpenGPS
                 }
                 GL.End();
             }
-
-            /*
-            GL.Begin(PrimitiveType.LineStrip);
-            GL.Vertex3(boxA.Easting, boxA.Northing, 0);
-            GL.Vertex3(boxB.Easting, boxB.Northing, 0);
-            GL.Vertex3(boxC.Easting, boxC.Northing, 0);
-            GL.Vertex3(boxD.Easting, boxD.Northing, 0);
-            GL.Vertex3(boxA.Easting, boxA.Northing, 0);
-            GL.Vertex3(boxF.Easting, boxF.Northing, 0);
-            GL.Vertex3(boxE.Easting, boxE.Northing, 0);
-            GL.Vertex3(boxB.Easting, boxB.Northing, 0);
-            GL.End();
-            */
 
             ////draw the guidance line
             int ptCount = ctList.Count;

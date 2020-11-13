@@ -13,7 +13,7 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         private double toolOverlap, toolOffset, toolTurnOffDelay, toolLookAheadOn, toolLookAheadOff, MappingOnDelay, MappingOffDelay;
-        private double hitchLength, toolTrailingHitchLength, tankTrailingHitchLength, SectionWidth, cutoffSpeed;
+        private double HitchLength, TankWheelLength, TankHitchLength, ToolWheelLength, ToolHitchLength, SectionWidth, cutoffSpeed;
         private bool isToolTrailing, isToolBehindPivot, isToolTBT;
         public int Here = 0, numberOfSections, MinApplied;
 
@@ -76,13 +76,18 @@ namespace AgOpenGPS
         private void FormToolSettings_Load(object sender, EventArgs e)
         {
             mf.CheckToolSettings();
+
             //HitchTab
-            TboxHitchLength.Text = (hitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].HitchLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxHitchLength.CheckValue(ref hitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
-            TboxTankHitch.Text = (tankTrailingHitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TankTrailingHitchLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxTankHitch.CheckValue(ref tankTrailingHitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
-            TboxTrailingHitch.Text = (toolTrailingHitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TrailingHitchLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxTrailingHitch.CheckValue(ref tankTrailingHitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
+            TboxHitchLength.Text = (HitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].HitchLength) * mf.m2MetImp, mf.decimals)).ToString();
+            TboxHitchLength.CheckValue(ref HitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
+            TboxTankWheelLength.Text = (TankWheelLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TankWheelLength) * mf.m2MetImp, mf.decimals)).ToString();
+            TboxTankWheelLength.CheckValue(ref TankWheelLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
+            TboxTankHitchLength.Text = (TankHitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TankHitchLength) * mf.m2MetImp, mf.decimals)).ToString();
+            TboxTankHitchLength.CheckValue(ref TankHitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
+            TboxToolWheelLength.Text = (ToolWheelLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].ToolWheelLength) * mf.m2MetImp, mf.decimals)).ToString();
+            TboxToolWheelLength.CheckValue(ref ToolWheelLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
+            TboxToolHitchLength.Text = (ToolHitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].ToolHitchLength) * mf.m2MetImp, mf.decimals)).ToString();
+            TboxToolHitchLength.CheckValue(ref ToolHitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
 
             //SettingsTab
             TboxOverlap.Text = (toolOverlap = Math.Round(Properties.Vehicle.Default.GuidanceOverlap * mf.m2MetImp, mf.decimals)).ToString();
@@ -152,9 +157,11 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.ToolSettings[Here].MappingOnDelay = MappingOnDelay;
             Properties.Vehicle.Default.ToolSettings[Here].MappingOffDelay = MappingOffDelay;
 
-            Properties.Vehicle.Default.ToolSettings[Here].TrailingHitchLength = Math.Round(toolTrailingHitchLength * -mf.metImp2m, 2);
-            Properties.Vehicle.Default.ToolSettings[Here].TankTrailingHitchLength = Math.Round(tankTrailingHitchLength * -mf.metImp2m, 2);
-            Properties.Vehicle.Default.ToolSettings[Here].HitchLength = Math.Round(hitchLength * mf.metImp2m * (isToolBehindPivot ? -1 : 1), 2);
+            Properties.Vehicle.Default.ToolSettings[Here].HitchLength = Math.Round(HitchLength * mf.metImp2m * (isToolBehindPivot ? -1 : 1), 2);
+            Properties.Vehicle.Default.ToolSettings[Here].TankWheelLength = Math.Round(TankWheelLength * -mf.metImp2m, 2);
+            Properties.Vehicle.Default.ToolSettings[Here].TankHitchLength = Math.Round(TankHitchLength * -mf.metImp2m, 2);
+            Properties.Vehicle.Default.ToolSettings[Here].ToolWheelLength = Math.Round(ToolWheelLength * -mf.metImp2m, 2);
+            Properties.Vehicle.Default.ToolSettings[Here].ToolHitchLength = Math.Round(ToolHitchLength * -mf.metImp2m, 2);
 
             Properties.Vehicle.Default.ToolSettings[Here].Trailing = isToolTrailing;
             Properties.Vehicle.Default.ToolSettings[Here].BehindPivot = isToolBehindPivot;
@@ -211,13 +218,14 @@ namespace AgOpenGPS
                 isToolTrailing = true;
                 isToolTBT = false;
 
-                TboxTrailingHitch.Visible = true;
-                TboxHitchLength.Visible = true;
-                TboxTankHitch.Visible = false;
+                TboxTankWheelLength.Visible = false;
+                TboxTankHitchLength.Visible = false;
+                TboxToolWheelLength.Visible = true;
+                TboxToolHitchLength.Visible = true;
 
-                TboxTrailingHitch.Left = 596;
                 TboxHitchLength.Left = 384;
-                TboxTankHitch.Left = 0;
+                TboxToolWheelLength.Left = 596;
+                TboxToolHitchLength.Left = 696;
 
                 tabHitch.BackgroundImage = Properties.Resources.ToolHitchPageTrailing;
             }
@@ -227,13 +235,12 @@ namespace AgOpenGPS
                 isToolTrailing = false;
                 isToolTBT = false;
 
-                TboxTrailingHitch.Visible = false;
-                TboxHitchLength.Visible = true;
-                TboxTankHitch.Visible = false;
+                TboxTankWheelLength.Visible = false;
+                TboxTankHitchLength.Visible = false;
+                TboxToolWheelLength.Visible = false;
+                TboxToolHitchLength.Visible = false;
 
-                TboxTrailingHitch.Left = 0;
                 TboxHitchLength.Left = 443;
-                TboxTankHitch.Left = 0;
 
                 tabHitch.BackgroundImage = Properties.Resources.ToolHitchPageRear;
             }
@@ -243,13 +250,12 @@ namespace AgOpenGPS
                 isToolTrailing = false;
                 isToolTBT = false;
 
-                TboxTrailingHitch.Visible = false;
-                TboxHitchLength.Visible = true;
-                TboxTankHitch.Visible = false;
+                TboxTankWheelLength.Visible = false;
+                TboxTankHitchLength.Visible = false;
+                TboxToolWheelLength.Visible = false;
+                TboxToolHitchLength.Visible = false;
 
-                TboxTrailingHitch.Left = 0;
                 TboxHitchLength.Left = 384;
-                TboxTankHitch.Left = 0;
 
                 tabHitch.BackgroundImage = Properties.Resources.ToolHitchPageFront;
             }
@@ -259,13 +265,16 @@ namespace AgOpenGPS
                 isToolTrailing = true;
                 isToolTBT = true;
 
-                TboxTrailingHitch.Visible = true;
-                TboxHitchLength.Visible = true;
-                TboxTankHitch.Visible = true;
+                TboxToolWheelLength.Visible = true;
+                TboxToolHitchLength.Visible = true;
+                TboxTankWheelLength.Visible = true;
+                TboxTankHitchLength.Visible = true;
 
-                TboxTrailingHitch.Left = 700;
                 TboxHitchLength.Left = 283;
-                TboxTankHitch.Left = 486;
+                TboxTankWheelLength.Left = 486;
+                TboxTankHitchLength.Left = 586;
+                TboxToolWheelLength.Left = 700;
+                TboxToolHitchLength.Left = 800;
 
                 tabHitch.BackgroundImage = Properties.Resources.ToolHitchPageTBT;
             }
@@ -305,27 +314,53 @@ namespace AgOpenGPS
             }
         }
 
-        private void TboxTrailingHitch_Enter(object sender, EventArgs e)
+        private void TboxToolWheelLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), toolTrailingHitchLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), ToolWheelLength, this, mf.isMetric, mf.decimals))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxTrailingHitch.Text = (toolTrailingHitchLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxToolWheelLength.Text = (ToolWheelLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
                 }
             }
             btnCancel.Focus();
         }
 
-        private void TboxTankHitch_Enter(object sender, EventArgs e)
+        private void TboxTankWheelLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), tankTrailingHitchLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), TankWheelLength, this, mf.isMetric, mf.decimals))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxTankHitch.Text = (tankTrailingHitchLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxTankWheelLength.Text = (TankWheelLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxTankHitchLength_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), TankHitchLength, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxTankHitchLength.Text = (TankHitchLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxToolHitchLength_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), ToolHitchLength, this, mf.isMetric, mf.decimals))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxToolHitchLength.Text = (ToolHitchLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
                 }
             }
             btnCancel.Focus();
@@ -390,12 +425,12 @@ namespace AgOpenGPS
 
         private void TboxHitchLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), hitchLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), HitchLength, this, mf.isMetric, mf.decimals))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxHitchLength.Text = (hitchLength = Math.Round(form.ReturnValue,mf.decimals)).ToString();
+                    TboxHitchLength.Text = (HitchLength = Math.Round(form.ReturnValue,mf.decimals)).ToString();
                 }
             }
             btnCancel.Focus();
@@ -486,7 +521,7 @@ namespace AgOpenGPS
 
         #endregion Sections //---------------------------------------------------------------
 
-        #region Keypad
+        #region TextBox
 
         private void TboxSectionWidth_Enter(object sender, EventArgs e)
         {
@@ -614,6 +649,6 @@ namespace AgOpenGPS
             UpdateSpinners();
         }
 
-        # endregion Keypad
+        # endregion TextBox
     }
 }

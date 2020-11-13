@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
     public static class DanielP
     {
-        public static bool GetLineIntersection(Vec3 PointAA, Vec3 PointAB, Vec3 PointBA, Vec3 PointBB, out Vec3 Crossing, out double TimeA)
+        public static bool GetLineIntersection(Vec3 PointAA, Vec3 PointAB, Vec3 PointBA, Vec3 PointBB, out Vec3 Crossing, out double TimeA, bool Limit = false)
         {
             TimeA = -1;
             Crossing = new Vec3();
@@ -16,10 +17,10 @@ namespace AgOpenGPS
             {
                 TimeA = ((PointBB.Northing - PointBA.Northing) * (PointAA.Easting - PointBA.Easting) - (PointAA.Northing - PointBA.Northing) * (PointBB.Easting - PointBA.Easting)) / Denominator;
 
-                if (TimeA > 0.0 && TimeA < 1.0)
+                if (Limit || (TimeA > 0.0 && TimeA < 1.0))
                 {
                     double TimeB = ((PointAB.Northing - PointAA.Northing) * (PointAA.Easting - PointBA.Easting) - (PointAA.Northing - PointBA.Northing) * (PointAB.Easting - PointAA.Easting)) / Denominator;
-                    if (TimeB > 0.0 && TimeB < 1.0)
+                    if (Limit || (TimeB > 0.0 && TimeB < 1.0))
                     {
                         Crossing = PointAA + (PointAB - PointAA) * TimeA;
                         return true;
@@ -56,13 +57,15 @@ namespace AgOpenGPS
             else return false;
         }
 
-        public static double PolygonArea(this List<Vec3> tt, bool ForceCW = false)
+        public static double PolygonArea(this List<Vec3> tt, CancellationToken ct, bool ForceCW = false)
         {
             double Area = 0;
             int j = tt.Count - 1;
             for (int i = 0; i < tt.Count; j = i++)
+            {
+                if (ct.IsCancellationRequested) break;
                 Area += (tt[i].Northing - tt[j].Northing) * (tt[i].Easting + tt[j].Easting);
-
+            }
             if (ForceCW && Area > 0)
             {
                 tt.Reverse();//force Clockwise rotation
@@ -88,13 +91,13 @@ namespace AgOpenGPS
             }
         }
 
-        public static List<List<Vec3>> ClipPolyLine(this List<Vec3> Points, List<Vec3> clipPoints, bool BoundaryMode, double Offset)
+        public static List<List<Vec3>> ClipPolyLine(this List<Vec3> Points, List<Vec3> clipPoints, bool BoundaryMode, double Offset, CancellationToken ct)
         {
             List<List<Vec3>> FinalPolyLine = new List<List<Vec3>>();
             List<VertexPoint> PolyLine = PolyLineStructure(Points);
             List<VertexPoint> Crossings = new List<VertexPoint>();
             List<VertexPoint> Polygons = new List<VertexPoint>();
-
+            if (PolyLine.Count < 3) return FinalPolyLine;
             VertexPoint CurrentVertex = PolyLine[0];
             VertexPoint StopVertex;
             if (BoundaryMode) StopVertex = CurrentVertex;
@@ -105,6 +108,7 @@ namespace AgOpenGPS
             bool start = true;
             while (true)
             {
+                if (ct.IsCancellationRequested) break;
                 if (!start && CurrentVertex == StopVertex) break;
                 start = false;
 
@@ -115,6 +119,7 @@ namespace AgOpenGPS
                 bool start2 = true;
                 while (true)
                 {
+                    if (ct.IsCancellationRequested) break;
                     if (!start2 && SecondVertex == StopVertex) break;
                     start2 = false;
 
@@ -137,7 +142,6 @@ namespace AgOpenGPS
 
                 if (safety++ > 100000) break;
             }
-
             if (IntersectionCount > 0)
             {
                 CurrentVertex = PolyLine[0];
@@ -149,6 +153,7 @@ namespace AgOpenGPS
 
                 while (Crossings.Count > 0 || Searching)
                 {
+                    if (ct.IsCancellationRequested) break;
                     if (Crossings.Count > 0)
                     {
                         start = true;
@@ -159,6 +164,7 @@ namespace AgOpenGPS
 
                     while (true)
                     {
+                        if (ct.IsCancellationRequested) break;
                         if (!start && CurrentVertex == StopVertex)
                         {
                             Polygons.Add(CurrentVertex);
@@ -192,6 +198,7 @@ namespace AgOpenGPS
             {
                 for (int i = 0; i < Polygons.Count; i++)
                 {
+                    if (ct.IsCancellationRequested) break;
                     start = true;
                     CurrentVertex = Polygons[i];
                     StopVertex = CurrentVertex;
@@ -199,6 +206,7 @@ namespace AgOpenGPS
 
                     while (true)
                     {
+                        if (ct.IsCancellationRequested) break;
                         if (!start && CurrentVertex == StopVertex)
                         {
                             if (ccw > 0)
@@ -220,6 +228,7 @@ namespace AgOpenGPS
                 {
                     for (int i = 0; i < Polygons.Count; i++)
                     {
+                        if (ct.IsCancellationRequested) break;
                         start = true;
                         CurrentVertex = Polygons[i];
                         StopVertex = CurrentVertex;
@@ -227,6 +236,7 @@ namespace AgOpenGPS
                         bool stop = false;
                         while (true)
                         {
+                            if (ct.IsCancellationRequested) break;
                             if (stop || !start && CurrentVertex == StopVertex)
                             {
                                 break;
@@ -258,6 +268,7 @@ namespace AgOpenGPS
 
                 for (int i = 0; i < Polygons.Count; i++)
                 {
+                    if (ct.IsCancellationRequested) break;
                     CurrentVertex = Polygons[i];
 
                     StopVertex = CurrentVertex.Prev;
@@ -270,6 +281,7 @@ namespace AgOpenGPS
                     start = true;
                     while (true)
                     {
+                        if (ct.IsCancellationRequested) break;
                         if (!start && CurrentVertex == StopVertex) break;
                         start = false;
 
@@ -281,6 +293,7 @@ namespace AgOpenGPS
                         bool start2 = true;
                         while (true)
                         {
+                            if (ct.IsCancellationRequested) break;
                             if (!start2 && SecondVertex == StopVertex2) break;
                             start2 = false;
 
@@ -311,10 +324,12 @@ namespace AgOpenGPS
                     }
                 }
             }
+
             if (FinalPolyLine.Count == 0)
             {
                 for (int i = 0; i < Polygons.Count; i++)
                 {
+                    if (ct.IsCancellationRequested) break;
                     FinalPolyLine.Add(new List<Vec3>());
 
                     start = true;
@@ -325,6 +340,7 @@ namespace AgOpenGPS
 
                     while (true)
                     {
+                        if (ct.IsCancellationRequested) break;
                         if (!start && CurrentVertex == StopVertex)
                             break;
                         start = false;
@@ -460,7 +476,7 @@ namespace AgOpenGPS
             return false;
         }
 
-        public static void CalculateHeading(this List<Vec3> Points, bool Loop)
+        public static void CalculateHeading(this List<Vec3> Points, bool Loop, CancellationToken ct)
         {
             int cnt = Points.Count;
             if (cnt > 3)
@@ -468,6 +484,7 @@ namespace AgOpenGPS
                 Vec3 point;
                 for (int i = 0; i + 1 < cnt; i++)
                 {
+                    if (ct.IsCancellationRequested) break;
                     point = Points[i];
                     point.Heading = Math.Atan2(Points[i + 1].Easting - Points[i].Easting, Points[i + 1].Northing - Points[i].Northing);
                     if (point.Heading < 0) point.Heading += Glm.twoPI;
@@ -487,23 +504,32 @@ namespace AgOpenGPS
             }
         }
 
-        public static void CalculateRoundedCorner(this List<Vec3> Points, double Radius, bool Loop, double MaxAngle, double Offset, bool tram = false, bool Experimental = false, bool Left = false, double halfWheelTrack = 0)
+        public static void CalculateRoundedCorner(this List<Vec3> Points, double Radius, bool Loop, double MaxAngle, CancellationToken ct, bool tram = false, bool Left = false, double halfWheelTrack = 0)
         {
-            MaxAngle = Math.Min(Math.Sinh(2.0 / Offset), MaxAngle);
+            double tt = Math.Asin(0.5 / Radius);
+            if (!double.IsNaN(tt)) MaxAngle = Math.Min(tt, MaxAngle);
 
             int A, C;
             double radius = Radius;
 
             for (int B = 0; B < Points.Count; B++)
             {
+                if (ct.IsCancellationRequested) break;
                 if (!Loop && (B == 0 || B + 1 == Points.Count)) continue;
                 A = (B == 0) ? Points.Count - 1 : B - 1;
                 C = (B + 1 == Points.Count) ? 0 : B + 1;
                 bool stop = false;
-                double dx1, dy1, dx2, dy2, angle, tan, segment = 0, length1 = 0, length2 = 0;
+                double dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0, angle = 0, segment = 0, length1 = 0, length2 = 0;
 
                 while (true)
                 {
+                    if (ct.IsCancellationRequested) break;
+                    if (GetLineIntersection(Points[A], Points[(A + 1).Clamp(Points.Count)], Points[C], Points[(C - 1).Clamp(Points.Count)], out Vec3 Crossing, out double Time, true))
+                    {
+                        if (Time > -100 && Time < 100)
+                            Points[B] = Crossing;
+                    }
+
                     dx1 = Points[B].Northing - Points[A].Northing;
                     dy1 = Points[B].Easting - Points[A].Easting;
                     dx2 = Points[B].Northing - Points[C].Northing;
@@ -517,7 +543,7 @@ namespace AgOpenGPS
 
                     if (Math.Abs(angle) > Glm.PIBy2 - MaxAngle && Math.Abs(angle) < Glm.PIBy2 + MaxAngle)
                     {
-                        if ((C - A > 2) || (Experimental && C - A > 0))
+                        if (C - A > 2)
                         {
                             while (C - 1 > A)
                             {
@@ -541,17 +567,16 @@ namespace AgOpenGPS
                             else radius = Radius + halfWheelTrack;
                         }
                     }
-
-                    tan = Math.Abs(Math.Tan(angle));
+                    double tan = Math.Abs(Math.Tan(angle));
 
                     segment = radius / tan;
-
                     length1 = GetLength(dx1, dy1);
                     length2 = GetLength(dx2, dy2);
                     if (segment > length1)
                     {
-                        A = (A == 0) ? Points.Count - 1 : A - 1;
-                        if ((!Loop && A == Points.Count - 1) || A == C)
+                        if (Loop || (!Loop && A > 0)) A = (A == 0) ? Points.Count - 1 : A - 1;
+
+                        if (A == C)
                         {
                             stop = true;
                             break;
@@ -559,15 +584,21 @@ namespace AgOpenGPS
                     }
                     if (segment > length2)
                     {
-                        C = (C + 1 == Points.Count) ? 0 : C + 1;
-                        if ((!Loop && C == 0) || C == A)
+                        if (Loop || (!Loop && C < Points.Count - 1)) C = (C + 1 == Points.Count) ? 0 : C + 1;
+                        if (C == A)
                         {
                             stop = true;
                             break;
                         }
                     }
                     else if (segment < length1) break;
+                    if (!Loop && A == 0 && C == Points.Count - 1)
+                    {
+                        stop = true;
+                        break;
+                    }
                 }
+                if (ct.IsCancellationRequested) break;
                 if (stop) continue;
 
                 var p1Cross = GetProportionPoint(Points[B], segment, length1, dx1, dy1);
@@ -584,7 +615,6 @@ namespace AgOpenGPS
 
                 double dx = Points[B].Northing * 2 - p1Cross.Northing - p2Cross.Northing;
                 double dy = Points[B].Easting * 2 - p1Cross.Easting - p2Cross.Easting;
-
 
                 if (dx1 == 0 && dy1 == 0 || dx2 == 0 && dy2 == 0 || dx == 0 && dy == 0) continue;
 
@@ -604,6 +634,7 @@ namespace AgOpenGPS
                 bool Looping = (A > C);
                 while (C - 1 > A || Looping)
                 {
+                    if (ct.IsCancellationRequested) break;
                     if (C == 0)
                     {
                         if (A == Points.Count - 1) break;
@@ -642,6 +673,7 @@ namespace AgOpenGPS
 
                 for (int j = 0; j < pointsCount; ++j)
                 {
+                    if (ct.IsCancellationRequested) break;
                     var pointX = circlePoint.Northing + Math.Cos(startAngle + sign * (j + 1) * degreeFactor) * radius;
                     var pointY = circlePoint.Easting + Math.Sin(startAngle + sign * (j + 1) * degreeFactor) * radius;
                     points[j] = new Vec3(pointX, pointY, 0);
@@ -651,10 +683,10 @@ namespace AgOpenGPS
                 B += points.Length;
             }
 
-            Points.CalculateHeading(Loop);
+            Points.CalculateHeading(Loop, ct);
         }
 
-        public static void FindCrossingPoints(this List<Vec4> Crossings, ref List<Vec2> Tram, Vec2 Point1, Vec2 Point2, int Index)
+        public static void FindCrossingPoints(this List<Vec4> Crossings, List<Vec2> Tram, Vec2 Point1, Vec2 Point2, int Index)
         {
             if (Tram.Count > 2)
             {
@@ -663,21 +695,24 @@ namespace AgOpenGPS
                 {
                     j += 2;
                     if (GetLineIntersection(Point1, Point2, Tram[j], Tram[k], out Vec2 Crossing, out double Time))
-                        Crossings.Add(new Vec4(Crossing.Northing, Crossing.Easting, Time, Index));
+                        Crossings.Add(new Vec4(Crossing.Northing, Crossing.Easting, 0, Time, Index));
                 }
             }
         }
 
-        public static void FindCrossingPoints(this List<Vec4> Crossings, ref List<Vec3> Bound, Vec3 Point1, Vec3 Point2, int Index)
+        public static void FindCrossingPoints(this List<Vec4> Crossings, List<Vec3> Bound, Vec3 Point1, Vec3 Point2, int Index)
         {
             if (Bound.Count > 2)
             {
-                int k = Bound.Count - 2;
-                for (int j = -2; j < Bound.Count - 2; k = j)
+                int k = Bound.Count - 1;
+                for (int j = -1; j < Bound.Count - 1; k = j)
                 {
-                    j += 2;
+                    j += 1;
                     if (GetLineIntersection(Point1, Point2, Bound[j], Bound[k], out Vec3 Crossing, out double Time))
-                        Crossings.Add(new Vec4(Crossing.Northing, Crossing.Easting, Time, Index));
+                    {
+                        int tt = (k == Bound.Count - 1) ? -1 : k;
+                        Crossings.Add(new Vec4(Crossing.Northing, Crossing.Easting, (j + tt)/2.0, Time, Index));
+                    }
                 }
             }
         }
@@ -693,7 +728,7 @@ namespace AgOpenGPS
             return new Vec2((point.Northing - dx * factor), (point.Easting - dy * factor));
         }
 
-        public static List<int> TriangulatePolygon(this List<Vec3> Points)
+        public static List<int> TriangulatePolygon(this List<Vec3> Points, CancellationToken ct)
         {
             List<int> Indexer = new List<int>();
 
@@ -703,25 +738,28 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Vertices.Count; i++)
             {
+                if (ct.IsCancellationRequested) break;
                 CheckClockwise(Vertices[i]);
             }
 
             for (int i = 0; i < Vertices.Count; i++)
             {
-                if (!Vertices[i].Data) IsEar(Vertices[i], Vertices);
+                if (ct.IsCancellationRequested) break;
+                if (!Vertices[i].Data) IsEar(Vertices[i], Vertices, ct);
             }
 
-            int Idx = 0;
+            VertexPoint LastVertex = Vertices[0].Prev;
+            VertexPoint CurrentVertex = Vertices[0];
 
             while (true)
             {
-                if (Vertices.Count < 3) break;
-
-                VertexPoint CurrentVertex = Vertices[Idx];
+                if (ct.IsCancellationRequested) break;
+                CurrentVertex = CurrentVertex.Next;
                 if (CurrentVertex.Crossing != null)
                 {
-                    Indexer.Add(!CurrentVertex.Data ? CurrentVertex.Prev.Idx : CurrentVertex.Idx);
-                    Indexer.Add(!CurrentVertex.Data ? CurrentVertex.Idx : CurrentVertex.Prev.Idx);
+                    LastVertex = CurrentVertex.Prev;
+                    Indexer.Add(CurrentVertex.Data ? CurrentVertex.Prev.Idx : CurrentVertex.Idx);
+                    Indexer.Add(CurrentVertex.Data ? CurrentVertex.Idx : CurrentVertex.Prev.Idx);
                     Indexer.Add(CurrentVertex.Next.Idx);
 
                     CurrentVertex.Prev.Next = CurrentVertex.Next;
@@ -733,11 +771,10 @@ namespace AgOpenGPS
                     Vertices.Remove(CurrentVertex);
                     CurrentVertex.Prev.Crossing = null;
                     CurrentVertex.Next.Crossing = null;
-                    if (!CurrentVertex.Prev.Data) IsEar(CurrentVertex.Prev, Vertices);
-                    if (!CurrentVertex.Next.Data) IsEar(CurrentVertex.Next, Vertices);
+                    if (!CurrentVertex.Prev.Data) IsEar(CurrentVertex.Prev, Vertices, ct);
+                    if (!CurrentVertex.Next.Data) IsEar(CurrentVertex.Next, Vertices, ct);
                 }
-                Idx++;
-                Idx %= Vertices.Count;
+                if (LastVertex == CurrentVertex) break;
             }
             return Indexer;
         }
@@ -760,12 +797,12 @@ namespace AgOpenGPS
                 return true;
         }
 
-        public static void IsEar(VertexPoint Point, List<VertexPoint> vertices)
+        public static void IsEar(VertexPoint Point, List<VertexPoint> vertices, CancellationToken ct)
         {
             bool hasPointInside = false;
-
             for (int i = 0; i < vertices.Count; i++)
             {
+                if (ct.IsCancellationRequested) break;
                 if (vertices[i].Data)
                 {
                     if (IsPointInTriangle(Point.Prev.Coords, Point.Coords, Point.Next.Coords, vertices[i].Coords))

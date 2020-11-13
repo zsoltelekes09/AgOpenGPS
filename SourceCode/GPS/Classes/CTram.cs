@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using OpenTK.Graphics.OpenGL;
 
 namespace AgOpenGPS
@@ -86,9 +87,6 @@ namespace AgOpenGPS
             {
                 int ChangeDirection = i == 0 ? 1 : -1;
 
-                //count the points from the boundary
-                int ptCount = mf.bnd.bndArr[i].bndLine.Count;
-
                 double Offset = tramWidth * 0.5 - halfWheelTrack - abOffset;
                 double Offset2 = tramWidth * 0.5 + halfWheelTrack - abOffset;
                 Vec3 Point;
@@ -97,7 +95,7 @@ namespace AgOpenGPS
                 List<Vec3> BuildRight = new List<Vec3>();
 
                 //make the boundary tram outer array
-                for (int j = 0; j < ptCount; j++)
+                for (int j = 0; j < mf.bnd.bndArr[i].bndLine.Count; j++)
                 {
                     double CosHeading = Math.Cos(mf.bnd.bndArr[i].bndLine[j].Heading);
                     double SinHeading = Math.Sin(mf.bnd.bndArr[i].bndLine[j].Heading);
@@ -110,7 +108,7 @@ namespace AgOpenGPS
                     Point.Easting += CosHeading * Offset * ChangeDirection;
 
                     bool fail = false;
-                    for (int k = 0; k < ptCount; k++)
+                    for (int k = 0; k < mf.bnd.bndArr[i].bndLine.Count; k++)
                     {
                         double dist = Glm.DistanceSquared(Point.Northing, Point.Easting, mf.bnd.bndArr[i].bndLine[k].Northing, mf.bnd.bndArr[i].bndLine[k].Easting);
                         if (dist < (Offset * Offset) - 0.001)
@@ -128,7 +126,7 @@ namespace AgOpenGPS
                         Point.Easting += CosHeading * Offset2 * ChangeDirection;
 
                         fail = false;
-                        for (int k = 0; k < ptCount; k++)
+                        for (int k = 0; k < mf.bnd.bndArr[i].bndLine.Count; k++)
                         {
                             double dist = Glm.DistanceSquared(Point.Northing, Point.Easting, mf.bnd.bndArr[i].bndLine[k].Northing, mf.bnd.bndArr[i].bndLine[k].Easting);
                             if (dist < (Offset2 * Offset2) - 0.001)
@@ -148,7 +146,7 @@ namespace AgOpenGPS
                 {
 
                     TramList.Add(new Trams());
-                    BuildLeft.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, 5, true, false, true, halfWheelTrack);
+                    BuildLeft.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, CancellationToken.None, true, true, halfWheelTrack);
 
                     BuildLeft.Add(BuildLeft[0]);
 
@@ -169,7 +167,7 @@ namespace AgOpenGPS
 
                     BuildRight.Add(BuildRight[0]);
 
-                    BuildRight.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, 5, true, false, false, halfWheelTrack);
+                    BuildRight.CalculateRoundedCorner(mf.vehicle.minTurningRadius, true, 0.0436332, CancellationToken.None, true, false, halfWheelTrack);
 
                     BuildRight.Add(BuildRight[0]);
 

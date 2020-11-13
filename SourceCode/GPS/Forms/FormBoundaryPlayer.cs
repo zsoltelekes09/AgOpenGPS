@@ -42,22 +42,12 @@ namespace AgOpenGPS
         {
             if (mf.bnd.bndBeingMadePts.Count > 2)
             {
-                mf.bnd.bndArr.Add(new CBoundaryLines());
-                mf.turn.turnArr.Add(new CTurnLines());
-                mf.gf.geoFenceArr.Add(new CGeoFenceLines());
-                mf.hd.headArr.Add(new CHeadLines());
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].bndLine.AddRange(mf.bnd.bndBeingMadePts);
+                CBoundaryLines newbnd = new CBoundaryLines();
+                newbnd.bndLine.AddRange(mf.bnd.bndBeingMadePts);
+                mf.bnd.bndArr.Add(newbnd);
 
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].FixBoundaryLine();
-                mf.bnd.bndArr[mf.bnd.bndArr.Count - 1].CalculateBoundaryArea();
-
-
-                mf.turn.BuildTurnLines(mf.bnd.bndArr.Count - 1);
-                mf.gf.BuildGeoFenceLines(mf.bnd.bndArr.Count - 1);
-
-                mf.fd.UpdateFieldBoundaryGUIAreas();
-
-                mf.FileSaveBoundary();
+                mf.StartTasks(newbnd, mf.bnd.bndArr.Count - 1, TaskName.Boundary);
+                mf.StartTasks(null, 1, TaskName.Save);
             }
 
             //stop it all for adding

@@ -78,22 +78,14 @@ namespace AgOpenGPS
             //get the fields directory, if not exist, create
             fieldsDirectory = baseDirectory + "Fields\\";
             string dir = Path.GetDirectoryName(fieldsDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
-
             //get the fields directory, if not exist, create
             vehiclesDirectory = baseDirectory + "Vehicles\\";
-            dir = Path.GetDirectoryName(vehiclesDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
 
             //get the Tools directory, if not exist, create
             toolsDirectory = baseDirectory + "Tools\\";
-            dir = Path.GetDirectoryName(toolsDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
 
             //get the Tools directory, if not exist, create
             envDirectory = baseDirectory + "Environments\\";
-            dir = Path.GetDirectoryName(envDirectory);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
 
             //make sure current field directory exists, null if not
             currentFieldDirectory = Settings.Default.setF_CurrentDir;
@@ -343,6 +335,8 @@ namespace AgOpenGPS
 
                     //grab the boundary
                     filename = dir + "\\Boundary.txt";
+                    if (!File.Exists(filename))
+                        filename = dir + "\\Boundary.Tmp";
 
                     if (File.Exists(filename))
                     {
@@ -585,7 +579,8 @@ namespace AgOpenGPS
                         if (yt.isYouTurnTriggered)
                         {
                             yt.ResetYouTurn();
-                            CurveLines.OldHowManyPathsAway = double.NegativeInfinity;
+                            CurveLines.ResetABLine = true;
+                            ABLines.ResetABLine = true;
                         }
                         else
                         {
@@ -600,7 +595,8 @@ namespace AgOpenGPS
                         if (yt.isYouTurnTriggered)
                         {
                             yt.ResetYouTurn();
-                            CurveLines.OldHowManyPathsAway = double.NegativeInfinity;
+                            CurveLines.ResetABLine = true;
+                            ABLines.ResetABLine = true;
                         }
                         else
                         {
@@ -673,6 +669,11 @@ namespace AgOpenGPS
 
         private void HalfSecond_Update(object sender, EventArgs e)
         {
+            lblInt.Text = vehicle.inty.ToString("N2");
+            lblDelta.Text = Glm.ToDegrees(abFixHeadingDelta).ToString("N2");
+            lblDist.Text = Glm.ToDegrees(xTrackCorrection).ToString("N2");
+            lblSetSteerAngle.Text = SetSteerAngle;
+
             HalfSecondUpdate.Enabled = false;
 
             AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;

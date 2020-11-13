@@ -349,13 +349,13 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool set_youUseDubins {
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public byte Youturn_Type {
             get {
-                return ((bool)(this["set_youUseDubins"]));
+                return ((byte)(this["Youturn_Type"]));
             }
             set {
-                this["set_youUseDubins"] = value;
+                this["Youturn_Type"] = value;
             }
         }
         

@@ -1534,5 +1534,29 @@ namespace AgOpenGPS.Properties {
                 this["DualAntennaDistance"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int LastABLine {
+            get {
+                return ((int)(this["LastABLine"]));
+            }
+            set {
+                this["LastABLine"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int LastCurveLine {
+            get {
+                return ((int)(this["LastCurveLine"]));
+            }
+            set {
+                this["LastCurveLine"] = value;
+            }
+        }
     }
 }

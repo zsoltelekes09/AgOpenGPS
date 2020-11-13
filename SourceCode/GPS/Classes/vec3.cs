@@ -22,16 +22,16 @@ namespace AgOpenGPS
 
         public static Vec3 operator *(Vec3 self, double s)
         {
-            return new Vec3(self.Northing * s, self.Easting * s, 0);
+            return new Vec3(self.Northing * s, self.Easting * s, self.Heading * s);
         }
 
         public static Vec3 operator +(Vec3 lhs, Vec3 rhs)
         {
-            return new Vec3(lhs.Northing + rhs.Northing, lhs.Easting + rhs.Easting, 0);
+            return new Vec3(lhs.Northing + rhs.Northing, lhs.Easting + rhs.Easting, lhs.Heading + rhs.Heading);
         }
         public static Vec3 operator -(Vec3 lhs, Vec3 rhs)
         {
-            return new Vec3(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting, 0);
+            return new Vec3(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting, lhs.Heading - rhs.Heading);
         }
     }
 
@@ -45,13 +45,15 @@ namespace AgOpenGPS
         public double Easting;
         public double Northing;
         public double Heading;
+        public double Time;
         public int Index;
 
-        public Vec4(double northing, double easting, double heading, int index)
+        public Vec4(double northing, double easting, double heading,double time, int index)
         {
             Northing = northing;
             Easting = easting;
             Heading = heading;
+            Time = time;
             Index = index;
         }
     }
@@ -59,7 +61,7 @@ namespace AgOpenGPS
     public class ToolSettings
     {
         public double LookAheadOn = 1, LookAheadOff = 0.8, TurnOffDelay = 0, MappingOnDelay = 0.95, MappingOffDelay = 0.85;
-        public double TrailingHitchLength = -6, TankTrailingHitchLength = -1.5, HitchLength = -0.5, ToolOffset = 0, SlowSpeedCutoff = 0;
+        public double ToolWheelLength = -6, TankWheelLength = -1.5, ToolHitchLength = -0.5, TankHitchLength = -0.5, HitchLength = -0.5, ToolOffset = 0, SlowSpeedCutoff = 0;
         public bool BehindPivot = true, Trailing = false, TBT = false;
         public int MinApplied = 0;
         public List<double[]> Sections = new List<double[]> {};
@@ -107,6 +109,10 @@ namespace AgOpenGPS
             return new Vec2(lhs.Northing + rhs.Northing, lhs.Easting + rhs.Easting);
         }
         public static Vec2 operator -(Vec2 lhs, Vec2 rhs)
+        {
+            return new Vec2(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting);
+        }
+        public static Vec2 operator -(Vec3 lhs, Vec2 rhs)
         {
             return new Vec2(lhs.Northing - rhs.Northing, lhs.Easting - rhs.Easting);
         }

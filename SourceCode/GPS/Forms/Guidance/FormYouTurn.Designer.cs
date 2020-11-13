@@ -239,7 +239,7 @@
             this.tabEdit.Location = new System.Drawing.Point(4, 64);
             this.tabEdit.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tabEdit.Name = "tabEdit";
-            this.tabEdit.Size = new System.Drawing.Size(894, 615);
+            this.tabEdit.Size = new System.Drawing.Size(875, 615);
             this.tabEdit.TabIndex = 4;
             this.tabEdit.Text = "Edit";
             this.tabEdit.UseVisualStyleBackColor = true;
@@ -444,7 +444,7 @@
             this.btnEditCancel.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnEditCancel.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnEditCancel.Image = global::AgOpenGPS.Properties.Resources.Cancel64;
-            this.btnEditCancel.Location = new System.Drawing.Point(411, 251);
+            this.btnEditCancel.Location = new System.Drawing.Point(392, 251);
             this.btnEditCancel.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnEditCancel.Name = "btnEditCancel";
             this.btnEditCancel.Size = new System.Drawing.Size(105, 78);
@@ -458,7 +458,7 @@
             this.btnSaveNames.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnSaveNames.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSaveNames.Image = global::AgOpenGPS.Properties.Resources.OK64;
-            this.btnSaveNames.Location = new System.Drawing.Point(411, 455);
+            this.btnSaveNames.Location = new System.Drawing.Point(392, 455);
             this.btnSaveNames.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnSaveNames.Name = "btnSaveNames";
             this.btnSaveNames.Size = new System.Drawing.Size(105, 78);
@@ -509,7 +509,7 @@
             this.tabExit.Location = new System.Drawing.Point(4, 64);
             this.tabExit.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tabExit.Name = "tabExit";
-            this.tabExit.Size = new System.Drawing.Size(894, 615);
+            this.tabExit.Size = new System.Drawing.Size(875, 615);
             this.tabExit.TabIndex = 2;
             this.tabExit.Text = "Exit";
             // 
@@ -533,9 +533,6 @@
             this.cboxExitAction7.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxExitAction7.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction7.FormattingEnabled = true;
-            this.cboxExitAction7.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxExitAction7.Location = new System.Drawing.Point(414, 546);
             this.cboxExitAction7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction7.Name = "cboxExitAction7";
@@ -548,13 +545,13 @@
             this.cboxExitFunc7.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc7.FormattingEnabled = true;
             this.cboxExitFunc7.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxExitFunc7.Location = new System.Drawing.Point(47, 545);
             this.cboxExitFunc7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc7.Name = "cboxExitFunc7";
             this.cboxExitFunc7.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc7.TabIndex = 84;
-            this.cboxExitFunc7.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc7_SelectedIndexChanged);
+            this.cboxExitFunc7.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // label19
             // 
@@ -602,9 +599,6 @@
             this.cboxExitAction5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxExitAction5.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction5.FormattingEnabled = true;
-            this.cboxExitAction5.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxExitAction5.Location = new System.Drawing.Point(415, 402);
             this.cboxExitAction5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction5.Name = "cboxExitAction5";
@@ -616,9 +610,6 @@
             this.cboxExitAction6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxExitAction6.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction6.FormattingEnabled = true;
-            this.cboxExitAction6.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxExitAction6.Location = new System.Drawing.Point(415, 472);
             this.cboxExitAction6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction6.Name = "cboxExitAction6";
@@ -631,13 +622,13 @@
             this.cboxExitFunc5.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc5.FormattingEnabled = true;
             this.cboxExitFunc5.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxExitFunc5.Location = new System.Drawing.Point(47, 402);
             this.cboxExitFunc5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc5.Name = "cboxExitFunc5";
             this.cboxExitFunc5.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc5.TabIndex = 78;
-            this.cboxExitFunc5.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc5_SelectedIndexChanged);
+            this.cboxExitFunc5.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxExitFunc6
             // 
@@ -645,13 +636,13 @@
             this.cboxExitFunc6.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc6.FormattingEnabled = true;
             this.cboxExitFunc6.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxExitFunc6.Location = new System.Drawing.Point(47, 471);
             this.cboxExitFunc6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc6.Name = "cboxExitFunc6";
             this.cboxExitFunc6.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc6.TabIndex = 77;
-            this.cboxExitFunc6.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc6_SelectedIndexChanged);
+            this.cboxExitFunc6.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // label31
             // 
@@ -769,22 +760,19 @@
             this.cboxExitFunc4.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc4.FormattingEnabled = true;
             this.cboxExitFunc4.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxExitFunc4.Location = new System.Drawing.Point(47, 332);
             this.cboxExitFunc4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc4.Name = "cboxExitFunc4";
             this.cboxExitFunc4.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc4.TabIndex = 48;
-            this.cboxExitFunc4.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc4_SelectedIndexChanged);
+            this.cboxExitFunc4.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxExitAction4
             // 
             this.cboxExitAction4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxExitAction4.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction4.FormattingEnabled = true;
-            this.cboxExitAction4.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxExitAction4.Location = new System.Drawing.Point(414, 332);
             this.cboxExitAction4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction4.Name = "cboxExitAction4";
@@ -812,22 +800,19 @@
             this.cboxExitFunc3.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc3.FormattingEnabled = true;
             this.cboxExitFunc3.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxExitFunc3.Location = new System.Drawing.Point(47, 262);
             this.cboxExitFunc3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc3.Name = "cboxExitFunc3";
             this.cboxExitFunc3.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc3.TabIndex = 45;
-            this.cboxExitFunc3.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc3_SelectedIndexChanged);
+            this.cboxExitFunc3.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxExitAction3
             // 
             this.cboxExitAction3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxExitAction3.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction3.FormattingEnabled = true;
-            this.cboxExitAction3.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxExitAction3.Location = new System.Drawing.Point(414, 262);
             this.cboxExitAction3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction3.Name = "cboxExitAction3";
@@ -855,22 +840,19 @@
             this.cboxExitFunc2.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc2.FormattingEnabled = true;
             this.cboxExitFunc2.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxExitFunc2.Location = new System.Drawing.Point(47, 192);
             this.cboxExitFunc2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc2.Name = "cboxExitFunc2";
             this.cboxExitFunc2.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc2.TabIndex = 42;
-            this.cboxExitFunc2.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc2_SelectedIndexChanged);
+            this.cboxExitFunc2.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxExitAction2
             // 
             this.cboxExitAction2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxExitAction2.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction2.FormattingEnabled = true;
-            this.cboxExitAction2.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxExitAction2.Location = new System.Drawing.Point(414, 192);
             this.cboxExitAction2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction2.Name = "cboxExitAction2";
@@ -898,22 +880,19 @@
             this.cboxExitFunc1.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc1.FormattingEnabled = true;
             this.cboxExitFunc1.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxExitFunc1.Location = new System.Drawing.Point(47, 122);
             this.cboxExitFunc1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc1.Name = "cboxExitFunc1";
             this.cboxExitFunc1.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc1.TabIndex = 39;
-            this.cboxExitFunc1.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc1_SelectedIndexChanged);
+            this.cboxExitFunc1.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxExitAction1
             // 
             this.cboxExitAction1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxExitAction1.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction1.FormattingEnabled = true;
-            this.cboxExitAction1.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxExitAction1.Location = new System.Drawing.Point(414, 122);
             this.cboxExitAction1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction1.Name = "cboxExitAction1";
@@ -941,13 +920,13 @@
             this.cboxExitFunc0.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitFunc0.FormattingEnabled = true;
             this.cboxExitFunc0.Items.AddRange(new object[] {
-            "-"});
+            " "});
             this.cboxExitFunc0.Location = new System.Drawing.Point(47, 52);
             this.cboxExitFunc0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc0.Name = "cboxExitFunc0";
             this.cboxExitFunc0.Size = new System.Drawing.Size(250, 41);
             this.cboxExitFunc0.TabIndex = 36;
-            this.cboxExitFunc0.SelectedIndexChanged += new System.EventHandler(this.CboxExitFunc0_SelectedIndexChanged);
+            this.cboxExitFunc0.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxExitAction0
             // 
@@ -955,8 +934,7 @@
             this.cboxExitAction0.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxExitAction0.FormattingEnabled = true;
             this.cboxExitAction0.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
+            ""});
             this.cboxExitAction0.Location = new System.Drawing.Point(414, 52);
             this.cboxExitAction0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction0.Name = "cboxExitAction0";
@@ -1021,7 +999,7 @@
             this.tabEnter.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tabEnter.Name = "tabEnter";
             this.tabEnter.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.tabEnter.Size = new System.Drawing.Size(894, 615);
+            this.tabEnter.Size = new System.Drawing.Size(875, 615);
             this.tabEnter.TabIndex = 1;
             this.tabEnter.Text = "Entry";
             // 
@@ -1056,9 +1034,6 @@
             this.cboxEnterAction7.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxEnterAction7.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction7.FormattingEnabled = true;
-            this.cboxEnterAction7.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction7.Location = new System.Drawing.Point(415, 545);
             this.cboxEnterAction7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction7.Name = "cboxEnterAction7";
@@ -1071,13 +1046,13 @@
             this.cboxEnterFunc7.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc7.FormattingEnabled = true;
             this.cboxEnterFunc7.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc7.Location = new System.Drawing.Point(46, 545);
             this.cboxEnterFunc7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc7.Name = "cboxEnterFunc7";
             this.cboxEnterFunc7.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc7.TabIndex = 70;
-            this.cboxEnterFunc7.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc7_SelectedIndexChanged);
+            this.cboxEnterFunc7.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // label30
             // 
@@ -1136,9 +1111,6 @@
             this.cboxEnterAction5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxEnterAction5.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction5.FormattingEnabled = true;
-            this.cboxEnterAction5.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction5.Location = new System.Drawing.Point(415, 402);
             this.cboxEnterAction5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction5.Name = "cboxEnterAction5";
@@ -1150,9 +1122,6 @@
             this.cboxEnterAction6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxEnterAction6.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction6.FormattingEnabled = true;
-            this.cboxEnterAction6.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction6.Location = new System.Drawing.Point(415, 472);
             this.cboxEnterAction6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction6.Name = "cboxEnterAction6";
@@ -1165,13 +1134,13 @@
             this.cboxEnterFunc5.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc5.FormattingEnabled = true;
             this.cboxEnterFunc5.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc5.Location = new System.Drawing.Point(46, 402);
             this.cboxEnterFunc5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc5.Name = "cboxEnterFunc5";
             this.cboxEnterFunc5.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc5.TabIndex = 63;
-            this.cboxEnterFunc5.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc5_SelectedIndexChanged);
+            this.cboxEnterFunc5.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxEnterFunc6
             // 
@@ -1179,13 +1148,13 @@
             this.cboxEnterFunc6.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc6.FormattingEnabled = true;
             this.cboxEnterFunc6.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc6.Location = new System.Drawing.Point(46, 472);
             this.cboxEnterFunc6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc6.Name = "cboxEnterFunc6";
             this.cboxEnterFunc6.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc6.TabIndex = 62;
-            this.cboxEnterFunc6.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc6_SelectedIndexChanged);
+            this.cboxEnterFunc6.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // label24
             // 
@@ -1281,22 +1250,19 @@
             this.cboxEnterFunc4.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc4.FormattingEnabled = true;
             this.cboxEnterFunc4.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc4.Location = new System.Drawing.Point(46, 332);
             this.cboxEnterFunc4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc4.Name = "cboxEnterFunc4";
             this.cboxEnterFunc4.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc4.TabIndex = 33;
-            this.cboxEnterFunc4.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc4_SelectedIndexChanged);
+            this.cboxEnterFunc4.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxEnterAction4
             // 
             this.cboxEnterAction4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxEnterAction4.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction4.FormattingEnabled = true;
-            this.cboxEnterAction4.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction4.Location = new System.Drawing.Point(415, 332);
             this.cboxEnterAction4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction4.Name = "cboxEnterAction4";
@@ -1324,22 +1290,19 @@
             this.cboxEnterFunc3.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc3.FormattingEnabled = true;
             this.cboxEnterFunc3.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc3.Location = new System.Drawing.Point(46, 262);
             this.cboxEnterFunc3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc3.Name = "cboxEnterFunc3";
             this.cboxEnterFunc3.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc3.TabIndex = 30;
-            this.cboxEnterFunc3.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc3_SelectedIndexChanged);
+            this.cboxEnterFunc3.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxEnterAction3
             // 
             this.cboxEnterAction3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxEnterAction3.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction3.FormattingEnabled = true;
-            this.cboxEnterAction3.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction3.Location = new System.Drawing.Point(415, 262);
             this.cboxEnterAction3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction3.Name = "cboxEnterAction3";
@@ -1367,22 +1330,19 @@
             this.cboxEnterFunc2.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc2.FormattingEnabled = true;
             this.cboxEnterFunc2.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc2.Location = new System.Drawing.Point(46, 192);
             this.cboxEnterFunc2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc2.Name = "cboxEnterFunc2";
             this.cboxEnterFunc2.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc2.TabIndex = 27;
-            this.cboxEnterFunc2.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc2_SelectedIndexChanged);
+            this.cboxEnterFunc2.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxEnterAction2
             // 
             this.cboxEnterAction2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxEnterAction2.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction2.FormattingEnabled = true;
-            this.cboxEnterAction2.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction2.Location = new System.Drawing.Point(415, 192);
             this.cboxEnterAction2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction2.Name = "cboxEnterAction2";
@@ -1410,22 +1370,19 @@
             this.cboxEnterFunc1.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc1.FormattingEnabled = true;
             this.cboxEnterFunc1.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc1.Location = new System.Drawing.Point(46, 122);
             this.cboxEnterFunc1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc1.Name = "cboxEnterFunc1";
             this.cboxEnterFunc1.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc1.TabIndex = 24;
-            this.cboxEnterFunc1.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc1_SelectedIndexChanged);
+            this.cboxEnterFunc1.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxEnterAction1
             // 
             this.cboxEnterAction1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxEnterAction1.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction1.FormattingEnabled = true;
-            this.cboxEnterAction1.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction1.Location = new System.Drawing.Point(415, 122);
             this.cboxEnterAction1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction1.Name = "cboxEnterAction1";
@@ -1453,13 +1410,13 @@
             this.cboxEnterFunc0.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterFunc0.FormattingEnabled = true;
             this.cboxEnterFunc0.Items.AddRange(new object[] {
-            "-"});
+            ""});
             this.cboxEnterFunc0.Location = new System.Drawing.Point(46, 52);
             this.cboxEnterFunc0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc0.Name = "cboxEnterFunc0";
             this.cboxEnterFunc0.Size = new System.Drawing.Size(250, 41);
             this.cboxEnterFunc0.TabIndex = 0;
-            this.cboxEnterFunc0.SelectedIndexChanged += new System.EventHandler(this.CboxEnterFunc0_SelectedIndexChanged);
+            this.cboxEnterFunc0.SelectedIndexChanged += new System.EventHandler(this.Cbox_IndexChanged);
             // 
             // cboxEnterAction0
             // 
@@ -1467,9 +1424,6 @@
             this.cboxEnterAction0.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxEnterAction0.FormattingEnabled = true;
             this.cboxEnterAction0.IntegralHeight = false;
-            this.cboxEnterAction0.Items.AddRange(new object[] {
-            "Turn Off",
-            "Turn On"});
             this.cboxEnterAction0.Location = new System.Drawing.Point(415, 52);
             this.cboxEnterAction0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction0.Name = "cboxEnterAction0";
@@ -1497,7 +1451,7 @@
             this.btnTurnAllOff.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTurnAllOff.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnTurnAllOff.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnTurnAllOff.Location = new System.Drawing.Point(762, 45);
+            this.btnTurnAllOff.Location = new System.Drawing.Point(743, 45);
             this.btnTurnAllOff.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnTurnAllOff.Name = "btnTurnAllOff";
             this.btnTurnAllOff.Size = new System.Drawing.Size(109, 95);
@@ -1512,7 +1466,7 @@
             this.btnToggle6.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnToggle6.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnToggle6.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnToggle6.Location = new System.Drawing.Point(65, 101);
+            this.btnToggle6.Location = new System.Drawing.Point(46, 101);
             this.btnToggle6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnToggle6.Name = "btnToggle6";
             this.btnToggle6.Size = new System.Drawing.Size(180, 39);
@@ -1528,7 +1482,7 @@
             this.btnToggle3.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnToggle3.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnToggle3.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnToggle3.Location = new System.Drawing.Point(65, 45);
+            this.btnToggle3.Location = new System.Drawing.Point(46, 45);
             this.btnToggle3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnToggle3.Name = "btnToggle3";
             this.btnToggle3.Size = new System.Drawing.Size(180, 39);
@@ -1544,7 +1498,7 @@
             this.btnToggle7.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnToggle7.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnToggle7.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnToggle7.Location = new System.Drawing.Point(294, 101);
+            this.btnToggle7.Location = new System.Drawing.Point(275, 101);
             this.btnToggle7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnToggle7.Name = "btnToggle7";
             this.btnToggle7.Size = new System.Drawing.Size(180, 39);
@@ -1560,7 +1514,7 @@
             this.btnToggle8.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnToggle8.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnToggle8.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnToggle8.Location = new System.Drawing.Point(524, 101);
+            this.btnToggle8.Location = new System.Drawing.Point(505, 101);
             this.btnToggle8.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnToggle8.Name = "btnToggle8";
             this.btnToggle8.Size = new System.Drawing.Size(180, 39);
@@ -1576,7 +1530,7 @@
             this.btnToggle5.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnToggle5.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnToggle5.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnToggle5.Location = new System.Drawing.Point(523, 45);
+            this.btnToggle5.Location = new System.Drawing.Point(504, 45);
             this.btnToggle5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnToggle5.Name = "btnToggle5";
             this.btnToggle5.Size = new System.Drawing.Size(180, 39);
@@ -1596,7 +1550,7 @@
             this.btnDistanceDn.Size = new System.Drawing.Size(59, 69);
             this.btnDistanceDn.TabIndex = 145;
             this.btnDistanceDn.UseVisualStyleBackColor = true;
-            this.btnDistanceDn.Click += new System.EventHandler(this.BtnDistanceDn_Click);
+            this.btnDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnDistanceDn_MouseDown);
             // 
             // btnToggle4
             // 
@@ -1605,7 +1559,7 @@
             this.btnToggle4.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnToggle4.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnToggle4.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.btnToggle4.Location = new System.Drawing.Point(294, 45);
+            this.btnToggle4.Location = new System.Drawing.Point(275, 45);
             this.btnToggle4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnToggle4.Name = "btnToggle4";
             this.btnToggle4.Size = new System.Drawing.Size(180, 39);
@@ -1625,7 +1579,7 @@
             this.btnDistanceUp.Size = new System.Drawing.Size(59, 69);
             this.btnDistanceUp.TabIndex = 146;
             this.btnDistanceUp.UseVisualStyleBackColor = true;
-            this.btnDistanceUp.Click += new System.EventHandler(this.BtnDistanceUp_Click);
+            this.btnDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnDistanceUp_MouseDown);
             // 
             // lblDistance
             // 
@@ -1730,7 +1684,7 @@
             this.tabYouTurn.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tabYouTurn.Name = "tabYouTurn";
             this.tabYouTurn.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.tabYouTurn.Size = new System.Drawing.Size(894, 615);
+            this.tabYouTurn.Size = new System.Drawing.Size(875, 615);
             this.tabYouTurn.TabIndex = 0;
             this.tabYouTurn.Text = "U Turn";
             // 
@@ -1806,7 +1760,11 @@
             "3",
             "4",
             "5",
-            "6"});
+            "6",
+            "7",
+            "8",
+            "9",
+            "10"});
             this.cboxRowWidth.Location = new System.Drawing.Point(182, 251);
             this.cboxRowWidth.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxRowWidth.Name = "cboxRowWidth";
@@ -1847,7 +1805,7 @@
             this.groupBox1.Controls.Add(this.btnYouTurnRecord);
             this.groupBox1.Controls.Add(this.btnYouTurnCustom);
             this.groupBox1.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(307, 198);
+            this.groupBox1.Location = new System.Drawing.Point(295, 195);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
@@ -1941,7 +1899,7 @@
             this.tabControl1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(902, 683);
+            this.tabControl1.Size = new System.Drawing.Size(883, 683);
             this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.tabControl1.TabIndex = 1;
             // 
@@ -2048,7 +2006,7 @@
         private System.Windows.Forms.ComboBox cboxExitAction2;
         private System.Windows.Forms.NumericUpDown nudExit2;
         private System.Windows.Forms.ComboBox cboxExitFunc1;
-        private System.Windows.Forms.ComboBox cboxExitAction1;
+        public System.Windows.Forms.ComboBox cboxExitAction1;
         private System.Windows.Forms.NumericUpDown nudExit1;
         private System.Windows.Forms.ComboBox cboxExitFunc0;
         private System.Windows.Forms.ComboBox cboxExitAction0;

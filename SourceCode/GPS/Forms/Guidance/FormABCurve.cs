@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace AgOpenGPS
 {
@@ -79,6 +79,11 @@ namespace AgOpenGPS
                     if (CurveMode)
                     {
                         mf.CurveLines.CurrentLine = mf.CurveLines.CurrentEditLine;
+                        mf.CurveLines.GuidanceLines.Clear();
+                        mf.CurveLines.ResetABLine = true;
+                        Properties.Settings.Default.LastCurveLine = mf.CurveLines.CurrentLine;
+                        Properties.Settings.Default.Save();
+
                         mf.CurveLines.CurrentEditLine = -1;
                         mf.CurveLines.tryoutcurve = -1;
                     }
@@ -86,6 +91,10 @@ namespace AgOpenGPS
                     {
 
                         mf.ABLines.CurrentLine = mf.ABLines.CurrentEditLine;
+
+                        mf.ABLines.ResetABLine = true;
+                        Properties.Settings.Default.LastABLine = mf.ABLines.CurrentLine;
+                        Properties.Settings.Default.Save();
                         mf.ABLines.CurrentEditLine = -1;
                         mf.ABLines.tryoutcurve = -1;
                     }
@@ -222,7 +231,7 @@ namespace AgOpenGPS
                         //build the tail extensions
                         mf.CurveLines.AddFirstLastPoints();
                         
-                        mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].BoundaryMode, 0.0436332, 5);
+                        mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].curvePts.CalculateRoundedCorner(0.5, mf.CurveLines.Lines[mf.CurveLines.CurrentEditLine].BoundaryMode, 0.0436332, CancellationToken.None);
 
                         //calculate average heading of line
                         double x = 0, y = 0;
@@ -286,11 +295,15 @@ namespace AgOpenGPS
         {
             if (CurveMode)
             {
-                mf.CurveLines.OldHowManyPathsAway = double.NegativeInfinity;
+                mf.CurveLines.ResetABLine = true;
                 mf.CurveLines.isOkToAddPoints = false;
                 mf.CurveLines.tryoutcurve = -1;
             }
-            else mf.ABLines.tryoutcurve = -1;
+            else
+            {
+                mf.ABLines.tryoutcurve = -1;
+                mf.ABLines.ResetABLine = true;
+            }
 
 
             mf.CurveLines.BtnCurveLineOn = false;
@@ -299,6 +312,10 @@ namespace AgOpenGPS
             mf.ABLines.BtnABLineOn = false;
             mf.btnABLine.Image = Properties.Resources.ABLineOff;
 
+
+            mf.snapLeftBigStrip.Enabled = false;
+            mf.snapRightBigStrip.Enabled = false;
+            mf.snapToCurrent.Enabled = mf.ct.isContourBtnOn;
 
             mf.YouTurnButtons(false);
 
@@ -321,19 +338,40 @@ namespace AgOpenGPS
                 if (CurveMode)
                 {
                     mf.CurveLines.CurrentEditLine--;
-
-                    if (mf.CurveLines.CurrentLine == num) mf.CurveLines.CurrentLine = -1;
-                    else if (mf.CurveLines.CurrentLine > num) mf.CurveLines.CurrentLine--;
+                    if (mf.CurveLines.CurrentLine == num)
+                    {
+                        mf.ABLines.ResetABLine = true;
+                        mf.CurveLines.CurrentLine = -1;
+                        mf.CurveLines.GuidanceLines.Clear();
+                    }
+                    else if (mf.CurveLines.CurrentLine > num)
+                    {
+                        mf.ABLines.ResetABLine = true;
+                        mf.CurveLines.CurrentLine--;
+                        mf.CurveLines.GuidanceLines.Clear();
+                    }
                     mf.CurveLines.Lines.RemoveAt(num);
+                    Properties.Settings.Default.LastCurveLine = mf.CurveLines.CurrentLine;
+                    Properties.Settings.Default.Save();
                     mf.FileSaveCurveLines();
                 }
                 else
                 {
                     mf.ABLines.CurrentEditLine--;
-
-                    if (mf.ABLines.CurrentLine == num) mf.ABLines.CurrentLine = -1;
-                    else if (mf.ABLines.CurrentLine > num) mf.ABLines.CurrentLine--;
+                    if (mf.ABLines.CurrentLine == num)
+                    {
+                        mf.ABLines.ResetABLine = true;
+                        mf.ABLines.CurrentLine = -1;
+                    }
+                    else if (mf.ABLines.CurrentLine > num)
+                    {
+                        mf.ABLines.ResetABLine = true;
+                        mf.ABLines.CurrentLine--;
+                    }
                     mf.ABLines.ABLines.RemoveAt(num);
+
+                    Properties.Settings.Default.LastABLine = mf.ABLines.CurrentLine;
+                    Properties.Settings.Default.Save();
                     mf.FileSaveABLines();
                 }
             }
@@ -349,14 +387,21 @@ namespace AgOpenGPS
 
                 if (CurveMode)
                 {
-                    mf.CurveLines.OldHowManyPathsAway = double.NegativeInfinity;
+                    mf.CurveLines.ResetABLine = true;
                     mf.CurveLines.CurrentLine = idx;
+                    mf.CurveLines.GuidanceLines.Clear();
                     mf.CurveLines.tryoutcurve = -1;
+                    Properties.Settings.Default.LastCurveLine = idx;
+                    Properties.Settings.Default.Save();
                 }
                 else
                 {
+                    mf.ABLines.ResetABLine = true;
                     mf.ABLines.CurrentLine = idx;
                     mf.ABLines.tryoutcurve = -1;
+
+                    Properties.Settings.Default.LastABLine = idx;
+                    Properties.Settings.Default.Save();
                 }
 
                 mf.YouTurnButtons(true);
@@ -422,9 +467,22 @@ namespace AgOpenGPS
                 {
                     if (mf.CurveLines.CurrentEditLine < mf.CurveLines.Lines.Count && mf.CurveLines.CurrentEditLine > -1)
                     {
-                        if (mf.CurveLines.CurrentLine == mf.CurveLines.CurrentEditLine) mf.CurveLines.CurrentLine = -1;
-                        else if (mf.CurveLines.CurrentLine > mf.CurveLines.CurrentEditLine) mf.CurveLines.CurrentLine--;
+                        if (mf.CurveLines.CurrentLine == mf.CurveLines.CurrentEditLine)
+                        {
+                            mf.CurveLines.ResetABLine = true;
+                            mf.CurveLines.CurrentLine = -1;
+                            mf.CurveLines.GuidanceLines.Clear();
+                        }
+                        else if (mf.CurveLines.CurrentLine > mf.CurveLines.CurrentEditLine)
+                        {
+                            mf.CurveLines.ResetABLine = true;
+                            mf.CurveLines.CurrentLine--;
+                            mf.CurveLines.GuidanceLines.Clear();
+                        }
                         mf.CurveLines.Lines.RemoveAt(mf.CurveLines.CurrentEditLine);
+
+                        Properties.Settings.Default.LastCurveLine = mf.CurveLines.CurrentLine;
+                        Properties.Settings.Default.Save();
                     }
                 }
                 mf.FileSaveCurveLines();
@@ -439,9 +497,20 @@ namespace AgOpenGPS
                 {
                     if (mf.ABLines.CurrentEditLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentEditLine > -1)
                     {
-                        if (mf.ABLines.CurrentLine == mf.ABLines.CurrentEditLine) mf.ABLines.CurrentLine = -1;
-                        else if (mf.ABLines.CurrentLine > mf.ABLines.CurrentEditLine) mf.ABLines.CurrentLine--;
+                        if (mf.ABLines.CurrentLine == mf.ABLines.CurrentEditLine)
+                        {
+                            mf.ABLines.ResetABLine = true;
+                            mf.ABLines.CurrentLine = -1;
+                        }
+                        else if (mf.ABLines.CurrentLine > mf.ABLines.CurrentEditLine)
+                        {
+                            mf.ABLines.ResetABLine = true;
+                            mf.ABLines.CurrentLine--;
+                        }
                         mf.ABLines.ABLines.RemoveAt(mf.ABLines.CurrentEditLine);
+
+                        Properties.Settings.Default.LastABLine = mf.ABLines.CurrentLine;
+                        Properties.Settings.Default.Save();
                     }
                 }
 

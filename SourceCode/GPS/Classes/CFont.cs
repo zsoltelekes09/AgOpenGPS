@@ -33,23 +33,8 @@ namespace AgOpenGPS
                 size *= -mf.camera.camSetDistance;
                 size = Math.Pow(size, 0.8)/800;
 
-                //2d
-                if (mf.camera.camPitch > -58)
-                {
-                    if (!mf.camera.camFollowing)
-                    {
-                        GL.Rotate(mf.camHeading, 0, 0, 1);
-                        y *= 1.2;
-                    }
-                    else
-                    {
-                        y *= 1.2;
-                        GL.Translate(x, y, 0);
-                        x = y = 0;
-                    }
-                }
                 //3d
-                else
+                if (mf.camera.camPitch < -45)
                 {
                     if (!mf.camera.camFollowing)
                     {
@@ -62,6 +47,21 @@ namespace AgOpenGPS
                     {
                         GL.Rotate(-mf.camera.camPitch, 1, 0, 0);
                         y *= 0.3;
+                    }
+                }
+                //2d
+                else
+                {
+                    if (!mf.camera.camFollowing)
+                    {
+                        GL.Rotate(mf.camHeading, 0, 0, 1);
+                        y *= 1.2;
+                    }
+                    else
+                    {
+                        y *= 1.2;
+                        GL.Translate(x, y, 0);
+                        x = y = 0;
                     }
                 }
             }

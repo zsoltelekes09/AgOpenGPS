@@ -67,15 +67,22 @@ namespace AgOpenGPS
             {
                 int last = mf.CurveLines.CurrentLine;
                 mf.FileLoadCurveLines();
+                mf.CurveLines.ResetABLine = true;
                 mf.CurveLines.isEditing = false;
                 mf.CurveLines.CurrentLine = last;
+                mf.CurveLines.GuidanceLines.Clear();
+                Properties.Settings.Default.LastCurveLine = last;
+                Properties.Settings.Default.Save();
                 mf.CurveLines.CurrentEditLine = -1;
             }
             else
             {
                 int last = mf.ABLines.CurrentLine;
                 mf.FileLoadABLines();
+                mf.ABLines.ResetABLine = true;
                 mf.ABLines.isEditing = false;
+                Properties.Settings.Default.LastABLine = last;
+                Properties.Settings.Default.Save();
                 mf.ABLines.CurrentLine = last;
                 mf.ABLines.CurrentEditLine = -1;
             }
@@ -147,26 +154,26 @@ namespace AgOpenGPS
 
         private void BtnRightHalfWidth_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
-            else mf.ABLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
+            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.CurveLines.isSameWay ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
+            else mf.ABLines.MoveLine(Math.Round(mf.ABLines.isSameWay ? snapAdj * mf.metImp2m : -snapAdj * mf.metImp2m, 2));
         }
 
         private void BtnLeftHalfWidth_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
-            else mf.ABLines.MoveLine(Math.Round(mf.isABSameAsVehicleHeading ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
+            if (CurveMode) mf.CurveLines.MoveLine(Math.Round(mf.CurveLines.isSameWay ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
+            else mf.ABLines.MoveLine(Math.Round(mf.ABLines.isSameWay ? -snapAdj * mf.metImp2m : snapAdj * mf.metImp2m, 2));
         }
 
         private void BtnAdjRight_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(mf.isABSameAsVehicleHeading ? 0.1 : -0.11);
-            else mf.ABLines.MoveLine(mf.isABSameAsVehicleHeading ? 0.1 : -0.1);
+            if (CurveMode) mf.CurveLines.MoveLine(mf.CurveLines.isSameWay ? 0.1 : -0.11);
+            else mf.ABLines.MoveLine(mf.ABLines.isSameWay ? 0.1 : -0.1);
         }
 
         private void BtnAdjLeft_Click(object sender, EventArgs e)
         {
-            if (CurveMode) mf.CurveLines.MoveLine(mf.isABSameAsVehicleHeading ? -0.1 : 0.1);
-            else mf.ABLines.MoveLine(mf.isABSameAsVehicleHeading ? -0.1 : 0.1);
+            if (CurveMode) mf.CurveLines.MoveLine(mf.CurveLines.isSameWay ? -0.1 : 0.1);
+            else mf.ABLines.MoveLine(mf.ABLines.isSameWay ? -0.1 : 0.1);
         }
     }
 }

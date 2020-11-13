@@ -1,13 +1,8 @@
 using AgOpenGPS.Properties;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Windows.Forms;
-
-//using Keypad;
 
 namespace AgOpenGPS
 {
@@ -26,10 +21,9 @@ namespace AgOpenGPS
             //winform initialization
             InitializeComponent();
 
-            
             this.Text = String.Get("gsUTurn");
 
-            // U Turn tab
+          // U Turn tab
             tabYouTurn.Text = String.Get("gsUTurn");
             btnYouTurnCustom.Text = String.Get("gsCustom");
             btnTurnAllOff.Text = String.Get("gsTurnallOff");
@@ -42,80 +36,39 @@ namespace AgOpenGPS
             lblWhenTrig.Text = String.Get("gsUTurnLength");
             btnYouTurnRecord.Text = String.Get("gsRecord");
 
-            // Entry tab
+          // Entry tab
             tabEnter.Text = String.Get("gsEntry");
             label13.Text = String.Get("gsFunction");
             label15.Text = String.Get("gsAction");
             label14.Text = String.Get("gsDistance");
-            cboxExitAction0.Items.Clear();
-            this.cboxExitAction0.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction7.Items.Clear();
-            this.cboxEnterAction7.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction5.Items.Clear();
-            this.cboxEnterAction5.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction6.Items.Clear();
-            this.cboxEnterAction6.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction4.Items.Clear();
-            this.cboxEnterAction4.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction3.Items.Clear();
-            this.cboxEnterAction3.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction2.Items.Clear();
-            this.cboxEnterAction2.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction1.Items.Clear();
-            this.cboxEnterAction1.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxEnterAction0.Items.Clear();
-            this.cboxEnterAction0.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
 
-            // Exit tab
+
+            object[] tt = new object[] { String.Get("gsTurnOff"), String.Get("gsTurnOn") };
+
+            cboxEnterAction0.Items.AddRange(tt);
+            cboxEnterAction1.Items.AddRange(tt);
+            cboxEnterAction2.Items.AddRange(tt);
+            cboxEnterAction3.Items.AddRange(tt);
+            cboxEnterAction4.Items.AddRange(tt);
+            cboxEnterAction5.Items.AddRange(tt);
+            cboxEnterAction6.Items.AddRange(tt);
+            cboxEnterAction7.Items.AddRange(tt);
+
+          // Exit tab
             tabExit.Text = String.Get("gsExit");
             label16.Text = String.Get("gsAction");
             label18.Text = String.Get("gsFunction");
             label17.Text = String.Get("gsDistance");
-            cboxExitAction7.Items.Clear();
-            this.cboxExitAction7.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxExitAction5.Items.Clear();
-            this.cboxExitAction5.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            this.cboxExitAction6.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxExitAction4.Items.Clear();
-            this.cboxExitAction4.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxExitAction3.Items.Clear();
-            this.cboxExitAction3.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxExitAction2.Items.Clear();
-            this.cboxExitAction2.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
-            cboxExitAction1.Items.Clear();
-            this.cboxExitAction1.Items.AddRange(new object[] {
-            String.Get("gsTurnOff"),
-            String.Get("gsTurnOn")});
+
+            cboxExitAction0.Items.AddRange(tt);
+            cboxExitAction1.Items.AddRange(tt);
+            cboxExitAction2.Items.AddRange(tt);
+            cboxExitAction3.Items.AddRange(tt);
+            cboxExitAction4.Items.AddRange(tt);
+            cboxExitAction5.Items.AddRange(tt);
+            cboxExitAction6.Items.AddRange(tt);
+            cboxExitAction7.Items.AddRange(tt);
+
 
             // Edit tab
             tabEdit.Text = String.Get("gsEdit");
@@ -123,7 +76,7 @@ namespace AgOpenGPS
             label43.Text = String.Get("gsSaveNames");
 
 
-    }
+        }
 
         private void FormYouTurn_Load(object sender, EventArgs e)
         {
@@ -131,20 +84,13 @@ namespace AgOpenGPS
             string line = Vehicle.Default.seq_FunctionList;
             string[] words = line.Split(',');
 
-            mf.seq.pos3 = words[0];
-            mf.seq.pos4 = words[1];
-            mf.seq.pos5 = words[2];
-            mf.seq.pos6 = words[3];
-            mf.seq.pos7 = words[4];
-            mf.seq.pos8 = words[5];
-
             //set button text and background color
-            btnToggle3.Text = mf.seq.pos3;
-            btnToggle4.Text = mf.seq.pos4;
-            btnToggle5.Text = mf.seq.pos5;
-            btnToggle6.Text = mf.seq.pos6;
-            btnToggle7.Text = mf.seq.pos7;
-            btnToggle8.Text = mf.seq.pos8;
+            btnToggle3.Text = mf.seq.pos3 = words[0];
+            btnToggle4.Text = mf.seq.pos4 = words[1];
+            btnToggle5.Text = mf.seq.pos5 = words[2];
+            btnToggle6.Text = mf.seq.pos6 = words[3];
+            btnToggle7.Text = mf.seq.pos7 = words[4];
+            btnToggle8.Text = mf.seq.pos8 = words[5];
             FunctionButtonsOnOff();
 
             //the drop down lists
@@ -187,7 +133,7 @@ namespace AgOpenGPS
             lblGeoFenceDistance.Text = mf.yt.geoFenceDistance + "m";
 
             //update dubins button
-            if (!mf.yt.isUsingDubinsTurn)
+            if (mf.yt.YouTurnType == 0)
             {
                 btnIsUsingDubins.Text = String.Get("gsPattern");
                 btnIsUsingDubins.BackColor = Color.Salmon;
@@ -199,7 +145,7 @@ namespace AgOpenGPS
             }
             else
             {
-                btnIsUsingDubins.Text = String.Get("gsDubins");
+                btnIsUsingDubins.Text = String.Get("gsDubins") + (mf.yt.YouTurnType > 1 ? " Curve" : "");
                 btnIsUsingDubins.BackColor = Color.LightGreen;
                 btnYouTurnCustom.Enabled = false;
                 btnYouTurnKeyHole.Enabled = false;
@@ -213,26 +159,22 @@ namespace AgOpenGPS
 
         private void PopulateSequencePages()
         {
-            if (mf.seq.seqEnter[0].function == 0)
+            if ((cboxEnterFunc0.SelectedIndex = mf.seq.seqEnter[0].function) == 0)
             {
-                cboxEnterFunc0.SelectedIndex = mf.seq.seqEnter[0].function;
                 cboxEnterAction0.SelectedIndex = -1;
             }
             else
             {
-                cboxEnterFunc0.SelectedIndex = mf.seq.seqEnter[0].function;
                 cboxEnterAction0.SelectedIndex = mf.seq.seqEnter[0].action;
                 nudEnter0.Value = (decimal)mf.seq.seqEnter[0].distance;
             }
 
-            if (mf.seq.seqEnter[1].function == 0)
+            if ((cboxEnterFunc1.SelectedIndex = mf.seq.seqEnter[1].function) == 0)
             {
-                cboxEnterFunc1.SelectedIndex = mf.seq.seqEnter[1].function;
                 cboxEnterAction1.SelectedIndex = -1;
             }
             else
             {
-                cboxEnterFunc1.SelectedIndex = mf.seq.seqEnter[1].function;
                 cboxEnterAction1.SelectedIndex = mf.seq.seqEnter[1].action;
                 nudEnter1.Value = (decimal)mf.seq.seqEnter[1].distance;
             }
@@ -607,141 +549,31 @@ namespace AgOpenGPS
 
         private void LoadComboStrings()
         {
-            cboxEnterFunc0.Items.Add(mf.seq.pos1);
-            cboxEnterFunc0.Items.Add(mf.seq.pos2);
-            cboxEnterFunc0.Items.Add(mf.seq.pos3);
-            cboxEnterFunc0.Items.Add(mf.seq.pos4);
-            cboxEnterFunc0.Items.Add(mf.seq.pos5);
-            cboxEnterFunc0.Items.Add(mf.seq.pos6);
-            cboxEnterFunc0.Items.Add(mf.seq.pos7);
-            cboxEnterFunc0.Items.Add(mf.seq.pos8);
-            cboxExitFunc0.Items.Add(mf.seq.pos1);
-            cboxExitFunc0.Items.Add(mf.seq.pos2);
-            cboxExitFunc0.Items.Add(mf.seq.pos3);
-            cboxExitFunc0.Items.Add(mf.seq.pos4);
-            cboxExitFunc0.Items.Add(mf.seq.pos5);
-            cboxExitFunc0.Items.Add(mf.seq.pos6);
-            cboxExitFunc0.Items.Add(mf.seq.pos7);
-            cboxExitFunc0.Items.Add(mf.seq.pos8);
+            object[] tt = Vehicle.Default.seq_FunctionList.Split(',');
 
-            cboxEnterFunc1.Items.Add(mf.seq.pos1);
-            cboxEnterFunc1.Items.Add(mf.seq.pos2);
-            cboxEnterFunc1.Items.Add(mf.seq.pos3);
-            cboxEnterFunc1.Items.Add(mf.seq.pos4);
-            cboxEnterFunc1.Items.Add(mf.seq.pos5);
-            cboxEnterFunc1.Items.Add(mf.seq.pos6);
-            cboxEnterFunc1.Items.Add(mf.seq.pos7);
-            cboxEnterFunc1.Items.Add(mf.seq.pos8);
-            cboxExitFunc1.Items.Add(mf.seq.pos1);
-            cboxExitFunc1.Items.Add(mf.seq.pos2);
-            cboxExitFunc1.Items.Add(mf.seq.pos3);
-            cboxExitFunc1.Items.Add(mf.seq.pos4);
-            cboxExitFunc1.Items.Add(mf.seq.pos5);
-            cboxExitFunc1.Items.Add(mf.seq.pos6);
-            cboxExitFunc1.Items.Add(mf.seq.pos7);
-            cboxExitFunc1.Items.Add(mf.seq.pos8);
+            cboxEnterFunc0.Items.AddRange(tt);
+            cboxExitFunc0.Items.AddRange(tt);
 
-            cboxEnterFunc2.Items.Add(mf.seq.pos1);
-            cboxEnterFunc2.Items.Add(mf.seq.pos2);
-            cboxEnterFunc2.Items.Add(mf.seq.pos3);
-            cboxEnterFunc2.Items.Add(mf.seq.pos4);
-            cboxEnterFunc2.Items.Add(mf.seq.pos5);
-            cboxEnterFunc2.Items.Add(mf.seq.pos6);
-            cboxEnterFunc2.Items.Add(mf.seq.pos7);
-            cboxEnterFunc2.Items.Add(mf.seq.pos8);
-            cboxExitFunc2.Items.Add(mf.seq.pos1);
-            cboxExitFunc2.Items.Add(mf.seq.pos2);
-            cboxExitFunc2.Items.Add(mf.seq.pos3);
-            cboxExitFunc2.Items.Add(mf.seq.pos4);
-            cboxExitFunc2.Items.Add(mf.seq.pos5);
-            cboxExitFunc2.Items.Add(mf.seq.pos6);
-            cboxExitFunc2.Items.Add(mf.seq.pos7);
-            cboxExitFunc2.Items.Add(mf.seq.pos8);
+            cboxEnterFunc1.Items.AddRange(tt);
+            cboxExitFunc1.Items.AddRange(tt);
 
-            cboxEnterFunc3.Items.Add(mf.seq.pos1);
-            cboxEnterFunc3.Items.Add(mf.seq.pos2);
-            cboxEnterFunc3.Items.Add(mf.seq.pos3);
-            cboxEnterFunc3.Items.Add(mf.seq.pos4);
-            cboxEnterFunc3.Items.Add(mf.seq.pos5);
-            cboxEnterFunc3.Items.Add(mf.seq.pos6);
-            cboxEnterFunc3.Items.Add(mf.seq.pos7);
-            cboxEnterFunc3.Items.Add(mf.seq.pos8);
-            cboxExitFunc3.Items.Add(mf.seq.pos1);
-            cboxExitFunc3.Items.Add(mf.seq.pos2);
-            cboxExitFunc3.Items.Add(mf.seq.pos3);
-            cboxExitFunc3.Items.Add(mf.seq.pos4);
-            cboxExitFunc3.Items.Add(mf.seq.pos5);
-            cboxExitFunc3.Items.Add(mf.seq.pos6);
-            cboxExitFunc3.Items.Add(mf.seq.pos7);
-            cboxExitFunc3.Items.Add(mf.seq.pos8);
+            cboxEnterFunc2.Items.AddRange(tt);
+            cboxExitFunc2.Items.AddRange(tt);
 
-            cboxEnterFunc4.Items.Add(mf.seq.pos1);
-            cboxEnterFunc4.Items.Add(mf.seq.pos2);
-            cboxEnterFunc4.Items.Add(mf.seq.pos3);
-            cboxEnterFunc4.Items.Add(mf.seq.pos4);
-            cboxEnterFunc4.Items.Add(mf.seq.pos5);
-            cboxEnterFunc4.Items.Add(mf.seq.pos6);
-            cboxEnterFunc4.Items.Add(mf.seq.pos7);
-            cboxEnterFunc4.Items.Add(mf.seq.pos8);
-            cboxExitFunc4.Items.Add(mf.seq.pos1);
-            cboxExitFunc4.Items.Add(mf.seq.pos2);
-            cboxExitFunc4.Items.Add(mf.seq.pos3);
-            cboxExitFunc4.Items.Add(mf.seq.pos4);
-            cboxExitFunc4.Items.Add(mf.seq.pos5);
-            cboxExitFunc4.Items.Add(mf.seq.pos6);
-            cboxExitFunc4.Items.Add(mf.seq.pos7);
-            cboxExitFunc4.Items.Add(mf.seq.pos8);
+            cboxEnterFunc3.Items.AddRange(tt);
+            cboxExitFunc3.Items.AddRange(tt);
 
-            cboxEnterFunc5.Items.Add(mf.seq.pos1);
-            cboxEnterFunc5.Items.Add(mf.seq.pos2);
-            cboxEnterFunc5.Items.Add(mf.seq.pos3);
-            cboxEnterFunc5.Items.Add(mf.seq.pos4);
-            cboxEnterFunc5.Items.Add(mf.seq.pos5);
-            cboxEnterFunc5.Items.Add(mf.seq.pos6);
-            cboxEnterFunc5.Items.Add(mf.seq.pos7);
-            cboxEnterFunc5.Items.Add(mf.seq.pos8);
-            cboxExitFunc5.Items.Add(mf.seq.pos1);
-            cboxExitFunc5.Items.Add(mf.seq.pos2);
-            cboxExitFunc5.Items.Add(mf.seq.pos3);
-            cboxExitFunc5.Items.Add(mf.seq.pos4);
-            cboxExitFunc5.Items.Add(mf.seq.pos5);
-            cboxExitFunc5.Items.Add(mf.seq.pos6);
-            cboxExitFunc5.Items.Add(mf.seq.pos7);
-            cboxExitFunc5.Items.Add(mf.seq.pos8);
+            cboxEnterFunc4.Items.AddRange(tt);
+            cboxExitFunc4.Items.AddRange(tt);
 
-            cboxEnterFunc6.Items.Add(mf.seq.pos1);
-            cboxEnterFunc6.Items.Add(mf.seq.pos2);
-            cboxEnterFunc6.Items.Add(mf.seq.pos3);
-            cboxEnterFunc6.Items.Add(mf.seq.pos4);
-            cboxEnterFunc6.Items.Add(mf.seq.pos5);
-            cboxEnterFunc6.Items.Add(mf.seq.pos6);
-            cboxEnterFunc6.Items.Add(mf.seq.pos7);
-            cboxEnterFunc6.Items.Add(mf.seq.pos8);
-            cboxExitFunc6.Items.Add(mf.seq.pos1);
-            cboxExitFunc6.Items.Add(mf.seq.pos2);
-            cboxExitFunc6.Items.Add(mf.seq.pos3);
-            cboxExitFunc6.Items.Add(mf.seq.pos4);
-            cboxExitFunc6.Items.Add(mf.seq.pos5);
-            cboxExitFunc6.Items.Add(mf.seq.pos6);
-            cboxExitFunc6.Items.Add(mf.seq.pos7);
-            cboxExitFunc6.Items.Add(mf.seq.pos8);
+            cboxEnterFunc5.Items.AddRange(tt);
+            cboxExitFunc5.Items.AddRange(tt);
 
-            cboxEnterFunc7.Items.Add(mf.seq.pos1);
-            cboxEnterFunc7.Items.Add(mf.seq.pos2);
-            cboxEnterFunc7.Items.Add(mf.seq.pos3);
-            cboxEnterFunc7.Items.Add(mf.seq.pos4);
-            cboxEnterFunc7.Items.Add(mf.seq.pos5);
-            cboxEnterFunc7.Items.Add(mf.seq.pos6);
-            cboxEnterFunc7.Items.Add(mf.seq.pos7);
-            cboxEnterFunc7.Items.Add(mf.seq.pos8);
-            cboxExitFunc7.Items.Add(mf.seq.pos1);
-            cboxExitFunc7.Items.Add(mf.seq.pos2);
-            cboxExitFunc7.Items.Add(mf.seq.pos3);
-            cboxExitFunc7.Items.Add(mf.seq.pos4);
-            cboxExitFunc7.Items.Add(mf.seq.pos5);
-            cboxExitFunc7.Items.Add(mf.seq.pos6);
-            cboxExitFunc7.Items.Add(mf.seq.pos7);
-            cboxExitFunc7.Items.Add(mf.seq.pos8);
+            cboxEnterFunc6.Items.AddRange(tt);
+            cboxExitFunc6.Items.AddRange(tt);
+
+            cboxEnterFunc7.Items.AddRange(tt);
+            cboxExitFunc7.Items.AddRange(tt);
         }
 
         private void LoadEditFunctionNames()
@@ -750,7 +582,6 @@ namespace AgOpenGPS
             tboxPos2.Text = mf.seq.pos2;
             tboxPos3.Text = mf.seq.pos3;
             tboxPos4.Text = mf.seq.pos4;
-
             tboxPos5.Text = mf.seq.pos5;
             tboxPos6.Text = mf.seq.pos6;
             tboxPos7.Text = mf.seq.pos7;
@@ -822,9 +653,10 @@ namespace AgOpenGPS
 
         private void BtnIsUsingDubins_Click(object sender, EventArgs e)
         {
-            if (mf.yt.isUsingDubinsTurn)
+            if (++mf.yt.YouTurnType > 2) mf.yt.YouTurnType = 0;
+
+            if (mf.yt.YouTurnType == 0)
             {
-                mf.yt.isUsingDubinsTurn = false;
                 btnIsUsingDubins.Text = String.Get("gsPattern");
                 btnIsUsingDubins.BackColor = Color.Salmon;
                 btnYouTurnCustom.Enabled = true;
@@ -835,8 +667,7 @@ namespace AgOpenGPS
             }
             else
             {
-                mf.yt.isUsingDubinsTurn = true;
-                btnIsUsingDubins.Text = String.Get("gsDubins");
+                btnIsUsingDubins.Text = String.Get("gsDubins") + (mf.yt.YouTurnType > 1 ? " Curve" : "");
                 btnIsUsingDubins.BackColor = Color.LightGreen;
                 btnYouTurnCustom.Enabled = false;
                 btnYouTurnKeyHole.Enabled = false;
@@ -855,193 +686,75 @@ namespace AgOpenGPS
 
         #region distance
 
-        private void BtnDistanceDn_Click(object sender, EventArgs e)
+        private void BtnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            if (mf.yt.youTurnStartOffset-- < 4) mf.yt.youTurnStartOffset = 3;
-            lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
-            if (mf.yt.youTurnStartOffset < 0) lblWhenTrig.Text = "Before";
-            else lblWhenTrig.Text = String.Get("gsAfter");
-        }
-
-        private void BtnDistanceUp_Click(object sender, EventArgs e)
-        {
-            if (mf.yt.youTurnStartOffset++ > 49) mf.yt.youTurnStartOffset = 50;
-            lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
-            if (mf.yt.youTurnStartOffset < 0) lblWhenTrig.Text = "Before";
-            else lblWhenTrig.Text = String.Get("gsAfter");
+            if (--mf.yt.triggerDistanceOffset < 0) mf.yt.triggerDistanceOffset = 0;
+            lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
         }
 
         private void BtnTriggerDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
-            if (mf.yt.triggerDistanceOffset++ > 50) mf.yt.triggerDistanceOffset = 50;
+            if (++mf.yt.triggerDistanceOffset > 50) mf.yt.triggerDistanceOffset = 50;
             lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
-        }
-
-        private void BtnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
-        {
-            mf.yt.triggerDistanceOffset--;
-            if (mf.yt.triggerDistanceOffset < 0) mf.yt.triggerDistanceOffset = 0;
-            lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
-        }
-
-        private void BtnGeoFenceDistanceUp_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (mf.yt.geoFenceDistance++ > 50) mf.yt.geoFenceDistance = 50;
-            lblGeoFenceDistance.Text = mf.yt.geoFenceDistance.ToString() + "m";
         }
 
         private void BtnGeoFenceDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            mf.yt.geoFenceDistance--;
-            if (mf.yt.geoFenceDistance < 0) mf.yt.geoFenceDistance = 0;
+            if (--mf.yt.geoFenceDistance < 0) mf.yt.geoFenceDistance = 0;
             lblGeoFenceDistance.Text = mf.yt.geoFenceDistance.ToString() + "m";
+        }
+
+        private void BtnGeoFenceDistanceUp_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (++mf.yt.geoFenceDistance > 50) mf.yt.geoFenceDistance = 50;
+            lblGeoFenceDistance.Text = mf.yt.geoFenceDistance.ToString() + "m";
+        }
+
+        private void BtnDistanceDn_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (--mf.yt.youTurnStartOffset < 0) mf.yt.youTurnStartOffset = 0;
+            lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
+        }
+
+        private void BtnDistanceUp_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (++mf.yt.youTurnStartOffset > 50) mf.yt.youTurnStartOffset = 50;
+            lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
         }
 
         #endregion distance
 
         #region Sequence select
 
-        private void CboxEnterFunc0_SelectedIndexChanged(object sender, EventArgs e)
+        private void Cbox_IndexChanged(object sender, EventArgs e)
         {
-            if (cboxEnterFunc0.SelectedIndex == 0)
-            {
-                cboxEnterAction0.SelectedIndex = -1;
-                nudEnter0.Value = 0;
-            }
-        }
+            ComboBox ComboBox = sender as ComboBox;
 
-        private void CboxEnterFunc1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxEnterFunc1.SelectedIndex == 0)
+            if (ComboBox != null && ComboBox.SelectedIndex == 0)
             {
-                cboxEnterAction1.SelectedIndex = -1;
-                nudEnter1.Value = 0;
-            }
-        }
+                ComboBox.SelectedIndex = -1;
+                bool Exit = ComboBox.Name.Substring(0, ComboBox.Name.Length - 5).EndsWith("Exit");
+                Control[] Controls = this.Controls.Find("cbox" + (Exit ? "Exit" : "Enter") + "Action" + ComboBox.Name[ComboBox.Name.Length - 1], true);
+                if (Controls.Length > 0)
+                {
+                    ComboBox = Controls[0] as ComboBox;
+                    if (ComboBox != null)
+                    {
+                        ComboBox.SelectedIndex = -1;
 
-        private void CboxEnterFunc2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxEnterFunc2.SelectedIndex == 0)
-            {
-                cboxEnterAction2.SelectedIndex = -1;
-                nudEnter2.Value = 0;
-            }
-        }
+                    }
+                }
 
-        private void CboxEnterFunc3_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxEnterFunc3.SelectedIndex == 0)
-            {
-                cboxEnterAction3.SelectedIndex = -1;
-                nudEnter3.Value = 0;
-            }
-        }
+                Controls = this.Controls.Find("nud" + (Exit ? "Exit" : "Enter") + ComboBox.Name[ComboBox.Name.Length - 1], true);
+                if (Controls.Length > 0)
+                {
+                    NumericUpDown NumBox = Controls[0] as NumericUpDown;
+                    if (NumBox != null)
+                    {
+                        NumBox.Value = 0;
+                    }
+                }
 
-        private void CboxEnterFunc4_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxEnterFunc4.SelectedIndex == 0)
-            {
-                cboxEnterAction4.SelectedIndex = -1;
-                nudEnter4.Value = 0;
-            }
-        }
-
-        private void CboxEnterFunc5_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxEnterFunc5.SelectedIndex == 0)
-            {
-                cboxEnterAction5.SelectedIndex = -1;
-                nudEnter5.Value = 0;
-            }
-        }
-
-        private void CboxEnterFunc6_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxEnterFunc6.SelectedIndex == 0)
-            {
-                cboxEnterAction6.SelectedIndex = -1;
-                nudEnter6.Value = 0;
-            }
-        }
-
-        private void CboxEnterFunc7_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxEnterFunc7.SelectedIndex == 0)
-            {
-                cboxEnterAction7.SelectedIndex = -1;
-                nudEnter7.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc0_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc0.SelectedIndex == 0)
-            {
-                cboxExitAction0.SelectedIndex = -1;
-                nudExit0.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc1.SelectedIndex == 0)
-            {
-                cboxExitAction1.SelectedIndex = -1;
-                nudExit1.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc2.SelectedIndex == 0)
-            {
-                cboxExitAction2.SelectedIndex = -1;
-                nudExit2.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc3_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc3.SelectedIndex == 0)
-            {
-                cboxExitAction3.SelectedIndex = -1;
-                nudExit3.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc4_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc4.SelectedIndex == 0)
-            {
-                cboxExitAction4.SelectedIndex = -1;
-                nudExit4.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc5_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc5.SelectedIndex == 0)
-            {
-                cboxExitAction5.SelectedIndex = -1;
-                nudExit5.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc6_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc6.SelectedIndex == 0)
-            {
-                cboxExitAction6.SelectedIndex = -1;
-                nudExit6.Value = 0;
-            }
-        }
-
-        private void CboxExitFunc7_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cboxExitFunc7.SelectedIndex == 0)
-            {
-                cboxExitAction7.SelectedIndex = -1;
-                nudExit7.Value = 0;
             }
         }
 
@@ -1054,7 +767,6 @@ namespace AgOpenGPS
             //pos1 = tboxPos1.Text; pos2 = tboxPos2.Text; auto manual buttons are read only
             mf.seq.pos3 = tboxPos3.Text;
             mf.seq.pos4 = tboxPos4.Text;
-
             mf.seq.pos5 = tboxPos5.Text;
             mf.seq.pos6 = tboxPos6.Text;
             mf.seq.pos7 = tboxPos7.Text;
@@ -1079,22 +791,22 @@ namespace AgOpenGPS
             cboxExitFunc7.Items.Clear();
 
             //add the dash, item 0
-            cboxEnterFunc0.Items.Add("-");
-            cboxEnterFunc1.Items.Add("-");
-            cboxEnterFunc2.Items.Add("-");
-            cboxEnterFunc3.Items.Add("-");
-            cboxEnterFunc4.Items.Add("-");
-            cboxEnterFunc5.Items.Add("-");
-            cboxEnterFunc6.Items.Add("-");
-            cboxEnterFunc7.Items.Add("-");
-            cboxExitFunc0.Items.Add("-");
-            cboxExitFunc1.Items.Add("-");
-            cboxExitFunc2.Items.Add("-");
-            cboxExitFunc3.Items.Add("-");
-            cboxExitFunc4.Items.Add("-");
-            cboxExitFunc5.Items.Add("-");
-            cboxExitFunc6.Items.Add("-");
-            cboxExitFunc7.Items.Add("-");
+            cboxEnterFunc0.Items.Add(" ");
+            cboxEnterFunc1.Items.Add(" ");
+            cboxEnterFunc2.Items.Add(" ");
+            cboxEnterFunc3.Items.Add(" ");
+            cboxEnterFunc4.Items.Add(" ");
+            cboxEnterFunc5.Items.Add(" ");
+            cboxEnterFunc6.Items.Add(" ");
+            cboxEnterFunc7.Items.Add(" ");
+            cboxExitFunc0.Items.Add(" ");
+            cboxExitFunc1.Items.Add(" ");
+            cboxExitFunc2.Items.Add(" ");
+            cboxExitFunc3.Items.Add(" ");
+            cboxExitFunc4.Items.Add(" ");
+            cboxExitFunc5.Items.Add(" ");
+            cboxExitFunc6.Items.Add(" ");
+            cboxExitFunc7.Items.Add(" ");
 
             //reload the comboboxes with updated strings
             LoadComboStrings();
@@ -1169,7 +881,7 @@ namespace AgOpenGPS
 
             //Vehicle.Default.set_youSkipHeight = mf.yt.rowSkipsHeight;
             Vehicle.Default.set_youSkipWidth = mf.yt.rowSkipsWidth;
-            Vehicle.Default.set_youUseDubins = mf.yt.isUsingDubinsTurn;
+            Vehicle.Default.Youturn_Type = mf.yt.YouTurnType;
 
             Vehicle.Default.set_youTurnDistance = mf.yt.youTurnStartOffset;
             //mf.hl.boxLength = 3.0 * mf.yt.triggerDistanceOffset;
@@ -1221,20 +933,24 @@ namespace AgOpenGPS
             Vehicle.Default.seq_DistanceEnter = sbEntry.ToString();
             Vehicle.Default.seq_DistanceExit = sbExit.ToString();
 
-
-
-
             if (Vehicle.Default.set_youTriggerDistance != mf.yt.triggerDistanceOffset)
             {
                 Vehicle.Default.set_youTriggerDistance = mf.yt.triggerDistanceOffset;
-                mf.turn.BuildTurnLines(-1);
+
+                for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+                {
+                    mf.StartTasks(mf.bnd.bndArr[i], i, TaskName.TurnLine);
+                }
             }
 
             if (Vehicle.Default.set_geoFenceDistance != mf.yt.geoFenceDistance)
             {
                 Vehicle.Default.set_geoFenceDistance = mf.yt.geoFenceDistance;
-                mf.gf.BuildGeoFenceLines(-1);
-                mf.mazeGrid.BuildMazeGridArray();
+
+                for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+                {
+                    mf.StartTasks(mf.bnd.bndArr[i], i, TaskName.GeoFence);
+                }
             }
             mf.yt.ResetCreatedYouTurn();
 

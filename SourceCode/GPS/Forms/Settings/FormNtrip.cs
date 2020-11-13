@@ -269,10 +269,6 @@ namespace AgOpenGPS
             {
                 mf.TimedMessageBox(2000, "Error", "No Source Data");
             }
-
-
-            // Console.WriteLine(page);
-            // Process.Start(syte);
         }
 
         private void TboxEnterURL_Click(object sender, EventArgs e)

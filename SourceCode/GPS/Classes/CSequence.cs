@@ -21,9 +21,6 @@ namespace AgOpenGPS
         public string pos7 = "";
         public string pos8 = "";
 
-        /// <summary> /// 0=Not in youturn, 1=Entering headland, 2=Exiting headland /// </summary>
-        public int whereAmI = 0;
-
         public bool isSequenceTriggered, isEntering;
 
         public struct SeqEvent
@@ -134,20 +131,10 @@ namespace AgOpenGPS
         }
 
         //determine when if and how functions are triggered
-        public void DoSequenceEvent()
+        public void DoSequenceEvent(bool Force)
         {
             if (isSequenceTriggered)
             {
-                if (mf.yt.onA <= 0)
-                {
-                    whereAmI = 1;
-                    mf.yt.onA = -mf.yt.onA;
-                }
-                else
-                {
-                    whereAmI = 2;
-                }
-
                 int c = 0;
                 for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
                 {
@@ -160,52 +147,35 @@ namespace AgOpenGPS
                 {
                     //sequences all done so reset everything and leave
                     isSequenceTriggered = false;
-                    whereAmI = 0;
                     ResetSequenceEventTriggers();
                     mf.distanceToolToTurnLine = -2222;
                     return;
                 }
 
-                switch (whereAmI)
+                bool tt = mf.yt.ytLength - mf.yt.onA > 0.5 * mf.yt.ytLength;
+
+                for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
                 {
-                    case 0: //not in you turn
-                        break;
+                    //have we gone past the distance and still haven't done it
+                    if (tt && mf.yt.onA >= mf.seq.seqEnter[i].distance && !mf.seq.seqEnter[i].isTrig)
+                    {
+                        //it shall only run once
+                        mf.seq.seqEnter[i].isTrig = true;
+                        //send the function and action to perform
+                        mf.DoYouTurnSequenceEvent(mf.seq.seqEnter[i].function, mf.seq.seqEnter[i].action);
+                        mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
+                        mf.SendData(mf.mc.Send_Uturn, false);
+                    }
+                    else if (!tt && !mf.seq.seqExit[i].isTrig && (Force || Math.Round(mf.yt.ytLength - mf.yt.onA, 1) <= mf.seq.seqExit[i].distance))
+                    {
+                        //it shall only run once
+                        mf.seq.seqExit[i].isTrig = true;
 
-                    case 1: //Entering the headland
-
-                        for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-                        {
-                            //have we gone past the distance and still haven't done it
-                            if (mf.yt.onA >= mf.seq.seqEnter[i].distance && !mf.seq.seqEnter[i].isTrig)
-                            {
-                                //it shall only run once
-                                mf.seq.seqEnter[i].isTrig = true;
-
-                                //send the function and action to perform
-                                mf.DoYouTurnSequenceEvent(mf.seq.seqEnter[i].function, mf.seq.seqEnter[i].action);
-                                mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
-                                mf.SendData(mf.mc.Send_Uturn, false);
-                            }
-                        }
-                        break;
-
-                    case 2: //Exiting the headland
-
-                        for (int i = 0; i < FormGPS.MAXFUNCTIONS; i++)
-                        {
-                            //have we gone past the distance and still haven't done it
-                            if (mf.yt.onA <= mf.seq.seqExit[i].distance && !mf.seq.seqExit[i].isTrig)
-                            {
-                                //it shall only run once
-                                mf.seq.seqExit[i].isTrig = true;
-
-                                //send the function and action to perform
-                                mf.DoYouTurnSequenceEvent(mf.seq.seqExit[i].function, mf.seq.seqExit[i].action);
-                                mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
-                                mf.SendData(mf.mc.Send_Uturn, false);
-                            }
-                        }
-                        break;
+                        //send the function and action to perform
+                        mf.DoYouTurnSequenceEvent(mf.seq.seqExit[i].function, mf.seq.seqExit[i].action);
+                        mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
+                        mf.SendData(mf.mc.Send_Uturn, false);
+                    }
                 }
 
             }

@@ -1,83 +1,87 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace AgOpenGPS
 {
-    public class CTurnLines
+    public partial class CBoundaryLines
     {
         //list of coordinates of boundary line
         public List<Vec3> turnLine = new List<Vec3>();
 
         //the list of constants and multiples of the boundary
         public List<Vec2> calcList = new List<Vec2>();
-        public double Northingmin, Northingmax, Eastingmin, Eastingmax;
 
-        public void FixTurnLine(double totalHeadWidth, ref List<Vec3> curBnd)
+        public void BuildTurnLine(List<Vec3> bndLine, double triggerDistanceOffset, CancellationToken ct, out List<Vec3> turnLine2, out List<Vec2> calcList2)
         {
-            double distance;
-            for (int i = 0; i < turnLine.Count; i++)
+            turnLine2 = new List<Vec3>();
+            calcList2 = new List<Vec2>();
+
+            //to fill the list of line points
+            Vec3 point = new Vec3();
+            for (int i = 0; i < bndLine.Count; i++)
             {
-                for (int k = 0; k < curBnd.Count; k++)
-                {
-                    //remove the points too close to boundary
-                    distance = Glm.Distance(curBnd[k], turnLine[i]);
-                    if (distance < totalHeadWidth)
-                    {
-                        turnLine.RemoveAt(i);
-                        i--;
-                        break;
-                    }
-                }
+                if (ct.IsCancellationRequested) break;
+                point.Northing = bndLine[i].Northing + Math.Sin(bndLine[i].Heading) * -triggerDistanceOffset;
+                point.Easting = bndLine[i].Easting + Math.Cos(bndLine[i].Heading) * triggerDistanceOffset;
+                point.Heading = bndLine[i].Heading;
+                turnLine2.Add(point);
             }
 
-            for (int i = 0; i < turnLine.Count; i++)
+            FixTurnLine(ref turnLine2, Math.Abs(triggerDistanceOffset), ref bndLine, ct);
+            PreCalcTurnLines(ref turnLine2, ref calcList2, ct);
+        }
+
+        public void FixTurnLine(ref List<Vec3> turnLine2, double totalHeadWidth, ref List<Vec3> curBnd, CancellationToken ct)
+        {
+            double distance;
+
+            turnLine2.PolygonArea(ct, true);
+            List<List<Vec3>> tt = turnLine2.ClipPolyLine(curBnd, true, totalHeadWidth, ct);
+            if (tt.Count > 0) turnLine2 = tt[0];
+
+            for (int i = 0; i < turnLine2.Count; i++)
             {
-                int j = (i == turnLine.Count - 1) ? 0 : i + 1;
+                if (ct.IsCancellationRequested) break;
+                int j = (i == turnLine2.Count - 1) ? 0 : i + 1;
                 //make sure distance isn't too small between points on turnLine
-                distance = Glm.Distance(turnLine[i], turnLine[j]);
+                distance = Glm.Distance(turnLine2[i], turnLine2[j]);
                 if (distance < 2)
                 {
-                    turnLine.RemoveAt(j);
+                    turnLine2.RemoveAt(j);
                     i--;
                 }
             }
-            turnLine.CalculateHeading(true);
+            turnLine2.CalculateHeading(true, ct);
         }
 
-        public void PreCalcTurnLines()
+        public void PreCalcTurnLines(ref List<Vec3> turnLine2, ref List<Vec2> calcList2, CancellationToken ct)
         {
-            if (turnLine.Count > 3)
+            if (turnLine2.Count > 3)
             {
-                int j = turnLine.Count - 1;
+                int j = turnLine2.Count - 1;
                 //clear the list, constant is easting, multiple is northing
-                calcList.Clear();
                 Vec2 constantMultiple = new Vec2(0, 0);
 
-                Northingmin = Northingmax = turnLine[0].Northing;
-                Eastingmin = Eastingmax = turnLine[0].Easting;
-
-                for (int i = 0; i < turnLine.Count; j = i++)
+                for (int i = 0; i < turnLine2.Count; j = i++)
                 {
-                    if (Northingmin > turnLine[i].Northing) Northingmin = turnLine[i].Northing;
-                    if (Northingmax < turnLine[i].Northing) Northingmax = turnLine[i].Northing;
-                    if (Eastingmin > turnLine[i].Easting) Eastingmin = turnLine[i].Easting;
-                    if (Eastingmax < turnLine[i].Easting) Eastingmax = turnLine[i].Easting;
+                    if (ct.IsCancellationRequested) break;
                     //check for divide by zero
-                    if (Math.Abs(turnLine[i].Northing - turnLine[j].Northing) < double.Epsilon)
+                    if (Math.Abs(turnLine2[i].Northing - turnLine2[j].Northing) < double.Epsilon)
                     {
-                        constantMultiple.Easting = turnLine[i].Easting;
+                        constantMultiple.Easting = turnLine2[i].Easting;
                         constantMultiple.Northing = 0;
-                        calcList.Add(constantMultiple);
+                        calcList2.Add(constantMultiple);
                     }
                     else
                     {
                         //determine constant and multiple and add to list
-                        constantMultiple.Easting = turnLine[i].Easting - ((turnLine[i].Northing * turnLine[j].Easting)
-                                        / (turnLine[j].Northing - turnLine[i].Northing)) + ((turnLine[i].Northing * turnLine[i].Easting)
-                                            / (turnLine[j].Northing - turnLine[i].Northing));
-                        constantMultiple.Northing = (turnLine[j].Easting - turnLine[i].Easting) / (turnLine[j].Northing - turnLine[i].Northing);
-                        calcList.Add(constantMultiple);
+                        constantMultiple.Easting = turnLine2[i].Easting - ((turnLine2[i].Northing * turnLine2[j].Easting)
+                                        / (turnLine2[j].Northing - turnLine2[i].Northing)) + ((turnLine2[i].Northing * turnLine2[i].Easting)
+                                            / (turnLine2[j].Northing - turnLine2[i].Northing));
+                        constantMultiple.Northing = (turnLine2[j].Easting - turnLine2[i].Easting) / (turnLine2[j].Northing - turnLine2[i].Northing);
+                        calcList2.Add(constantMultiple);
                     }
                 }
             }
@@ -107,10 +111,9 @@ namespace AgOpenGPS
         public void DrawTurnLine()
         {
             ////draw the turn line oject
-            int ptCount = turnLine.Count;
-            if (ptCount < 1) return;
+            if (turnLine.Count < 1) return;
             GL.Begin(PrimitiveType.LineLoop);
-            for (int h = 0; h < ptCount; h++) GL.Vertex3(turnLine[h].Easting, turnLine[h].Northing, 0);
+            for (int h = 0; h < turnLine.Count; h++) GL.Vertex3(turnLine[h].Easting, turnLine[h].Northing, 0);
             GL.End();
         }
     }

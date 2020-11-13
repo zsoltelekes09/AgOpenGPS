@@ -38,6 +38,7 @@
             // 
             // btnExit
             // 
+            this.btnExit.DialogResult = System.Windows.Forms.DialogResult.No;
             this.btnExit.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.btnExit.Image = global::AgOpenGPS.Properties.Resources.SwitchOff;
             this.btnExit.Location = new System.Drawing.Point(300, 100);
@@ -45,10 +46,10 @@
             this.btnExit.Size = new System.Drawing.Size(100, 100);
             this.btnExit.TabIndex = 261;
             this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
             // 
             // btnReturn
             // 
+            this.btnReturn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnReturn.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.btnReturn.Image = global::AgOpenGPS.Properties.Resources.back_button;
             this.btnReturn.Location = new System.Drawing.Point(100, 100);
@@ -56,7 +57,6 @@
             this.btnReturn.Size = new System.Drawing.Size(100, 100);
             this.btnReturn.TabIndex = 260;
             this.btnReturn.UseVisualStyleBackColor = true;
-            this.btnReturn.Click += new System.EventHandler(this.BtnReturn_Click);
             // 
             // label7
             // 
@@ -64,12 +64,12 @@
             this.label7.Location = new System.Drawing.Point(50, 50);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(200, 50);
-            this.label7.TabIndex = 263;
             this.label7.Text = "Return";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnShutDown
             // 
+            this.btnShutDown.DialogResult = System.Windows.Forms.DialogResult.Yes;
             this.btnShutDown.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.btnShutDown.Image = global::AgOpenGPS.Properties.Resources.SwitchOff;
             this.btnShutDown.Location = new System.Drawing.Point(500, 100);
@@ -77,7 +77,6 @@
             this.btnShutDown.Size = new System.Drawing.Size(100, 100);
             this.btnShutDown.TabIndex = 265;
             this.btnShutDown.UseVisualStyleBackColor = true;
-            this.btnShutDown.Click += new System.EventHandler(this.BtnShutDown_Click);
             // 
             // label2
             // 
@@ -85,7 +84,6 @@
             this.label2.Location = new System.Drawing.Point(250, 50);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(200, 50);
-            this.label2.TabIndex = 266;
             this.label2.Text = "AgOpenGPS";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -95,7 +93,6 @@
             this.label1.Location = new System.Drawing.Point(450, 50);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(200, 50);
-            this.label1.TabIndex = 267;
             this.label1.Text = "Computer";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -112,7 +109,7 @@
             this.Controls.Add(this.btnReturn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FormShutDown";
-            this.Text = "Form1";
+            this.ShowInTaskbar = false;
             this.Activated += new System.EventHandler(this.FormShutDown_Activated);
             this.ResumeLayout(false);
 

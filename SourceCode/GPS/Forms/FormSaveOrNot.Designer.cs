@@ -91,6 +91,7 @@
             // btnSaveAs
             // 
             this.btnSaveAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSaveAs.DialogResult = System.Windows.Forms.DialogResult.Yes;
             this.btnSaveAs.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.btnSaveAs.Image = global::AgOpenGPS.Properties.Resources.FileSaveAs;
             this.btnSaveAs.Location = new System.Drawing.Point(262, 51);
@@ -98,11 +99,11 @@
             this.btnSaveAs.Size = new System.Drawing.Size(127, 85);
             this.btnSaveAs.TabIndex = 258;
             this.btnSaveAs.UseVisualStyleBackColor = true;
-            this.btnSaveAs.Click += new System.EventHandler(this.BtnSaveAs_Click);
             // 
             // btnReturn
             // 
             this.btnReturn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnReturn.DialogResult = System.Windows.Forms.DialogResult.Ignore;
             this.btnReturn.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.btnReturn.Image = global::AgOpenGPS.Properties.Resources.back_button;
             this.btnReturn.Location = new System.Drawing.Point(25, 51);
@@ -110,11 +111,11 @@
             this.btnReturn.Size = new System.Drawing.Size(127, 85);
             this.btnReturn.TabIndex = 5;
             this.btnReturn.UseVisualStyleBackColor = true;
-            this.btnReturn.Click += new System.EventHandler(this.BtnReturn_Click);
             // 
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOk.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.btnOk.Image = global::AgOpenGPS.Properties.Resources.OK64;
             this.btnOk.Location = new System.Drawing.Point(154, 204);
@@ -122,7 +123,6 @@
             this.btnOk.Size = new System.Drawing.Size(127, 85);
             this.btnOk.TabIndex = 0;
             this.btnOk.UseVisualStyleBackColor = true;
-            this.btnOk.Click += new System.EventHandler(this.BtnOk_Click);
             // 
             // FormSaveOrNot
             // 
@@ -139,10 +139,12 @@
             this.Controls.Add(this.lblQuestion);
             this.Controls.Add(this.btnOk);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "FormSaveOrNot";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Activated += new System.EventHandler(this.FormSaveOrNot_Activated);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSaveOrNot_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

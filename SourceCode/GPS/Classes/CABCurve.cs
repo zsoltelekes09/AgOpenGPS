@@ -1,10 +1,10 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace AgOpenGPS
 {
-
     public class CABCurve
     {
         //pointers to mainform controls
@@ -14,11 +14,11 @@ namespace AgOpenGPS
         public bool BtnCurveLineOn, isOkToAddPoints;
         public double distanceFromRefLine;
 
-        public double HowManyPathsAway, OldHowManyPathsAway;
+        public bool ResetABLine = false;
+        public int HowManyPathsAway, OldHowManyPathsAway;
         public bool isSmoothWindowOpen, isSameWay, OldisSameWay;
 
-        public int A, B, CurrentLine = -1, CurrentEditLine = -1;
-        public int tryoutcurve = -1;
+        public int A, B, CurrentLine = -1, CurrentEditLine = -1, tryoutcurve = -1;
 
         //the list of points of curve to drive on
         public List<Vec3> curList = new List<Vec3>();
@@ -26,7 +26,7 @@ namespace AgOpenGPS
         public List<CCurveLines> Lines = new List<CCurveLines>();
 
         public bool isEditing;
-        public List<List<Vec3>> GuidanceLines = new List<List<Vec3>>();
+        public List<List<List<Vec3>>> GuidanceLines = new List<List<List<Vec3>>>();
 
         public CABCurve(FormGPS _f)
         {
@@ -78,7 +78,7 @@ namespace AgOpenGPS
                 if (CurrentLine < Lines.Count && CurrentLine > -1)
                 {
                     ptCount = Lines[CurrentLine].curvePts.Count;
-                    if (ptCount < 2) return;
+                    if (ptCount < 1) return;
 
                     GL.Color3(0.96, 0.2f, 0.2f);
 
@@ -118,12 +118,15 @@ namespace AgOpenGPS
 
                         for (int i = 0; i < GuidanceLines.Count; i++)
                         {
-                            if (GuidanceLines[i].Count > 0)
+                            for (int j = 0; j < GuidanceLines[i].Count; j++)
                             {
-                                if (Lines[CurrentLine].BoundaryMode) GL.Begin(PrimitiveType.LineLoop);
-                                else GL.Begin(PrimitiveType.LineStrip);
-                                for (int h = 0; h < GuidanceLines[i].Count; h++) GL.Vertex3(GuidanceLines[i][h].Easting, GuidanceLines[i][h].Northing, 0);
-                                GL.End();
+                                if (GuidanceLines[i][j].Count > 0)
+                                {
+                                    if (Lines[CurrentLine].BoundaryMode) GL.Begin(PrimitiveType.LineLoop);
+                                    else GL.Begin(PrimitiveType.LineStrip);
+                                    for (int h = 0; h < GuidanceLines[i][j].Count; h++) GL.Vertex3(GuidanceLines[i][j][h].Easting, GuidanceLines[i][j][h].Northing, 0);
+                                    GL.End();
+                                }
                             }
                         }
                         GL.Disable(EnableCap.LineStipple);
@@ -257,13 +260,13 @@ namespace AgOpenGPS
                         }
                         else Build2.Add(Point2);
                     }
-                    BuildLeft.AddRange(Build.ClipPolyLine(mf.bnd.bndArr[0].bndLine, Lines[CurrentLine].BoundaryMode, Offset));
-                    BuildRight.AddRange(Build2.ClipPolyLine(mf.bnd.bndArr[0].bndLine, Lines[CurrentLine].BoundaryMode, Offset));
+                    BuildLeft.AddRange(Build.ClipPolyLine(mf.bnd.bndArr[0].bndLine, Lines[CurrentLine].BoundaryMode, Offset, CancellationToken.None));
+                    BuildRight.AddRange(Build2.ClipPolyLine(mf.bnd.bndArr[0].bndLine, Lines[CurrentLine].BoundaryMode, Offset, CancellationToken.None));
                 }
 
                 for (int k = 0; k < BuildLeft.Count; k++)
                 {
-                    BuildLeft[k].CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332, 5, true, false, true, mf.tram.halfWheelTrack);
+                    BuildLeft[k].CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332, CancellationToken.None, true, true, mf.tram.halfWheelTrack);
 
                     if (Lines[CurrentLine].BoundaryMode) BuildLeft[k].Add(BuildLeft[k][0]);
 
@@ -287,7 +290,7 @@ namespace AgOpenGPS
                 }
                 for (int k = 0; k < BuildRight.Count; k++)
                 {
-                    BuildRight[k].CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332, 5, true, false, false, mf.tram.halfWheelTrack);
+                    BuildRight[k].CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332, CancellationToken.None, true, false, mf.tram.halfWheelTrack);
 
                     if (Lines[CurrentLine].BoundaryMode) BuildRight[k].Add(BuildRight[k][0]);
 
@@ -326,28 +329,26 @@ namespace AgOpenGPS
                 //the temp array
                 Vec3[] arr = new Vec3[cnt];
 
-                //read the points before and after the setpoint
-                for (int s = 0; s < smPts / 2; s++)
-                {
-                    arr[s].Easting = Lines[CurrentEditLine].curvePts[s].Easting;
-                    arr[s].Northing = Lines[CurrentEditLine].curvePts[s].Northing;
-                    arr[s].Heading = Lines[CurrentEditLine].curvePts[s].Heading;
-                }
-
-                for (int s = cnt - (smPts / 2); s < cnt; s++)
-                {
-                    arr[s].Easting = Lines[CurrentEditLine].curvePts[s].Easting;
-                    arr[s].Northing = Lines[CurrentEditLine].curvePts[s].Northing;
-                    arr[s].Heading = Lines[CurrentEditLine].curvePts[s].Heading;
-                }
-
+                int counter = 0;
                 //average them - center weighted average
-                for (int i = smPts / 2; i < cnt - (smPts / 2); i++)
+
+                for (int i = 0; i < cnt; i++)
                 {
+                    if (!Lines[CurrentEditLine].BoundaryMode && (i < smPts / 2 || i > cnt - (smPts / 2)))
+                    {
+                        arr[i].Easting = Lines[CurrentEditLine].curvePts[i].Easting;
+                        arr[i].Northing = Lines[CurrentEditLine].curvePts[i].Northing;
+                        arr[i].Heading = Lines[CurrentEditLine].curvePts[i].Heading;
+                        continue;
+                    }
+
                     for (int j = -smPts / 2; j < smPts / 2; j++)
                     {
-                        arr[i].Easting += Lines[CurrentEditLine].curvePts[j + i].Easting;
-                        arr[i].Northing += Lines[CurrentEditLine].curvePts[j + i].Northing;
+                        counter++;
+                        int test = (j + i).Clamp(cnt);
+
+                        arr[i].Easting += Lines[CurrentEditLine].curvePts[test].Easting;
+                        arr[i].Northing += Lines[CurrentEditLine].curvePts[test].Northing;
                     }
                     arr[i].Easting /= smPts;
                     arr[i].Northing /= smPts;
@@ -369,7 +370,7 @@ namespace AgOpenGPS
                 Lines[CurrentLine].Heading += Math.PI;
                 Lines[CurrentLine].Heading %= Glm.twoPI;
 
-                Lines[CurrentEditLine].curvePts.CalculateHeading(Lines[CurrentEditLine].BoundaryMode);
+                Lines[CurrentEditLine].curvePts.CalculateHeading(Lines[CurrentEditLine].BoundaryMode, CancellationToken.None);
             }
         }
 
@@ -381,9 +382,75 @@ namespace AgOpenGPS
                 int cnt = smooList.Count;
                 if (cnt < 3) return;
 
-                smooList.CalculateHeading(Lines[CurrentEditLine].BoundaryMode);
-                Lines[CurrentEditLine].curvePts = smooList;
-                OldHowManyPathsAway = double.NegativeInfinity;
+                smooList.CalculateHeading(Lines[CurrentEditLine].BoundaryMode, CancellationToken.None);
+                Lines[CurrentEditLine].curvePts.Clear();
+                Lines[CurrentEditLine].curvePts.AddRange(smooList);
+                ResetABLine = true;
+            }
+        }
+
+        public void CalculateExtraGuides(int Idx, double PathsAway)
+        {
+            double Offset2 = mf.Guidance.WidthMinusOverlap * PathsAway;
+
+            for (int j = 0; j < Lines[CurrentLine].curvePts.Count; j++)
+            {
+                var point2 = new Vec3(
+                    Lines[CurrentLine].curvePts[j].Northing + (Math.Sin(Lines[CurrentLine].curvePts[j].Heading) * -Offset2),
+                    Lines[CurrentLine].curvePts[j].Easting + (Math.Cos(Lines[CurrentLine].curvePts[j].Heading) * Offset2),
+                    Lines[CurrentLine].curvePts[j].Heading);
+
+                bool Add = true;
+                for (int t = 0; t < Lines[CurrentLine].curvePts.Count; t++)
+                {
+                    double dist = ((point2.Easting - Lines[CurrentLine].curvePts[t].Easting) * (point2.Easting - Lines[CurrentLine].curvePts[t].Easting)) + ((point2.Northing - Lines[CurrentLine].curvePts[t].Northing) * (point2.Northing - Lines[CurrentLine].curvePts[t].Northing));
+                    if (dist < (Offset2 * Offset2) - 0.001)
+                    {
+                        Add = false;
+                        break;
+                    }
+                }
+                if (Add)
+                {
+                    if (GuidanceLines[Idx][0].Count > 0)
+                    {
+                        double dist = ((point2.Easting - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Easting) * (point2.Easting - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Easting)) + ((point2.Northing - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Northing) * (point2.Northing - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Northing));
+                        if (dist > 1) GuidanceLines[Idx][0].Add(point2);
+                    }
+                    else GuidanceLines[Idx][0].Add(point2);
+                }
+            }
+
+            if (Lines[CurrentLine].BoundaryMode)
+            {
+                bool first = true;
+                int testa = -1;
+                int l = 0;
+                int m = 1;
+
+                for (int k = 1; k + 1 < GuidanceLines[Idx][0].Count; l = k++)
+                {
+                    double Nort = GuidanceLines[Idx][0][k].Northing - GuidanceLines[Idx][0][l].Northing;
+                    double East = GuidanceLines[Idx][0][k].Easting - GuidanceLines[Idx][0][l].Easting;
+                    double dist = (East * East) + (Nort * Nort);
+                    if (dist > Offset2 * Offset2 + Offset2 * Offset2)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                            testa = k;
+                        }
+                        else
+                        {
+                            GuidanceLines[Idx].Add(new List<Vec3>());
+
+                            GuidanceLines[Idx][m].AddRange(GuidanceLines[Idx][0].GetRange(testa, k - testa));
+                            GuidanceLines[Idx][0].RemoveRange(testa, k - testa);
+                            first = true;
+                            m++;
+                        }
+                    }
+                }
             }
         }
 
@@ -404,13 +471,15 @@ namespace AgOpenGPS
 
                 if (Lines[CurrentLine].SpiralMode == true)
                 {
-                    double dist = ((pivot.Easting - Lines[CurrentLine].curvePts[0].Easting) * (pivot.Easting - Lines[CurrentLine].curvePts[0].Easting)) + ((pivot.Northing - Lines[CurrentLine].curvePts[0].Northing) * (pivot.Northing - Lines[CurrentLine].curvePts[0].Northing));
+                    minDistance = Glm.Distance(pivot, Lines[CurrentLine].curvePts[0]);
 
-                    minDistance = Math.Sqrt(dist);
+                    double RefDist = minDistance / mf.Guidance.WidthMinusOverlap;
+                    if (RefDist < 0) HowManyPathsAway = (int)(RefDist - 0.5);
+                    else HowManyPathsAway = (int)(RefDist + 0.5);
 
-                    HowManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
-                    if (OldHowManyPathsAway != HowManyPathsAway)
+                    if (OldHowManyPathsAway != HowManyPathsAway || ResetABLine)
                     {
+                        ResetABLine = false;
                         OldHowManyPathsAway = HowManyPathsAway;
                         if (HowManyPathsAway < 2) HowManyPathsAway = 2;
 
@@ -432,16 +501,16 @@ namespace AgOpenGPS
                             circumference = (Glm.twoPI * radius) / (boundaryTriggerDistance);
                         }
 
-                        if (curList.Count > 2) curList.CalculateHeading(true);
+                        if (curList.Count > 2) curList.CalculateHeading(true, CancellationToken.None);
                     }
                 }
                 else if (Lines[CurrentLine].CircleMode == true)
                 {
-                    double dist = ((pivot.Easting - Lines[CurrentLine].curvePts[0].Easting) * (pivot.Easting - Lines[CurrentLine].curvePts[0].Easting)) + ((pivot.Northing - Lines[CurrentLine].curvePts[0].Northing) * (pivot.Northing - Lines[CurrentLine].curvePts[0].Northing));
+                    minDistance = Glm.Distance(pivot, Lines[CurrentLine].curvePts[0]);
 
-                    minDistance = Math.Sqrt(dist);
-
-                    HowManyPathsAway = Math.Round(minDistance / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                    double RefDist = minDistance / mf.Guidance.WidthMinusOverlap;
+                    if (RefDist < 0) HowManyPathsAway = (int)(RefDist - 0.5);
+                    else HowManyPathsAway = (int)(RefDist + 0.5);
 
                     if (OldHowManyPathsAway != HowManyPathsAway && HowManyPathsAway == 0)
                     {
@@ -455,7 +524,7 @@ namespace AgOpenGPS
 
                         curList.Clear();
 
-                        int aa = (int)((Glm.twoPI * mf.Guidance.WidthMinusOverlap * HowManyPathsAway) / (boundaryTriggerDistance));
+                        int aa = (int)((Glm.twoPI * mf.Guidance.WidthMinusOverlap * HowManyPathsAway) / boundaryTriggerDistance);
 
                         for (double round = 0; round <= Glm.twoPI + 0.00001; round += (Glm.twoPI) / aa)
                         {
@@ -463,7 +532,7 @@ namespace AgOpenGPS
                             curList.Add(pt);
                         }
 
-                        if (curList.Count > 2) curList.CalculateHeading(true);
+                        if (curList.Count > 2) curList.CalculateHeading(true, CancellationToken.None);
                     }
                 }
                 else
@@ -471,7 +540,7 @@ namespace AgOpenGPS
                     if (Lines[CurrentLine].curvePts.Count < 2) return;
                     double minDistA = double.PositiveInfinity, minDistB = double.PositiveInfinity;
 
-                    if (!mf.isAutoSteerBtnOn || double.IsNegativeInfinity(OldHowManyPathsAway))
+                    if (!mf.isAutoSteerBtnOn || ResetABLine)
                     {
                         //find the closest 2 points to current fix
                         for (int t = 0; t < Lines[CurrentLine].curvePts.Count; t++)
@@ -509,7 +578,10 @@ namespace AgOpenGPS
                         if (isSameWay) distanceFromRefLine += mf.Guidance.GuidanceOffset;
                         else distanceFromRefLine -= mf.Guidance.GuidanceOffset;
 
-                        HowManyPathsAway = Math.Round(distanceFromRefLine / mf.Guidance.WidthMinusOverlap, 0, MidpointRounding.AwayFromZero);
+                        double RefDist = distanceFromRefLine / mf.Guidance.WidthMinusOverlap;
+                        if (RefDist < 0) HowManyPathsAway = (int)(RefDist - 0.5);
+                        else HowManyPathsAway = (int)(RefDist + 0.5);
+
                     }
                     else if (A < Lines[CurrentLine].curvePts.Count && B < Lines[CurrentLine].curvePts.Count)
                     {
@@ -521,78 +593,60 @@ namespace AgOpenGPS
                         distanceFromRefLine = ((dy * point.Easting) - (dx * point.Northing) + (Lines[CurrentLine].curvePts[B].Easting * Lines[CurrentLine].curvePts[A].Northing) - (Lines[CurrentLine].curvePts[B].Northing * Lines[CurrentLine].curvePts[A].Easting)) / Math.Sqrt((dy * dy) + (dx * dx));
                     }
 
-                    if (OldisSameWay != isSameWay || HowManyPathsAway != OldHowManyPathsAway)
+                    if (OldisSameWay != isSameWay || HowManyPathsAway != OldHowManyPathsAway || ResetABLine)
                     {
-                        OldisSameWay = isSameWay;
-                        OldHowManyPathsAway = HowManyPathsAway;
-
+                        ResetABLine = false;
                         if (mf.isSideGuideLines)
                         {
-                            GuidanceLines.Clear();
-                            for (double i = -2.5; i < 3.5; i++)
+                            if (OldHowManyPathsAway != HowManyPathsAway)
                             {
-                                GuidanceLines.Add(new List<Vec3>());
-                                int Gcnt = GuidanceLines.Count - 1;
-                                double Offset2 = mf.Guidance.WidthMinusOverlap * (i + HowManyPathsAway);
+                                int Gcnt;
 
-                                for (int j = 0; j < Lines[CurrentLine].curvePts.Count; j++)
+                                int Up = HowManyPathsAway - OldHowManyPathsAway;
+
+                                if (Up < -5 || Up > 5) GuidanceLines.Clear();
+
+                                int Count = GuidanceLines.Count;
+
+                                if (Count < 6 || Up == 0)
                                 {
-                                    var point2 = new Vec3(
-                                        Lines[CurrentLine].curvePts[j].Northing + (Math.Sin(Lines[CurrentLine].curvePts[j].Heading) * -Offset2),
-                                        Lines[CurrentLine].curvePts[j].Easting + (Math.Cos(Lines[CurrentLine].curvePts[j].Heading) * Offset2),
-                                        Lines[CurrentLine].curvePts[j].Heading);
-
-                                    bool Add = true;
-                                    for (int t = 0; t < Lines[CurrentLine].curvePts.Count; t++)
+                                    if (Count > 0) GuidanceLines.Clear();
+                                    for (double i = -2.5; i < 3; i++)
                                     {
-                                        double dist = ((point2.Easting - Lines[CurrentLine].curvePts[t].Easting) * (point2.Easting - Lines[CurrentLine].curvePts[t].Easting)) + ((point2.Northing - Lines[CurrentLine].curvePts[t].Northing) * (point2.Northing - Lines[CurrentLine].curvePts[t].Northing));
-                                        if (dist < (Offset2 * Offset2) - 0.001)
-                                        {
-                                            Add = false;
-                                            break;
-                                        }
-                                    }
-                                    if (Add)
-                                    {
-                                        if (GuidanceLines[Gcnt].Count > 0)
-                                        {
-                                            double dist = ((point2.Easting - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Easting) * (point2.Easting - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Easting)) + ((point2.Northing - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Northing) * (point2.Northing - GuidanceLines[Gcnt][GuidanceLines[Gcnt].Count - 1].Northing));
-                                            if (dist > 1) GuidanceLines[Gcnt].Add(point2);
-                                        }
-                                        else GuidanceLines[Gcnt].Add(point2);
+                                        GuidanceLines.Add(new List<List<Vec3>>());
+                                        Gcnt = GuidanceLines.Count - 1;
+                                        GuidanceLines[Gcnt].Add(new List<Vec3>());
+                                        CalculateExtraGuides(Gcnt, HowManyPathsAway + i);
                                     }
                                 }
-
-                                if (Lines[CurrentLine].BoundaryMode)
+                                else if (Up < 0)
                                 {
-
-                                    bool first = true;
-                                    int testa = -1;
-                                    int m = 1;
-                                    int l = 0;
-                                    for (int k = 1; k + 1 < GuidanceLines[Gcnt].Count; l = k++)
+                                    for (double i = -3.5; i >= Up - 2.5; i--)
                                     {
-                                        double dist = ((GuidanceLines[Gcnt][k].Easting - GuidanceLines[Gcnt][l].Easting) * (GuidanceLines[Gcnt][k].Easting - GuidanceLines[Gcnt][l].Easting)) + ((GuidanceLines[Gcnt][k].Northing - GuidanceLines[Gcnt][l].Northing) * (GuidanceLines[Gcnt][k].Northing - GuidanceLines[Gcnt][l].Northing));
-                                        if (dist > Offset2 * Offset2 + Offset2 * Offset2)
-                                        {
-                                            if (first)
-                                            {
-                                                first = false;
-                                                testa = k;
-                                            }
-                                            else
-                                            {
-                                                GuidanceLines.Add(new List<Vec3>());
-                                                GuidanceLines[Gcnt + m].AddRange(GuidanceLines[Gcnt].GetRange(testa, k - testa));
-                                                GuidanceLines[Gcnt].RemoveRange(testa, k - testa);
-                                                first = true;
-                                                m++;
-                                            }
-                                        }
+                                        GuidanceLines.RemoveAt(5);
+                                        GuidanceLines.Insert(0, new List<List<Vec3>>());
+                                        Gcnt = 0;
+                                        GuidanceLines[Gcnt].Add(new List<Vec3>());
+                                        CalculateExtraGuides(Gcnt, OldHowManyPathsAway + i);
+                                    }
+                                }
+                                else
+                                {
+                                    for (double i = 3.5; i <= Up + 2.5; i++)
+                                    {
+                                        GuidanceLines.RemoveAt(0);
+                                        GuidanceLines.Insert(5, new List<List<Vec3>>());
+                                        Gcnt = 5;
+                                        GuidanceLines[Gcnt].Add(new List<Vec3>());
+                                        CalculateExtraGuides(Gcnt, OldHowManyPathsAway + i);
                                     }
                                 }
                             }
                         }
+                        else GuidanceLines.Clear();
+
+                        OldisSameWay = isSameWay;
+                        OldHowManyPathsAway = HowManyPathsAway;
 
                         curList.Clear();
 
@@ -609,7 +663,7 @@ namespace AgOpenGPS
                             for (int t = 0; t < Lines[CurrentLine].curvePts.Count; t++)
                             {
                                 double dist = ((point2.Easting - Lines[CurrentLine].curvePts[t].Easting) * (point2.Easting - Lines[CurrentLine].curvePts[t].Easting)) + ((point2.Northing - Lines[CurrentLine].curvePts[t].Northing) * (point2.Northing - Lines[CurrentLine].curvePts[t].Northing));
-                                if (dist < (Offset * Offset) - 0.001)
+                                if (dist < (Offset * Offset) - 0.003)
                                 {
                                     Add = false;
                                     break;
@@ -625,141 +679,10 @@ namespace AgOpenGPS
                                 else curList.Add(point2);
                             }
                         }
-
-                        curList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332, Offset);
-
-                        int cnt = curList.Count;
-                        if (cnt < -10)
-                        {
-                            for (int i = 1; i < (curList.Count - 1); i++)
-                            {
-                                curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
-                            }
-
-                            Vec3[] arr = new Vec3[cnt];
-                            curList.CopyTo(arr);
-                            curList.Clear();
-                            bool Next = false;
-                            for (int i = 0; i < arr.Length - 1; i++)
-                            {
-                                if (arr[i].Heading - arr[i + 1].Heading > 0.174533)
-                                {
-                                    Next = true;
-                                    curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
-                                    curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
-                                }
-                                else if (Next)
-                                {
-                                    Next = false;
-                                    curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
-                                    curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
-                                }
-                                else
-                                {
-                                    curList.Add(new Vec3(arr[i].Northing * 0.5 + arr[i + 1].Northing * 0.5, arr[i].Easting * 0.5 + arr[i + 1].Easting * 0.5, 0));
-                                }
-                            }
-
-
-                            for (int i = 1; i < curList.Count - 1; i++)
-                            {
-                                curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
-                            }
-
-
-
-                            if (mf.Tools[0].isToolTrailing)
-                            {
-                                double head = 0;
-                                if (isSameWay) head = Math.PI;
-
-                                if (mf.Tools[0].isToolTBT && mf.Tools[0].toolTankTrailingHitchLength < 0)
-                                {
-                                    arr = new Vec3[curList.Count];
-                                    curList.CopyTo(arr);
-                                    curList.Clear();
-
-                                    for (int i = 0; i < arr.Length; i++)
-                                    {
-                                        arr[i].Easting += Math.Sin(arr[i].Heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
-                                        arr[i].Northing += Math.Cos(arr[i].Heading + head) * mf.Tools[0].toolTankTrailingHitchLength;
-                                    }
-
-                                    for (int i = 1; i < (arr.Length - 1); i++)
-                                    {
-                                        arr[i].Heading = Math.Atan2(arr[i + 1].Easting - arr[i - 1].Easting, arr[i + 1].Northing - arr[i - 1].Northing);
-                                    }
-
-                                    Next = false;
-                                    for (int i = 0; i < arr.Length - 1; i++)
-                                    {
-                                        if (arr[i].Heading - arr[i + 1].Heading > 0.174533)
-                                        {
-                                            Next = true;
-                                            curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
-                                            curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
-                                        }
-                                        else if (Next)
-                                        {
-                                            Next = false;
-                                            curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
-                                            curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
-                                        }
-                                        else
-                                        {
-                                            curList.Add(new Vec3(arr[i].Northing * 0.5 + arr[i + 1].Northing * 0.5, arr[i].Easting * 0.5 + arr[i + 1].Easting * 0.5, 0));
-                                        }
-                                    }
-                                    for (int i = 1; i < (curList.Count - 1); i++)
-                                    {
-                                        curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
-                                    }
-                                }
-
-                                arr = new Vec3[curList.Count];
-                                curList.CopyTo(arr);
-                                curList.Clear();
-
-
-                                for (int i = 0; i < arr.Length; i++)
-                                {
-                                    arr[i].Easting += Math.Sin(arr[i].Heading + head) * mf.Tools[0].toolTrailingHitchLength;
-                                    arr[i].Northing += Math.Cos(arr[i].Heading + head) * mf.Tools[0].toolTrailingHitchLength;
-                                }
-                                for (int i = 1; i < (arr.Length - 1); i++)
-                                {
-                                    arr[i].Heading = Math.Atan2(arr[i + 1].Easting - arr[i - 1].Easting, arr[i + 1].Northing - arr[i - 1].Northing);
-                                }
-
-                                Next = false;
-                                for (int i = 0; i < arr.Length - 1; i++)
-                                {
-                                    if (arr[i].Heading - arr[i + 1].Heading > 0.174533)
-                                    {
-                                        Next = true;
-                                        curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
-                                        curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
-                                    }
-                                    else if (Next)
-                                    {
-                                        Next = false;
-                                        curList.Add(new Vec3(arr[i].Northing * 0.75 + arr[i + 1].Northing * 0.25, arr[i].Easting * 0.75 + arr[i + 1].Easting * 0.25, 0));
-                                        curList.Add(new Vec3(arr[i].Northing * 0.25 + arr[i + 1].Northing * 0.75, arr[i].Easting * 0.25 + arr[i + 1].Easting * 0.75, 0));
-                                    }
-                                    else
-                                    {
-                                        curList.Add(new Vec3(arr[i].Northing * 0.5 + arr[i + 1].Northing * 0.5, arr[i].Easting * 0.5 + arr[i + 1].Easting * 0.5, 0));
-                                    }
-                                }
-                                for (int i = 1; i < (curList.Count - 1); i++)
-                                {
-                                    curList[i] = new Vec3(curList[i].Northing, curList[i].Easting, Math.Atan2(curList[i + 1].Easting - curList[i - 1].Easting, curList[i + 1].Northing - curList[i - 1].Northing));
-                                }
-                            }
-                        }
+                        curList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].BoundaryMode, 0.0436332, CancellationToken.None);
                     }
                 }
-                mf.CalculateSteerAngle(ref curList);
+                mf.CalculateSteerAngle(ref curList, isSameWay, Lines[CurrentLine].BoundaryMode);
             }
             else
             {
@@ -788,7 +711,7 @@ namespace AgOpenGPS
                     Lines[test].curvePts[i] = point;
                 }
             }
-            OldHowManyPathsAway = double.NegativeInfinity;
+            ResetABLine = true;
         }
 
         public bool PointOnLine(Vec3 pt1, Vec3 pt2, Vec3 pt)

@@ -185,11 +185,11 @@ namespace AgOpenGPS
 
                         if (mf.isMetric)
                         {
-                            bb.Text = Math.Round(mf.bnd.bndArr[i].area * 0.0001, 2) + " Ha";
+                            bb.Text = Math.Round(mf.bnd.bndArr[i].Area * 0.0001, 2) + " Ha";
                         }
                         else
                         {
-                            bb.Text = Math.Round(mf.bnd.bndArr[i].area * 0.000247105, 2) + " Ac";
+                            bb.Text = Math.Round(mf.bnd.bndArr[i].Area * 0.000247105, 2) + " Ac";
                         }
 
                         if (Selectedreset == false && i == mf.bnd.boundarySelected)
@@ -238,7 +238,6 @@ namespace AgOpenGPS
                 int pos = Convert.ToInt32(b.Name) + Position;
                 mf.bnd.bndArr[pos].isDriveThru = !mf.bnd.bndArr[pos].isDriveThru;
                 UpdateChart();
-                mf.FileSaveBoundary();
             }
         }
 
@@ -249,7 +248,6 @@ namespace AgOpenGPS
                 int pos = Convert.ToInt32(b.Name) + Position;
                 mf.bnd.bndArr[pos].isDriveAround = !mf.bnd.bndArr[pos].isDriveAround;
                 UpdateChart();
-                mf.FileSaveBoundary();
             }
         }
 
@@ -295,16 +293,11 @@ namespace AgOpenGPS
 
                 if (mf.bnd.bndArr.Count > mf.bnd.boundarySelected)
                 {
-                    mf.bnd.bndArr.RemoveAt(mf.bnd.boundarySelected);
-                    mf.turn.turnArr.RemoveAt(mf.bnd.boundarySelected);
-                    mf.gf.geoFenceArr.RemoveAt(mf.bnd.boundarySelected);
-                    mf.hd.headArr.RemoveAt(mf.bnd.boundarySelected);
+                    int idx = mf.bnd.boundarySelected;
+                    mf.StartTasks(mf.bnd.bndArr[idx], mf.bnd.boundarySelected, TaskName.Delete);
+                    if (mf.bnd.bndArr.Count == 1) mf.bnd.BtnHeadLand = false;
                 }
-
-                mf.FileSaveBoundary();
-                mf.FileSaveHeadland();
-
-                if (mf.bnd.bndArr.Count == 0) mf.hd.BtnHeadLand = false;
+                mf.StartTasks(null, 6, TaskName.Save);
 
                 mf.bnd.boundarySelected = -1;
 
@@ -312,7 +305,6 @@ namespace AgOpenGPS
                 if (Position < 0) Position = 0;
 
                 Selectedreset = true;
-                mf.fd.UpdateFieldBoundaryGUIAreas();
 
                 UpdateChart();
                 UpdateScroll(-1);
@@ -327,12 +319,13 @@ namespace AgOpenGPS
         {
             Position = 0;
 
-            mf.bnd.bndArr.Clear();
-            mf.turn.turnArr.Clear();
-            mf.gf.geoFenceArr.Clear();
-            mf.hd.headArr.Clear();
+            for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+            {
+                mf.StartTasks(mf.bnd.bndArr[i], i, TaskName.Delete);
+            }
 
-            mf.FileSaveBoundary();
+            mf.StartTasks(null, 6, TaskName.Save);
+
             tableLayoutPanel1.Controls.Clear();
             tableLayoutPanel1.RowStyles.Clear();
 
@@ -349,7 +342,6 @@ namespace AgOpenGPS
             mf.FileMakeKMLFromCurrentPosition(mf.pn.latitude, mf.pn.longitude);
             System.Diagnostics.Process.Start(mf.fieldsDirectory + mf.currentFieldDirectory + "\\CurrentPosition.KML");
             Close();
-
         }
 
         private void BtnGo_Click(object sender, EventArgs e)
@@ -358,7 +350,6 @@ namespace AgOpenGPS
 
             Form form2 = new FormBoundaryPlayer(mf, this);
             form2.Show(this);
-
             Hide();
         }
 
@@ -379,10 +370,8 @@ namespace AgOpenGPS
                 Selectedreset = true;
 
                 mf.bnd.isOkToAddPoints = false;
-                mf.FileSaveHeadland();
 
-                mf.hd.BtnHeadLand = false;
-                mf.fd.UpdateFieldBoundaryGUIAreas();
+                mf.bnd.BtnHeadLand = false;
             }
         }
 
@@ -552,10 +541,7 @@ namespace AgOpenGPS
                                 //at least 3 points
                                 if (numberSets.Length > 2)
                                 {
-                                    mf.bnd.bndArr.Add(new CBoundaryLines());
-                                    mf.turn.turnArr.Add(new CTurnLines());
-                                    mf.gf.geoFenceArr.Add(new CGeoFenceLines());
-                                    mf.hd.headArr.Add(new CHeadLines());
+                                    CBoundaryLines newbnd = new CBoundaryLines();
 
                                     foreach (var item in numberSets)
                                     {
@@ -577,28 +563,15 @@ namespace AgOpenGPS
 
                                         //add the point to boundary
                                         Vec3 bndPt = new Vec3(northing, easting, 0);
-                                        mf.bnd.bndArr[i].bndLine.Add(bndPt);
+                                        newbnd.bndLine.Add(bndPt);
                                     }
 
-                                    if (mf.bnd.bndArr[i].bndLine.Count > 0)
-                                    {
-                                        //fix the points if there are gaps bigger then
-                                        mf.bnd.bndArr[i].FixBoundaryLine();
-                                        mf.bnd.bndArr[i].CalculateBoundaryArea();
+                                    mf.bnd.bndArr.Add(newbnd);
 
-                                        mf.turn.BuildTurnLines(i);
-                                        mf.gf.BuildGeoFenceLines(i);
+                                    mf.StartTasks(newbnd, mf.bnd.bndArr.Count - 1, TaskName.Boundary);
 
-                                        coordinates = "";
-                                        i++;
-                                    }
-                                    else
-                                    {
-                                        mf.bnd.bndArr.RemoveAt(mf.bnd.bndArr.Count - 1);
-                                        mf.turn.turnArr.RemoveAt(mf.bnd.bndArr.Count - 1);
-                                        mf.gf.geoFenceArr.RemoveAt(mf.bnd.bndArr.Count - 1);
-                                        mf.hd.headArr.RemoveAt(mf.bnd.bndArr.Count - 1);
-                                    }
+                                    coordinates = "";
+                                    i++;
                                 }
                                 else
                                 {
@@ -610,9 +583,8 @@ namespace AgOpenGPS
                                 }
                             }
                         }
-                        mf.fd.UpdateFieldBoundaryGUIAreas();
+                        mf.StartTasks(null, 1, TaskName.Save);
 
-                        mf.FileSaveBoundary();
                         UpdateChart();
                         UpdateScroll(-1);
                     }

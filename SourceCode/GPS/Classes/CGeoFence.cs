@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace AgOpenGPS
 {
@@ -7,11 +6,6 @@ namespace AgOpenGPS
     {
         //copy of the mainform address
         private readonly FormGPS mf;
-
-        /// <summary>
-        /// array of turns
-        /// </summary>
-        public List<CGeoFenceLines> geoFenceArr = new List<CGeoFenceLines>();
 
         //constructor
         public CGeoFence(FormGPS _f)
@@ -37,7 +31,7 @@ namespace AgOpenGPS
                 pt.Easting = fromPt.Easting + (sinHead * b);
                 pt.Northing = fromPt.Northing + (cosHead * b);
 
-                if (mf.turn.turnArr[0].IsPointInTurnWorkArea(pt))
+                if (mf.bnd.bndArr[0].IsPointInTurnWorkArea(pt))
                 {
                     for (int t = 1; t < mf.bnd.bndArr.Count; t++)
                     {
@@ -45,7 +39,7 @@ namespace AgOpenGPS
 
                         if (mf.bnd.bndArr[t].isDriveAround)
                         {
-                            if (mf.gf.geoFenceArr[t].IsPointInGeoFenceArea(pt))
+                            if (mf.bnd.bndArr[t].IsPointInGeoFenceArea(pt))
                             {
                                 isFound = true;
                                 closestTurnNum = t;
@@ -60,7 +54,7 @@ namespace AgOpenGPS
                         else
                         {
                             //its a uturn obstacle
-                            if (mf.turn.turnArr[0].IsPointInTurnWorkArea(pt))
+                            if (mf.bnd.bndArr[0].IsPointInTurnWorkArea(pt))
                             {
                                 start.Easting = 88888;
                                 return;
@@ -83,7 +77,7 @@ namespace AgOpenGPS
                 pt.Easting = fromPt.Easting + (sinHead * b);
                 pt.Northing = fromPt.Northing + (cosHead * b);
 
-                if (mf.gf.geoFenceArr[closestTurnNum].IsPointInGeoFenceArea(pt))
+                if (mf.bnd.bndArr[closestTurnNum].IsPointInGeoFenceArea(pt))
                 {
                     isFound = true;
 
@@ -135,11 +129,11 @@ namespace AgOpenGPS
         public bool IsPointInsideGeoFences(Vec3 pt)
         {
             //if inside outer boundary, then potentially add
-            if (geoFenceArr.Count > 0 && geoFenceArr[0].IsPointInGeoFenceArea(pt))
+            if (mf.bnd.bndArr.Count > 0 && mf.bnd.bndArr[0].IsPointInGeoFenceArea(pt))
             {
                 for (int b = 1; b < mf.bnd.bndArr.Count; b++)
                 {
-                    if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
+                    if (mf.bnd.bndArr[b].IsPointInGeoFenceArea(pt))
                     {
                         //point is in an inner turn area but inside outer
                         return false;
@@ -156,11 +150,11 @@ namespace AgOpenGPS
         public bool IsPointInsideGeoFences(Vec2 pt)
         {
             //if inside outer boundary, then potentially add
-            if (geoFenceArr.Count > 0 && geoFenceArr[0].IsPointInGeoFenceArea(pt))
+            if (mf.bnd.bndArr.Count > 0 && mf.bnd.bndArr[0].IsPointInGeoFenceArea(pt))
             {
                 for (int b = 1; b < mf.bnd.bndArr.Count; b++)
                 {
-                    if (geoFenceArr[b].IsPointInGeoFenceArea(pt))
+                    if (mf.bnd.bndArr[b].IsPointInGeoFenceArea(pt))
                     {
                         //point is in an inner turn area but inside outer
                         return false;
@@ -174,46 +168,14 @@ namespace AgOpenGPS
             }
         }
 
-        public void BuildGeoFenceLines(int Num)
-        {
-            if (mf.bnd.bndArr.Count == 0)
-            {
-                return;
-            }
-
-            //to fill the list of line points
-            Vec2 point = new Vec2();
-
-            //inside boundaries
-            for (int j = (Num < 0) ? 0 : Num; j < mf.bnd.bndArr.Count; j++)
-            {
-                geoFenceArr[j].geoFenceLine.Clear();
-
-                int ChangeDirection = j == 0 ? 1 : -1;
-
-                int ptCount = mf.bnd.bndArr[j].bndLine.Count;
-
-                for (int i = ptCount - 1; i >= 0; i--)
-                {
-                    point.Northing = mf.bnd.bndArr[j].bndLine[i].Northing + Math.Sin(mf.bnd.bndArr[j].bndLine[i].Heading) * -mf.yt.geoFenceDistance * ChangeDirection;
-                    point.Easting = mf.bnd.bndArr[j].bndLine[i].Easting + Math.Cos(mf.bnd.bndArr[j].bndLine[i].Heading) * mf.yt.geoFenceDistance * ChangeDirection;
-                    geoFenceArr[j].geoFenceLine.Add(point);
-                }
-                geoFenceArr[j].FixGeoFenceLine(mf.yt.geoFenceDistance, mf.bnd.bndArr[j].bndLine);
-                geoFenceArr[j].PreCalcTurnLines();
-
-                if (Num > -1) break;
-            }
-        }
-
         public void DrawGeoFenceLines()
         {
             for (int i = 0; i < mf.bnd.bndArr.Count; i++)
             {
-                if (geoFenceArr[i].Eastingmin > mf.worldGrid.EastingMax || geoFenceArr[i].Eastingmax < mf.worldGrid.EastingMin) continue;
-                if (geoFenceArr[i].Northingmin > mf.worldGrid.NorthingMax || geoFenceArr[i].Northingmax < mf.worldGrid.NorthingMin) continue;
+                if (mf.bnd.bndArr[i].Eastingmin > mf.worldGrid.EastingMax || mf.bnd.bndArr[i].Eastingmax < mf.worldGrid.EastingMin) continue;
+                if (mf.bnd.bndArr[i].Northingmin > mf.worldGrid.NorthingMax || mf.bnd.bndArr[i].Northingmax < mf.worldGrid.NorthingMin) continue;
 
-                geoFenceArr[i].DrawGeoFenceLine();
+                mf.bnd.bndArr[i].DrawGeoFence();
             }
         }
     }

@@ -14,6 +14,7 @@ using System.Media;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -78,7 +79,7 @@ namespace AgOpenGPS
         public bool isInAutoDrive = true;
 
         //the trackbar angle for TestAutoSteer
-        public bool TestAutoSteer;
+        public bool TestAutoSteer, ShutDown = false;
         public int TestAutoSteerAngle = 0;
         public int TotalSections = 0;
 
@@ -153,11 +154,6 @@ namespace AgOpenGPS
         /// The boundary object
         /// </summary>
         public CTurn turn;
-
-        /// <summary>
-        /// The headland created
-        /// </summary>
-        public CHead hd;
 
         /// <summary>
         /// The entry and exit sequences, functions, actions
@@ -273,9 +269,6 @@ namespace AgOpenGPS
 
             //GeoFence
             gf = new CGeoFence(this);
-
-            //headland object
-            hd = new CHead();
 
             //headland entry/exit sequences
             seq = new CSequence(this);
@@ -410,16 +403,11 @@ namespace AgOpenGPS
             //remembered window position
 
             if (Settings.Default.setWindow_Maximized)
-            {
-                WindowState = FormWindowState.Normal;
-                Location = Settings.Default.setWindow_Location;
-                Size = Settings.Default.setWindow_Size;
-            }
-            else
-            {
-                Location = Settings.Default.setWindow_Location;
-                Size = Settings.Default.setWindow_Size;
-            }
+                WindowState = FormWindowState.Maximized;
+            Location = Settings.Default.setWindow_Location;
+            Size = Settings.Default.setWindow_Size;
+
+
             if (Settings.Default.setDisplay_isStartFullScreen)
             {
                 this.WindowState = FormWindowState.Normal;
@@ -463,57 +451,45 @@ namespace AgOpenGPS
         }
 
         //form is closing so tidy up and save settings
-        private void FormGPS_FormClosing(object sender, FormClosingEventArgs e)
+        private async void FormGPS_FormClosing(object sender, FormClosingEventArgs e)
         {
             //Save, return, cancel save
             if (isJobStarted)
             {
-                bool closing = true;
-                int choice = SaveOrNot(closing);
-
-                switch (choice)
+                using (var form = new FormSaveOrNot(true, this))
                 {
+                    var result = form.ShowDialog(this);
                     //OK
-                    case 0:
+                    if (result == DialogResult.Ignore)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    else
+                    {
                         isUDPSendConnected = false;
                         Settings.Default.setF_CurrentDir = currentFieldDirectory;
                         Settings.Default.Save();
 
                         FileSaveEverythingBeforeClosingField();
-
-                        //shutdown and reset all module data
-                        mc.ResetAllModuleCommValues(true);
-                        break;
-
-                    //Ignore and return
-                    case 1:
-                        e.Cancel = true;
-                        break;
+                    }
                 }
             }
 
             //save window settings
-            if (WindowState == FormWindowState.Maximized)
-            {
-                Settings.Default.setWindow_Location = RestoreBounds.Location;
-                Settings.Default.setWindow_Size = RestoreBounds.Size;
-                Settings.Default.setWindow_Maximized = false;
-                Settings.Default.setWindow_Minimized = false;
-            }
-            else if (WindowState == FormWindowState.Normal)
+            if (WindowState == FormWindowState.Normal)
             {
                 Settings.Default.setWindow_Location = Location;
                 Settings.Default.setWindow_Size = Size;
-                Settings.Default.setWindow_Maximized = false;
-                Settings.Default.setWindow_Minimized = false;
             }
             else
             {
                 Settings.Default.setWindow_Location = RestoreBounds.Location;
                 Settings.Default.setWindow_Size = RestoreBounds.Size;
-                Settings.Default.setWindow_Maximized = false;
-                Settings.Default.setWindow_Minimized = true;
             }
+
+            Settings.Default.setWindow_Maximized = WindowState == FormWindowState.Maximized;
+            Settings.Default.setWindow_Minimized = WindowState == FormWindowState.Minimized;
 
             Settings.Default.setDisplay_camPitch = camera.camPitch;
             Settings.Default.setF_UserTotalArea = fd.workedAreaTotalUser;
@@ -523,6 +499,32 @@ namespace AgOpenGPS
             Settings.Default.setDisplay_panelSimLocation = panelSim.Location;
 
             Settings.Default.Save();
+
+
+            List<Task> tasks = new List<Task>();
+            for (int j = 0; j < TaskList.Count; j++)
+            {
+                if (TaskList[j].Task.IsCompleted)
+                {
+                    TaskList.RemoveAt(j);
+                    j--;
+                }
+                else
+                {
+                    tasks.Add(TaskList[j].Task);
+                }
+            }
+
+            if (TaskList.Count > 0)
+            {
+                e.Cancel = true;
+                await Task.WhenAll(tasks);
+                Close();
+            }
+            else if (ShutDown)
+            {
+                Process.Start("shutdown", "/s /t 0");
+            }
         }
 
         //called everytime window is resized, clean up button positions
@@ -712,27 +714,12 @@ namespace AgOpenGPS
             }
         }
 
-        public void SwapDirection()
+        public void SwapDirection(bool Reset = true)
         {
             if (!yt.isYouTurnTriggered)
             {
                 yt.isYouTurnRight = !yt.isYouTurnRight;
-                yt.isLastYouTurnRight = !yt.isLastYouTurnRight;
-                yt.ResetCreatedYouTurn();
-            }
-        }
-
-        //dialog for requesting user to save or cancel
-        public int SaveOrNot(bool closing)
-        {
-            using (var form = new FormSaveOrNot(closing, this))
-            {
-                var result = form.ShowDialog(this);
-
-                if (result == DialogResult.OK) return 0;      //Save and Exit
-                if (result == DialogResult.Ignore) return 1;   //Ignore
-                if (result == DialogResult.Yes) return 2;      //Save As
-                return 3;  // oops something is really busted
+                if (Reset) yt.ResetCreatedYouTurn();
             }
         }
 
@@ -783,7 +770,6 @@ namespace AgOpenGPS
                     Tools[i].SetToolSettings(i);
                 }
             }
-
             LineUpManualBtns();
         }
 
@@ -797,6 +783,10 @@ namespace AgOpenGPS
                 oglZoom.Height = 300;
             }
             isJobStarted = true;
+
+            MinuteCounter = 0;
+
+            btnSection_Update();
 
             //update the menu
             layoutPanelRight.Enabled = true;
@@ -814,11 +804,17 @@ namespace AgOpenGPS
             layoutPanelRight.Enabled = false;
             toolStripBtnDropDownBoundaryTools.Enabled = false;
 
+            snapLeftBigStrip.Enabled = false;
+            snapRightBigStrip.Enabled = false;
+            snapToCurrent.Enabled = false;
+
             //CurveLine
             btnCurve.Image = Resources.CurveOff;
             CurveLines.BtnCurveLineOn = false;
             CurveLines.Lines.Clear();
             CurveLines.CurrentLine = -1;
+            CurveLines.GuidanceLines.Clear();
+            CurveLines.ResetABLine = true;
             CurveLines.isOkToAddPoints = false;
 
             //ABLine
@@ -826,28 +822,25 @@ namespace AgOpenGPS
             ABLines.BtnABLineOn = false;
             ABLines.ABLines.Clear();
             ABLines.CurrentLine = -1;
+            ABLines.ResetABLine = true;
 
             //TramLines
             tram.displayMode = 0;
             tram.TramList.Clear();
 
-
             //turn off headland
             btnHeadlandOnOff.Image = Resources.HeadlandOff;
-            hd.BtnHeadLand = false;
+            bnd.BtnHeadLand = false;
             btnHydLift.Image = Resources.HydraulicLiftOff;
             vehicle.BtnHydLiftOn = false;
-
-
 
             pn.latStart = 0;
             pn.lonStart = 0;
 
             bnd.bndArr.Clear();
-            gf.geoFenceArr.Clear();
-            turn.turnArr.Clear();
-            hd.headArr.Clear();
 
+            PatchSaveList.Clear();
+            PatchDrawList.Clear();
 
             autoBtnState = btnStates.Off;
             btnSection_Update();
@@ -863,8 +856,6 @@ namespace AgOpenGPS
 
             //clear the flags
             flagPts.Clear();
-
-
 
             //clear out contour and Lists
             btnContourPriority.Image = Resources.Snap2;
@@ -884,10 +875,6 @@ namespace AgOpenGPS
             //reset acre and distance counters
             fd.workedAreaTotal = 0;
 
-
-            //reset GUI areas
-            fd.UpdateFieldBoundaryGUIAreas();
-
             ////turn off path record
             recPath.recList.Clear();
             if (recPath.isRecordOn)
@@ -906,16 +893,26 @@ namespace AgOpenGPS
             //bring up dialog if no job active, close job if one is
             if (!isJobStarted)
             {
+                DialogResult result;
                 using (var form = new FormJob(this))
                 {
-                    var result = form.ShowDialog(this);
-                    if (result == DialogResult.Yes)
+                    result = form.ShowDialog(this);
+                }
+
+                if (result == DialogResult.Retry)
+                {
+                    //ask for a directory name
+                    using (var form2 = new FormFieldDir(this))
                     {
-                        //ask for a directory name
-                        using (var form2 = new FormFieldDir(this))
-                        { form2.ShowDialog(this); }
+                        form2.ShowDialog(this);
                     }
                 }
+                else if (result == DialogResult.OK)
+                {
+                    FileOpenField("Resume");
+                }
+                else if (result == DialogResult.Yes)
+                    FileOpenField(filePickerFileAndDirectory);
 
                 Text = "AgOpenGPS - " + currentFieldDirectory;
 
@@ -924,35 +921,23 @@ namespace AgOpenGPS
             //close the current job and ask how to or if to save
             else
             {
-                bool closing = false;
-                int choice = SaveOrNot(closing);
-                switch (choice)
+                using (var form = new FormSaveOrNot(false, this))
                 {
-                    //OK
-                    case 0:
+                    var result = form.ShowDialog(this);
+                    if (result != DialogResult.Ignore)
+                    {
                         Settings.Default.setF_CurrentDir = currentFieldDirectory;
                         Settings.Default.Save();
                         FileSaveEverythingBeforeClosingField();
-                        break;
-
-                    //Ignore and return
-                    case 1:
-                        break;
-
-                    //Save As
-                    case 2:
-                        //close current field but remember last used like normal
-                        Settings.Default.setF_CurrentDir = currentFieldDirectory;
-                        Settings.Default.Save();
-                        FileSaveEverythingBeforeClosingField();
-
-                        //ask for a directory name
-                        using (var form2 = new FormSaveAs(this))
+                        if (result == DialogResult.Yes)
                         {
-                            form2.ShowDialog(this);
+                            //ask for a directory name
+                            using (var form2 = new FormSaveAs(this))
+                            {
+                                form2.ShowDialog(this);
+                            }
                         }
-
-                        break;
+                    }
                 }
             }
         }
@@ -986,7 +971,6 @@ namespace AgOpenGPS
                         if (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].SectionOverlapTimer == 0)
                         {
                             Tools[i].Sections[j].IsSectionOn = false;
-
                             mc.Send_Sections[3] = (byte)i;
                             mc.Send_Sections[4] = (byte)j;
                             mc.Send_Sections[5] = 0x00;
@@ -1195,14 +1179,9 @@ namespace AgOpenGPS
                         Tools[i].Sections[j].SectionOnRequest = false;
                     }
                 }
-
-                FileSaveSections();
-                FileSaveContour();
-                FileSaveFieldKML();
-
-                PatchDrawList.Clear();
-
-                JobClose();
+                isJobStarted = false;
+                StartTasks(null, 0, TaskName.Save);
+                StartTasks(null, 0, TaskName.CloseJob);
                 Text = "AgOpenGPS";
             }
         }
@@ -1210,24 +1189,23 @@ namespace AgOpenGPS
         public void DrawPatchList(int mipmap)
         {
             //for every new chunk of patch
-            foreach (var triList in PatchDrawList)
+            for (int i = 0; i < PatchDrawList.Count; i++)
             {
                 bool isDraw = true;
-                int count2 = triList.Count;
-                for (int k = 1; k < count2; k += 3)
+                for (int k = 1; k < PatchDrawList[i].Count; k += 3)
                 {
                     //determine if point is in frustum or not, if < 0, its outside so abort, z always is 0                            
-                    if (frustum[0] * triList[k].Easting + frustum[1] * triList[k].Northing + frustum[3] <= 0)
+                    if (frustum[0] * PatchDrawList[i][k].Easting + frustum[1] * PatchDrawList[i][k].Northing + frustum[3] <= 0)
                         continue;//right
-                    if (frustum[4] * triList[k].Easting + frustum[5] * triList[k].Northing + frustum[7] <= 0)
+                    if (frustum[4] * PatchDrawList[i][k].Easting + frustum[5] * PatchDrawList[i][k].Northing + frustum[7] <= 0)
                         continue;//left
-                    if (frustum[16] * triList[k].Easting + frustum[17] * triList[k].Northing + frustum[19] <= 0)
+                    if (frustum[16] * PatchDrawList[i][k].Easting + frustum[17] * PatchDrawList[i][k].Northing + frustum[19] <= 0)
                         continue;//bottom
-                    if (frustum[20] * triList[k].Easting + frustum[21] * triList[k].Northing + frustum[23] <= 0)
+                    if (frustum[20] * PatchDrawList[i][k].Easting + frustum[21] * PatchDrawList[i][k].Northing + frustum[23] <= 0)
                         continue;//top
-                    if (frustum[8] * triList[k].Easting + frustum[9] * triList[k].Northing + frustum[11] <= 0)
+                    if (frustum[8] * PatchDrawList[i][k].Easting + frustum[9] * PatchDrawList[i][k].Northing + frustum[11] <= 0)
                         continue;//far
-                    if (frustum[12] * triList[k].Easting + frustum[13] * triList[k].Northing + frustum[15] <= 0)
+                    if (frustum[12] * PatchDrawList[i][k].Easting + frustum[13] * PatchDrawList[i][k].Northing + frustum[15] <= 0)
                         continue;//near
 
                     //point is in frustum so draw the entire patch. The downside of triangle strips.
@@ -1237,26 +1215,25 @@ namespace AgOpenGPS
 
                 if (isDraw)
                 {
-                    count2 = triList.Count;
-                    if (count2 < 4) continue;
+                    if (PatchDrawList[i].Count < 4) continue;
                     //draw the triangle in each triangle strip
                     GL.Begin(PrimitiveType.TriangleStrip);
 
-                    if (isDay) GL.Color4((byte)triList[0].Northing, (byte)triList[0].Easting, (byte)triList[0].Heading, (byte)152);
-                    else GL.Color4((byte)triList[0].Northing, (byte)triList[0].Easting, (byte)triList[0].Heading, (byte)(152 * 0.5));
+                    if (isDay) GL.Color4((byte)PatchDrawList[i][0].Northing, (byte)PatchDrawList[i][0].Easting, (byte)PatchDrawList[i][0].Heading, (byte)152);
+                    else GL.Color4((byte)PatchDrawList[i][0].Northing, (byte)PatchDrawList[i][0].Easting, (byte)PatchDrawList[i][0].Heading, (byte)(152 * 0.5));
 
                     //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
-                    if (count2 >= (mipmap + 2))
+                    if (PatchDrawList[i].Count >= (mipmap + 2))
                     {
                         int step = mipmap;
-                        for (int k = 1; k < count2; k += step)
+                        for (int k = 1; k + 1 < PatchDrawList[i].Count; k += step)
                         {
-                            GL.Vertex3(triList[k].Easting, triList[k].Northing, 0); k++;
-                            GL.Vertex3(triList[k].Easting, triList[k].Northing, 0); k++;
-                            if (count2 - k <= (mipmap + 2)) step = 0;//too small to mipmap it
+                            GL.Vertex3(PatchDrawList[i][k].Easting, PatchDrawList[i][k].Northing, 0); k++;
+                            GL.Vertex3(PatchDrawList[i][k].Easting, PatchDrawList[i][k].Northing, 0); k++;
+                            if (PatchDrawList[i].Count - k <= (mipmap + 2)) step = 0;//too small to mipmap it
                         }
                     }
-                    else { for (int k = 1; k < count2; k++) GL.Vertex3(triList[k].Easting, triList[k].Northing, 0); }
+                    else { for (int k = 1; k < PatchDrawList[i].Count; k++) GL.Vertex3(PatchDrawList[i][k].Easting, PatchDrawList[i][k].Northing, 0); }
                     GL.End();
                 }
             }
@@ -1318,6 +1295,12 @@ namespace AgOpenGPS
         //message box pops up with info then goes away
         public void TimedMessageBox(int timeout, string s1, string s2)
         {
+            if (InvokeRequired)
+            {
+                // We're not in the UI thread, so we need to call BeginInvoke
+                BeginInvoke((MethodInvoker)(() => TimedMessageBox(timeout, s1, s2)));
+                return;
+            }
             Form.SetTimedMessage(timeout, s1, s2, this);
         }
     }//class FormGPS

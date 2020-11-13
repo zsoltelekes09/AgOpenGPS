@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.btnSave = new System.Windows.Forms.Button();
-            this.colorPick = new Keypad.ColorPickerControl();
             this.btnDay = new System.Windows.Forms.Button();
             this.btnNight = new System.Windows.Forms.Button();
             this.btn01 = new System.Windows.Forms.Button();
@@ -50,6 +49,7 @@
             this.btn08 = new System.Windows.Forms.Button();
             this.chkUse = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -67,17 +67,6 @@
             this.btnSave.TabIndex = 215;
             this.btnSave.UseVisualStyleBackColor = false;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
-            // 
-            // colorPick
-            // 
-            this.colorPick.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.colorPick.Location = new System.Drawing.Point(10, 10);
-            this.colorPick.Name = "colorPick";
-            this.colorPick.SelectedColor = System.Drawing.SystemColors.Control;
-            this.colorPick.Size = new System.Drawing.Size(600, 300);
-            this.colorPick.TabIndex = 216;
-            this.colorPick.Text = "colorPickerControl1";
-            this.colorPick.ColorPicked += new System.EventHandler(this.ColorPick_ColorPicked);
             // 
             // btnDay
             // 
@@ -348,6 +337,18 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Select Preset Color";
             // 
+            // button1
+            // 
+            this.button1.FlatAppearance.BorderSize = 0;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Image = global::AgOpenGPS.Properties.Resources.ColorPicker;
+            this.button1.Location = new System.Drawing.Point(10, 10);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(600, 300);
+            this.button1.TabIndex = 235;
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
             // btnCancel
             // 
             this.btnCancel.BackColor = System.Drawing.Color.Transparent;
@@ -370,12 +371,12 @@
             this.BackColor = System.Drawing.Color.DarkGray;
             this.ClientSize = new System.Drawing.Size(830, 500);
             this.ControlBox = false;
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.chkUse);
             this.Controls.Add(this.btnNight);
             this.Controls.Add(this.btnDay);
-            this.Controls.Add(this.colorPick);
             this.Controls.Add(this.btnSave);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MinimizeBox = false;
@@ -391,7 +392,6 @@
 
         #endregion
         private System.Windows.Forms.Button btnSave;
-        private Keypad.ColorPickerControl colorPick;
         private System.Windows.Forms.Button btnDay;
         private System.Windows.Forms.Button btnNight;
         private System.Windows.Forms.Button btn01;
@@ -413,5 +413,6 @@
         private System.Windows.Forms.CheckBox chkUse;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Button button1;
     }
 }

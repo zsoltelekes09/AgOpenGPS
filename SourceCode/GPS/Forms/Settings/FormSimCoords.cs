@@ -44,7 +44,7 @@ namespace AgOpenGPS
 
         private void BntOK_Click(object sender, EventArgs e)
         {
-            mf.JobClose();
+            mf.FileSaveEverythingBeforeClosingField();
             mf.sim.latitude = latitude;
             mf.sim.longitude = longitude;
             Properties.Settings.Default.setGPS_SimLatitude = mf.sim.latitude;

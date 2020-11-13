@@ -37,7 +37,7 @@ namespace AgOpenGPS
         {
             if (!mf.isDay) mf.SwapDayNightMode();
 
-            using (var form = new FormColorPicker(mf, mf.dayColor))
+            using (var form = new FormColorPicker(mf, this, mf.dayColor))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -57,7 +57,7 @@ namespace AgOpenGPS
         {
             if (mf.isDay) mf.SwapDayNightMode();
 
-            using (var form = new FormColorPicker(mf, mf.nightColor))
+            using (var form = new FormColorPicker(mf, this, mf.nightColor))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -77,7 +77,7 @@ namespace AgOpenGPS
         {
             if (!mf.isDay) mf.SwapDayNightMode();
 
-            using (var form = new FormColorPicker(mf, mf.fieldColorDay))
+            using (var form = new FormColorPicker(mf, this, mf.fieldColorDay))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -95,7 +95,7 @@ namespace AgOpenGPS
         {
             if (mf.isDay) mf.SwapDayNightMode();
 
-            using (var form = new FormColorPicker(mf, mf.fieldColorNight))
+            using (var form = new FormColorPicker(mf, this, mf.fieldColorNight))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)

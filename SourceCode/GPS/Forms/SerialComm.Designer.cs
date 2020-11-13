@@ -27,7 +27,6 @@ namespace AgOpenGPS
         //called by the AutoSteer module delegate every time a chunk is rec'd
         public double actualSteerAngleDisp = 0;
 
-
         public string[] DataSend = new string[9];
         public string[] DataRecieved = new string[9];
 
