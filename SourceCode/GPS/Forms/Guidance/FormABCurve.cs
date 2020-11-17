@@ -146,8 +146,8 @@ namespace AgOpenGPS
             {
                 mf.ABLines.ABLines.Add(new CABLines());
                 mf.ABLines.CurrentEditLine = mf.ABLines.ABLines.Count - 1;
-                tboxHeading.Text = Math.Round(Glm.ToDegrees(mf.fixHeading), 6).ToString();
-
+                tboxHeading.Text = (upDnHeading = Math.Round(Glm.ToDegrees(mf.fixHeading), 6)).ToString();
+                
                 Vec3 pivot = mf.pivotAxlePos;
                 mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].ref1.Easting = pivot.Easting;
                 mf.ABLines.ABLines[mf.ABLines.CurrentEditLine].ref1.Northing = pivot.Northing;

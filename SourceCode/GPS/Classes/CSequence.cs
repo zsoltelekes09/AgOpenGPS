@@ -164,7 +164,6 @@ namespace AgOpenGPS
                         //send the function and action to perform
                         mf.DoYouTurnSequenceEvent(mf.seq.seqEnter[i].function, mf.seq.seqEnter[i].action);
                         mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
-                        mf.SendData(mf.mc.Send_Uturn, false);
                     }
                     else if (!tt && !mf.seq.seqExit[i].isTrig && (Force || Math.Round(mf.yt.ytLength - mf.yt.onA, 1) <= mf.seq.seqExit[i].distance))
                     {
@@ -174,10 +173,8 @@ namespace AgOpenGPS
                         //send the function and action to perform
                         mf.DoYouTurnSequenceEvent(mf.seq.seqExit[i].function, mf.seq.seqExit[i].action);
                         mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
-                        mf.SendData(mf.mc.Send_Uturn, false);
                     }
                 }
-
             }
         }
     }

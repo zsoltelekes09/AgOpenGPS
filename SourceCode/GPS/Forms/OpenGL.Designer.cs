@@ -719,21 +719,19 @@ namespace AgOpenGPS
                 {
                     mc.Send_HydraulicLift[3] = 0x02;
                     DataSend[8] = "Hydraulic Lift: State Up";
-                    SendData(mc.Send_HydraulicLift, false);
                 }
                 else if (!bnd.isToolUp && mc.Send_HydraulicLift[3] != 0x01)
                 {
                     mc.Send_HydraulicLift[3] = 0x01;
                     DataSend[8] = "Hydraulic Lift: State Down";
-                    SendData(mc.Send_HydraulicLift, false);
                 }
             }
             else if(mc.Send_HydraulicLift[3] != 0x00)
             {
                 mc.Send_HydraulicLift[3] = 0x00;
                 DataSend[8] = "HydraulicLift: State Off";
-                SendData(mc.Send_HydraulicLift, false);
             }
+            SendData(mc.Send_HydraulicLift, false);
 
             //Determine if sections want to be on or off
             ProcessSectionOnOffRequests();

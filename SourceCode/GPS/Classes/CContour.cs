@@ -13,7 +13,7 @@ namespace AgOpenGPS
         public bool isContourOn, isContourBtnOn, isRightPriority = true;
         public bool OldisSameWay, isSameWay;
         public double HowManyPathsAway, OldHowManyPathsAway;
-
+        public bool ResetLine = false;
         public int Oldstrip, strip = 0, pt = 0;
 
         //angle to path line closest point and fix
@@ -179,7 +179,7 @@ namespace AgOpenGPS
 
             Vec3 Point = (UseSteer) ? SteerAxlePos : PivotAxlePos;
 
-            if (!mf.isAutoSteerBtnOn || ctList.Count < 5)
+            if (!mf.isAutoSteerBtnOn || ctList.Count < 5 || ResetLine)
             {
                 int closestRefPointRight = 0, ClosestStripRight = 0;
                 int closestRefPoint = 0;
@@ -286,8 +286,9 @@ namespace AgOpenGPS
                 distanceFromRefLine = Math.Abs(distanceFromRefLine);
             }
 
-            if (OldisSameWay != isSameWay || HowManyPathsAway != OldHowManyPathsAway || strip != Oldstrip)
+            if (OldisSameWay != isSameWay || HowManyPathsAway != OldHowManyPathsAway || strip != Oldstrip || ResetLine)
             {
+                ResetLine = false;
                 OldisSameWay = isSameWay;
                 OldHowManyPathsAway = HowManyPathsAway;
                 Oldstrip = strip;
@@ -371,11 +372,10 @@ namespace AgOpenGPS
 
                 distance = Glm.Distance(ctList[0], ctList[ctList.Count - 1]);
                 bool loop = distance < 5;
-
                 ctList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, loop, 0.0436332, CancellationToken.None);
             }
 
-            mf.CalculateSteerAngle(ref ctList, isSameWay);
+            mf.CalculateSteerAngle(ref ctList, !isSameWay);
         }
 
         //draw the red follow me line

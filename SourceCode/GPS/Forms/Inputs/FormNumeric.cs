@@ -156,11 +156,12 @@ namespace AgOpenGPS
 
         private void FormNumeric_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (isFirstKey)
+            if (isFirstKey && char.IsNumber(e.KeyChar))
             {
                 tboxNumber.Text = "";
                 isFirstKey = false;
             }
+            isFirstKey = false;
 
             //clear the error as user entered new values
             if (tboxNumber.Text == String.Get("gsError"))
@@ -188,7 +189,7 @@ namespace AgOpenGPS
             int decSeparator = tboxNumber.Text.IndexOf(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
 
             //if its a number just add it
-            if (Char.IsNumber(e.KeyChar))
+            if (char.IsNumber(e.KeyChar))
             {
                 if (decSeparator < 0 || tboxNumber.Text.Length - decSeparator <= Decimals)
                 {

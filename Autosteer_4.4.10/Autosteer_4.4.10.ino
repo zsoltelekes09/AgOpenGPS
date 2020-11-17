@@ -41,6 +41,7 @@
 
 //{0,0,14} section 3 on pin 14
 //{0,14,0} section 2 on pin 14
+
 byte Sections_Output[100] = {14, 15, 16, 17};//Section pins just add pins to enable starts with first section
 
 byte Sections_InputAuto[100] = {14, 15, 0, 0};//Section pins
@@ -163,7 +164,7 @@ byte serialResetTimer = 100; //if serial buffer is getting full, empty it
 #endif
 
 #if (Enable_Hydraulic_Lift)
-  byte RaiseTimer = 0, LowerTimer = 0;
+  byte RaiseTimer = 0, LowerTimer = 0, LastTimer = 0;
 #endif
   
 #if (Enable_Section_Control_Input)
@@ -528,6 +529,7 @@ void loop()
           SendData(toSend, 6);
         }
       }
+
     #endif
     
     //get steering position       
@@ -553,10 +555,10 @@ void loop()
     //RealisticAngle = -ackermanAngle+degrees(asin(2.*Alpha - sin(radians(ackermanAngle + -steerAngleSetPoint))));//left wheel sensor
 
     #if (Enable_Hydraulic_Lift)
-      //if (HydrLiftWatchdog++ > 11) HydrLiftWatchdog = 11;
+      if (HydrLiftWatchdog++ > 11) HydrLiftWatchdog = 11;
       if (RaiseTimer)
       {
-        //if (HydrLiftWatchdog > 10) RaiseTimer = 1;
+        if (HydrLiftWatchdog > 10) RaiseTimer = 1;
         RaiseTimer--;
         if (!RaiseTimer)
           if (HydraulicLift.IsRelayActiveHigh) digitalWrite(RAISE,HIGH);
@@ -565,7 +567,7 @@ void loop()
       }
       if (LowerTimer)
       {
-        //if (HydrLiftWatchdog > 10) LowerTimer = 1;
+        if (HydrLiftWatchdog > 10) LowerTimer = 1;
         LowerTimer--;
         if (!LowerTimer)
         {

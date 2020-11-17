@@ -509,7 +509,7 @@ namespace AgOpenGPS
             double tt = Math.Asin(0.5 / Radius);
             if (!double.IsNaN(tt)) MaxAngle = Math.Min(tt, MaxAngle);
 
-            int A, C;
+            int A, C, oldA, OldC;
             double radius = Radius;
 
             for (int B = 0; B < Points.Count; B++)
@@ -572,6 +572,8 @@ namespace AgOpenGPS
                     segment = radius / tan;
                     length1 = GetLength(dx1, dy1);
                     length2 = GetLength(dx2, dy2);
+                    oldA = A;
+                    OldC = C;
                     if (segment > length1)
                     {
                         if (Loop || (!Loop && A > 0)) A = (A == 0) ? Points.Count - 1 : A - 1;
@@ -592,7 +594,8 @@ namespace AgOpenGPS
                         }
                     }
                     else if (segment < length1) break;
-                    if (!Loop && A == 0 && C == Points.Count - 1)
+
+                    if (!Loop && A == 0 && C == Points.Count - 1 || (oldA == A && OldC == C))
                     {
                         stop = true;
                         break;

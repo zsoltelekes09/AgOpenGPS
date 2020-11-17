@@ -71,29 +71,26 @@ void ParseData(byte* Data, int len)
 #if (Enable_Section_Control_Output)
   else if (Data[0] == 0x7F && Data[1] == 0x71) //Send_Sections
   {
-  if (Data[3] == 0xFF || Data[3] == ToolIndex)
-  {
-    if (Data[5] == 1)
+    int count = ((Data[2]-4) * 8) - 8 + Data[3];
+    
+    int i = 0;
+    int bits = 0;
+    
+    for (int k = 0; k < count && k < sizeof(Sections_Output); k++)
     {
-      if (Data[4] == 0xFF)
+      byte ff = Data[4 + i];
+      if ((ff & (1 << bits)) == (1 << bits))
       {
-        for (int k = 0; k < sizeof(Sections_Output); k++)
-        {
-          if (Sections_Output[k]) digitalWrite(Sections_Output[k],HIGH)
-        }
+        if (Sections_Output[k]) digitalWrite(Sections_Output[k],HIGH)
       }
-      else if (Sections_Output[Data[4]]) digitalWrite(Sections_Output[Data[4]],HIGH)
-    }
-    else
-    {
-      if (Data[4] == 0xFF)
+      else if (Sections_Output[k]) digitalWrite(Sections_Output[k],LOW)
+
+      bits++;
+      if (bits == 8)
       {
-        for (int k = 0; k < sizeof(Sections_Output); k++)
-        {
-          if (Sections_Output[k]) digitalWrite(Sections_Output[k],LOW)
-        }
+        bits = 0;
+        i++;
       }
-      else if (Sections_Output[Data[4]]) digitalWrite(Sections_Output[Data[4]],LOW)
     }
   }
 #endif
@@ -109,25 +106,28 @@ void ParseData(byte* Data, int len)
 #if (Enable_Hydraulic_Lift)
   else if (Data[0] == 0x7F && Data[1] == 0x73) //Send_HydraulicLift
   {
-    //HydrLiftWatchdog = 0;
-    if (Data[3] == 0x02)//Up
+    HydrLiftWatchdog = 0;
+    if (LastTimer != Data[3])
     {
-      RaiseTimer = HydraulicLift.raiseTime * 2;
-      if (aogConfig.isRelayActiveHigh) digitalWrite(RAISE,LOW);
-      else digitalWrite(RAISE,HIGH);
-      LowerTimer = 1;
-    }
-    else if (Data[3] == 0x01)//Down
-    {
-      LowerTimer = HydraulicLift.lowerTime * 2;
-      if (aogConfig.isRelayActiveHigh) digitalWrite(LOWER,LOW);
-      else digitalWrite(LOWER,HIGH);
-      RaiseTimer = 1;
-    }
-    else//Off
-    {
-      LowerTimer = 1;
-      RaiseTimer = 1;
+      if (Data[3] == 0x02)//Up
+      {
+        RaiseTimer = HydraulicLift.raiseTime * 2;
+        if (aogConfig.isRelayActiveHigh) digitalWrite(RAISE,LOW);
+        else digitalWrite(RAISE,HIGH);
+        LowerTimer = 1;
+      }
+      else if (Data[3] == 0x01)//Down
+      {
+        LowerTimer = HydraulicLift.lowerTime * 2;
+        if (aogConfig.isRelayActiveHigh) digitalWrite(LOWER,LOW);
+        else digitalWrite(LOWER,HIGH);
+        RaiseTimer = 1;
+      }
+      else//Off
+      {
+        LowerTimer = 1;
+        RaiseTimer = 1;
+      }
     }
   }
 #endif

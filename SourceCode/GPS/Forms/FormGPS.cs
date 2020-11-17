@@ -945,8 +945,10 @@ namespace AgOpenGPS
         //Does the logic to process section on off requests
         private void ProcessSectionOnOffRequests()
         {
+            int counter = 0;
             for (int i = 0; i < Tools.Count; i++)
             {
+                counter += Tools[i].numOfSections;
                 for (int j = 0; j < Tools[i].numOfSections; j++)
                 {
                     //SECTIONS - 
@@ -954,11 +956,7 @@ namespace AgOpenGPS
                     {
                         if (!Tools[i].Sections[j].IsSectionOn)
                         {
-                            mc.Send_Sections[3] = (byte)i;
-                            mc.Send_Sections[4] = (byte)j;
-                            mc.Send_Sections[5] = 0x01;
                             DataSend[8] = "Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State On";
-                            SendData(mc.Send_Sections, false);
                             Tools[i].Sections[j].IsSectionOn = true;
                         }
                         Tools[i].Sections[j].SectionOverlapTimer = (int)(HzTime * Tools[i].TurnOffDelay + 1);
@@ -971,11 +969,7 @@ namespace AgOpenGPS
                         if (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].SectionOverlapTimer == 0)
                         {
                             Tools[i].Sections[j].IsSectionOn = false;
-                            mc.Send_Sections[3] = (byte)i;
-                            mc.Send_Sections[4] = (byte)j;
-                            mc.Send_Sections[5] = 0x00;
                             DataSend[8] = "Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State Off";
-                            SendData(mc.Send_Sections, false);
                         }
                     }
 
@@ -1034,6 +1028,39 @@ namespace AgOpenGPS
                     }
                 }
             }
+
+            if (counter > 2000) counter = 2000;
+
+            mc.Send_Sections = new byte[(int)(Math.Ceiling(counter / 8.0) + 4)];
+
+            mc.Send_Sections[0] = 0x7F;
+            mc.Send_Sections[1] = 0x71;
+            mc.Send_Sections[2] = (byte)(Math.Ceiling(counter / 8.0) + 4);
+            mc.Send_Sections[3] = (byte)(counter % 8.0);
+
+
+            int set = 1;
+            int machine = 0;
+            int idx = 4;
+
+            for (int i = 0; i < Tools.Count; i++)
+            {
+                for (int j = 0; j < Tools[i].numOfSections; j++)
+                {
+                    if (Tools[i].SuperSection || Tools[i].Sections[j].IsSectionOn) machine |= set;
+                    set <<= 1;
+                    if (set == 256)
+                    {
+                        mc.Send_Sections[idx++] = (byte)machine;
+                        set = 1;
+                        machine = 0;
+                    }
+                }
+            }
+            if (set > 1)
+                mc.Send_Sections[idx++] = (byte)machine;
+
+            SendData(mc.Send_Sections, false);
         }
 
         //called by you turn class to set control byte, click auto man buttons

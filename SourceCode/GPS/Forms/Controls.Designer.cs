@@ -753,6 +753,10 @@ namespace AgOpenGPS
             ABLines.isSameWay = !ABLines.isSameWay;
             CurveLines.ResetABLine = true;
             CurveLines.isSameWay = !CurveLines.isSameWay;
+
+            ct.ResetLine = true;
+            ct.isSameWay = !CurveLines.isSameWay;
+
             sim.headingTrue += Math.PI;
             if (sim.headingTrue > Glm.twoPI) sim.headingTrue -= Glm.twoPI;
             if (sim.headingTrue < 0) sim.headingTrue += Glm.twoPI;

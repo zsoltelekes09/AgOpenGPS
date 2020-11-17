@@ -300,7 +300,7 @@ namespace AgOpenGPS
                         mc.Recieve_SectionsStatus[4] = Data[4];//Section Index; do all if 255
                         mc.Recieve_SectionsStatus[5] = Data[5];//On Off Auto
 
-                        DataSend[8] = "Sections Control: Tool " + (Data[3] + 1).ToString() + ", Section " + (Data[4] + 1).ToString() + ", State " + ((Data[5] & 2) == 2 ? "On" : (Data[5] & 1) == 1 ? "Auto" : "Off");
+                        DataRecieved[8] = "Sections Control: Tool " + (Data[3] + 1).ToString() + ", Section " + (Data[4] + 1).ToString() + ", State " + ((Data[5] & 2) == 2 ? "On" : (Data[5] & 1) == 1 ? "Auto" : "Off");
 
                         for (int j = (Data[3] == 0xFF ? 0 : Data[3]); j < Tools.Count && (Data[3] == 0xFF ? true : j <= Data[3]); j++)
                         {
@@ -321,6 +321,64 @@ namespace AgOpenGPS
                                 Tools[j].SectionButtonColor(k);
                             }
                         }
+
+
+                        /*
+                        if (port != 5) machineUDPActivity++;
+
+                        int Cnt = Data[3];//Sections * 2.0    /4 is bytes
+                        int SectionIndex = 0;
+                        int ToolIndex = 0;
+                        int i = 0;
+                        int bit = 0;
+
+                        while (i+4 < Data[2])
+                        {
+                            if (ToolIndex < Tools.Count && SectionIndex < Tools[ToolIndex].numOfSections)
+                            {
+                                byte ff = Data[4 + i];
+                                if ((ff & (1 << bit + 1)) == (1 << bit + 1) && autoBtnState != 0)
+                                {
+                                    if (Tools[ToolIndex].Sections[SectionIndex].BtnSectionState != btnStates.On)
+                                    {
+                                        Tools[ToolIndex].Sections[SectionIndex].BtnSectionState = btnStates.On;
+                                        Tools[ToolIndex].SectionButtonColor(SectionIndex);
+                                    }
+                                }
+                                else if ((ff & (1 << bit)) == (1 << bit) && autoBtnState != 0)
+                                {
+                                    if (Tools[ToolIndex].Sections[SectionIndex].BtnSectionState != btnStates.Auto)
+                                    {
+                                        Tools[ToolIndex].Sections[SectionIndex].BtnSectionState = btnStates.Auto;
+                                        Tools[ToolIndex].SectionButtonColor(SectionIndex);
+                                    }
+                                }
+                                else
+                                {
+                                    if (Tools[ToolIndex].Sections[SectionIndex].BtnSectionState != btnStates.Off)
+                                    {
+                                        Tools[ToolIndex].Sections[SectionIndex].BtnSectionState = btnStates.Off;
+                                        Tools[ToolIndex].SectionButtonColor(SectionIndex);
+                                    }
+                                }
+                                bit += 2;
+                                SectionIndex++;
+
+                                if (bit == 8)
+                                {
+                                    bit = 0;
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                SectionIndex = 0;
+                                ToolIndex++;
+                                if (ToolIndex >= Tools.Count) break;
+                            }
+                        }
+                        DataRecieved[0] = "Sections Control";
+                        */
                     }
                     else if (Data[1] == 0xC2 && Data.Length > 6)
                     {
@@ -362,7 +420,6 @@ namespace AgOpenGPS
                             btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
                         }
                         else DataRecieved[0] = "Remote Auto Steer not turned on!";
-
                     }
                     else if (Data[1] == 0xC5 && Data.Length > 3)
                     {
