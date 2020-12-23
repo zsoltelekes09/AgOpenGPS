@@ -87,8 +87,8 @@ namespace AgOpenGPS
             {
                 int ChangeDirection = i == 0 ? 1 : -1;
 
-                double Offset = tramWidth * 0.5 - halfWheelTrack - abOffset;
-                double Offset2 = tramWidth * 0.5 + halfWheelTrack - abOffset;
+                double Offset = tramWidth * 0.5 - halfWheelTrack + abOffset;
+                double Offset2 = tramWidth * 0.5 + halfWheelTrack + abOffset;
                 Vec3 Point;
 
                 List<Vec3> BuildLeft = new List<Vec3>();

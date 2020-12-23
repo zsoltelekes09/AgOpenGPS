@@ -708,9 +708,8 @@ namespace AgOpenGPS
             if (Bound.Count > 2)
             {
                 int k = Bound.Count - 1;
-                for (int j = -1; j < Bound.Count - 1; k = j)
+                for (int j = 0; j < Bound.Count; k = j++)
                 {
-                    j += 1;
                     if (GetLineIntersection(Point1, Point2, Bound[j], Bound[k], out Vec3 Crossing, out double Time))
                     {
                         int tt = (k == Bound.Count - 1) ? -1 : k;
@@ -855,29 +854,11 @@ namespace AgOpenGPS
         //meters to feet
         public static double m2ft = 3.28084;
 
-        //Hectare to Acres
-        public static double ha2ac = 2.47105;
-
-        //Acres to Hectare
-        public static double ac2ha = 0.404686;
-
         //Meters to Acres
         public static double m2ac = 0.000247105;
 
         //Meters to Hectare
         public static double m2ha = 0.0001;
-
-        // liters per hectare to us gal per acre
-        public static double galAc2Lha = 9.35396;
-
-        //us gal per acre to liters per hectare
-        public static double LHa2galAc = 0.106907;
-
-        //Liters to Gallons
-        public static double L2Gal = 0.264172;
-
-        //Gallons to Liters
-        public static double Gal2L = 3.785412534258;
 
         //the pi's
         public static double twoPI = 6.28318530717958647692;
@@ -909,13 +890,6 @@ namespace AgOpenGPS
         }
 
         public static double Distance(Vec2 first, Vec3 second)
-        {
-            return Math.Sqrt(
-                Math.Pow(first.Easting - second.Easting, 2)
-                + Math.Pow(first.Northing - second.Northing, 2));
-        }
-
-        public static double Distance(Vec3 first, Vec2 second)
         {
             return Math.Sqrt(
                 Math.Pow(first.Easting - second.Easting, 2)

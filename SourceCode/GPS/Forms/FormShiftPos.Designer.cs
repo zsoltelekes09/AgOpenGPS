@@ -34,10 +34,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.btnSouth = new ProXoft.WinForms.RepeatButton();
-            this.btnNorth = new ProXoft.WinForms.RepeatButton();
-            this.btnEast = new ProXoft.WinForms.RepeatButton();
-            this.btnWest = new ProXoft.WinForms.RepeatButton();
+            this.btnSouth = new System.Windows.Forms.Button();
+            this.btnNorth = new System.Windows.Forms.Button();
+            this.btnEast = new System.Windows.Forms.Button();
+            this.btnWest = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
             this.btnZero = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudNorth)).BeginInit();
@@ -148,6 +148,7 @@
             this.btnSouth.TabIndex = 192;
             this.btnSouth.UseVisualStyleBackColor = true;
             this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSouth_MouseDown);
+            this.btnSouth.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnNorth
             // 
@@ -161,6 +162,7 @@
             this.btnNorth.TabIndex = 193;
             this.btnNorth.UseVisualStyleBackColor = true;
             this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnNorth_MouseDown);
+            this.btnNorth.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnEast
             // 
@@ -174,6 +176,7 @@
             this.btnEast.TabIndex = 194;
             this.btnEast.UseVisualStyleBackColor = true;
             this.btnEast.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnEast_MouseDown);
+            this.btnEast.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnWest
             // 
@@ -187,6 +190,7 @@
             this.btnWest.TabIndex = 195;
             this.btnWest.UseVisualStyleBackColor = true;
             this.btnWest.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnWest_MouseDown);
+            this.btnWest.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // bntOK
             // 
@@ -253,10 +257,10 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private ProXoft.WinForms.RepeatButton btnSouth;
-        private ProXoft.WinForms.RepeatButton btnNorth;
-        private ProXoft.WinForms.RepeatButton btnEast;
-        private ProXoft.WinForms.RepeatButton btnWest;
+        private System.Windows.Forms.Button btnSouth;
+        private System.Windows.Forms.Button btnNorth;
+        private System.Windows.Forms.Button btnEast;
+        private System.Windows.Forms.Button btnWest;
         private System.Windows.Forms.Button bntOK;
         private System.Windows.Forms.Button btnZero;
     }

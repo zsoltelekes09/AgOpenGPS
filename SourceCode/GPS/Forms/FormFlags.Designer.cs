@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.btnSouth = new ProXoft.WinForms.RepeatButton();
-            this.btnNorth = new ProXoft.WinForms.RepeatButton();
+            this.btnSouth = new System.Windows.Forms.Button();
+            this.btnNorth = new System.Windows.Forms.Button();
             this.lblFlagSelected = new System.Windows.Forms.Label();
             this.lblLonStart = new System.Windows.Forms.Label();
             this.lblLatStart = new System.Windows.Forms.Label();
@@ -64,6 +64,7 @@
             this.btnSouth.TabIndex = 195;
             this.btnSouth.UseVisualStyleBackColor = true;
             this.btnSouth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSouth_MouseDown);
+            this.btnSouth.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnNorth
             // 
@@ -78,6 +79,7 @@
             this.btnNorth.TabIndex = 196;
             this.btnNorth.UseVisualStyleBackColor = true;
             this.btnNorth.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnNorth_MouseDown);
+            this.btnNorth.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // lblFlagSelected
             // 
@@ -250,7 +252,7 @@
             this.btnDriveToFlag.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnDriveToFlag.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDriveToFlag.Font = new System.Drawing.Font("Tahoma", 14.25F);
-            this.btnDriveToFlag.Image = global::AgOpenGPS.Properties.Resources.AutoSteerConf;
+            this.btnDriveToFlag.Image = global::AgOpenGPS.Properties.Resources.AutoSteerOff;
             this.btnDriveToFlag.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.btnDriveToFlag.Location = new System.Drawing.Point(118, 225);
             this.btnDriveToFlag.Name = "btnDriveToFlag";
@@ -354,8 +356,8 @@
 
         #endregion
 
-        private ProXoft.WinForms.RepeatButton btnSouth;
-        private ProXoft.WinForms.RepeatButton btnNorth;
+        private System.Windows.Forms.Button btnSouth;
+        private System.Windows.Forms.Button btnNorth;
         private System.Windows.Forms.Label lblFlagSelected;
         private System.Windows.Forms.Label lblLonStart;
         private System.Windows.Forms.Label lblLatStart;

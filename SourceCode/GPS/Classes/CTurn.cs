@@ -239,7 +239,7 @@ namespace AgOpenGPS
 
         public void DrawTurnLines()
         {
-            GL.LineWidth(mf.ABLines.lineWidth);
+            GL.LineWidth(mf.lineWidth);
             GL.Color3(0.3555f, 0.6232f, 0.20f);
             //GL.PointSize(2);
 

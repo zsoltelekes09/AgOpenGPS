@@ -8,67 +8,132 @@ namespace AgOpenGPS
 {
     public partial class FormNumeric : Form
     {
-        private readonly double max;
-        private readonly double min;
+        private readonly double MaxValue, MinValue, Unit2Mtr;
         private bool isFirstKey;
-        private readonly bool WholeNumbers;
+        private readonly string guifix = "";
+        private readonly bool WholeNumbers, ChangeToCulture;
         private readonly int Decimals = 0;
         private readonly decimal Divisible = 1;
+        private readonly System.Windows.Forms.Timer Timer = new System.Windows.Forms.Timer();
+        private bool UPorDOWN = true;
 
         public double ReturnValue { get; set; }
 
-        public FormNumeric(double _min, double _max, double currentValue,Form callingForm, bool wholenumbers, int decimals, decimal divisible = -1)
+        public FormNumeric(double minvalue, double maxvalue, double currentValue, Form callingForm, int decimals, bool changetoculture, double unit2mtr = 1, double Mtr2Unit = 1, decimal divisible = -1)
         {
-            KeyPreview = true;
+            Unit2Mtr = unit2mtr;
             Decimals = decimals;
+            ChangeToCulture = changetoculture;
+
+            if (ChangeToCulture)
+            {
+                currentValue = Math.Round(currentValue * Mtr2Unit, decimals, MidpointRounding.AwayFromZero);
+
+                MaxValue = Math.Round(maxvalue * Mtr2Unit, Decimals, MidpointRounding.AwayFromZero);
+                if (MaxValue * Unit2Mtr > maxvalue)
+                {
+                    MaxValue = Math.Round(MaxValue - Math.Pow(0.1, Decimals), decimals, MidpointRounding.AwayFromZero);
+                }
+                MinValue = Math.Round(minvalue * Mtr2Unit, Decimals, MidpointRounding.AwayFromZero);
+                if (MinValue * Unit2Mtr < minvalue)
+                {
+                    MinValue += Math.Pow(0.1, Decimals);
+                }
+            }
+            else
+            {
+                MinValue = minvalue;
+                MaxValue = maxvalue;
+            }
+
+            InitializeComponent();
+            Timer.Tick += new EventHandler(this.TimerRepeat_Tick);
+
+            KeyPreview = true;
 
             Owner = callingForm;
-            max = _max;
-            min = _min;
-            InitializeComponent();
             Divisible = divisible;
             Text = String.Get("gsEnteraValue");
             //fill in the display
-            tboxNumber.Text = currentValue.ToString();
 
-            BtnSeparator.Enabled = !(WholeNumbers = wholenumbers);
-            BtnPlus.Enabled = _min < 0;
+
+            BtnSeparator.Enabled = !(WholeNumbers = decimals == 0);
+            BtnPlus.Enabled = minvalue < 0;
             BtnSeparator.Text = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
             isFirstKey = true;
-        }
 
-        private void FormNumeric_Load(object sender, EventArgs e)
-        {
-            lblMax.Text = max.ToString();
-            lblMin.Text = min.ToString();
+            lblMax.Text = MaxValue.ToString();
+            lblMin.Text = MinValue.ToString();
+
             tboxNumber.SelectionStart = tboxNumber.Text.Length;
             tboxNumber.SelectionLength = 0;
 
             BtnOk.Focus();
+
+            if (decimals > 0)
+            {
+                guifix = "0.0";
+                while (--decimals > 0)
+                    guifix += "#";
+            }
+            tboxNumber.Text = currentValue.ToString(guifix);
         }
 
         private void BtnDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
-            if (tboxNumber.Text == "" || tboxNumber.Text == "-" || tboxNumber.Text == String.Get("gsError")) tboxNumber.Text = "0";
-            double tryNumber = double.Parse(tboxNumber.Text, CultureInfo.CurrentCulture);
-
-
-            tryNumber++;
-
-            if (tryNumber > max) tryNumber = max;
-
-            tboxNumber.Text = tryNumber.ToString();
-
-            isFirstKey = false;
+            UPorDOWN = true;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            if (tboxNumber.Text == "" || tboxNumber.Text == "-" || tboxNumber.Text == String.Get("gsError")) tboxNumber.Text = "0";
+            UPorDOWN = false;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
+        }
+
+        private void Btn_MouseUp(object sender, MouseEventArgs e)
+        {
+            Timer.Enabled = false;
+        }
+
+        private void TimerRepeat_Tick(object sender, EventArgs e)
+        {
+            if (Timer.Enabled)
+            {
+                if (Timer.Interval > 50) Timer.Interval -= 50;
+            }
+            else
+                Timer.Interval = 500;
+
+            Timer.Enabled = true;
+
+
+            if (tboxNumber.Text == "" || tboxNumber.Text == "-" || tboxNumber.Text == "Error")
+            {
+                tboxNumber.Text = "0";
+            }
+
             double tryNumber = double.Parse(tboxNumber.Text, CultureInfo.CurrentCulture);
 
-            tryNumber--;
-            if (tryNumber < min) tryNumber = min;
+            if (UPorDOWN)
+            {
+                tryNumber++;
+            }
+            else
+            {
+                tryNumber--;
+            }
+
+            if (tryNumber < MinValue)
+            {
+                tryNumber = MinValue;
+            }
+            else if (tryNumber > MaxValue)
+            {
+                tryNumber = MaxValue;
+            }
 
             tboxNumber.Text = tryNumber.ToString();
 
@@ -200,14 +265,14 @@ namespace AgOpenGPS
 
                 if (double.TryParse(tboxNumber.Text, out double value))
                 {
-                    if (value > max)
+                    if (value > MaxValue)
                     {
-                        tboxNumber.Text = max.ToString();
+                        tboxNumber.Text = MaxValue.ToString();
                         tboxNumber.SelectionStart = tboxNumber.Text.Length;
                     }
-                    else if (min <= 0 && value < min)
+                    else if (MinValue <= 0 && value < MinValue)
                     {
-                        tboxNumber.Text = min.ToString();
+                        tboxNumber.Text = MinValue.ToString();
                         tboxNumber.SelectionStart = tboxNumber.Text.Length;
                     }
                 }
@@ -244,12 +309,14 @@ namespace AgOpenGPS
                     //prefix the negative sign
                     tboxNumber.Text = "-" + tboxNumber.Text;
                 }
-                else
+                else if (MinValue < 0)
                 {
                     //if already has one, take it away = +/- does that
                     if (tboxNumber.Text.StartsWith("-"))
                     {
                         tboxNumber.Text = tboxNumber.Text.Substring(1);
+                        if (tboxNumber.SelectionStart == 0)
+                            tboxNumber.SelectionStart = tboxNumber.Text.Length;
                     }
                 }
             }
@@ -266,23 +333,25 @@ namespace AgOpenGPS
                 //culture invariant parse to double
                 double tryNumber = double.Parse(tboxNumber.Text, CultureInfo.CurrentCulture);
 
-                //test if above or below min/max
-                if (tryNumber < min)
+                if (tryNumber > MaxValue)
                 {
-                    tboxNumber.Text = min.ToString();
-                    lblMin.ForeColor = Color.Red;
+                    tboxNumber.Text = MaxValue.ToString();
+                    tboxNumber.SelectionStart = tboxNumber.Text.Length;
+                    lblMax.ForeColor = Color.Red;
                     return;
                 }
-                else if (tryNumber > max)
+                else if (MinValue <= 0 && tryNumber < MinValue)
                 {
-                    tboxNumber.Text = max.ToString();
-                    lblMax.ForeColor = Color.Red;
+                    tboxNumber.Text = MinValue.ToString();
+                    tboxNumber.SelectionStart = tboxNumber.Text.Length;
+                    lblMin.ForeColor = Color.Red;
                     return;
                 }
                 else
                 {
                     //all good, return the value
-                    ReturnValue = tryNumber;
+                    if (ChangeToCulture) ReturnValue = Math.Round(tryNumber * Unit2Mtr, Decimals, MidpointRounding.AwayFromZero);
+                    else ReturnValue = tryNumber;
                     DialogResult = DialogResult.OK;
                     Close();
                 }
@@ -300,7 +369,7 @@ namespace AgOpenGPS
             tboxNumber.Focus();
         }
 
-        private void tboxNumber_Click(object sender, EventArgs e)
+        private void TboxNumber_Click(object sender, EventArgs e)
         {
             isFirstKey = false;
         }

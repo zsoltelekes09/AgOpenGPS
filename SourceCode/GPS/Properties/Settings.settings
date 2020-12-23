@@ -1025,14 +1025,23 @@
     <Setting Name="HeadingCorrection" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="DualAntennaDistance" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
+    <Setting Name="DualAntennaDistance" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">1.2</Value>
     </Setting>
-    <Setting Name="LastABLine" Type="System.Int32" Scope="User">
+    <Setting Name="LastGuidanceLine" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
     </Setting>
-    <Setting Name="LastCurveLine" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">-1</Value>
+    <Setting Name="setComm_commName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="setPort_baudRateGPS" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">9600</Value>
+    </Setting>
+    <Setting Name="setPort_baudRateGPS2" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">9600</Value>
+    </Setting>
+    <Setting Name="setPort_portNameGPS2" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

@@ -39,11 +39,11 @@ namespace AgOpenGPS
             tboxNMEASerial.Lines = mf.recvSentenceSettings;
             lblSpeed.Text = mf.pn.speed.ToString("N2");
 
-            lblUturnByte.Text = Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
+            lblUturnByte.Text = Convert.ToString(mf.mc.Send_Uturn[5], 2).PadLeft(6, '0');
 
             lblRoll.Text = mf.RollInDegrees;
             lblYawHeading.Text = mf.GyroInDegrees;
-            lblGPSHeading.Text = Math.Round(Glm.ToDegrees(mf.gpsHeading), 1) + "\u00B0";
+            lblGPSHeading.Text = Math.Round(Glm.ToDegrees(mf.fixHeading), 1) + "\u00B0";
             lblFixHeading.Text = (mf.fixHeading * 57.2957795).ToString("N1");
 
             if (mf.isMetric)

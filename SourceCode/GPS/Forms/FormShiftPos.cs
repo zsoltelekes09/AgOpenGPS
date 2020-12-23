@@ -7,12 +7,15 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf;
+        private readonly Timer Timer = new Timer();
+        private byte TimerMode = 0;
 
         public FormShiftPos(Form callingForm)
         {
             //get copy of the calling main form
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
+            Timer.Tick += new EventHandler(TimerRepeat_Tick);
 
             label27.Text = String.Get("gsNorth");
             label2.Text = String.Get("gsWest");
@@ -29,26 +32,68 @@ namespace AgOpenGPS
 
         private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
         {
-            nudNorth.UpButton();
-            mf.pn.fixOffset.Northing = (double)nudNorth.Value / 100;
+            TimerMode = 0;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnSouth_MouseDown(object sender, MouseEventArgs e)
         {
-            nudNorth.DownButton();
-            mf.pn.fixOffset.Northing = (double)nudNorth.Value / 100;
+            TimerMode = 1;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnWest_MouseDown(object sender, MouseEventArgs e)
         {
-            nudEast.DownButton();
-            mf.pn.fixOffset.Easting = (double)nudEast.Value / 100;
+            TimerMode = 2;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnEast_MouseDown(object sender, MouseEventArgs e)
         {
-            nudEast.UpButton();
-            mf.pn.fixOffset.Easting = (double)nudEast.Value / 100;
+            TimerMode = 3;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
+        }
+
+        private void Btn_MouseUp(object sender, MouseEventArgs e)
+        {
+            Timer.Enabled = false;
+        }
+
+        private void TimerRepeat_Tick(object sender, EventArgs e)
+        {
+            if (Timer.Enabled)
+            {
+                if (Timer.Interval > 50) Timer.Interval -= 50;
+            }
+            else
+                Timer.Interval = 500;
+
+            Timer.Enabled = true;
+
+            if (TimerMode == 0)
+            {
+                nudNorth.UpButton();
+                mf.pn.fixOffset.Northing = (double)nudNorth.Value / 100;
+            }
+            else if (TimerMode == 1)
+            {
+                nudNorth.DownButton();
+                mf.pn.fixOffset.Northing = (double)nudNorth.Value / 100;
+            }
+            else if (TimerMode == 2)
+            {
+                nudEast.DownButton();
+                mf.pn.fixOffset.Easting = (double)nudEast.Value / 100;
+            }
+            else if (TimerMode == 3)
+            {
+                nudEast.UpButton();
+                mf.pn.fixOffset.Easting = (double)nudEast.Value / 100;
+            }
         }
 
         private void NudNorth_ValueChanged(object sender, EventArgs e)

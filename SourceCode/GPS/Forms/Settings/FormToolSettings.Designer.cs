@@ -37,9 +37,16 @@
             this.lblInchesCm = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.tabSections = new System.Windows.Forms.TabPage();
+            this.Right_Scroll = new System.Windows.Forms.Button();
             this.TboxNumSections = new System.Windows.Forms.TextBox();
+            this.Slider_Scroll = new System.Windows.Forms.Button();
             this.TboxMinApplied = new System.Windows.Forms.TextBox();
+            this.Left_Scroll = new System.Windows.Forms.Button();
             this.TboxSectionWidth = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.SectionPanel = new System.Windows.Forms.Panel();
@@ -165,7 +172,6 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.btnCancel.Image = global::AgOpenGPS.Properties.Resources.Cancel64;
@@ -178,7 +184,6 @@
             // 
             // bntOK
             // 
-            this.bntOK.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.bntOK.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.bntOK.Image = global::AgOpenGPS.Properties.Resources.OK64;
             this.bntOK.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -190,13 +195,56 @@
             this.bntOK.UseVisualStyleBackColor = true;
             this.bntOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(10, 10);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(150, 60);
+            this.button1.TabIndex = 110;
+            this.button1.Text = "Prev";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(170, 10);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(150, 60);
+            this.button2.TabIndex = 111;
+            this.button2.Text = "Next";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(660, 10);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(151, 60);
+            this.button3.TabIndex = 112;
+            this.button3.Text = "Add";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.Button3_Click);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(820, 10);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(150, 60);
+            this.button4.TabIndex = 113;
+            this.button4.Text = "Delete";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.Button4_Click);
+            // 
             // tabSections
             // 
             this.tabSections.AutoScroll = true;
             this.tabSections.BackColor = System.Drawing.SystemColors.Window;
             this.tabSections.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.tabSections.Controls.Add(this.Right_Scroll);
             this.tabSections.Controls.Add(this.TboxNumSections);
+            this.tabSections.Controls.Add(this.Slider_Scroll);
             this.tabSections.Controls.Add(this.TboxMinApplied);
+            this.tabSections.Controls.Add(this.Left_Scroll);
             this.tabSections.Controls.Add(this.TboxSectionWidth);
             this.tabSections.Controls.Add(this.label2);
             this.tabSections.Controls.Add(this.SectionPanel);
@@ -206,15 +254,28 @@
             this.tabSections.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabSections.Location = new System.Drawing.Point(4, 73);
             this.tabSections.Name = "tabSections";
-            this.tabSections.Size = new System.Drawing.Size(972, 523);
+            this.tabSections.Size = new System.Drawing.Size(972, 456);
             this.tabSections.TabIndex = 2;
             this.tabSections.Text = " Sections ";
+            // 
+            // Right_Scroll
+            // 
+            this.Right_Scroll.Font = new System.Drawing.Font("Tahoma", 24F);
+            this.Right_Scroll.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.Right_Scroll.Location = new System.Drawing.Point(663, 270);
+            this.Right_Scroll.Margin = new System.Windows.Forms.Padding(0);
+            this.Right_Scroll.Name = "Right_Scroll";
+            this.Right_Scroll.Size = new System.Drawing.Size(50, 50);
+            this.Right_Scroll.TabIndex = 421;
+            this.Right_Scroll.Text = "▶";
+            this.Right_Scroll.UseVisualStyleBackColor = true;
+            this.Right_Scroll.Click += new System.EventHandler(this.Right_Scroll_Click);
             // 
             // TboxNumSections
             // 
             this.TboxNumSections.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxNumSections.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxNumSections.Location = new System.Drawing.Point(35, 460);
+            this.TboxNumSections.Location = new System.Drawing.Point(55, 373);
             this.TboxNumSections.Name = "TboxNumSections";
             this.TboxNumSections.ShortcutsEnabled = false;
             this.TboxNumSections.Size = new System.Drawing.Size(150, 50);
@@ -224,11 +285,27 @@
             this.TboxNumSections.WordWrap = false;
             this.TboxNumSections.Enter += new System.EventHandler(this.TboxNumSections_Enter);
             // 
+            // Slider_Scroll
+            // 
+            this.Slider_Scroll.CausesValidation = false;
+            this.Slider_Scroll.Location = new System.Drawing.Point(212, 270);
+            this.Slider_Scroll.Margin = new System.Windows.Forms.Padding(0);
+            this.Slider_Scroll.Name = "Slider_Scroll";
+            this.Slider_Scroll.Size = new System.Drawing.Size(451, 50);
+            this.Slider_Scroll.TabIndex = 422;
+            this.Slider_Scroll.TabStop = false;
+            this.Slider_Scroll.UseCompatibleTextRendering = true;
+            this.Slider_Scroll.UseVisualStyleBackColor = true;
+            this.Slider_Scroll.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Slider_Scroll_MouseDown);
+            this.Slider_Scroll.MouseLeave += new System.EventHandler(this.Slider_Scroll_Mouse);
+            this.Slider_Scroll.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Slider_Scroll_MouseMove);
+            this.Slider_Scroll.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Slider_Scroll_Mouse);
+            // 
             // TboxMinApplied
             // 
             this.TboxMinApplied.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxMinApplied.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxMinApplied.Location = new System.Drawing.Point(685, 460);
+            this.TboxMinApplied.Location = new System.Drawing.Point(705, 373);
             this.TboxMinApplied.Name = "TboxMinApplied";
             this.TboxMinApplied.ShortcutsEnabled = false;
             this.TboxMinApplied.Size = new System.Drawing.Size(150, 50);
@@ -238,11 +315,23 @@
             this.TboxMinApplied.WordWrap = false;
             this.TboxMinApplied.Enter += new System.EventHandler(this.TboxMinApplied_Enter);
             // 
+            // Left_Scroll
+            // 
+            this.Left_Scroll.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Left_Scroll.Location = new System.Drawing.Point(162, 270);
+            this.Left_Scroll.Margin = new System.Windows.Forms.Padding(0);
+            this.Left_Scroll.Name = "Left_Scroll";
+            this.Left_Scroll.Size = new System.Drawing.Size(50, 50);
+            this.Left_Scroll.TabIndex = 420;
+            this.Left_Scroll.Text = "◀";
+            this.Left_Scroll.UseVisualStyleBackColor = true;
+            this.Left_Scroll.Click += new System.EventHandler(this.Left_Scroll_Click);
+            // 
             // TboxSectionWidth
             // 
             this.TboxSectionWidth.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxSectionWidth.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxSectionWidth.Location = new System.Drawing.Point(335, 460);
+            this.TboxSectionWidth.Location = new System.Drawing.Point(355, 373);
             this.TboxSectionWidth.Name = "TboxSectionWidth";
             this.TboxSectionWidth.ShortcutsEnabled = false;
             this.TboxSectionWidth.Size = new System.Drawing.Size(150, 50);
@@ -257,7 +346,7 @@
             this.label2.BackColor = System.Drawing.SystemColors.Window;
             this.label2.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.label2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label2.Location = new System.Drawing.Point(3, 419);
+            this.label2.Location = new System.Drawing.Point(23, 332);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(220, 34);
             this.label2.TabIndex = 1;
@@ -270,7 +359,7 @@
             this.SectionPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.SectionPanel.Location = new System.Drawing.Point(0, 0);
             this.SectionPanel.Name = "SectionPanel";
-            this.SectionPanel.Size = new System.Drawing.Size(970, 416);
+            this.SectionPanel.Size = new System.Drawing.Size(972, 250);
             this.SectionPanel.TabIndex = 260;
             // 
             // label4
@@ -278,7 +367,7 @@
             this.label4.BackColor = System.Drawing.SystemColors.Window;
             this.label4.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.label4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label4.Location = new System.Drawing.Point(300, 419);
+            this.label4.Location = new System.Drawing.Point(320, 332);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(221, 34);
             this.label4.TabIndex = 250;
@@ -290,7 +379,7 @@
             this.lblVehicleToolWidth.AutoSize = true;
             this.lblVehicleToolWidth.Font = new System.Drawing.Font("Tahoma", 24F);
             this.lblVehicleToolWidth.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lblVehicleToolWidth.Location = new System.Drawing.Point(490, 467);
+            this.lblVehicleToolWidth.Location = new System.Drawing.Point(510, 380);
             this.lblVehicleToolWidth.Name = "lblVehicleToolWidth";
             this.lblVehicleToolWidth.Size = new System.Drawing.Size(41, 39);
             this.lblVehicleToolWidth.TabIndex = 49;
@@ -301,7 +390,7 @@
             this.label41.BackColor = System.Drawing.SystemColors.Window;
             this.label41.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.label41.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label41.Location = new System.Drawing.Point(634, 419);
+            this.label41.Location = new System.Drawing.Point(654, 332);
             this.label41.Name = "label41";
             this.label41.Size = new System.Drawing.Size(244, 34);
             this.label41.TabIndex = 48;
@@ -330,18 +419,18 @@
             this.tabSettings.Controls.Add(this.label3);
             this.tabSettings.Location = new System.Drawing.Point(4, 73);
             this.tabSettings.Name = "tabSettings";
-            this.tabSettings.Size = new System.Drawing.Size(972, 523);
+            this.tabSettings.Size = new System.Drawing.Size(972, 456);
             this.tabSettings.TabIndex = 9;
             this.tabSettings.Text = "Settings";
             // 
             // TboxTurnOffDelay
             // 
             this.TboxTurnOffDelay.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxTurnOffDelay.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxTurnOffDelay.Location = new System.Drawing.Point(70, 472);
+            this.TboxTurnOffDelay.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxTurnOffDelay.Location = new System.Drawing.Point(70, 388);
             this.TboxTurnOffDelay.Name = "TboxTurnOffDelay";
             this.TboxTurnOffDelay.ShortcutsEnabled = false;
-            this.TboxTurnOffDelay.Size = new System.Drawing.Size(150, 70);
+            this.TboxTurnOffDelay.Size = new System.Drawing.Size(150, 60);
             this.TboxTurnOffDelay.TabIndex = 474;
             this.TboxTurnOffDelay.Text = "0.0";
             this.TboxTurnOffDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -351,11 +440,11 @@
             // TboxMappingOffDelay
             // 
             this.TboxMappingOffDelay.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxMappingOffDelay.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxMappingOffDelay.Location = new System.Drawing.Point(70, 361);
+            this.TboxMappingOffDelay.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxMappingOffDelay.Location = new System.Drawing.Point(70, 295);
             this.TboxMappingOffDelay.Name = "TboxMappingOffDelay";
             this.TboxMappingOffDelay.ShortcutsEnabled = false;
-            this.TboxMappingOffDelay.Size = new System.Drawing.Size(150, 70);
+            this.TboxMappingOffDelay.Size = new System.Drawing.Size(150, 60);
             this.TboxMappingOffDelay.TabIndex = 473;
             this.TboxMappingOffDelay.Text = "0.5";
             this.TboxMappingOffDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -365,11 +454,11 @@
             // TboxMappingOnDelay
             // 
             this.TboxMappingOnDelay.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxMappingOnDelay.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxMappingOnDelay.Location = new System.Drawing.Point(70, 149);
+            this.TboxMappingOnDelay.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxMappingOnDelay.Location = new System.Drawing.Point(70, 115);
             this.TboxMappingOnDelay.Name = "TboxMappingOnDelay";
             this.TboxMappingOnDelay.ShortcutsEnabled = false;
-            this.TboxMappingOnDelay.Size = new System.Drawing.Size(150, 70);
+            this.TboxMappingOnDelay.Size = new System.Drawing.Size(150, 60);
             this.TboxMappingOnDelay.TabIndex = 472;
             this.TboxMappingOnDelay.Text = "1.0";
             this.TboxMappingOnDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -379,11 +468,11 @@
             // TboxLookAheadOff
             // 
             this.TboxLookAheadOff.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxLookAheadOff.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxLookAheadOff.Location = new System.Drawing.Point(70, 260);
+            this.TboxLookAheadOff.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLookAheadOff.Location = new System.Drawing.Point(70, 205);
             this.TboxLookAheadOff.Name = "TboxLookAheadOff";
             this.TboxLookAheadOff.ShortcutsEnabled = false;
-            this.TboxLookAheadOff.Size = new System.Drawing.Size(150, 70);
+            this.TboxLookAheadOff.Size = new System.Drawing.Size(150, 60);
             this.TboxLookAheadOff.TabIndex = 471;
             this.TboxLookAheadOff.Text = "1.0";
             this.TboxLookAheadOff.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -393,11 +482,11 @@
             // TboxLookAheadOn
             // 
             this.TboxLookAheadOn.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxLookAheadOn.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxLookAheadOn.Location = new System.Drawing.Point(70, 43);
+            this.TboxLookAheadOn.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxLookAheadOn.Location = new System.Drawing.Point(70, 25);
             this.TboxLookAheadOn.Name = "TboxLookAheadOn";
             this.TboxLookAheadOn.ShortcutsEnabled = false;
-            this.TboxLookAheadOn.Size = new System.Drawing.Size(150, 70);
+            this.TboxLookAheadOn.Size = new System.Drawing.Size(150, 60);
             this.TboxLookAheadOn.TabIndex = 470;
             this.TboxLookAheadOn.Text = "1.0";
             this.TboxLookAheadOn.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -407,11 +496,11 @@
             // TboxOffset
             // 
             this.TboxOffset.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxOffset.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxOffset.Location = new System.Drawing.Point(497, 405);
+            this.TboxOffset.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxOffset.Location = new System.Drawing.Point(497, 328);
             this.TboxOffset.Name = "TboxOffset";
             this.TboxOffset.ShortcutsEnabled = false;
-            this.TboxOffset.Size = new System.Drawing.Size(150, 65);
+            this.TboxOffset.Size = new System.Drawing.Size(150, 60);
             this.TboxOffset.TabIndex = 469;
             this.TboxOffset.Text = "-8";
             this.TboxOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -421,11 +510,11 @@
             // TboxCutoffSpeed
             // 
             this.TboxCutoffSpeed.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxCutoffSpeed.Font = new System.Drawing.Font("Tahoma", 39F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxCutoffSpeed.Location = new System.Drawing.Point(727, 421);
+            this.TboxCutoffSpeed.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxCutoffSpeed.Location = new System.Drawing.Point(733, 324);
             this.TboxCutoffSpeed.Name = "TboxCutoffSpeed";
             this.TboxCutoffSpeed.ShortcutsEnabled = false;
-            this.TboxCutoffSpeed.Size = new System.Drawing.Size(150, 70);
+            this.TboxCutoffSpeed.Size = new System.Drawing.Size(150, 60);
             this.TboxCutoffSpeed.TabIndex = 468;
             this.TboxCutoffSpeed.Text = "1.1";
             this.TboxCutoffSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -435,11 +524,11 @@
             // TboxOverlap
             // 
             this.TboxOverlap.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.TboxOverlap.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxOverlap.Location = new System.Drawing.Point(733, 222);
+            this.TboxOverlap.Font = new System.Drawing.Font("Tahoma", 32.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxOverlap.Location = new System.Drawing.Point(733, 174);
             this.TboxOverlap.Name = "TboxOverlap";
             this.TboxOverlap.ShortcutsEnabled = false;
-            this.TboxOverlap.Size = new System.Drawing.Size(150, 65);
+            this.TboxOverlap.Size = new System.Drawing.Size(150, 60);
             this.TboxOverlap.TabIndex = 467;
             this.TboxOverlap.Text = "8";
             this.TboxOverlap.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -450,9 +539,9 @@
             // 
             this.label12.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label12.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label12.Location = new System.Drawing.Point(5, 328);
+            this.label12.Location = new System.Drawing.Point(5, 270);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(280, 35);
+            this.label12.Size = new System.Drawing.Size(280, 25);
             this.label12.TabIndex = 118;
             this.label12.Text = "Stop Mapping Delay (Secs)";
             this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -461,9 +550,9 @@
             // 
             this.label9.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label9.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label9.Location = new System.Drawing.Point(5, 116);
+            this.label9.Location = new System.Drawing.Point(5, 90);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(280, 35);
+            this.label9.Size = new System.Drawing.Size(280, 25);
             this.label9.TabIndex = 116;
             this.label9.Text = "Start Mapping Delay (Secs)";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -472,19 +561,19 @@
             // 
             this.label8.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label8.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label8.Location = new System.Drawing.Point(5, 222);
+            this.label8.Location = new System.Drawing.Point(5, 180);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(280, 35);
+            this.label8.Size = new System.Drawing.Size(280, 25);
             this.label8.TabIndex = 114;
             this.label8.Text = "Turn Off Ahead (Secs)";
-            this.label8.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label30
             // 
             this.label30.BackColor = System.Drawing.SystemColors.Window;
             this.label30.Font = new System.Drawing.Font("Tahoma", 15.75F);
             this.label30.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label30.Location = new System.Drawing.Point(728, 357);
+            this.label30.Location = new System.Drawing.Point(728, 260);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(171, 61);
             this.label30.TabIndex = 111;
@@ -497,7 +586,7 @@
             this.lblTurnOffBelowUnits.BackColor = System.Drawing.SystemColors.Window;
             this.lblTurnOffBelowUnits.Font = new System.Drawing.Font("Tahoma", 20.25F);
             this.lblTurnOffBelowUnits.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.lblTurnOffBelowUnits.Location = new System.Drawing.Point(883, 433);
+            this.lblTurnOffBelowUnits.Location = new System.Drawing.Point(884, 352);
             this.lblTurnOffBelowUnits.Name = "lblTurnOffBelowUnits";
             this.lblTurnOffBelowUnits.Size = new System.Drawing.Size(82, 33);
             this.lblTurnOffBelowUnits.TabIndex = 112;
@@ -507,9 +596,9 @@
             // 
             this.label23.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label23.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label23.Location = new System.Drawing.Point(5, 434);
+            this.label23.Location = new System.Drawing.Point(8, 360);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(280, 35);
+            this.label23.Size = new System.Drawing.Size(280, 25);
             this.label23.TabIndex = 109;
             this.label23.Text = "Turn Off Delay (Secs)";
             this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -518,9 +607,9 @@
             // 
             this.label3.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(5, 10);
+            this.label3.Location = new System.Drawing.Point(5, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(280, 35);
+            this.label3.Size = new System.Drawing.Size(280, 25);
             this.label3.TabIndex = 107;
             this.label3.Text = "Turn On Ahead (Secs)";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -528,6 +617,7 @@
             // tabHitch
             // 
             this.tabHitch.BackgroundImage = global::AgOpenGPS.Properties.Resources.ToolHitchPageTBT;
+            this.tabHitch.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.tabHitch.Controls.Add(this.TboxToolHitchLength);
             this.tabHitch.Controls.Add(this.TboxTankHitchLength);
             this.tabHitch.Controls.Add(this.TboxToolWheelLength);
@@ -536,7 +626,7 @@
             this.tabHitch.Controls.Add(this.btnNext);
             this.tabHitch.Location = new System.Drawing.Point(4, 73);
             this.tabHitch.Name = "tabHitch";
-            this.tabHitch.Size = new System.Drawing.Size(972, 523);
+            this.tabHitch.Size = new System.Drawing.Size(972, 456);
             this.tabHitch.TabIndex = 11;
             this.tabHitch.Text = "Hitch";
             this.tabHitch.UseVisualStyleBackColor = true;
@@ -547,7 +637,7 @@
             this.TboxToolHitchLength.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TboxToolHitchLength.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TboxToolHitchLength.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TboxToolHitchLength.Location = new System.Drawing.Point(814, 41);
+            this.TboxToolHitchLength.Location = new System.Drawing.Point(814, 3);
             this.TboxToolHitchLength.MaxLength = 10;
             this.TboxToolHitchLength.Name = "TboxToolHitchLength";
             this.TboxToolHitchLength.Size = new System.Drawing.Size(150, 65);
@@ -562,7 +652,7 @@
             this.TboxTankHitchLength.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TboxTankHitchLength.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TboxTankHitchLength.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TboxTankHitchLength.Location = new System.Drawing.Point(592, 41);
+            this.TboxTankHitchLength.Location = new System.Drawing.Point(593, 3);
             this.TboxTankHitchLength.MaxLength = 10;
             this.TboxTankHitchLength.Name = "TboxTankHitchLength";
             this.TboxTankHitchLength.Size = new System.Drawing.Size(150, 65);
@@ -577,7 +667,7 @@
             this.TboxToolWheelLength.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TboxToolWheelLength.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TboxToolWheelLength.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TboxToolWheelLength.Location = new System.Drawing.Point(711, 112);
+            this.TboxToolWheelLength.Location = new System.Drawing.Point(709, 71);
             this.TboxToolWheelLength.MaxLength = 10;
             this.TboxToolWheelLength.Name = "TboxToolWheelLength";
             this.TboxToolWheelLength.Size = new System.Drawing.Size(150, 65);
@@ -592,7 +682,7 @@
             this.TboxTankWheelLength.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TboxTankWheelLength.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TboxTankWheelLength.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TboxTankWheelLength.Location = new System.Drawing.Point(486, 112);
+            this.TboxTankWheelLength.Location = new System.Drawing.Point(489, 71);
             this.TboxTankWheelLength.MaxLength = 10;
             this.TboxTankWheelLength.Name = "TboxTankWheelLength";
             this.TboxTankWheelLength.Size = new System.Drawing.Size(150, 65);
@@ -607,7 +697,7 @@
             this.TboxHitchLength.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.TboxHitchLength.Font = new System.Drawing.Font("Tahoma", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TboxHitchLength.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TboxHitchLength.Location = new System.Drawing.Point(283, 112);
+            this.TboxHitchLength.Location = new System.Drawing.Point(298, 71);
             this.TboxHitchLength.MaxLength = 10;
             this.TboxHitchLength.Name = "TboxHitchLength";
             this.TboxHitchLength.Size = new System.Drawing.Size(150, 65);
@@ -637,7 +727,7 @@
             this.tabConfig.Name = "tabConfig";
             this.tabConfig.Padding = new System.Windows.Forms.Padding(4);
             this.tabConfig.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.tabConfig.Size = new System.Drawing.Size(972, 523);
+            this.tabConfig.Size = new System.Drawing.Size(972, 456);
             this.tabConfig.TabIndex = 1;
             this.tabConfig.Text = "Configuration";
             // 
@@ -649,7 +739,7 @@
             this.gboxAttachment.Controls.Add(this.rbtnFixedRear);
             this.gboxAttachment.Controls.Add(this.rbtnFront);
             this.gboxAttachment.Controls.Add(this.rbtnTrailing);
-            this.gboxAttachment.Location = new System.Drawing.Point(28, 80);
+            this.gboxAttachment.Location = new System.Drawing.Point(28, 26);
             this.gboxAttachment.Name = "gboxAttachment";
             this.gboxAttachment.Size = new System.Drawing.Size(888, 356);
             this.gboxAttachment.TabIndex = 110;
@@ -747,11 +837,11 @@
             this.tabControl1.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControl1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.tabControl1.ItemSize = new System.Drawing.Size(180, 69);
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Location = new System.Drawing.Point(0, 84);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(980, 600);
+            this.tabControl1.Size = new System.Drawing.Size(980, 533);
             this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.tabControl1.TabIndex = 0;
             // 
@@ -762,6 +852,10 @@
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(980, 700);
             this.ControlBox = false;
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.lblInchesCm);
             this.Controls.Add(this.lblSecTotalWidthMeters);
             this.Controls.Add(this.label16);
@@ -773,7 +867,7 @@
             this.Controls.Add(this.lblSecTotalWidthInches);
             this.Controls.Add(this.lblDoNotExceed);
             this.Font = new System.Drawing.Font("Tahoma", 9.75F);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -783,6 +877,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ToolSettings";
             this.Load += new System.EventHandler(this.FormToolSettings_Load);
+            this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.MouseWheel_Scroll);
             this.tabSections.ResumeLayout(false);
             this.tabSections.PerformLayout();
             this.tabSettings.ResumeLayout(false);
@@ -807,6 +902,10 @@
         private System.Windows.Forms.Label lblSecTotalWidthMeters;
         private System.Windows.Forms.Label lblDoNotExceed;
         private System.Windows.Forms.Label lblInchesCm;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
         private System.Windows.Forms.TabPage tabSections;
         private System.Windows.Forms.TextBox TboxNumSections;
         private System.Windows.Forms.TextBox TboxMinApplied;
@@ -821,7 +920,6 @@
         private System.Windows.Forms.TextBox TboxMappingOffDelay;
         private System.Windows.Forms.TextBox TboxMappingOnDelay;
         private System.Windows.Forms.TextBox TboxLookAheadOff;
-        private System.Windows.Forms.TextBox TboxLookAheadOn;
         private System.Windows.Forms.TextBox TboxOffset;
         private System.Windows.Forms.TextBox TboxCutoffSpeed;
         private System.Windows.Forms.TextBox TboxOverlap;
@@ -833,6 +931,8 @@
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TabPage tabHitch;
+        private System.Windows.Forms.TextBox TboxToolHitchLength;
+        private System.Windows.Forms.TextBox TboxTankHitchLength;
         private System.Windows.Forms.TextBox TboxToolWheelLength;
         private System.Windows.Forms.TextBox TboxTankWheelLength;
         private System.Windows.Forms.TextBox TboxHitchLength;
@@ -845,7 +945,9 @@
         private System.Windows.Forms.RadioButton rbtnFront;
         private System.Windows.Forms.RadioButton rbtnTrailing;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TextBox TboxTankHitchLength;
-        private System.Windows.Forms.TextBox TboxToolHitchLength;
+        private System.Windows.Forms.TextBox TboxLookAheadOn;
+        private System.Windows.Forms.Button Right_Scroll;
+        private System.Windows.Forms.Button Slider_Scroll;
+        private System.Windows.Forms.Button Left_Scroll;
     }
 }

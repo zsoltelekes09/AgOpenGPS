@@ -1,5 +1,4 @@
-﻿using AgOpenGPS.Properties;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -58,58 +57,44 @@ namespace AgOpenGPS
         }
         private void BntOK_Click(object sender, EventArgs e)
         {
-            mf.isSkyOn = chkSky.Checked;
-            mf.isGridOn = chkGrid.Checked;
-            mf.isCompassOn = chkCompass.Checked;
-            mf.isSpeedoOn = chkSpeedo.Checked;
-            mf.isAutoDayNight = chkDayNight.Checked;
-            mf.isSideGuideLines = chkExtraGuides.Checked;
-            mf.isLogNMEA = chkLogNMEA.Checked;
             mf.isDrawPolygons = chkPolygons.Checked;
-            mf.isPureDisplayOn = chkPursuitLines.Checked;
-            mf.isUTurnAlwaysOn = chkUTurnOn.Checked;
-            mf.isAutoLoadFields = chkAutoLoadFields.Checked;
-            mf.DrawBackBuffer = chkDrawBackBuffer.Checked;
+            Properties.Settings.Default.setMenu_isSkyOn = mf.isSkyOn = chkSky.Checked;
+            Properties.Settings.Default.setMenu_isGridOn = mf.isGridOn = chkGrid.Checked;
+            Properties.Settings.Default.setMenu_isCompassOn = mf.isCompassOn = chkCompass.Checked;
+            Properties.Settings.Default.setMenu_isSpeedoOn = mf.isSpeedoOn = chkSpeedo.Checked;
+            Properties.Settings.Default.setDisplay_isAutoDayNight = mf.isAutoDayNight = chkDayNight.Checked;
+            Properties.Settings.Default.setDisplay_isStartFullScreen = chkStartFullScreen.Checked;
+            Properties.Settings.Default.setMenu_isSideGuideLines = mf.isSideGuideLines = chkExtraGuides.Checked;
+            Properties.Settings.Default.setMenu_isLogNMEA = mf.isLogNMEA = chkLogNMEA.Checked;
+            Properties.Settings.Default.setMenu_isPureOn = mf.isPureDisplayOn = chkPursuitLines.Checked;
+            Properties.Settings.Default.setMenu_isUTurnAlwaysOn = mf.isUTurnAlwaysOn = chkUTurnOn.Checked;
+            Properties.Settings.Default.AutoLoadFields = mf.isAutoLoadFields = chkAutoLoadFields.Checked;
+            Properties.Settings.Default.DrawBackBuffer = mf.DrawBackBuffer = chkDrawBackBuffer.Checked;
+            Properties.Settings.Default.setMenu_isMetric = mf.isMetric = rbtnMetric.Checked;
+            Properties.Settings.Default.Save();
+
             if (mf.isAutoLoadFields) mf.LoadFields();
             else mf.Fields.Clear();
-
-            Settings.Default.setMenu_isSkyOn = mf.isSkyOn;
-            Settings.Default.setMenu_isGridOn = mf.isGridOn;
-            Settings.Default.setMenu_isCompassOn = mf.isCompassOn;
-            Settings.Default.setMenu_isSpeedoOn = mf.isSpeedoOn;
-            Settings.Default.setDisplay_isAutoDayNight = mf.isAutoDayNight;
-            Settings.Default.setDisplay_isStartFullScreen = chkStartFullScreen.Checked;
-            Settings.Default.setMenu_isSideGuideLines = mf.isSideGuideLines;
-            Settings.Default.setMenu_isLogNMEA = mf.isLogNMEA;
-            mf.isDrawPolygons = chkPolygons.Checked ;
-            Settings.Default.setMenu_isPureOn = mf.isPureDisplayOn;
-            Settings.Default.setMenu_isUTurnAlwaysOn = mf.isUTurnAlwaysOn;
-            Settings.Default.AutoLoadFields = mf.isAutoLoadFields;
-            Settings.Default.DrawBackBuffer = mf.DrawBackBuffer;
-
-
-
-            if (rbtnMetric.Checked) { Settings.Default.setMenu_isMetric = true; mf.isMetric = true; }
-            else { Settings.Default.setMenu_isMetric = false; mf.isMetric = false; }
 
             //metric settings
             if (mf.isMetric)
             {
-                mf.metImp2m = 0.01;
-                mf.m2MetImp = 100.0;
-                mf.cutoffMetricImperial = 1;
-                mf.decimals = 0;
+                mf.Mtr2Unit = 1.0;
+                mf.Unit2Mtr = 1.0;
+                mf.Kmh2Unit = 1.0;
+                mf.Unit2Kmh = 1.0;
+                mf.Decimals = 2;
             }
             else
             {
-                mf.metImp2m = Glm.in2m;
-                mf.m2MetImp = Glm.m2in;
-                mf.cutoffMetricImperial = 1.60934;
-                mf.decimals = 3;
+                mf.Mtr2Unit = Glm.m2in;
+                mf.Unit2Mtr = Glm.in2m;
+                mf.Kmh2Unit = 0.62137273665;
+                mf.Unit2Kmh = 1.60934;
+                mf.Decimals = 3;
             }
 
 
-            Settings.Default.Save();
             Close();
         }
 

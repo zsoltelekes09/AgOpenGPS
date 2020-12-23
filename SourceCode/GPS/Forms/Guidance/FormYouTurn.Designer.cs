@@ -129,20 +129,20 @@
             this.btnToggle7 = new System.Windows.Forms.Button();
             this.btnToggle8 = new System.Windows.Forms.Button();
             this.btnToggle5 = new System.Windows.Forms.Button();
-            this.btnDistanceDn = new ProXoft.WinForms.RepeatButton();
+            this.btnDistanceDn = new System.Windows.Forms.Button();
             this.btnToggle4 = new System.Windows.Forms.Button();
-            this.btnDistanceUp = new ProXoft.WinForms.RepeatButton();
-            this.lblDistance = new System.Windows.Forms.Label();
+            this.btnDistanceUp = new System.Windows.Forms.Button();
             this.lblWhenTrig = new System.Windows.Forms.Label();
             this.label48 = new System.Windows.Forms.Label();
-            this.btnTriggerDistanceDn = new ProXoft.WinForms.RepeatButton();
-            this.btnTriggerDistanceUp = new ProXoft.WinForms.RepeatButton();
-            this.lblTriggerDistance = new System.Windows.Forms.Label();
+            this.btnTriggerDistanceDn = new System.Windows.Forms.Button();
+            this.btnTriggerDistanceUp = new System.Windows.Forms.Button();
             this.tabYouTurn = new System.Windows.Forms.TabPage();
-            this.btnGeoFenceDistanceDn = new ProXoft.WinForms.RepeatButton();
-            this.btnGeoFenceDistanceUp = new ProXoft.WinForms.RepeatButton();
+            this.TboxGeoFenceDistance = new System.Windows.Forms.TextBox();
+            this.TboxUturnLength = new System.Windows.Forms.TextBox();
+            this.TboxUturnTriggerDistance = new System.Windows.Forms.TextBox();
+            this.btnGeoFenceDistanceDn = new System.Windows.Forms.Button();
+            this.btnGeoFenceDistanceUp = new System.Windows.Forms.Button();
             this.label49 = new System.Windows.Forms.Label();
-            this.lblGeoFenceDistance = new System.Windows.Forms.Label();
             this.label46 = new System.Windows.Forms.Label();
             this.cboxRowWidth = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -1551,6 +1551,7 @@
             this.btnDistanceDn.TabIndex = 145;
             this.btnDistanceDn.UseVisualStyleBackColor = true;
             this.btnDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnDistanceDn_MouseDown);
+            this.btnDistanceDn.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnToggle4
             // 
@@ -1580,18 +1581,7 @@
             this.btnDistanceUp.TabIndex = 146;
             this.btnDistanceUp.UseVisualStyleBackColor = true;
             this.btnDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnDistanceUp_MouseDown);
-            // 
-            // lblDistance
-            // 
-            this.lblDistance.AutoSize = true;
-            this.lblDistance.BackColor = System.Drawing.SystemColors.Control;
-            this.lblDistance.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDistance.Location = new System.Drawing.Point(710, 456);
-            this.lblDistance.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblDistance.Name = "lblDistance";
-            this.lblDistance.Size = new System.Drawing.Size(95, 45);
-            this.lblDistance.TabIndex = 144;
-            this.lblDistance.Text = "XXX";
+            this.btnDistanceUp.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // lblWhenTrig
             // 
@@ -1620,46 +1610,38 @@
             this.btnTriggerDistanceDn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnTriggerDistanceDn.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTriggerDistanceDn.Image = global::AgOpenGPS.Properties.Resources.DnArrow64;
-            this.btnTriggerDistanceDn.Location = new System.Drawing.Point(369, 512);
+            this.btnTriggerDistanceDn.Location = new System.Drawing.Point(370, 512);
             this.btnTriggerDistanceDn.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnTriggerDistanceDn.Name = "btnTriggerDistanceDn";
-            this.btnTriggerDistanceDn.Size = new System.Drawing.Size(59, 69);
+            this.btnTriggerDistanceDn.Size = new System.Drawing.Size(70, 70);
             this.btnTriggerDistanceDn.TabIndex = 158;
             this.btnTriggerDistanceDn.UseVisualStyleBackColor = true;
             this.btnTriggerDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceDn_MouseDown);
+            this.btnTriggerDistanceDn.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnTriggerDistanceUp
             // 
             this.btnTriggerDistanceUp.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.btnTriggerDistanceUp.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTriggerDistanceUp.Image = global::AgOpenGPS.Properties.Resources.UpArrow64;
-            this.btnTriggerDistanceUp.Location = new System.Drawing.Point(459, 512);
+            this.btnTriggerDistanceUp.Location = new System.Drawing.Point(460, 512);
             this.btnTriggerDistanceUp.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnTriggerDistanceUp.Name = "btnTriggerDistanceUp";
-            this.btnTriggerDistanceUp.Size = new System.Drawing.Size(59, 69);
+            this.btnTriggerDistanceUp.Size = new System.Drawing.Size(70, 70);
             this.btnTriggerDistanceUp.TabIndex = 159;
             this.btnTriggerDistanceUp.UseVisualStyleBackColor = true;
             this.btnTriggerDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceUp_MouseDown);
-            // 
-            // lblTriggerDistance
-            // 
-            this.lblTriggerDistance.AutoSize = true;
-            this.lblTriggerDistance.BackColor = System.Drawing.SystemColors.Control;
-            this.lblTriggerDistance.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTriggerDistance.Location = new System.Drawing.Point(394, 456);
-            this.lblTriggerDistance.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblTriggerDistance.Name = "lblTriggerDistance";
-            this.lblTriggerDistance.Size = new System.Drawing.Size(95, 45);
-            this.lblTriggerDistance.TabIndex = 160;
-            this.lblTriggerDistance.Text = "XXX";
+            this.btnTriggerDistanceUp.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // tabYouTurn
             // 
             this.tabYouTurn.BackColor = System.Drawing.Color.AliceBlue;
+            this.tabYouTurn.Controls.Add(this.TboxGeoFenceDistance);
+            this.tabYouTurn.Controls.Add(this.TboxUturnLength);
+            this.tabYouTurn.Controls.Add(this.TboxUturnTriggerDistance);
             this.tabYouTurn.Controls.Add(this.btnGeoFenceDistanceDn);
             this.tabYouTurn.Controls.Add(this.btnGeoFenceDistanceUp);
             this.tabYouTurn.Controls.Add(this.label49);
-            this.tabYouTurn.Controls.Add(this.lblGeoFenceDistance);
             this.tabYouTurn.Controls.Add(this.btnTurnAllOff);
             this.tabYouTurn.Controls.Add(this.btnTriggerDistanceDn);
             this.tabYouTurn.Controls.Add(this.btnToggle6);
@@ -1670,12 +1652,10 @@
             this.tabYouTurn.Controls.Add(this.btnToggle5);
             this.tabYouTurn.Controls.Add(this.btnDistanceUp);
             this.tabYouTurn.Controls.Add(this.btnToggle4);
-            this.tabYouTurn.Controls.Add(this.lblTriggerDistance);
             this.tabYouTurn.Controls.Add(this.btnToggle8);
             this.tabYouTurn.Controls.Add(this.btnToggle7);
             this.tabYouTurn.Controls.Add(this.lblWhenTrig);
             this.tabYouTurn.Controls.Add(this.cboxRowWidth);
-            this.tabYouTurn.Controls.Add(this.lblDistance);
             this.tabYouTurn.Controls.Add(this.label1);
             this.tabYouTurn.Controls.Add(this.btnIsUsingDubins);
             this.tabYouTurn.Controls.Add(this.btnDistanceDn);
@@ -1687,6 +1667,54 @@
             this.tabYouTurn.Size = new System.Drawing.Size(875, 615);
             this.tabYouTurn.TabIndex = 0;
             this.tabYouTurn.Text = "U Turn";
+            // 
+            // TboxGeoFenceDistance
+            // 
+            this.TboxGeoFenceDistance.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxGeoFenceDistance.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxGeoFenceDistance.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxGeoFenceDistance.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxGeoFenceDistance.Location = new System.Drawing.Point(46, 456);
+            this.TboxGeoFenceDistance.Name = "TboxGeoFenceDistance";
+            this.TboxGeoFenceDistance.ShortcutsEnabled = false;
+            this.TboxGeoFenceDistance.Size = new System.Drawing.Size(160, 50);
+            this.TboxGeoFenceDistance.TabIndex = 474;
+            this.TboxGeoFenceDistance.Text = "XXX";
+            this.TboxGeoFenceDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxGeoFenceDistance.WordWrap = false;
+            this.TboxGeoFenceDistance.Enter += new System.EventHandler(this.TboxGeoFenceDistance_Enter);
+            // 
+            // TboxUturnLength
+            // 
+            this.TboxUturnLength.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxUturnLength.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxUturnLength.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxUturnLength.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxUturnLength.Location = new System.Drawing.Point(676, 455);
+            this.TboxUturnLength.Name = "TboxUturnLength";
+            this.TboxUturnLength.ShortcutsEnabled = false;
+            this.TboxUturnLength.Size = new System.Drawing.Size(160, 50);
+            this.TboxUturnLength.TabIndex = 473;
+            this.TboxUturnLength.Text = "XXX";
+            this.TboxUturnLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxUturnLength.WordWrap = false;
+            this.TboxUturnLength.Enter += new System.EventHandler(this.TboxUturnLength_Enter);
+            // 
+            // TboxUturnTriggerDistance
+            // 
+            this.TboxUturnTriggerDistance.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.TboxUturnTriggerDistance.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxUturnTriggerDistance.Font = new System.Drawing.Font("Tahoma", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxUturnTriggerDistance.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxUturnTriggerDistance.Location = new System.Drawing.Point(370, 456);
+            this.TboxUturnTriggerDistance.Name = "TboxUturnTriggerDistance";
+            this.TboxUturnTriggerDistance.ShortcutsEnabled = false;
+            this.TboxUturnTriggerDistance.Size = new System.Drawing.Size(160, 50);
+            this.TboxUturnTriggerDistance.TabIndex = 472;
+            this.TboxUturnTriggerDistance.Text = "XXX";
+            this.TboxUturnTriggerDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxUturnTriggerDistance.WordWrap = false;
+            this.TboxUturnTriggerDistance.Enter += new System.EventHandler(this.TboxUturnTriggerDistance_Enter);
             // 
             // btnGeoFenceDistanceDn
             // 
@@ -1700,6 +1728,7 @@
             this.btnGeoFenceDistanceDn.TabIndex = 163;
             this.btnGeoFenceDistanceDn.UseVisualStyleBackColor = true;
             this.btnGeoFenceDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnGeoFenceDistanceDn_MouseDown);
+            this.btnGeoFenceDistanceDn.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnGeoFenceDistanceUp
             // 
@@ -1713,6 +1742,7 @@
             this.btnGeoFenceDistanceUp.TabIndex = 164;
             this.btnGeoFenceDistanceUp.UseVisualStyleBackColor = true;
             this.btnGeoFenceDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnGeoFenceDistanceUp_MouseDown);
+            this.btnGeoFenceDistanceUp.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // label49
             // 
@@ -1724,18 +1754,6 @@
             this.label49.TabIndex = 166;
             this.label49.Text = "GeoFence Distance";
             this.label49.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            // 
-            // lblGeoFenceDistance
-            // 
-            this.lblGeoFenceDistance.AutoSize = true;
-            this.lblGeoFenceDistance.BackColor = System.Drawing.SystemColors.Control;
-            this.lblGeoFenceDistance.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGeoFenceDistance.Location = new System.Drawing.Point(78, 456);
-            this.lblGeoFenceDistance.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblGeoFenceDistance.Name = "lblGeoFenceDistance";
-            this.lblGeoFenceDistance.Size = new System.Drawing.Size(95, 45);
-            this.lblGeoFenceDistance.TabIndex = 165;
-            this.lblGeoFenceDistance.Text = "XXX";
             // 
             // label46
             // 
@@ -1914,7 +1932,7 @@
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btnOK);
             this.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.Name = "FormYouTurn";
             this.ShowInTaskbar = false;
@@ -2048,12 +2066,10 @@
         private System.Windows.Forms.ComboBox cboxEnterAction0;
         private System.Windows.Forms.NumericUpDown nudEnter0;
         private System.Windows.Forms.Label label48;
-        private ProXoft.WinForms.RepeatButton btnTriggerDistanceDn;
-        private ProXoft.WinForms.RepeatButton btnTriggerDistanceUp;
-        private ProXoft.WinForms.RepeatButton btnDistanceDn;
-        private System.Windows.Forms.Label lblTriggerDistance;
-        private ProXoft.WinForms.RepeatButton btnDistanceUp;
-        private System.Windows.Forms.Label lblDistance;
+        private System.Windows.Forms.Button btnTriggerDistanceDn;
+        private System.Windows.Forms.Button btnTriggerDistanceUp;
+        private System.Windows.Forms.Button btnDistanceDn;
+        private System.Windows.Forms.Button btnDistanceUp;
         private System.Windows.Forms.Label lblWhenTrig;
         private System.Windows.Forms.TabPage tabYouTurn;
         private System.Windows.Forms.Label label46;
@@ -2074,9 +2090,11 @@
         private System.Windows.Forms.Button btnYouTurnRecord;
         private System.Windows.Forms.Button btnYouTurnCustom;
         private System.Windows.Forms.TabControl tabControl1;
-        private ProXoft.WinForms.RepeatButton btnGeoFenceDistanceDn;
-        private ProXoft.WinForms.RepeatButton btnGeoFenceDistanceUp;
+        private System.Windows.Forms.Button btnGeoFenceDistanceDn;
+        private System.Windows.Forms.Button btnGeoFenceDistanceUp;
         private System.Windows.Forms.Label label49;
-        private System.Windows.Forms.Label lblGeoFenceDistance;
+        private System.Windows.Forms.TextBox TboxUturnTriggerDistance;
+        private System.Windows.Forms.TextBox TboxGeoFenceDistance;
+        private System.Windows.Forms.TextBox TboxUturnLength;
     }
 }

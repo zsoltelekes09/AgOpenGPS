@@ -61,10 +61,10 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool setVehicle_isPivotBehindAntenna {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int setVehicle_isPivotBehindAntenna {
             get {
-                return ((bool)(this["setVehicle_isPivotBehindAntenna"]));
+                return ((int)(this["setVehicle_isPivotBehindAntenna"]));
             }
             set {
                 this["setVehicle_isPivotBehindAntenna"] = value;
@@ -374,12 +374,12 @@ namespace AgOpenGPS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("4")]
-        public double set_youTriggerDistance {
+        public double UturnTriggerDistance {
             get {
-                return ((double)(this["set_youTriggerDistance"]));
+                return ((double)(this["UturnTriggerDistance"]));
             }
             set {
-                this["set_youTriggerDistance"] = value;
+                this["UturnTriggerDistance"] = value;
             }
         }
         
@@ -422,12 +422,12 @@ namespace AgOpenGPS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double set_geoFenceDistance {
+        public double GeoFenceOffset {
             get {
-                return ((double)(this["set_geoFenceDistance"]));
+                return ((double)(this["GeoFenceOffset"]));
             }
             set {
-                this["set_geoFenceDistance"] = value;
+                this["GeoFenceOffset"] = value;
             }
         }
         
@@ -804,7 +804,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.9")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.01")]
         public double setSteer_averageXTE {
             get {
                 return ((double)(this["setSteer_averageXTE"]));
@@ -840,7 +840,7 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.3")]
         public double setSteer_integralDistanceAway {
             get {
                 return ((double)(this["setSteer_integralDistanceAway"]));

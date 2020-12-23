@@ -202,6 +202,9 @@ namespace AgOpenGPS
             shuttleDubinsList.Clear();
             shortestDubinsList.Clear();
             mf.sim.stepDistance = 0;
+
+            mf.sim.reverse = false;
+            mf.btnReverseDirection.BackgroundImage = Properties.Resources.UpArrow64;
             isDrivingRecordedPath = false;
             mf.goPathMenu.Image = Properties.Resources.AutoGo;
             isPausedDrivingRecordedPath = false;

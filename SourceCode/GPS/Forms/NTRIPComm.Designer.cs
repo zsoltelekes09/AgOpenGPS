@@ -215,7 +215,15 @@ namespace AgOpenGPS
             {
                 try
                 {
-                    SendUDPMessageNTRIP(data);
+                    if (isUDPSendConnected)
+                    {
+                        try
+                        {
+                            if (data.Length != 0)
+                                sendSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, epNTRIP, new AsyncCallback(SendData), null);
+                        }
+                        catch (Exception) { }
+                    }
                 }
                 catch (Exception ex)
                 {

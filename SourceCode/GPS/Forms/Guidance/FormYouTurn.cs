@@ -1,4 +1,3 @@
-using AgOpenGPS.Properties;
 using System;
 using System.Drawing;
 using System.Text;
@@ -10,9 +9,12 @@ namespace AgOpenGPS
     {
         //properties
         private readonly FormGPS mf;
-
+        double GeoFenceOffset = 0, UturnTriggerDistance = 0;
+        int UturnLength = 0;
         //strings for comboboxes past auto and manual choices
         //pos0 is "-" no matter what
+        private readonly Timer Timer = new Timer();
+        private byte TimerMode = 0;
 
         public FormYouTurn(Form callingForm)
         {
@@ -20,6 +22,7 @@ namespace AgOpenGPS
 
             //winform initialization
             InitializeComponent();
+            Timer.Tick += new EventHandler(TimerRepeat_Tick);
 
             this.Text = String.Get("gsUTurn");
 
@@ -81,7 +84,7 @@ namespace AgOpenGPS
         private void FormYouTurn_Load(object sender, EventArgs e)
         {
             //Fill in the strings for comboboxes - editable
-            string line = Vehicle.Default.seq_FunctionList;
+            string line = Properties.Vehicle.Default.seq_FunctionList;
             string[] words = line.Split(',');
 
             //set button text and background color
@@ -105,13 +108,13 @@ namespace AgOpenGPS
             btnYouTurnSemiCircle.BackColor = Color.Silver;
             btnYouTurnWideReturn.BackColor = Color.Silver;
 
-            if (Settings.Default.setAS_youTurnShape == "Custom")
+            if (Properties.Settings.Default.setAS_youTurnShape == "Custom")
                 btnYouTurnCustom.BackColor = Color.LimeGreen;
-            else if (Settings.Default.setAS_youTurnShape == "KeyHole")
+            else if (Properties.Settings.Default.setAS_youTurnShape == "KeyHole")
                 btnYouTurnKeyHole.BackColor = Color.LimeGreen;
-            else if (Settings.Default.setAS_youTurnShape == "SemiCircle")
+            else if (Properties.Settings.Default.setAS_youTurnShape == "SemiCircle")
                 btnYouTurnSemiCircle.BackColor = Color.LimeGreen;
-            else if (Settings.Default.setAS_youTurnShape == "WideReturn")
+            else if (Properties.Settings.Default.setAS_youTurnShape == "WideReturn")
                 btnYouTurnWideReturn.BackColor = Color.LimeGreen;
 
             cboxRowWidth.SelectedIndex = mf.yt.rowSkipsWidth - 1;
@@ -119,18 +122,9 @@ namespace AgOpenGPS
             //populate the Enter and Exit pages.
             PopulateSequencePages();
 
-            lblDistance.Text = mf.yt.youTurnStartOffset.ToString();
-            if (mf.yt.isYouTurnBtnOn)
-            {
-                lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
-            }
-            else
-            {
-                lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
-            }
-
-            lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
-            lblGeoFenceDistance.Text = mf.yt.geoFenceDistance + "m";
+            TboxUturnLength.Text = ((UturnLength = mf.yt.youTurnStartOffset) * mf.Mtr2Unit).ToString("N0");
+            TboxUturnTriggerDistance.Text = ((UturnTriggerDistance = Properties.Vehicle.Default.UturnTriggerDistance) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxGeoFenceDistance.Text = ((GeoFenceOffset = Properties.Vehicle.Default.GeoFenceOffset) * mf.Mtr2Unit).ToString(mf.GuiFix);
 
             //update dubins button
             if (mf.yt.YouTurnType == 0)
@@ -549,7 +543,7 @@ namespace AgOpenGPS
 
         private void LoadComboStrings()
         {
-            object[] tt = Vehicle.Default.seq_FunctionList.Split(',');
+            object[] tt = Properties.Vehicle.Default.seq_FunctionList.Split(',');
 
             cboxEnterFunc0.Items.AddRange(tt);
             cboxExitFunc0.Items.AddRange(tt);
@@ -596,9 +590,9 @@ namespace AgOpenGPS
 
         private void BtnYouTurnKeyHole_Click(object sender, EventArgs e)
         {
-            mf.yt.LoadYouTurnShapeFromData(Settings.Default.KeyHole);
-            Settings.Default.setAS_youTurnShape = "KeyHole";
-            Settings.Default.Save();
+            mf.yt.LoadYouTurnShapeFromData(Properties.Settings.Default.KeyHole);
+            Properties.Settings.Default.setAS_youTurnShape = "KeyHole";
+            Properties.Settings.Default.Save();
             btnYouTurnKeyHole.BackColor = Color.LimeGreen;
             btnYouTurnSemiCircle.BackColor = Color.Silver;
             btnYouTurnCustom.BackColor = Color.Silver;
@@ -607,9 +601,9 @@ namespace AgOpenGPS
 
         private void BtnYouTurnSemiCircle_Click(object sender, EventArgs e)
         {
-            mf.yt.LoadYouTurnShapeFromData(Settings.Default.SemiCircle);
-            Settings.Default.setAS_youTurnShape = "SemiCircle";
-            Settings.Default.Save();
+            mf.yt.LoadYouTurnShapeFromData(Properties.Settings.Default.SemiCircle);
+            Properties.Settings.Default.setAS_youTurnShape = "SemiCircle";
+            Properties.Settings.Default.Save();
             btnYouTurnKeyHole.BackColor = Color.Silver;
             btnYouTurnSemiCircle.BackColor = Color.LimeGreen;
             btnYouTurnCustom.BackColor = Color.Silver;
@@ -618,9 +612,9 @@ namespace AgOpenGPS
 
         private void BtnYouTurnWideReturn_Click(object sender, EventArgs e)
         {
-            mf.yt.LoadYouTurnShapeFromData(Settings.Default.WideReturn);
-            Settings.Default.setAS_youTurnShape = "WideReturn";
-            Settings.Default.Save();
+            mf.yt.LoadYouTurnShapeFromData(Properties.Settings.Default.WideReturn);
+            Properties.Settings.Default.setAS_youTurnShape = "WideReturn";
+            Properties.Settings.Default.Save();
             btnYouTurnKeyHole.BackColor = Color.Silver;
             btnYouTurnSemiCircle.BackColor = Color.Silver;
             btnYouTurnCustom.BackColor = Color.Silver;
@@ -629,9 +623,9 @@ namespace AgOpenGPS
 
         private void BtnYouTurnCustom_Click(object sender, EventArgs e)
         {
-            mf.yt.LoadYouTurnShapeFromData(Settings.Default.Custom);
-            Settings.Default.setAS_youTurnShape = "Custom";
-            Settings.Default.Save();
+            mf.yt.LoadYouTurnShapeFromData(Properties.Settings.Default.Custom);
+            Properties.Settings.Default.setAS_youTurnShape = "Custom";
+            Properties.Settings.Default.Save();
             btnYouTurnKeyHole.BackColor = Color.Silver;
             btnYouTurnSemiCircle.BackColor = Color.Silver;
             btnYouTurnCustom.BackColor = Color.LimeGreen;
@@ -640,15 +634,13 @@ namespace AgOpenGPS
 
         private void BtnYouTurnRecord_Click(object sender, EventArgs e)
         {
-            if (mf.ABLines.BtnABLineOn)
+            if (mf.Guidance.CurrentLine > -1 && mf.Guidance.CurrentLine < mf.Guidance.Lines.Count && mf.Guidance.Lines[mf.Guidance.CurrentLine].Mode == Gmode.AB || mf.Guidance.Lines[mf.Guidance.CurrentLine].Mode == Gmode.Heading)
             {
                 Form form = new FormYouTurnRecord(mf);
-
                 form.Show(Owner);
-
                 Close();
             }
-            else { mf.TimedMessageBox(3000, "No AB Lines", "Start AB Line Guidance"); }
+            else { mf.TimedMessageBox(3000, "No AB Line", "Start AB Line Guidance"); }
         }
 
         private void BtnIsUsingDubins_Click(object sender, EventArgs e)
@@ -688,38 +680,97 @@ namespace AgOpenGPS
 
         private void BtnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            if (--mf.yt.triggerDistanceOffset < 0) mf.yt.triggerDistanceOffset = 0;
-            lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
+            TimerMode = 0;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnTriggerDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
-            if (++mf.yt.triggerDistanceOffset > 50) mf.yt.triggerDistanceOffset = 50;
-            lblTriggerDistance.Text = mf.yt.triggerDistanceOffset.ToString() + "m";
+            TimerMode = 1;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnGeoFenceDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            if (--mf.yt.geoFenceDistance < 0) mf.yt.geoFenceDistance = 0;
-            lblGeoFenceDistance.Text = mf.yt.geoFenceDistance.ToString() + "m";
+            TimerMode = 2;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnGeoFenceDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
-            if (++mf.yt.geoFenceDistance > 50) mf.yt.geoFenceDistance = 50;
-            lblGeoFenceDistance.Text = mf.yt.geoFenceDistance.ToString() + "m";
+            TimerMode = 3;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            if (--mf.yt.youTurnStartOffset < 0) mf.yt.youTurnStartOffset = 0;
-            lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
+            TimerMode = 4;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
-            if (++mf.yt.youTurnStartOffset > 50) mf.yt.youTurnStartOffset = 50;
-            lblDistance.Text = Math.Abs(mf.yt.youTurnStartOffset).ToString() + " m";
+            TimerMode = 5;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
+        }
+
+        private void Btn_MouseUp(object sender, MouseEventArgs e)
+        {
+            Timer.Enabled = false;
+        }
+
+        private void TimerRepeat_Tick(object sender, EventArgs e)
+        {
+            if (Timer.Enabled)
+            {
+                if (Timer.Interval > 50) Timer.Interval -= 50;
+            }
+            else
+                Timer.Interval = 500;
+
+            Timer.Enabled = true;
+
+            if (TimerMode == 0)
+            {
+                UturnTriggerDistance = Math.Round(UturnTriggerDistance - 1);
+                if (UturnTriggerDistance < mf.vehicle.minTurningRadius) UturnTriggerDistance = mf.vehicle.minTurningRadius;
+                TboxUturnTriggerDistance.Text = (UturnTriggerDistance * mf.Mtr2Unit).ToString(mf.GuiFix);
+            }
+            else if (TimerMode == 1)
+            {
+                UturnTriggerDistance = Math.Round(UturnTriggerDistance + 1);
+                if (UturnTriggerDistance > 50) UturnTriggerDistance = 50;
+                if (UturnTriggerDistance < mf.vehicle.minTurningRadius) UturnTriggerDistance = mf.vehicle.minTurningRadius;
+                TboxUturnTriggerDistance.Text = (UturnTriggerDistance * mf.Mtr2Unit).ToString(mf.GuiFix);
+            }
+            else if (TimerMode == 2)
+            {
+                GeoFenceOffset = Math.Round(GeoFenceOffset - 1);
+                if (GeoFenceOffset < 0) GeoFenceOffset = 0;
+                TboxGeoFenceDistance.Text = (GeoFenceOffset * mf.Mtr2Unit).ToString(mf.GuiFix);
+            }
+            else if (TimerMode == 3)
+            {
+                GeoFenceOffset = Math.Round(GeoFenceOffset + 1);
+                if (GeoFenceOffset > 50) GeoFenceOffset = 50;
+                TboxGeoFenceDistance.Text = (GeoFenceOffset * mf.Mtr2Unit).ToString("N0");
+            }
+            else if (TimerMode == 4)
+            {
+                if (--UturnLength < 0) UturnLength = 0;
+                TboxUturnLength.Text = (UturnLength * mf.Mtr2Unit).ToString(mf.GuiFix);
+            }
+            else if (TimerMode == 5)
+            {
+                if (++UturnLength > 50) UturnLength = 50;
+                TboxUturnLength.Text = (UturnLength * mf.Mtr2Unit).ToString("N0");
+            }
         }
 
         #endregion distance
@@ -748,11 +799,8 @@ namespace AgOpenGPS
                 Controls = this.Controls.Find("nud" + (Exit ? "Exit" : "Enter") + ComboBox.Name[ComboBox.Name.Length - 1], true);
                 if (Controls.Length > 0)
                 {
-                    NumericUpDown NumBox = Controls[0] as NumericUpDown;
-                    if (NumBox != null)
-                    {
+                    if (Controls[0] is NumericUpDown NumBox)
                         NumBox.Value = 0;
-                    }
                 }
 
             }
@@ -815,8 +863,8 @@ namespace AgOpenGPS
             PopulateSequencePages();
 
             //save in settings
-            Vehicle.Default.seq_FunctionList = mf.seq.pos3 + "," + mf.seq.pos4 + "," + mf.seq.pos5 + "," + mf.seq.pos6 + "," + mf.seq.pos7 + "," + mf.seq.pos8;
-            Vehicle.Default.Save();
+            Properties.Vehicle.Default.seq_FunctionList = mf.seq.pos3 + "," + mf.seq.pos4 + "," + mf.seq.pos5 + "," + mf.seq.pos6 + "," + mf.seq.pos7 + "," + mf.seq.pos8;
+            Properties.Vehicle.Default.Save();
 
             //reload buttons text
             btnToggle3.Text = mf.seq.pos3;
@@ -845,7 +893,7 @@ namespace AgOpenGPS
             btnCancel.Enabled = false;
 
             //Fill in the strings for comboboxes - editable
-            string line = Vehicle.Default.seq_FunctionList;
+            string line = Properties.Vehicle.Default.seq_FunctionList;
             string[] words = line.Split(',');
 
             mf.seq.pos3 = words[0];
@@ -879,11 +927,11 @@ namespace AgOpenGPS
             //save all the sequences and events
             SaveSequences();
 
-            //Vehicle.Default.set_youSkipHeight = mf.yt.rowSkipsHeight;
-            Vehicle.Default.set_youSkipWidth = mf.yt.rowSkipsWidth;
-            Vehicle.Default.Youturn_Type = mf.yt.YouTurnType;
+            //Properties.Vehicle.Default.set_youSkipHeight = mf.yt.rowSkipsHeight;
+            Properties.Vehicle.Default.set_youSkipWidth = mf.yt.rowSkipsWidth;
+            Properties.Vehicle.Default.Youturn_Type = mf.yt.YouTurnType;
 
-            Vehicle.Default.set_youTurnDistance = mf.yt.youTurnStartOffset;
+            Properties.Vehicle.Default.set_youTurnDistance = mf.yt.youTurnStartOffset = UturnLength;
             //mf.hl.boxLength = 3.0 * mf.yt.triggerDistanceOffset;
 
             StringBuilder sbEntry = new StringBuilder();
@@ -900,8 +948,8 @@ namespace AgOpenGPS
             sbEntry.Append(mf.seq.seqEnter[FormGPS.MAXFUNCTIONS - 1].function.ToString());
             sbExit.Append(mf.seq.seqExit[FormGPS.MAXFUNCTIONS - 1].function.ToString());
 
-            Vehicle.Default.seq_FunctionEnter = sbEntry.ToString();
-            Vehicle.Default.seq_FunctionExit = sbExit.ToString();
+            Properties.Vehicle.Default.seq_FunctionEnter = sbEntry.ToString();
+            Properties.Vehicle.Default.seq_FunctionExit = sbExit.ToString();
             sbEntry.Clear(); sbExit.Clear();
 
             //Sequence actions
@@ -915,8 +963,8 @@ namespace AgOpenGPS
             sbEntry.Append(mf.seq.seqEnter[FormGPS.MAXFUNCTIONS - 1].action.ToString());
             sbExit.Append(mf.seq.seqExit[FormGPS.MAXFUNCTIONS - 1].action.ToString());
 
-            Vehicle.Default.seq_ActionEnter = sbEntry.ToString();
-            Vehicle.Default.seq_ActionExit = sbExit.ToString();
+            Properties.Vehicle.Default.seq_ActionEnter = sbEntry.ToString();
+            Properties.Vehicle.Default.seq_ActionExit = sbExit.ToString();
             sbEntry.Clear(); sbExit.Clear();
 
             //Sequence Distances
@@ -930,23 +978,28 @@ namespace AgOpenGPS
             sbEntry.Append(mf.seq.seqEnter[FormGPS.MAXFUNCTIONS - 1].distance.ToString());
             sbExit.Append(mf.seq.seqExit[FormGPS.MAXFUNCTIONS - 1].distance.ToString());
 
-            Vehicle.Default.seq_DistanceEnter = sbEntry.ToString();
-            Vehicle.Default.seq_DistanceExit = sbExit.ToString();
+            Properties.Vehicle.Default.seq_DistanceEnter = sbEntry.ToString();
+            Properties.Vehicle.Default.seq_DistanceExit = sbExit.ToString();
 
-            if (Vehicle.Default.set_youTriggerDistance != mf.yt.triggerDistanceOffset)
+            if (Properties.Vehicle.Default.UturnTriggerDistance != UturnTriggerDistance)
             {
-                Vehicle.Default.set_youTriggerDistance = mf.yt.triggerDistanceOffset;
+                Properties.Vehicle.Default.UturnTriggerDistance = UturnTriggerDistance;
 
+                if (Properties.Vehicle.Default.UturnTriggerDistance < mf.vehicle.minTurningRadius)
+                    Properties.Vehicle.Default.UturnTriggerDistance = mf.vehicle.minTurningRadius;
+
+                Properties.Vehicle.Default.Save();
                 for (int i = 0; i < mf.bnd.bndArr.Count; i++)
                 {
                     mf.StartTasks(mf.bnd.bndArr[i], i, TaskName.TurnLine);
                 }
             }
 
-            if (Vehicle.Default.set_geoFenceDistance != mf.yt.geoFenceDistance)
+            if (Properties.Vehicle.Default.GeoFenceOffset != GeoFenceOffset)
             {
-                Vehicle.Default.set_geoFenceDistance = mf.yt.geoFenceDistance;
+                Properties.Vehicle.Default.GeoFenceOffset = GeoFenceOffset;
 
+                Properties.Vehicle.Default.Save();
                 for (int i = 0; i < mf.bnd.bndArr.Count; i++)
                 {
                     mf.StartTasks(mf.bnd.bndArr[i], i, TaskName.GeoFence);
@@ -955,77 +1008,116 @@ namespace AgOpenGPS
             mf.yt.ResetCreatedYouTurn();
 
             //save it all
-            Vehicle.Default.Save();
+            Properties.Vehicle.Default.Save();
             Close();
         }
 
         private void BtnTurnAllOff_Click(object sender, EventArgs e)
         {
-            mf.mc.Send_Uturn[3] = 0;
+            mf.mc.Send_Uturn[5] = 0;
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle3_Click(object sender, EventArgs e)
         {
-            mf.mc.Send_Uturn[3] ^= 0x01;
+            mf.mc.Send_Uturn[5] ^= 0x01;
 
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle4_Click(object sender, EventArgs e)
         {
-            mf.mc.Send_Uturn[3] ^= 0x02;
+            mf.mc.Send_Uturn[5] ^= 0x02;
 
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle5_Click(object sender, EventArgs e)
         {
-            mf.mc.Send_Uturn[3] ^= 0x04;
+            mf.mc.Send_Uturn[5] ^= 0x04;
 
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle6_Click(object sender, EventArgs e)
         {
-            mf.mc.Send_Uturn[3] ^= 0x08;
+            mf.mc.Send_Uturn[5] ^= 0x08;
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle7_Click(object sender, EventArgs e)
         {
-            mf.mc.Send_Uturn[3] ^= 0x10;
+            mf.mc.Send_Uturn[5] ^= 0x10;
             FunctionButtonsOnOff();
         }
 
         private void BtnToggle8_Click(object sender, EventArgs e)
         {
-            mf.mc.Send_Uturn[3] ^= 0x20;
+            mf.mc.Send_Uturn[5] ^= 0x20;
             FunctionButtonsOnOff();
         }
 
         private void FunctionButtonsOnOff()
         {
-            if ((mf.mc.Send_Uturn[3] & 0x01) == 0x01) btnToggle3.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[5] & 0x01) == 0x01) btnToggle3.BackColor = Color.LightGreen;
             else btnToggle3.BackColor = Color.LightSalmon;
 
-            if ((mf.mc.Send_Uturn[3] & 0x02) == 0x02) btnToggle4.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[5] & 0x02) == 0x02) btnToggle4.BackColor = Color.LightGreen;
             else btnToggle4.BackColor = Color.LightSalmon;
 
-            if ((mf.mc.Send_Uturn[3] & 0x04) == 0x04) btnToggle5.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[5] & 0x04) == 0x04) btnToggle5.BackColor = Color.LightGreen;
             else btnToggle5.BackColor = Color.LightSalmon;
 
-            if ((mf.mc.Send_Uturn[3] & 0x08) == 0x08) btnToggle6.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[5] & 0x08) == 0x08) btnToggle6.BackColor = Color.LightGreen;
             else btnToggle6.BackColor = Color.LightSalmon;
 
-            if ((mf.mc.Send_Uturn[3] & 0x10) == 0x10) btnToggle7.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[5] & 0x10) == 0x10) btnToggle7.BackColor = Color.LightGreen;
             else btnToggle7.BackColor = Color.LightSalmon;
 
-            if ((mf.mc.Send_Uturn[3] & 0x20) == 0x20) btnToggle8.BackColor = Color.LightGreen;
+            if ((mf.mc.Send_Uturn[5] & 0x20) == 0x20) btnToggle8.BackColor = Color.LightGreen;
             else btnToggle8.BackColor = Color.LightSalmon;
 
-            mf.DataSend[8] = "Uturn: " + Convert.ToString(mf.mc.Send_Uturn[3], 2).PadLeft(6, '0');
+            mf.UpdateSendDataText("Uturn: " + Convert.ToString(mf.mc.Send_Uturn[5], 2).PadLeft(8, '0'));
             mf.SendData(mf.mc.Send_Uturn, false);
+        }
+
+        private void TboxUturnTriggerDistance_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(mf.vehicle.minTurningRadius, 50, UturnTriggerDistance, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxUturnTriggerDistance.Text = ((UturnTriggerDistance = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxGeoFenceDistance_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, 50, GeoFenceOffset, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxGeoFenceDistance.Text = ((GeoFenceOffset = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
+                }
+            }
+            btnCancel.Focus();
+        }
+
+        private void TboxUturnLength_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(0, 50, UturnLength, this, 0, true, mf.Unit2Mtr, mf.Mtr2Unit))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxUturnLength.Text = ((UturnLength = (int)form.ReturnValue) * mf.Mtr2Unit).ToString("N0");
+                }
+            }
+            btnCancel.Focus();
         }
     }
 }

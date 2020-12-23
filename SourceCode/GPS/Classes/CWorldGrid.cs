@@ -10,11 +10,12 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        //Z
         public double NorthingMin, NorthingMax;
 
         public double EastingMin, EastingMax;
 
+        public double GridSize = 20000;
+        public double Count = 100;
         public CWorldGrid(FormGPS _f)
         {
             mf = _f;
@@ -27,15 +28,15 @@ namespace AgOpenGPS
             GL.Enable(EnableCap.Texture2D);
             GL.Color3(field.R, field.G, field.B);
             GL.BindTexture(TextureTarget.Texture2D, mf.texture[1]);
-            GL.Begin(PrimitiveType.TriangleStrip);
+            GL.Begin(PrimitiveType.Quads);
             GL.TexCoord2(0, 0);
-            GL.Vertex3(EastingMin, NorthingMax, 0.0);
-            GL.TexCoord2(20, 0.0);
-            GL.Vertex3(EastingMax, NorthingMax, 0.0);
-            GL.TexCoord2(0.0, 20);
             GL.Vertex3(EastingMin, NorthingMin, 0.0);
-            GL.TexCoord2(20, 20);
+            GL.TexCoord2(Count, 0.0);
             GL.Vertex3(EastingMax, NorthingMin, 0.0);
+            GL.TexCoord2(Count, Count);
+            GL.Vertex3(EastingMax, NorthingMax, 0.0);
+            GL.TexCoord2(0.0, Count);//topright
+            GL.Vertex3(EastingMin, NorthingMax, 0.0);
 
             GL.End();
             GL.Disable(EnableCap.Texture2D);
@@ -46,7 +47,7 @@ namespace AgOpenGPS
             GL.Color3(0, 0, 0);
             GL.LineWidth(1);
             GL.Begin(PrimitiveType.Lines);
-            for (double num = Math.Floor(EastingMin / _gridZoom) * _gridZoom; num < EastingMax; num += _gridZoom)
+            for (double num = Math.Round(EastingMin / _gridZoom, MidpointRounding.AwayFromZero) * _gridZoom; num < EastingMax; num += _gridZoom)
             {
                 if (num < EastingMin) continue;
 
@@ -54,7 +55,7 @@ namespace AgOpenGPS
                 GL.Vertex3(num, NorthingMin, 0.1);
             }
 
-            for (double num2 = Math.Floor(NorthingMin / _gridZoom) * _gridZoom; num2 < NorthingMax; num2 += _gridZoom)
+            for (double num2 = Math.Round(NorthingMin / _gridZoom, MidpointRounding.AwayFromZero) * _gridZoom; num2 < NorthingMax; num2 += _gridZoom)
             {
                 if (num2 < NorthingMin) continue;
 
@@ -66,13 +67,14 @@ namespace AgOpenGPS
 
         public void CheckWorldGrid(double northing, double easting)
         {
-            double n = Math.Floor(northing / 200.0 + 0.5) * 200.0;
-            double e = Math.Floor(easting / 200.0 + 0.5) * 200.0;
+            double n = Math.Round(northing / (GridSize / Count) * 2, MidpointRounding.AwayFromZero) * (GridSize / Count) * 2;
+            double e = Math.Round(easting / (GridSize / Count) * 2, MidpointRounding.AwayFromZero) * (GridSize / Count) * 2;
 
-            NorthingMax = n + 20000.0;
-            NorthingMin = n - 20000.0;
-            EastingMax = e + 20000.0;
-            EastingMin = e - 20000.0;
+
+            NorthingMax = n + GridSize;
+            NorthingMin = n - GridSize;
+            EastingMax = e + GridSize;
+            EastingMin = e - GridSize;
         }
     }
 }

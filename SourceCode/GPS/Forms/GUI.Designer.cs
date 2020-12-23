@@ -1,5 +1,4 @@
-﻿using AgOpenGPS.Properties;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -17,8 +16,8 @@ namespace AgOpenGPS
         public byte flagColor = 0;
 
         //how many cm off line per big pixel
-        public int lightbarCmPerPixel, decimals = 0;
-
+        public int lightbarCmPerPixel, Decimals = 2;
+        public string GuiFix = "0.0#";
         //polygon mode for section drawing
         public bool isDrawPolygons;
 
@@ -28,8 +27,9 @@ namespace AgOpenGPS
         public bool isPureDisplayOn = true, DrawBackBuffer = false, isSkyOn = true, isRollMeterOn = false;
         public bool isDay = true, isDayTime = true, isSimNoisy, isKeyboardOn = true;
 
-        public double metImp2m = 0.01, m2MetImp = 100.0, cutoffMetricImperial = 1;
-
+        public double Mtr2Unit = 1.0, Unit2Mtr = 1.0, Kmh2Unit = 1.0, Unit2Kmh = 1.0;
+        public string Units = " Mtr";
+        public int lineWidth = 1;
         //master Manual and Auto, 3 states possible
         public enum btnStates { Off, Auto, On }
         public btnStates autoBtnState = btnStates.Off;
@@ -55,25 +55,31 @@ namespace AgOpenGPS
         private void LoadSettings()
         {
             //metric settings
-            if (isMetric = Settings.Default.setMenu_isMetric)
+            if (isMetric = Properties.Settings.Default.setMenu_isMetric)
             {
-                metImp2m = 0.01;
-                m2MetImp = 100.0;
-                cutoffMetricImperial = 1;
-                decimals = 0;
+                Mtr2Unit = 1.0;
+                Unit2Mtr = 1.0;
+                Kmh2Unit = 1.0;
+                Unit2Kmh = 1.0;
+                Decimals = 2;
+                GuiFix = "0.0#";
+                Units = " Mtr";
             }
             else
             {
-                metImp2m = Glm.in2m;
-                m2MetImp = Glm.m2in;
-                cutoffMetricImperial = 1.60934;
-                decimals = 3;
+                Mtr2Unit = Glm.m2in;
+                Unit2Mtr = Glm.in2m;
+                Kmh2Unit = 0.62137273665;
+                Unit2Kmh = 1.60934;
+                Decimals = 2;
+                GuiFix = "0.0#";
+                Units = " Inch";
             }
 
 
-            if (Settings.Default.setF_workingDirectory == "Default")
+            if (Properties.Settings.Default.setF_workingDirectory == "Default")
                 baseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\AgOpenGPS\\";
-            else baseDirectory = Settings.Default.setF_workingDirectory + "\\AgOpenGPS\\";
+            else baseDirectory = Properties.Settings.Default.setF_workingDirectory + "\\AgOpenGPS\\";
 
             //get the fields directory, if not exist, create
             fieldsDirectory = baseDirectory + "Fields\\";
@@ -88,7 +94,7 @@ namespace AgOpenGPS
             envDirectory = baseDirectory + "Environments\\";
 
             //make sure current field directory exists, null if not
-            currentFieldDirectory = Settings.Default.setF_CurrentDir;
+            currentFieldDirectory = Properties.Settings.Default.setF_CurrentDir;
 
             string curDir;
             if (currentFieldDirectory != "")
@@ -98,18 +104,18 @@ namespace AgOpenGPS
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 {
                     currentFieldDirectory = "";
-                    Settings.Default.setF_CurrentDir = "";
-                    Settings.Default.Save();
+                    Properties.Settings.Default.setF_CurrentDir = "";
+                    Properties.Settings.Default.Save();
                 }
             }
 
             //set the language to last used
-            SetLanguage((object)Settings.Default.setF_culture, null);
+            SetLanguage((object)Properties.Settings.Default.setF_culture, null);
 
-            SndBoundaryAlarm = new SoundPlayer(Resources.Alarm10);
+            SndBoundaryAlarm = new SoundPlayer(Properties.Resources.Alarm10);
 
             //grab the current vehicle filename - make sure it exists
-            envFileName = Vehicle.Default.setVehicle_envName;
+            envFileName = Properties.Vehicle.Default.setVehicle_envName;
 
             timerSim.Interval = 94;
 
@@ -121,10 +127,10 @@ namespace AgOpenGPS
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
 
             //set baud and port from last time run
-            baudRateGPS = Settings.Default.setPort_baudRate;
-            portNameGPS = Settings.Default.setPort_portNameGPS;
+            baudRateGPS = Properties.Settings.Default.setPort_baudRate;
+            portNameGPS = Properties.Settings.Default.setPort_portNameGPS;
 
-            if (Settings.Default.setMenu_isSimulatorOn)
+            if (Properties.Settings.Default.setMenu_isSimulatorOn)
             {
                 simulatorOnToolStripMenuItem.Checked = true;
                 panelSim.Visible = true;
@@ -137,13 +143,13 @@ namespace AgOpenGPS
             }
 
             //same for SectionMachine port
-            portNameMachine = Settings.Default.setPort_portNameMachine;
-            wasRateMachineConnectedLastRun = Settings.Default.setPort_wasMachineConnected;
+            portNameMachine = Properties.Settings.Default.setPort_portNameMachine;
+            wasRateMachineConnectedLastRun = Properties.Settings.Default.setPort_wasMachineConnected;
             if (wasRateMachineConnectedLastRun) SerialPortMachineOpen();
 
             //same for AutoSteer port
-            portNameAutoSteer = Settings.Default.setPort_portNameAutoSteer;
-            wasAutoSteerConnectedLastRun = Settings.Default.setPort_wasAutoSteerConnected;
+            portNameAutoSteer = Properties.Settings.Default.setPort_portNameAutoSteer;
+            wasAutoSteerConnectedLastRun = Properties.Settings.Default.setPort_wasAutoSteerConnected;
             if (wasAutoSteerConnectedLastRun) SerialPortAutoSteerOpen();
 
 
@@ -152,65 +158,59 @@ namespace AgOpenGPS
             SetZoom();
 
             //which heading source is being used
-            headingFromSource = Settings.Default.setGPS_headingFromWhichSource;
+            headingFromSource = Properties.Settings.Default.setGPS_headingFromWhichSource;
 
-            //start udp server if required
-            if (Settings.Default.setUDP_isInterAppOn) StartLocalUDPServer();
-            else if (Settings.Default.setUDP_isOn) StartUDPServer();
-            else StopUDPServer();
+            StartLocalUDPServer();
 
             //start NTRIP if required
-            isNTRIP_TurnedOn = Settings.Default.setNTRIP_isOn;
+            if (isNTRIP_TurnedOn = Properties.Settings.Default.setNTRIP_isOn) StartUDPServer();
+            else StopUDPServer();
 
 
             //workswitch stuff
-            mc.isWorkSwitchEnabled = Vehicle.Default.setF_IsWorkSwitchEnabled;
-            mc.isWorkSwitchActiveLow = Vehicle.Default.setF_IsWorkSwitchActiveLow;
-            mc.isWorkSwitchManual = Vehicle.Default.setF_IsWorkSwitchManual;
-            mc.RemoteAutoSteer = Vehicle.Default.setAS_isAutoSteerAutoOn;
+            mc.isWorkSwitchEnabled = Properties.Vehicle.Default.setF_IsWorkSwitchEnabled;
+            mc.isWorkSwitchActiveLow = Properties.Vehicle.Default.setF_IsWorkSwitchActiveLow;
+            mc.isWorkSwitchManual = Properties.Vehicle.Default.setF_IsWorkSwitchManual;
+            mc.RemoteAutoSteer = Properties.Vehicle.Default.setAS_isAutoSteerAutoOn;
 
-            minFixStepDist = Settings.Default.setF_minFixStep;
-            HeadingCorrection = Settings.Default.HeadingCorrection;
-            DualAntennaDistance = Settings.Default.DualAntennaDistance;
+            minFixStepDist = Properties.Settings.Default.setF_minFixStep;
+            HeadingCorrection = Properties.Settings.Default.HeadingCorrection;
+            DualAntennaDistance = Properties.Settings.Default.DualAntennaDistance;
 
-            fd.workedAreaTotalUser = Settings.Default.setF_UserTotalArea;
-            fd.userSquareMetersAlarm = Settings.Default.setF_UserTripAlarm;
+            fd.workedAreaTotalUser = Properties.Settings.Default.setF_UserTotalArea;
+            fd.userSquareMetersAlarm = Properties.Settings.Default.setF_UserTripAlarm;
 
-            if (Settings.Default.setAS_youTurnShape == "Custom")
-                yt.LoadYouTurnShapeFromData(Settings.Default.Custom);
-            else if (Settings.Default.setAS_youTurnShape == "KeyHole")
-                yt.LoadYouTurnShapeFromData(Settings.Default.KeyHole);
-            else if (Settings.Default.setAS_youTurnShape == "SemiCircle")
-                yt.LoadYouTurnShapeFromData(Settings.Default.SemiCircle);
-            else if (Settings.Default.setAS_youTurnShape == "WideReturn")
-                yt.LoadYouTurnShapeFromData(Settings.Default.WideReturn);
+            if (Properties.Settings.Default.setAS_youTurnShape == "Custom")
+                yt.LoadYouTurnShapeFromData(Properties.Settings.Default.Custom);
+            else if (Properties.Settings.Default.setAS_youTurnShape == "KeyHole")
+                yt.LoadYouTurnShapeFromData(Properties.Settings.Default.KeyHole);
+            else if (Properties.Settings.Default.setAS_youTurnShape == "SemiCircle")
+                yt.LoadYouTurnShapeFromData(Properties.Settings.Default.SemiCircle);
+            else if (Properties.Settings.Default.setAS_youTurnShape == "WideReturn")
+                yt.LoadYouTurnShapeFromData(Properties.Settings.Default.WideReturn);
             else
-                yt.LoadYouTurnShapeFromData(Settings.Default.KeyHole);
+                yt.LoadYouTurnShapeFromData(Properties.Settings.Default.KeyHole);
 
             //load th elightbar resolution
-            lightbarCmPerPixel = Settings.Default.setDisplay_lightbarCmPerPixel;
+            lightbarCmPerPixel = Properties.Settings.Default.setDisplay_lightbarCmPerPixel;
 
             //Stanley guidance
-            isStanleyUsed = Vehicle.Default.setVehicle_isStanleyUsed;
+            isStanleyUsed = Properties.Vehicle.Default.setVehicle_isStanleyUsed;
 
-            isRTK = Settings.Default.setGPS_isRTK;
+            isRTK = Properties.Settings.Default.setGPS_isRTK;
+            isSkyOn = Properties.Settings.Default.setMenu_isSkyOn;
+            isGridOn = Properties.Settings.Default.setMenu_isGridOn;
+            isCompassOn = Properties.Settings.Default.setMenu_isCompassOn;
+            isSpeedoOn = Properties.Settings.Default.setMenu_isSpeedoOn;
+            isAutoDayNight = Properties.Settings.Default.setDisplay_isAutoDayNight;
+            isSideGuideLines = Properties.Settings.Default.setMenu_isSideGuideLines;
+            isLogNMEA = Properties.Settings.Default.setMenu_isLogNMEA;
+            isPureDisplayOn = Properties.Settings.Default.setMenu_isPureOn;
+            isUTurnAlwaysOn = Properties.Settings.Default.setMenu_isUTurnAlwaysOn;
+            isAutoLoadFields = Properties.Settings.Default.AutoLoadFields;
+            DrawBackBuffer = Properties.Settings.Default.DrawBackBuffer;
 
-
-
-
-            isSkyOn = Settings.Default.setMenu_isSkyOn;
-            isGridOn = Settings.Default.setMenu_isGridOn;
-            isCompassOn = Settings.Default.setMenu_isCompassOn;
-            isSpeedoOn = Settings.Default.setMenu_isSpeedoOn;
-            isAutoDayNight = Settings.Default.setDisplay_isAutoDayNight;
-            isSideGuideLines = Settings.Default.setMenu_isSideGuideLines;
-            isLogNMEA = Settings.Default.setMenu_isLogNMEA;
-            isPureDisplayOn = Settings.Default.setMenu_isPureOn;
-            isUTurnAlwaysOn = Settings.Default.setMenu_isUTurnAlwaysOn;
-            isAutoLoadFields = Settings.Default.AutoLoadFields;
-            DrawBackBuffer = Settings.Default.DrawBackBuffer;
-
-            simulatorOnToolStripMenuItem.Checked = Settings.Default.setMenu_isSimulatorOn;
+            simulatorOnToolStripMenuItem.Checked = Properties.Settings.Default.setMenu_isSimulatorOn;
             if (simulatorOnToolStripMenuItem.Checked)
             {
                 panelSim.Visible = true;
@@ -238,26 +238,27 @@ namespace AgOpenGPS
             }
 
             //load up colors
-            fieldColorDay = Settings.Default.setDisplay_colorFieldDay;
-            sectionColorDay = Settings.Default.setDisplay_colorSectionsDay;
-            fieldColorNight = Settings.Default.setDisplay_colorFieldNight;
-            sectionColorNight = Settings.Default.setDisplay_colorSectionsNight;
-            dayColor = Settings.Default.setDisplay_colorDayMode;
-            nightColor = Settings.Default.setDisplay_colorNightMode;
+            fieldColorDay = Properties.Settings.Default.setDisplay_colorFieldDay;
+            sectionColorDay = Properties.Settings.Default.setDisplay_colorSectionsDay;
+            fieldColorNight = Properties.Settings.Default.setDisplay_colorFieldNight;
+            sectionColorNight = Properties.Settings.Default.setDisplay_colorSectionsNight;
+            dayColor = Properties.Settings.Default.setDisplay_colorDayMode;
+            nightColor = Properties.Settings.Default.setDisplay_colorNightMode;
 
+            lineWidth = Properties.Settings.Default.setDisplay_lineWidth;
 
             YouTurnButtons(false);
 
-            isLightbarOn = Settings.Default.setMenu_isLightbarOn;
+            isLightbarOn = Properties.Settings.Default.setMenu_isLightbarOn;
             lightbarToolStripMenuItem.Checked = isLightbarOn;
 
             //set up grid and lightbar
 
-            isKeyboardOn = Settings.Default.setDisplay_isKeyboardOn;
+            isKeyboardOn = Properties.Settings.Default.setDisplay_isKeyboardOn;
             keyboardToolStripMenuItem1.Checked = isKeyboardOn;
 
 
-            if (Settings.Default.setMenu_isOGLZoomOn == 1)
+            if (Properties.Settings.Default.setMenu_isOGLZoomOn == 1)
                 topFieldViewToolStripMenuItem.Checked = true;
             else topFieldViewToolStripMenuItem.Checked = false;
 
@@ -268,7 +269,6 @@ namespace AgOpenGPS
             oglZoom.Top = 80;
 
             oglZoom.SendToBack();
-
 
             yt.rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;
             cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
@@ -432,7 +432,7 @@ namespace AgOpenGPS
         private void FixPanelsAndMenus()
         {
             oglMain.Left = statusStripLeft.Width;
-            if (Settings.Default.setDisplay_isSimple)
+            if (Properties.Settings.Default.setDisplay_isSimple)
             {
                 oglMain.Width = Width - 17 - statusStripLeft.Width - layoutPanelRight.Width / 2;
             }
@@ -443,7 +443,7 @@ namespace AgOpenGPS
 
             if (isFullScreen) oglMain.Width += 16;
 
-            if (Settings.Default.setDisplay_isSimple)
+            if (Properties.Settings.Default.setDisplay_isSimple)
             {
                 toolToolbottomStripBtn.Visible = false;
                 vehicleToolStripBtn.Visible = false;
@@ -579,8 +579,7 @@ namespace AgOpenGPS
                         if (yt.isYouTurnTriggered)
                         {
                             yt.ResetYouTurn();
-                            CurveLines.ResetABLine = true;
-                            ABLines.ResetABLine = true;
+                            Guidance.ResetABLine = true;
                         }
                         else
                         {
@@ -595,8 +594,7 @@ namespace AgOpenGPS
                         if (yt.isYouTurnTriggered)
                         {
                             yt.ResetYouTurn();
-                            CurveLines.ResetABLine = true;
-                            ABLines.ResetABLine = true;
+                            Guidance.ResetABLine = true;
                         }
                         else
                         {
@@ -678,7 +676,7 @@ namespace AgOpenGPS
 
             AutoSteerToolBtn.Text = SetSteerAngle + "\r\n" + ActualSteerAngle;
 
-            lblSpeed.Text = Math.Round(avgSpeed / cutoffMetricImperial, 1).ToString();
+            lblSpeed.Text = Math.Round(avgSpeed * Kmh2Unit, Decimals).ToString(GuiFix);
 
             if (isMetric)  //metric or imperial
             {
@@ -697,8 +695,7 @@ namespace AgOpenGPS
                 MinuteCounter++;
 
                 //Make sure it is off when it should
-                if ((!ABLines.BtnABLineOn && !ct.isContourBtnOn && !CurveLines.BtnCurveLineOn && isAutoSteerBtnOn)
-                    || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn))
+                if ((!ct.isContourBtnOn && !Guidance.BtnGuidanceOn && isAutoSteerBtnOn) || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn))
                 {
                     isAutoSteerBtnOn = false;
                     btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
@@ -774,12 +771,8 @@ namespace AgOpenGPS
                 //check to make sure the grid is on the right place
                 worldGrid.CheckWorldGrid(pn.fix.Northing, pn.fix.Easting);
 
-                //not Metric/Standard units sensitive
-                if (ABLines.BtnABLineOn) btnABLine.Text = "# " + ABLines.HowManyPathsAway.ToString();
-                else btnABLine.Text = "";
-
-                if (CurveLines.BtnCurveLineOn) btnCurve.Text = "# " + CurveLines.HowManyPathsAway.ToString();
-                else btnCurve.Text = "";
+                if (Guidance.BtnGuidanceOn) btnGuidance.Text = "# " + Guidance.HowManyPathsAway.ToString();
+                else btnGuidance.Text = "";
 
                 lblDateTime.Text = DateTime.Now.ToString("HH:mm:ss") + "\n\r" + DateTime.Now.ToString("ddd MMM yyyy");
 

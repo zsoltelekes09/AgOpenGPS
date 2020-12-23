@@ -75,8 +75,8 @@ namespace AgOpenGPS
             TboxLatitude.Text = (latitude = Properties.Settings.Default.setNTRIP_manualLat).ToString("N7");
             TboxLongitude.Text = (longitude = Properties.Settings.Default.setNTRIP_manualLon).ToString("N7");
 
-            tboxCurrentLat.Text = mf.pn.latitude.ToString("N7");
-            tboxCurrentLon.Text = mf.pn.longitude.ToString("N7");
+            //tboxCurrentLat.Text = mf.pn.latitude.ToString("N7");
+            //tboxCurrentLon.Text = mf.pn.longitude.ToString("N7");
 
             checkBoxusetcp.Checked = Properties.Settings.Default.setNTRIP_isTCP;
 
@@ -190,8 +190,8 @@ namespace AgOpenGPS
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            tboxCurrentLat.Text = mf.pn.latitude.ToString("N7");
-            tboxCurrentLon.Text = mf.pn.longitude.ToString("N7");
+            //tboxCurrentLat.Text = mf.pn.latitude.ToString("N7");
+            //tboxCurrentLon.Text = mf.pn.longitude.ToString("N7");
         }
 
         public List<string> DataList { get; set; } = new List<string>();
@@ -328,7 +328,7 @@ namespace AgOpenGPS
 
         private void TboxUDPPort_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 65535, udpport, this, true,0))
+            using (var form = new FormNumeric(0, 65535, udpport, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -341,12 +341,12 @@ namespace AgOpenGPS
 
         private void TboxLatitude_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(-90, 90, latitude, this, false,7))
+            using (var form = new FormNumeric(-90, 90, latitude, this, 7, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxLatitude.Text = (latitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                    TboxLatitude.Text = (latitude = form.ReturnValue).ToString("N7");
                 }
             }
             btnSerialCancel.Focus();
@@ -354,12 +354,12 @@ namespace AgOpenGPS
 
         private void TboxLongitude_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(-180, 180, longitude, this, false, 7))
+            using (var form = new FormNumeric(-180, 180, longitude, this, 7, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxLatitude.Text = (longitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                    TboxLatitude.Text = (longitude = form.ReturnValue).ToString("N7");
                 }
             }
             btnSerialCancel.Focus();
@@ -367,7 +367,7 @@ namespace AgOpenGPS
 
         private void TboxGGAInterval_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 600, ggainterval, this, true, 0))
+            using (var form = new FormNumeric(0, 600, ggainterval, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -380,7 +380,7 @@ namespace AgOpenGPS
 
         private void TboxCasterPort_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 65535, casterport, this, true, 0))
+            using (var form = new FormNumeric(0, 65535, casterport, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)

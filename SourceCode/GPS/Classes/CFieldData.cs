@@ -110,8 +110,8 @@ namespace AgOpenGPS
             {
                 if (mf.pn.speed > 2 && mf.Guidance.GuidanceWidth > 0)
                 {
-                    var timeSpan = TimeSpan.FromHours(((areaBoundaryOuterLessInner - workedAreaTotal) * Glm.m2ha
-                        / (mf.Guidance.GuidanceWidth * mf.pn.speed * 0.1)));
+                    var timeSpan = TimeSpan.FromHours((areaBoundaryOuterLessInner - workedAreaTotal) * Glm.m2ha
+                        / (mf.Guidance.GuidanceWidth * mf.pn.speed * 0.1));
 
                     if (timeSpan.Days > 0) return timeSpan.TotalDays.ToString("N0") + " \n Days";
                     else return timeSpan.Hours.ToString("00") + ":" + timeSpan.Minutes.ToString("00");

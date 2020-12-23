@@ -73,12 +73,12 @@ namespace AgOpenGPS
 
         private void TboxLatitude_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(-90, 90, latitude, this, false, 7))
+            using (var form = new FormNumeric(-90, 90, latitude, this, 7, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxLatitude.Text = (latitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                    TboxLatitude.Text = (latitude = form.ReturnValue).ToString("N7");
                 }
             }
             btnCancel.Focus();
@@ -86,12 +86,12 @@ namespace AgOpenGPS
 
         private void TboxLongitude_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(-180, 180, longitude, this, false, 7))
+            using (var form = new FormNumeric(-180, 180, longitude, this, 7, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxLongitude.Text = (longitude = Math.Round(form.ReturnValue, 7)).ToString("N7");
+                    TboxLongitude.Text = (longitude = form.ReturnValue).ToString("N7");
                 }
             }
             btnCancel.Focus();

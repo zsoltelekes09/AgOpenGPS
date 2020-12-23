@@ -12,8 +12,8 @@ namespace AgOpenGPS
 
         private double antennaHeight, antennaOffset, antennaPivot, wheelbase, minTurningRadius, hydliftsecs;
 
-        private bool isPivotBehindAntenna, isSteerAxleAhead;
-        private int snapDistance, vehicleType, lightbarCmPerPixie, linewidth;
+        private bool isSteerAxleAhead;
+        private int isPivotBehindAntenna, snapDistance, vehicleType, lightbarCmPerPixie, linewidth;
 
         //constructor
         public FormSettings(Form callingForm, int page)
@@ -28,7 +28,7 @@ namespace AgOpenGPS
             gboxAttachment.Text = String.Get("gsVehicleType");
             label6.Text = String.Get("gsTurnRadius");
             label26.Text = String.Get("gsWheelbase");
-            label9.Text = String.Get("gsLeftIs_");
+            label9.Text = String.Get("gsLeftIs-");
             label15.Text = String.Get("gsHeight");
             label7.Text = String.Get("gsOffset");
             label18.Text = String.Get("gsDistance");
@@ -67,18 +67,21 @@ namespace AgOpenGPS
             FixRadioButtonsAndImages();
 
             //SettingsTab
-            TboxAntennaPivot.Text = (antennaPivot = Math.Round(Math.Abs(Properties.Vehicle.Default.setVehicle_antennaPivot) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxAntennaPivot.CheckValue(ref antennaPivot, 0, Math.Round(10 * mf.m2MetImp, mf.decimals));
-            TboxAntennaHeight.Text = (antennaHeight = Math.Round(Properties.Vehicle.Default.setVehicle_antennaHeight * mf.m2MetImp, mf.decimals)).ToString();
-            TboxAntennaHeight.CheckValue(ref antennaHeight, 0, Math.Round(10 * mf.m2MetImp, mf.decimals));
-            TboxWheelbase.Text = (wheelbase = Math.Round(Math.Abs(Properties.Vehicle.Default.setVehicle_wheelbase) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxWheelbase.CheckValue(ref wheelbase, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
-            TboxAntennaOffset.Text = (antennaOffset = Math.Round(Properties.Vehicle.Default.setVehicle_antennaOffset * mf.m2MetImp, mf.decimals)).ToString();
-            TboxAntennaOffset.CheckValue(ref antennaHeight, Math.Round(-10 * mf.m2MetImp, mf.decimals), Math.Round(10 * mf.m2MetImp, mf.decimals));
+            TboxAntennaPivot.Text = ((antennaPivot = Properties.Vehicle.Default.setVehicle_antennaPivot) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxAntennaPivot.CheckValue(ref antennaPivot, 0, 10);
+            TboxAntennaHeight.Text = ((antennaHeight = Properties.Vehicle.Default.setVehicle_antennaHeight) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxAntennaHeight.CheckValue(ref antennaHeight, 0, 10);
+            TboxWheelbase.Text = ((wheelbase = Math.Abs(Properties.Vehicle.Default.setVehicle_wheelbase)) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxWheelbase.CheckValue(ref wheelbase, 0, 20);
+            TboxAntennaOffset.Text = ((antennaOffset = Properties.Vehicle.Default.setVehicle_antennaOffset) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxAntennaOffset.CheckValue(ref antennaOffset, -10, 10);
+
+
 
             //VehicleTab
-            TboxMinTurnRadius.Text = (minTurningRadius = Math.Round(Properties.Vehicle.Default.setVehicle_minTurningRadius * mf.m2MetImp, mf.decimals)).ToString();
-            TboxMinTurnRadius.CheckValue(ref minTurningRadius, Math.Round(0.5 * mf.m2MetImp, mf.decimals), Math.Round(100 * mf.m2MetImp, mf.decimals));
+            TboxMinTurnRadius.Text = ((minTurningRadius = Properties.Vehicle.Default.setVehicle_minTurningRadius) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxMinTurnRadius.CheckValue(ref minTurningRadius, 0.5, 100);
+
             TboxHydLiftSecs.Text = (hydliftsecs = Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead).ToString("0.0#");
             TboxHydLiftSecs.CheckValue(ref hydliftsecs, 0, 20);
 
@@ -100,19 +103,30 @@ namespace AgOpenGPS
             Properties.Vehicle.Default.setVehicle_vehicleType = mf.vehicle.vehicleType = vehicleType;
 
             //SettingsTab
-            Properties.Vehicle.Default.setVehicle_antennaPivot = mf.vehicle.antennaPivot = Math.Round(antennaPivot * mf.metImp2m, 2) * (isPivotBehindAntenna ? 1 : -1);
-            Properties.Vehicle.Default.setVehicle_antennaHeight = mf.vehicle.antennaHeight = Math.Round(antennaHeight * mf.metImp2m, 2);
-            Properties.Vehicle.Default.setVehicle_wheelbase = mf.vehicle.wheelbase = Math.Round(wheelbase * mf.metImp2m, 2) * (isSteerAxleAhead ? 1 : -1);
-            Properties.Vehicle.Default.setVehicle_antennaOffset = mf.vehicle.antennaOffset = Math.Round(antennaOffset * mf.metImp2m, 2);
+            Properties.Vehicle.Default.setVehicle_antennaPivot = mf.vehicle.antennaPivot = antennaPivot * isPivotBehindAntenna;
+            Properties.Vehicle.Default.setVehicle_antennaHeight = mf.vehicle.antennaHeight = antennaHeight;
+            Properties.Vehicle.Default.setVehicle_wheelbase = mf.vehicle.wheelbase = wheelbase * (isSteerAxleAhead ? 1 : -1);
+            Properties.Vehicle.Default.setVehicle_antennaOffset = mf.vehicle.antennaOffset = antennaOffset;
 
             //VehicleTab
             Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead = mf.vehicle.hydLiftLookAheadTime = hydliftsecs;
-            Properties.Vehicle.Default.setVehicle_minTurningRadius = mf.vehicle.minTurningRadius = Math.Round(minTurningRadius * mf.metImp2m, 2);
+            Properties.Vehicle.Default.setVehicle_minTurningRadius = mf.vehicle.minTurningRadius = minTurningRadius;
+
+            if (Properties.Vehicle.Default.UturnTriggerDistance < mf.vehicle.minTurningRadius)
+            {
+                Properties.Vehicle.Default.UturnTriggerDistance = mf.vehicle.minTurningRadius;
+
+                for (int i = 0; i < mf.bnd.bndArr.Count; i++)
+                {
+                    mf.StartTasks(mf.bnd.bndArr[i], i, TaskName.TurnLine);
+                }
+
+            }
 
             //GuidanceTab
             Properties.Settings.Default.setAS_snapDistance = snapDistance;
             Properties.Settings.Default.setDisplay_lightbarCmPerPixel = mf.lightbarCmPerPixel = lightbarCmPerPixie;
-            Properties.Settings.Default.setDisplay_lineWidth = mf.ABLines.lineWidth = linewidth;
+            Properties.Settings.Default.setDisplay_lineWidth = mf.lineWidth = linewidth;
 
             Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
@@ -132,7 +146,7 @@ namespace AgOpenGPS
 
             btnNext.Focus();
 
-            isPivotBehindAntenna = vehicleType != 2;//4WD
+            isPivotBehindAntenna = vehicleType == 2 ? -1 : 1;//4WD
             isSteerAxleAhead = vehicleType == 0;//harvestor
         }
 
@@ -177,12 +191,12 @@ namespace AgOpenGPS
         #region SettingsTab
         private void TboxAntennaPivot_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(10 * mf.m2MetImp, mf.decimals), antennaPivot, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, 10, antennaPivot, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxAntennaPivot.Text = (antennaPivot = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxAntennaPivot.Text = ((antennaPivot = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -190,12 +204,12 @@ namespace AgOpenGPS
 
         private void TboxAntennaHeight_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(10 * mf.m2MetImp, mf.decimals), antennaHeight, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, 10, antennaHeight, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxAntennaHeight.Text = (antennaHeight = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxAntennaHeight.Text = ((antennaHeight = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -203,12 +217,12 @@ namespace AgOpenGPS
 
         private void TboxWheelbase_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), wheelbase, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, 20, wheelbase, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxWheelbase.Text = (wheelbase = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxWheelbase.Text = ((wheelbase = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -216,12 +230,12 @@ namespace AgOpenGPS
 
         private void TboxAntennaOffset_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(-10 * mf.m2MetImp, mf.decimals), Math.Round(10 * mf.m2MetImp, mf.decimals), antennaOffset, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(-10, 10, antennaOffset, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxAntennaOffset.Text = (antennaOffset = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxAntennaOffset.Text = ((antennaOffset = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -231,12 +245,12 @@ namespace AgOpenGPS
         private void TboxHydLiftSecs_Enter(object sender, EventArgs e)
         {
 
-            using (var form = new FormNumeric(0, 20, hydliftsecs, this, false,2))
+            using (var form = new FormNumeric(0, 20, hydliftsecs, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxHydLiftSecs.Text = (hydliftsecs = Math.Round(form.ReturnValue, 2)).ToString("0.0#");
+                    TboxHydLiftSecs.Text = (hydliftsecs = form.ReturnValue).ToString("0.0#");
                 }
             }
             btnCancel.Focus();
@@ -244,12 +258,12 @@ namespace AgOpenGPS
 
         private void TboxMinTurnRadius_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(0.5 * mf.m2MetImp, mf.decimals), Math.Round(100 * mf.m2MetImp, mf.decimals), minTurningRadius, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0.5, 100, minTurningRadius, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxMinTurnRadius.Text = (minTurningRadius = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxMinTurnRadius.Text = ((minTurningRadius = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -258,7 +272,7 @@ namespace AgOpenGPS
         #region GuidanceTab
         private void TboxSnapDistance_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 500, snapDistance, this, true, 0))
+            using (var form = new FormNumeric(1, 500, snapDistance, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -271,7 +285,7 @@ namespace AgOpenGPS
 
         private void TboxLightbarCmPerPixel_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 20, lightbarCmPerPixie, this, true, 0))
+            using (var form = new FormNumeric(1, 20, lightbarCmPerPixie, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -284,7 +298,7 @@ namespace AgOpenGPS
 
         private void TboxLineWidth_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 8, linewidth, this, true, 0))
+            using (var form = new FormNumeric(1, 8, linewidth, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)

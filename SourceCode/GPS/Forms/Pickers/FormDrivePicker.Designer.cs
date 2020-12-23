@@ -72,7 +72,7 @@
             this.btnOpenExistingLv.BackColor = System.Drawing.Color.Transparent;
             this.btnOpenExistingLv.DialogResult = System.Windows.Forms.DialogResult.Yes;
             this.btnOpenExistingLv.Font = new System.Drawing.Font("Tahoma", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnOpenExistingLv.Image = global::AgOpenGPS.Properties.Resources.FileOpen;
+            this.btnOpenExistingLv.Image = global::AgOpenGPS.Properties.Resources.FileLoad;
             this.btnOpenExistingLv.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnOpenExistingLv.Location = new System.Drawing.Point(730, 330);
             this.btnOpenExistingLv.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);

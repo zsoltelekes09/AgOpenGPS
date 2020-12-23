@@ -34,7 +34,6 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tboxThisIP = new System.Windows.Forms.TextBox();
-            this.nudThisPort = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -45,17 +44,16 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.nudAutoSteerPort = new System.Windows.Forms.NumericUpDown();
             this.tboxAutoSteerIP = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.TboxAutoSteerPort = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.cboxIsUDPOn = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.cboxIsInterAppOn = new System.Windows.Forms.CheckBox();
+            this.TboxAogPort = new System.Windows.Forms.TextBox();
             this.groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudThisPort)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAutoSteerPort)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -63,12 +61,12 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.TboxAogPort);
             this.groupBox4.Controls.Add(this.label11);
             this.groupBox4.Controls.Add(this.tboxHostName);
             this.groupBox4.Controls.Add(this.label14);
             this.groupBox4.Controls.Add(this.label1);
             this.groupBox4.Controls.Add(this.tboxThisIP);
-            this.groupBox4.Controls.Add(this.nudThisPort);
             this.groupBox4.Controls.Add(this.label9);
             this.groupBox4.Controls.Add(this.label10);
             this.groupBox4.Controls.Add(this.label2);
@@ -93,6 +91,7 @@
             // tboxHostName
             // 
             this.tboxHostName.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tboxHostName.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tboxHostName.Location = new System.Drawing.Point(57, 79);
             this.tboxHostName.Name = "tboxHostName";
             this.tboxHostName.ReadOnly = true;
@@ -123,35 +122,13 @@
             // tboxThisIP
             // 
             this.tboxThisIP.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tboxThisIP.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tboxThisIP.Location = new System.Drawing.Point(54, 120);
             this.tboxThisIP.Name = "tboxThisIP";
             this.tboxThisIP.ReadOnly = true;
             this.tboxThisIP.Size = new System.Drawing.Size(157, 30);
             this.tboxThisIP.TabIndex = 73;
             this.tboxThisIP.Text = "192.168.1.255";
-            // 
-            // nudThisPort
-            // 
-            this.nudThisPort.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudThisPort.Location = new System.Drawing.Point(54, 162);
-            this.nudThisPort.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.nudThisPort.Minimum = new decimal(new int[] {
-            1025,
-            0,
-            0,
-            0});
-            this.nudThisPort.Name = "nudThisPort";
-            this.nudThisPort.Size = new System.Drawing.Size(96, 30);
-            this.nudThisPort.TabIndex = 74;
-            this.nudThisPort.Value = new decimal(new int[] {
-            9999,
-            0,
-            0,
-            0});
             // 
             // label9
             // 
@@ -263,32 +240,10 @@
             this.label6.TabIndex = 81;
             this.label6.Text = "Port";
             // 
-            // nudAutoSteerPort
-            // 
-            this.nudAutoSteerPort.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nudAutoSteerPort.Location = new System.Drawing.Point(70, 143);
-            this.nudAutoSteerPort.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.nudAutoSteerPort.Minimum = new decimal(new int[] {
-            1025,
-            0,
-            0,
-            0});
-            this.nudAutoSteerPort.Name = "nudAutoSteerPort";
-            this.nudAutoSteerPort.Size = new System.Drawing.Size(96, 30);
-            this.nudAutoSteerPort.TabIndex = 80;
-            this.nudAutoSteerPort.Value = new decimal(new int[] {
-            8888,
-            0,
-            0,
-            0});
-            // 
             // tboxAutoSteerIP
             // 
             this.tboxAutoSteerIP.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tboxAutoSteerIP.ForeColor = System.Drawing.SystemColors.ControlText;
             this.tboxAutoSteerIP.Location = new System.Drawing.Point(70, 95);
             this.tboxAutoSteerIP.Name = "tboxAutoSteerIP";
             this.tboxAutoSteerIP.Size = new System.Drawing.Size(167, 30);
@@ -299,9 +254,9 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.TboxAutoSteerPort);
             this.groupBox1.Controls.Add(this.label8);
             this.groupBox1.Controls.Add(this.tboxAutoSteerIP);
-            this.groupBox1.Controls.Add(this.nudAutoSteerPort);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
@@ -313,6 +268,19 @@
             this.groupBox1.TabIndex = 91;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Module Adress and Ports";
+            // 
+            // TboxAutoSteerPort
+            // 
+            this.TboxAutoSteerPort.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxAutoSteerPort.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxAutoSteerPort.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxAutoSteerPort.Location = new System.Drawing.Point(70, 143);
+            this.TboxAutoSteerPort.Name = "TboxAutoSteerPort";
+            this.TboxAutoSteerPort.Size = new System.Drawing.Size(100, 33);
+            this.TboxAutoSteerPort.TabIndex = 95;
+            this.TboxAutoSteerPort.Text = "8888";
+            this.TboxAutoSteerPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxAutoSteerPort.Enter += new System.EventHandler(this.TboxAutoSteerPort_Enter);
             // 
             // label8
             // 
@@ -379,10 +347,24 @@
             this.cboxIsInterAppOn.Text = "Inter App On";
             this.cboxIsInterAppOn.UseVisualStyleBackColor = true;
             // 
+            // TboxAogPort
+            // 
+            this.TboxAogPort.BackColor = System.Drawing.SystemColors.Control;
+            this.TboxAogPort.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TboxAogPort.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TboxAogPort.Location = new System.Drawing.Point(54, 162);
+            this.TboxAogPort.Name = "TboxAogPort";
+            this.TboxAogPort.Size = new System.Drawing.Size(100, 33);
+            this.TboxAogPort.TabIndex = 96;
+            this.TboxAogPort.Text = "9999";
+            this.TboxAogPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TboxAogPort.Enter += new System.EventHandler(this.TboxAogPort_Enter);
+            // 
             // FormUDP
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ClientSize = new System.Drawing.Size(590, 546);
             this.ControlBox = false;
             this.Controls.Add(this.groupBox3);
@@ -393,7 +375,7 @@
             this.Controls.Add(this.btnSerialCancel);
             this.Controls.Add(this.btnSerialOK);
             this.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -404,8 +386,6 @@
             this.Load += new System.EventHandler(this.FormUDp_Load);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudThisPort)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudAutoSteerPort)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -427,11 +407,9 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.NumericUpDown nudAutoSteerPort;
         private System.Windows.Forms.TextBox tboxAutoSteerIP;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox tboxThisIP;
-        private System.Windows.Forms.NumericUpDown nudThisPort;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label2;
@@ -444,5 +422,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox cboxIsInterAppOn;
+        private System.Windows.Forms.TextBox TboxAutoSteerPort;
+        private System.Windows.Forms.TextBox TboxAogPort;
     }
 }

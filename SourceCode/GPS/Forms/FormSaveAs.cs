@@ -237,15 +237,14 @@ namespace AgOpenGPS
                     if (File.Exists(fileToCopy))
                         File.Copy(fileToCopy, destinationDirectory);
 
-                    fileToCopy = templateDirectoryName + "\\CurveLines.txt";
-                    destinationDirectory = directoryName + "\\CurveLines.txt";
+                    fileToCopy = templateDirectoryName + "\\GuidanceLines.txt";
+                    destinationDirectory = directoryName + "\\GuidanceLines.txt";
                     if (File.Exists(fileToCopy))
                         File.Copy(fileToCopy, destinationDirectory);
                 }
                 else
                 {
-                    mf.FileSaveABLines();
-                    mf.FileSaveCurveLines();
+                    mf.FileSaveGuidanceLines();
                     mf.FileSaveRecPath();
                 }
 

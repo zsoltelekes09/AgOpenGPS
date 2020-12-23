@@ -15,9 +15,9 @@ namespace AgOpenGPS
 
         public Vec3(double northing, double easting, double heading)
         {
-            this.Northing = northing;
-            this.Easting = easting;
-            this.Heading = heading;
+            Northing = northing;
+            Easting = easting;
+            Heading = heading;
         }
 
         public static Vec3 operator *(Vec3 self, double s)
@@ -61,10 +61,33 @@ namespace AgOpenGPS
     public class ToolSettings
     {
         public double LookAheadOn = 1, LookAheadOff = 0.8, TurnOffDelay = 0, MappingOnDelay = 0.95, MappingOffDelay = 0.85;
-        public double ToolWheelLength = -6, TankWheelLength = -1.5, ToolHitchLength = -0.5, TankHitchLength = -0.5, HitchLength = -0.5, ToolOffset = 0, SlowSpeedCutoff = 0;
+        public double ToolWheelLength = 6, TankWheelLength = 1.5, ToolHitchLength = 0.5, TankHitchLength = 0.5, HitchLength = 0.5, ToolOffset = 0, SlowSpeedCutoff = 0;
         public bool BehindPivot = true, Trailing = false, TBT = false;
         public int MinApplied = 0;
         public List<double[]> Sections = new List<double[]> {};
+        public ToolSettings()
+        {}
+
+        public ToolSettings(ToolSettings settings)
+        {
+            LookAheadOn = settings.LookAheadOn;
+            LookAheadOff = settings.LookAheadOff;
+            TurnOffDelay = settings.TurnOffDelay;
+            MappingOnDelay = settings.MappingOnDelay;
+            MappingOffDelay = settings.MappingOffDelay;
+            ToolWheelLength = settings.ToolWheelLength;
+            TankWheelLength = settings.TankWheelLength;
+            ToolHitchLength = settings.ToolHitchLength;
+            TankHitchLength = settings.TankHitchLength;
+            HitchLength = settings.HitchLength;
+            ToolOffset = settings.ToolOffset;
+            SlowSpeedCutoff = settings.SlowSpeedCutoff;
+            BehindPivot = settings.BehindPivot;
+            Trailing = settings.Trailing;
+            TBT = settings.TBT;
+            MinApplied = settings.MinApplied;
+            Sections = settings.Sections;
+        }
     }
 
     public struct Vec2
@@ -76,6 +99,11 @@ namespace AgOpenGPS
         {
             Easting = easting;
             Northing = northing;
+        }
+        public Vec2(Vec3 point)
+        {
+            Easting = point.Easting;
+            Northing = point.Northing;
         }
 
         public Vec2 Normalize()
@@ -102,6 +130,10 @@ namespace AgOpenGPS
         public static Vec2 operator *(Vec2 self, double s)
         {
             return new Vec2(self.Northing * s, self.Easting * s);
+        }
+        public static Vec2 operator /(Vec2 self, double s)
+        {
+            return new Vec2(self.Northing / s, self.Easting / s);
         }
 
         public static Vec2 operator +(Vec2 lhs, Vec2 rhs)

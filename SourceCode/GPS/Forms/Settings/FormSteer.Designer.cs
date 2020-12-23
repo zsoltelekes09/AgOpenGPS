@@ -111,8 +111,8 @@
             this.pbActPos = new System.Windows.Forms.ProgressBar();
             this.pbSetPos = new System.Windows.Forms.ProgressBar();
             this.BtnMinus20 = new System.Windows.Forms.Button();
-            this.BtnSteerAngleDown = new ProXoft.WinForms.RepeatButton();
-            this.BtnSteerAngleUp = new ProXoft.WinForms.RepeatButton();
+            this.BtnSteerAngleDown = new System.Windows.Forms.Button();
+            this.BtnSteerAngleUp = new System.Windows.Forms.Button();
             this.BtnFreeDriveZero = new System.Windows.Forms.Button();
             this.lblError = new System.Windows.Forms.Label();
             this.lblSteerAngle = new System.Windows.Forms.Label();
@@ -882,7 +882,7 @@
             this.hsbarAvgXTE.Size = new System.Drawing.Size(285, 30);
             this.hsbarAvgXTE.TabIndex = 342;
             this.hsbarAvgXTE.Value = 5;
-            this.hsbarAvgXTE.ValueChanged += new System.EventHandler(this.hsbarAvgXTE_ValueChanged);
+            this.hsbarAvgXTE.ValueChanged += new System.EventHandler(this.HsbarAvgXTE_ValueChanged);
             // 
             // label17
             // 
@@ -925,7 +925,7 @@
             this.hsbarIntegralGain.Size = new System.Drawing.Size(285, 30);
             this.hsbarIntegralGain.TabIndex = 337;
             this.hsbarIntegralGain.Value = 5;
-            this.hsbarIntegralGain.ValueChanged += new System.EventHandler(this.hsbarIntegralGain_ValueChanged);
+            this.hsbarIntegralGain.ValueChanged += new System.EventHandler(this.HsbarIntegralGain_ValueChanged);
             // 
             // label21
             // 
@@ -1099,6 +1099,7 @@
             this.BtnSteerAngleDown.TabIndex = 343;
             this.BtnSteerAngleDown.UseVisualStyleBackColor = true;
             this.BtnSteerAngleDown.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSteerAngleDown_MouseDown);
+            this.BtnSteerAngleDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // BtnSteerAngleUp
             // 
@@ -1113,6 +1114,7 @@
             this.BtnSteerAngleUp.TabIndex = 344;
             this.BtnSteerAngleUp.UseVisualStyleBackColor = true;
             this.BtnSteerAngleUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnSteerAngleUp_MouseDown);
+            this.BtnSteerAngleUp.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // BtnFreeDriveZero
             // 
@@ -1370,8 +1372,8 @@
         private System.Windows.Forms.ProgressBar pbActPos;
         private System.Windows.Forms.ProgressBar pbSetPos;
         private System.Windows.Forms.Button BtnMinus20;
-        private ProXoft.WinForms.RepeatButton BtnSteerAngleDown;
-        private ProXoft.WinForms.RepeatButton BtnSteerAngleUp;
+        private System.Windows.Forms.Button BtnSteerAngleDown;
+        private System.Windows.Forms.Button BtnSteerAngleUp;
         private System.Windows.Forms.Button BtnFreeDriveZero;
         private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Label lblSteerAngle;

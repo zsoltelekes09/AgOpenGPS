@@ -263,9 +263,6 @@ namespace AgOpenGPS
         {
             //GPS phrase
             textBoxRcv.Lines = mf.recvSentenceSettings;
-
-            tBoxSend.Lines = mf.DataSend;
-            tBoxRecieved.Lines = mf.DataRecieved;
         }
 
         private void BtnSerialOK_Click(object sender, EventArgs e)

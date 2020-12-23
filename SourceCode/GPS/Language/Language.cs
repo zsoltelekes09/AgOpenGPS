@@ -8,10 +8,15 @@ namespace AgOpenGPS
 
         internal static string Get(string str)
         {
-            string LanguageString = ResourceManager.GetString(str, Culture);
-            if (LanguageString == null && resourceManEn != null)
-                LanguageString = resourceManEn.GetString(str, Culture);
-            return LanguageString;
+            if (Culture != null)
+            {
+                string LanguageString = ResourceManager.GetString(str, Culture);
+                if (LanguageString == null && resourceManEn != null)
+                    LanguageString = resourceManEn.GetString(str, Culture);
+                if (LanguageString == null) return str;
+                else return LanguageString;
+            }
+            else return "Error No Culture";
         }
 
         private static ResourceManager resourceMan;

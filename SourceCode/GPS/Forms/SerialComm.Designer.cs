@@ -1,8 +1,7 @@
-﻿using System.IO.Ports;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.IO.Ports;
 using System.Windows.Forms;
-using AgOpenGPS.Properties;
-using System.Globalization;
 
 namespace AgOpenGPS
 {
@@ -27,7 +26,7 @@ namespace AgOpenGPS
         //called by the AutoSteer module delegate every time a chunk is rec'd
         public double actualSteerAngleDisp = 0;
 
-        public string[] DataSend = new string[9];
+        public string[] DataSend = new string[20];
         public string[] DataRecieved = new string[9];
 
         public string[] recvSentenceSettings = new string[4];
@@ -48,63 +47,10 @@ namespace AgOpenGPS
         int spAutoSteerIdx = 0;
         public byte[] spAutoSteerBytes = new byte[3] { 0x7F, 0, 0 };
 
-        int spUBXHeaderIdx = 0;
-        public byte[] spUBXMessage = new byte[3] { 0xB5, 0x62, 0x01 };
-
-
-        public void SendData(byte[] Data, bool Checksum)
-        {
-            for (int i = 7; i > 0; i--) DataSend[i] = DataSend[i - 1];
-            DataSend[0] = DataSend[8];
-
-            if (spAutoSteer.IsOpen)
-            {
-                try { spAutoSteer.Write(Data, 0, Data.Length); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Out Steer Port " + e.ToString());
-                    SerialPortAutoSteerClose();
-                }
-            }
-
-            if (spMachine.IsOpen)
-            {
-                try { spMachine.Write(Data, 0, Data.Length); }
-                catch (Exception e)
-                {
-                    WriteErrorLog("Out Machine Port " + e.ToString());
-                    SerialPortMachineClose();
-                }
-            }
-
-            //send out to udp network
-            if (Properties.Settings.Default.setUDP_isOn)
-            {
-                if (isUDPSendConnected)
-                {
-                    try
-                    {
-                        if (Data.Length != 0)
-                        {
-                            sendSocket.BeginSendTo(Data, 0, Data.Length, 0, epAutoSteer, new AsyncCallback(SendData), null);
-                        }
-                    }
-                    catch (Exception) { }
-                }
-            }
-
-            if (Checksum)
-            {
-                int tt = Data[2];
-                checksumSent = 0;
-                for (int i = 3; i < Data[2]; i++)
-                {
-                    checksumSent += Data[i];
-                }
-            }
-        }
-
-
+        int UBXMessageIdx = 0;
+        int UBXMessageLength = 8;
+        public List<byte> UBXMessage = new List<byte>() { 0xB5, 0x62 };
+        
         #region AutoSteerPort // --------------------------------------------------------------------
 
         //Arduino serial port receive in its own thread
@@ -117,37 +63,33 @@ namespace AgOpenGPS
                     while (spAutoSteer.BytesToRead > 0)
                     {
                         int Data = spAutoSteer.ReadByte();
-
-                        if (spUBXHeaderIdx < 3)
+                        if (UBXMessageIdx < 2)
                         {
-                            if (spUBXMessage[spUBXHeaderIdx] == Data) spUBXHeaderIdx++;
-                            else spUBXHeaderIdx = 0;
-                        }
-                        if (spAutoSteerIdx == 0 && spUBXHeaderIdx < 3)
-                        {
-                            if (Data == spAutoSteerBytes[spAutoSteerIdx]) spAutoSteerIdx++;
-                            else spAutoSteerIdx = 0;
-                        }
-                        else if (spUBXHeaderIdx < 3)
-                        {
-                            spAutoSteerBytes[spAutoSteerIdx] = (byte)Data;
-                            if (spAutoSteerIdx == 2) Array.Resize(ref spAutoSteerBytes, Math.Max((int)spAutoSteerBytes[spAutoSteerIdx], 3));
-
-                            if (++spAutoSteerIdx >= spAutoSteerBytes.Length)
-                            {
-                                BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spAutoSteerBytes)));
-                                spAutoSteerIdx = 0;
-                            }
+                            if (UBXMessage[UBXMessageIdx] == Data) UBXMessageIdx++;
+                            else UBXMessageIdx = 0;
                         }
                         else
                         {
-                            spUBXMessage[spUBXHeaderIdx] = (byte)Data;
-                            if (spUBXHeaderIdx == 5) Array.Resize(ref spUBXMessage, Math.Max((spUBXMessage[4] + (spUBXMessage[5] << 8)) + 8, 8));
+                            UBXMessage.Add((byte)Data);
 
-                            if (++spUBXHeaderIdx >= spUBXMessage.Length)
+                            if (UBXMessageIdx == 5)
+                                UBXMessageLength = Math.Max((UBXMessage[4] + (UBXMessage[5] << 8)) + 8, 8);
+
+                            if (UBXMessageIdx >= UBXMessageLength)
                             {
-                                BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spUBXMessage)));
-                                spUBXHeaderIdx = 0;
+                                int CK_A = 0;
+                                int CK_B = 0;
+
+                                for (int j = 2; j < UBXMessageLength-2; j++)// start with Class and end by Checksum
+                                {
+                                    CK_A = (CK_A + UBXMessage[j]) & 0xFF;
+                                    CK_B = (CK_B + CK_A) & 0xFF;
+                                }
+
+                                if (UBXMessage[UBXMessageLength - 2] == CK_A && UBXMessage[UBXMessageLength - 1] == CK_B)
+                                    BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, UBXMessage.ToArray())));
+                                UBXMessageIdx = 0;
+                                UBXMessage.RemoveRange(2, UBXMessageIdx);
                             }
                         }
                     }
@@ -344,8 +286,8 @@ namespace AgOpenGPS
                 panelSim.Visible = false;
                 timerSim.Enabled = false;
 
-                Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
-                Settings.Default.Save();
+                Properties.Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
+                Properties.Settings.Default.Save();
             }
 
 

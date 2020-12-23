@@ -804,7 +804,7 @@
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.bntOK);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormIMU";

@@ -7,45 +7,46 @@ namespace AgOpenGPS
     {
         //access to the main GPS form and all its variables
         private readonly FormGPS mf;
-        readonly dynamic CurveMode;
         private double snapAdj = 0;
+        private readonly Timer Timer = new Timer();
+        private byte TimerMode = 0;
 
-        public FormTram(Form callingForm, bool mode)
+        public FormTram(Form callingForm)
         {
             //get copy of the calling main form
             Owner = mf = callingForm as FormGPS;
 
             InitializeComponent();
+            Timer.Tick += new EventHandler(TimerRepeat_Tick);
 
             this.Text = String.Get("gsTramLines");
             lblSmallSnapRight.Text = String.Get("gsWidth");
             label1.Text = String.Get("gsTrack");
             label3.Text = String.Get("gsPasses");
 
-            CurveMode = mode;
-
-            if (CurveMode) mf.CurveLines.CurrentEditLine = mf.CurveLines.CurrentLine;
-            else mf.ABLines.CurrentEditLine = mf.ABLines.CurrentLine;
+            CurrentLineIdx.Text = (mf.Guidance.CurrentTramLine + 1).ToString() + " of " + mf.Guidance.Lines.Count.ToString();
+            if (mf.Guidance.CurrentTramLine > -1 && mf.Guidance.CurrentTramLine < mf.Guidance.Lines.Count)
+                lblGuidanceName.Text = mf.Guidance.Lines[mf.Guidance.CurrentTramLine].Name;
+            else
+                lblGuidanceName.Text = "***";
         }
 
         private void FormTram_Load(object sender, EventArgs e)
         {
-            //snapAdj = Properties.Settings.Default.setTram_eqWidth/2;
-            snapAdj = Math.Round(mf.Guidance.WidthMinusOverlap / 2, mf.decimals);
-            TboxSnapAdj.Text = Math.Round(snapAdj * mf.m2MetImp, mf.decimals).ToString();
+            snapAdj = Math.Round(mf.Guidance.WidthMinusOverlap / 2, 2);
+            TboxSnapAdj.Text = (snapAdj * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
 
-            TboxWheelTrack.Text = Math.Round(mf.tram.wheelTrack * mf.m2MetImp, mf.decimals).ToString();
-            TboxWheelWidth.Text = Math.Round(mf.tram.WheelWidth * mf.m2MetImp, mf.decimals).ToString();
-            TboxOffset.Text = Math.Round(mf.tram.abOffset * mf.m2MetImp, mf.decimals).ToString();
-            TboxTramWidth.Text = Math.Round(mf.tram.tramWidth * mf.m2MetImp, mf.decimals).ToString();
+            TboxWheelTrack.Text = (mf.tram.wheelTrack * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
+            TboxWheelWidth.Text = (mf.tram.WheelWidth * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
+            TboxOffset.Text = (mf.tram.abOffset * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
+            TboxTramWidth.Text = (mf.tram.tramWidth * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
             TboxPasses.Text = mf.tram.passes.ToString();
-            label2.Text = Math.Round(0.1 * mf.m2MetImp, mf.decimals).ToString() + (mf.isMetric ? " (Cm)" : " Inch?");
+            label2.Text = (0.1 * mf.Mtr2Unit).ToString(mf.GuiFix) + (mf.isMetric ? " (Mtr)" : " Inch?");
             //if off, turn it on because they obviously want a tram.
             if (mf.tram.displayMode == 0)
             {
                 mf.tram.displayMode = 1;
-                if (CurveMode) mf.CurveLines.BuildTram();
-                else mf.ABLines.BuildTram();
+                mf.Guidance.BuildTram();
             }
 
             switch (mf.tram.displayMode)
@@ -70,111 +71,90 @@ namespace AgOpenGPS
 
         private void BtnExit_Click(object sender, EventArgs e)
         {
-            if (CurveMode)
-            {
-                mf.FileSaveCurveLines();
-                mf.CurveLines.isEditing = false;
-                mf.CurveLines.CurrentEditLine = -1;
-            }
-            else
-            {
-                mf.FileSaveABLines();
-                mf.ABLines.isEditing = false;
-                mf.ABLines.CurrentEditLine = -1;
-            }
-
+            mf.FileSaveGuidanceLines();
             Close();
         }
 
         private void BtnLeft_Click(object sender, EventArgs e)
         {
-            if (CurveMode)
-            {
-                mf.CurveLines.MoveLine(-0.1);
-                mf.CurveLines.BuildTram();
-            }
-            else
-            {
-                mf.ABLines.MoveLine(-0.1);
-                mf.ABLines.BuildTram();
-            }
+            mf.Guidance.MoveLine(mf.Guidance.CurrentTramLine, -0.1);
         }
 
         private void BtnRight_Click(object sender, EventArgs e)
         {
-            if (CurveMode)
-            {
-                mf.CurveLines.MoveLine(0.1);
-                mf.CurveLines.BuildTram();
-            }
-            else
-            {
-                mf.ABLines.MoveLine(0.1);
-                mf.ABLines.BuildTram();
-            }
+            mf.Guidance.MoveLine(mf.Guidance.CurrentTramLine, 0.1);
         }
 
         private void BtnAdjLeft_Click(object sender, EventArgs e)
         {
-            if (CurveMode)
-            {
-                mf.CurveLines.MoveLine(-snapAdj);
-                mf.CurveLines.BuildTram();
-            }
-            else
-            {
-                mf.ABLines.MoveLine(-snapAdj);
-                mf.ABLines.BuildTram();
-            }
+            mf.Guidance.MoveLine(mf.Guidance.CurrentTramLine, -snapAdj);
         }
 
         private void BtnAdjRight_Click(object sender, EventArgs e)
         {
-            if (CurveMode)
-            {
-                mf.CurveLines.MoveLine(snapAdj);
-                mf.CurveLines.BuildTram();
-            }
-            else
-            {
-                mf.ABLines.MoveLine(snapAdj);
-                mf.ABLines.BuildTram();
-            }
+            mf.Guidance.MoveLine(mf.Guidance.CurrentTramLine, snapAdj);
         }
 
         private void BtnSwapAB_Click(object sender, EventArgs e)
         {
-            if (CurveMode)
-            {
-                mf.CurveLines.SwapAB();
-                mf.CurveLines.BuildTram();
-            }
+            mf.Guidance.SwapHeading(mf.Guidance.CurrentTramLine);
+        }
+
+        private void ChangeTramLine_Click(object sender, EventArgs e)
+        {
+            mf.Guidance.CurrentTramLine = (mf.Guidance.CurrentTramLine + 1 >= mf.Guidance.Lines.Count) ? -1 : mf.Guidance.CurrentTramLine + 1;
+
+            CurrentLineIdx.Text = (mf.Guidance.CurrentTramLine + 1).ToString() + " of " + mf.Guidance.Lines.Count.ToString();
+            if (mf.Guidance.CurrentTramLine > -1 && mf.Guidance.CurrentTramLine < mf.Guidance.Lines.Count)
+                lblGuidanceName.Text = mf.Guidance.Lines[mf.Guidance.CurrentTramLine].Name;
             else
-            {
-                mf.ABLines.SwapAB();
-                mf.ABLines.BuildTram();
-            }
+                lblGuidanceName.Text = "***";
+
+            mf.Guidance.BuildTram();
         }
 
         private void BtnTriggerDistanceUp_MouseDown(object sender, MouseEventArgs e)
         {
-            mf.tram.passes++;
-            TboxPasses.Text = mf.tram.passes.ToString();
-            Properties.Settings.Default.setTram_passes = mf.tram.passes;
-            Properties.Settings.Default.Save();
-
-            if (CurveMode) mf.CurveLines.BuildTram();
-            else mf.ABLines.BuildTram();
+            TimerMode = 0;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void BtnTriggerDistanceDn_MouseDown(object sender, MouseEventArgs e)
         {
-            mf.tram.passes--;
+            TimerMode = 1;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
+        }
+
+        private void Btn_MouseUp(object sender, MouseEventArgs e)
+        {
+            Timer.Enabled = false;
+        }
+
+        private void TimerRepeat_Tick(object sender, EventArgs e)
+        {
+            if (Timer.Enabled)
+            {
+                if (Timer.Interval > 50) Timer.Interval -= 50;
+            }
+            else
+                Timer.Interval = 500;
+
+            Timer.Enabled = true;
+
+            if (TimerMode == 0)
+            {
+                mf.tram.passes++;
+            }
+            else if (TimerMode == 1)
+            {
+                mf.tram.passes--;
+            }
             TboxPasses.Text = mf.tram.passes.ToString();
             Properties.Settings.Default.setTram_passes = mf.tram.passes;
             Properties.Settings.Default.Save();
-            if (CurveMode) mf.CurveLines.BuildTram();
-            else mf.ABLines.BuildTram();
+            mf.Guidance.BuildTram();
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
@@ -182,19 +162,7 @@ namespace AgOpenGPS
             mf.tram.TramList.Clear();
             mf.tram.displayMode = 0;
 
-            if (CurveMode)
-            {
-                mf.FileLoadCurveLines();
-                mf.CurveLines.isEditing = false;
-                mf.CurveLines.CurrentEditLine = -1;
-            }
-            else
-            {
-                mf.FileLoadABLines();
-                mf.ABLines.isEditing = false;
-                mf.ABLines.CurrentEditLine = -1;
-            }
-
+            mf.FileLoadGuidanceLines();
             Close();
         }
 
@@ -228,13 +196,13 @@ namespace AgOpenGPS
 
         private void TboxSnapAdj_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(0.01 * mf.m2MetImp, mf.decimals), Math.Round(50 * mf.m2MetImp, mf.decimals), Math.Round(snapAdj * mf.m2MetImp, mf.decimals), this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0.01, 50, snapAdj, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxSnapAdj.Text = Math.Round(form.ReturnValue, mf.decimals).ToString();
-                    Properties.Settings.Default.setTram_snapAdj = snapAdj = Math.Round(form.ReturnValue * mf.metImp2m, 2);
+                    TboxSnapAdj.Text = (form.ReturnValue * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
+                    Properties.Settings.Default.setTram_snapAdj = snapAdj = form.ReturnValue;
                     Properties.Settings.Default.Save();
                 }
             }
@@ -243,16 +211,15 @@ namespace AgOpenGPS
 
         private void TboxWheelWidth_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(0.05 * mf.m2MetImp, mf.decimals), Math.Round(5 * mf.m2MetImp, mf.decimals), Math.Round(mf.tram.WheelWidth * mf.m2MetImp, mf.decimals), this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0.05, 5, mf.tram.WheelWidth, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxWheelWidth.Text = Math.Round(form.ReturnValue, mf.decimals).ToString();
-                    Properties.Settings.Default.Tram_wheelWidth = mf.tram.WheelWidth = Math.Round(form.ReturnValue * mf.metImp2m, 2);
+                    TboxWheelWidth.Text = (form.ReturnValue * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
+                    Properties.Settings.Default.Tram_wheelWidth = mf.tram.WheelWidth = form.ReturnValue;
                     Properties.Settings.Default.Save();
-                    if (CurveMode) mf.CurveLines.BuildTram();
-                    else mf.ABLines.BuildTram();
+                    mf.Guidance.BuildTram();
                 }
             }
             btnCancel.Focus();
@@ -260,17 +227,16 @@ namespace AgOpenGPS
 
         private void TboxWheelTrack_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(0.1 * mf.m2MetImp, mf.decimals), Math.Round(10 * mf.m2MetImp, mf.decimals), Math.Round(mf.tram.wheelTrack * mf.m2MetImp, mf.decimals), this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0.1, 10, mf.tram.wheelTrack, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxWheelTrack.Text = Math.Round(form.ReturnValue, mf.decimals).ToString();
-                    Properties.Settings.Default.setTram_wheelSpacing = mf.tram.wheelTrack = Math.Round(form.ReturnValue * mf.metImp2m, 2);
+                    TboxWheelTrack.Text = (form.ReturnValue * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
+                    Properties.Settings.Default.setTram_wheelSpacing = mf.tram.wheelTrack = form.ReturnValue;
                     mf.tram.halfWheelTrack = mf.tram.wheelTrack * 0.5;
                     Properties.Settings.Default.Save();
-                    if (CurveMode) mf.CurveLines.BuildTram();
-                    else mf.ABLines.BuildTram();
+                    mf.Guidance.BuildTram();
                 }
             }
             btnCancel.Focus();
@@ -278,17 +244,16 @@ namespace AgOpenGPS
 
         private void TboxOffset_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(-100 * mf.m2MetImp, mf.decimals), Math.Round(100 * mf.m2MetImp, mf.decimals), Math.Round(mf.tram.abOffset * mf.m2MetImp, mf.decimals), this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(-100, 100, mf.tram.abOffset, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxOffset.Text = Math.Round(form.ReturnValue, mf.decimals).ToString();
+                    TboxOffset.Text = (form.ReturnValue * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
 
-                    Properties.Settings.Default.setTram_offset = mf.tram.abOffset = Math.Round(form.ReturnValue * mf.metImp2m, 2);
+                    Properties.Settings.Default.setTram_offset = mf.tram.abOffset = form.ReturnValue;
                     Properties.Settings.Default.Save();
-                    if (CurveMode) mf.CurveLines.BuildTram();
-                    else mf.ABLines.BuildTram();
+                    mf.Guidance.BuildTram();
                 }
             }
             btnCancel.Focus();
@@ -296,16 +261,15 @@ namespace AgOpenGPS
 
         private void TboxTramWidth_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(0.2 * mf.m2MetImp, mf.decimals), Math.Round(100 * mf.m2MetImp, mf.decimals), Math.Round(mf.tram.tramWidth * mf.m2MetImp, mf.decimals), this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0.2, 100, mf.tram.tramWidth, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxTramWidth.Text = Math.Round(form.ReturnValue, mf.decimals).ToString();
-                    Properties.Settings.Default.setTram_eqWidth = mf.tram.tramWidth = Math.Round(form.ReturnValue * mf.metImp2m, 2);
+                    TboxTramWidth.Text = (form.ReturnValue * mf.Mtr2Unit).ToString(mf.GuiFix) + mf.Units;
+                    Properties.Settings.Default.setTram_eqWidth = mf.tram.tramWidth = form.ReturnValue;
                     Properties.Settings.Default.Save();
-                    if (CurveMode) mf.CurveLines.BuildTram();
-                    else mf.ABLines.BuildTram();
+                    mf.Guidance.BuildTram();
                 }
             }
             btnCancel.Focus();
@@ -313,7 +277,7 @@ namespace AgOpenGPS
 
         private void TboxPasses_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 999, mf.tram.passes, this, true,0))
+            using (var form = new FormNumeric(0, 999, mf.tram.passes, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -322,8 +286,7 @@ namespace AgOpenGPS
                     TboxPasses.Text = mf.tram.passes.ToString();
                     Properties.Settings.Default.setTram_passes = mf.tram.passes;
                     Properties.Settings.Default.Save();
-                    if (CurveMode) mf.CurveLines.BuildTram();
-                    else mf.ABLines.BuildTram();
+                    mf.Guidance.BuildTram();
                 }
             }
             btnCancel.Focus();

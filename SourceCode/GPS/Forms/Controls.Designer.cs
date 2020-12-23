@@ -4,19 +4,17 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using AgOpenGPS.Properties;
-using Microsoft.Win32;
 
 namespace AgOpenGPS
 {
     public partial class FormGPS
     {
         // Buttons //-----------------------------------------------------------------------
-
+        private byte TimerMode = 0;
         private void btnStartStopNtrip_Click(object sender, EventArgs e)
         {
-            Settings.Default.setNTRIP_isOn = isNTRIP_TurnedOn = !isNTRIP_TurnedOn;
-            Settings.Default.Save();
+            Properties.Settings.Default.setNTRIP_isOn = isNTRIP_TurnedOn = !isNTRIP_TurnedOn;
+            Properties.Settings.Default.Save();
 
             UpdateNtripButton();
         }
@@ -42,14 +40,11 @@ namespace AgOpenGPS
 
             YouTurnButtons(false);
 
-            ABLines.BtnABLineOn = false;
-            btnABLine.Image = Properties.Resources.ABLineOff;
+            Guidance.BtnGuidanceOn = false;
+            btnGuidance.Image = Properties.Resources.CurveOff;
 
-
-            CurveLines.isOkToAddPoints = false;
-            CurveLines.BtnCurveLineOn = false;
-            btnCurve.Image = Properties.Resources.CurveOff;
-
+            Guidance.isOkToAddPoints = false;
+            Guidance.isEditing = false;
 
             if (!recPath.isPausedDrivingRecordedPath)
             {
@@ -135,18 +130,18 @@ namespace AgOpenGPS
                 isAutoSteerBtnOn = false;
                 btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
                 //if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
-                mc.Send_AutoSteerButton[3] = 0x00;
-                DataSend[8] = "Auto Steer Button: State Off";
+                mc.Send_AutoSteerButton[5] = 0x00;
+                UpdateSendDataText("Auto Steer Button: State Off");
                 SendData(mc.Send_AutoSteerButton, false);//reset pulsecount = true & Autosteer off
             }
             else
             {
-                if (ABLines.BtnABLineOn | ct.isContourBtnOn | CurveLines.BtnCurveLineOn)
+                if (ct.isContourBtnOn || Guidance.BtnGuidanceOn)
                 {
                     isAutoSteerBtnOn = true;
                     btnAutoSteer.Image = Properties.Resources.AutoSteerOn;
-                    mc.Send_AutoSteerButton[3] = 0x01;
-                    DataSend[8] = "Auto Steer Button: State On";
+                    mc.Send_AutoSteerButton[5] = 0x01;
+                    UpdateSendDataText("Auto Steer Button: State On");
                     SendData(mc.Send_AutoSteerButton, false);//reset pulsecount = true & Autosteer on
                 }
                 else
@@ -166,7 +161,8 @@ namespace AgOpenGPS
                 return;
             }
 
-            CurveLines.isOkToAddPoints = false;
+            Guidance.isOkToAddPoints = false;
+            Guidance.isEditing = false;
 
             Form f = Application.OpenForms["FormABDraw"];
             if (f != null)
@@ -174,53 +170,51 @@ namespace AgOpenGPS
                 f.Focus();
                 return;
             }
-            Form form = new FormABDraw(this, false);
+            Form form = new FormGuidanceDraw(this, false);
             form.Show(this);
             form.Left = Left + Width / 2 - form.Width / 2;
             form.Top = Top + Height / 2 - form.Height / 2;
-
-            if (CurveLines.BtnCurveLineOn) btnCycleLines.Text = "Cu-" + CurveLines.CurrentLine + 1;
-            if (ABLines.BtnABLineOn) btnCycleLines.Text = "AB-" + ABLines.CurrentLine;
         }
 
         private void btnCycleLines_Click(object sender, EventArgs e)
         {
-            if (ABLines.BtnABLineOn && ABLines.ABLines.Count > 0)
+            if (Guidance.Lines.Count > 0)
             {
-                ABLines.ResetABLine = true;
-                ABLines.CurrentLine = (ABLines.ABLines.Count > 0) ? (ABLines.CurrentLine + 1) % ABLines.ABLines.Count : -1;
+                //if contour is on, turn it off
+                if (ct.isContourBtnOn) btnContour.PerformClick();
 
-                Properties.Settings.Default.LastABLine = ABLines.CurrentLine;
+                Guidance.ResetABLine = true;
+                Guidance.CurrentLine = (Guidance.CurrentLine + 1 >= Guidance.Lines.Count) ? -1 : Guidance.CurrentLine + 1;
+                
+                Guidance.GuidanceLines.Clear();
+                Properties.Settings.Default.LastGuidanceLine = Guidance.CurrentLine;
                 Properties.Settings.Default.Save();
                 yt.ResetYouTurn();
-                btnCycleLines.Text = "AB-" + ABLines.CurrentLine;
-                if (tram.displayMode > 0) ABLines.BuildTram();
 
-            }
-            else if (CurveLines.BtnCurveLineOn && CurveLines.Lines.Count > 0)
-            {
-                CurveLines.ResetABLine = true;
+                if (Guidance.CurrentLine == -1)
+                {
+                    btnGuidance.Image = Properties.Resources.CurveOff;
+                    btnCycleLines.Text = String.Get("gsOff");
+                    Guidance.BtnGuidanceOn = false;
+                }
+                else
+                {
+                    btnGuidance.Image = Properties.Resources.GuidanceCurve;
+                    btnCycleLines.Text = (Guidance.CurrentLine + 1).ToString() + " of " + Guidance.Lines.Count.ToString();
+                    Guidance.BtnGuidanceOn = true;
+                }
 
-                CurveLines.CurrentLine = (CurveLines.Lines.Count > 0) ? (CurveLines.CurrentLine + 1) % CurveLines.Lines.Count : -1;
-
-                CurveLines.GuidanceLines.Clear();
-                Properties.Settings.Default.LastCurveLine = CurveLines.CurrentLine;
-                Properties.Settings.Default.Save();
-
-                yt.ResetYouTurn();
-                btnCycleLines.Text = "Cur-" + CurveLines.CurrentLine + 1;
-                if (tram.displayMode > 0) CurveLines.BuildTram();
+                YouTurnButtons(Guidance.BtnGuidanceOn);
+                snapLeftBigStrip.Enabled = Guidance.BtnGuidanceOn;
+                snapRightBigStrip.Enabled = Guidance.BtnGuidanceOn;
+                snapToCurrent.Enabled = ct.isContourBtnOn || Guidance.BtnGuidanceOn;
             }
         }
 
-        private void btnCurve_Click(object sender, EventArgs e)
+        private void btnGuidance_Click(object sender, EventArgs e)
         {
-            Button test = (Button)sender;
-
-            btnCycleLines.Text = "";
-
             //if contour is on, turn it off
-            if (ct.isContourBtnOn) { if (ct.isContourBtnOn) btnContour.PerformClick(); }
+            if (ct.isContourBtnOn) btnContour.PerformClick();
 
             //check if window already exists
             Form f = Application.OpenForms["FormABCurve"];
@@ -232,35 +226,28 @@ namespace AgOpenGPS
             }
             else
             {
-                if (test.Name == "btnCurve" && !CurveLines.BtnCurveLineOn)
+                if (!Guidance.BtnGuidanceOn && Properties.Settings.Default.LastGuidanceLine > -1)
                 {
-                    CurveLines.ResetABLine = true;
-                    CurveLines.CurrentLine = Properties.Settings.Default.LastCurveLine;
-                    CurveLines.GuidanceLines.Clear();
-                    btnCurve.Image = Properties.Resources.CurveOn;
-                    CurveLines.BtnCurveLineOn = true;
-                    btnABLine.Image = Properties.Resources.ABLineOff;
-                    ABLines.BtnABLineOn = false;
-                }
-                else if (test.Name == "btnABLine" && !ABLines.BtnABLineOn)
-                {
-                    ABLines.ResetABLine = true;
-                    ABLines.CurrentLine = Properties.Settings.Default.LastABLine;
-                    btnABLine.Image = Properties.Resources.ABLineOn;
-                    ABLines.BtnABLineOn = true;
-                    btnCurve.Image = Properties.Resources.CurveOff;
-                    CurveLines.BtnCurveLineOn = false;
+                    Guidance.ResetABLine = true;
+                    Guidance.CurrentLine = Properties.Settings.Default.LastGuidanceLine;
+                    Guidance.GuidanceLines.Clear();
+                    btnGuidance.Image = Properties.Resources.GuidanceCurve;
+                    Guidance.BtnGuidanceOn = true;
+
+                    if (Guidance.CurrentLine == -1) btnCycleLines.Text = String.Get("gsOff");
+                    else btnCycleLines.Text = (Guidance.CurrentLine + 1).ToString() +
+                            " of " + Guidance.Lines.Count.ToString();
                 }
                 else
                 {
-                    Form form = new FormABCurve(this, test.Name == "btnCurve");
+                    Form form = new FormABCurve(this);
                     form.Show(this);
                     form.Left = Left + Width / 2 - form.Width / 2;
                     form.Top = Top + Height / 2 - form.Height / 2;
                 }
-                snapLeftBigStrip.Enabled = CurveLines.BtnCurveLineOn || ABLines.BtnABLineOn;
-                snapRightBigStrip.Enabled = CurveLines.BtnCurveLineOn || ABLines.BtnABLineOn;
-                snapToCurrent.Enabled = ct.isContourBtnOn || CurveLines.BtnCurveLineOn || ABLines.BtnABLineOn;
+                snapLeftBigStrip.Enabled = Guidance.BtnGuidanceOn;
+                snapRightBigStrip.Enabled = Guidance.BtnGuidanceOn;
+                snapToCurrent.Enabled = ct.isContourBtnOn || Guidance.BtnGuidanceOn;
             }
             YouTurnButtons(true);
         }
@@ -270,7 +257,7 @@ namespace AgOpenGPS
             ct.isContourBtnOn = !ct.isContourBtnOn;
             btnContour.Image = ct.isContourBtnOn ? Properties.Resources.ContourOn : Properties.Resources.ContourOff;
 
-            snapToCurrent.Enabled = ct.isContourBtnOn || CurveLines.BtnCurveLineOn || ABLines.BtnABLineOn;
+            snapToCurrent.Enabled = ct.isContourBtnOn || Guidance.BtnGuidanceOn;
 
             if (ct.isContourBtnOn)
             {
@@ -288,7 +275,7 @@ namespace AgOpenGPS
 
             else
             {
-                if (ABLines.BtnABLineOn | CurveLines.BtnCurveLineOn)
+                if (Guidance.BtnGuidanceOn)
                 {
                     YouTurnButtons(true);
                 }
@@ -305,71 +292,10 @@ namespace AgOpenGPS
             }
             else
             {
-                if (ABLines.BtnABLineOn)
+                if (Guidance.BtnGuidanceOn)
                 {
-                    ABLines.MoveLine(ABLines.distanceFromRefLine);
-                    ABLines.distanceFromRefLine = 0;
-                }
-                else if (CurveLines.BtnCurveLineOn)
-                {
-                    CurveLines.MoveLine(CurveLines.distanceFromRefLine);
-                    CurveLines.distanceFromRefLine = 0;
-                }
-                else
-                {
-                    TimedMessageBox(2000, String.Get("gsNoGuidanceLines"), String.Get("gsTurnOnContourOrMakeABLine"));
-                }
-            }
-        }
-
-        //Snaps
-        private void SnapRight()
-        {
-            if (!ct.isContourBtnOn)
-            {
-                if (ABLines.BtnABLineOn && ABLines.ABLines.Count > 0)
-                {
-                    //snap distance is in cm
-                    yt.ResetCreatedYouTurn();
-                    double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
-
-                    ABLines.MoveLine(ABLines.isSameWay ? dist : -dist);
-                }
-                else if (CurveLines.BtnCurveLineOn && CurveLines.Lines.Count > 0)
-                {
-                    //snap distance is in cm
-                    yt.ResetCreatedYouTurn();
-                    double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
-
-                    CurveLines.MoveLine(CurveLines.isSameWay ? dist : -dist);
-                }
-                else
-                {
-                    TimedMessageBox(2000, String.Get("gsNoGuidanceLines"), String.Get("gsTurnOnContourOrMakeABLine"));
-                }
-            }
-        }
-
-        private void SnapLeft()
-        {
-            if (!ct.isContourBtnOn)
-            {
-                if (ABLines.BtnABLineOn)
-                {
-                    //snap distance is in cm
-                    yt.ResetCreatedYouTurn();
-                    double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
-
-                    ABLines.MoveLine(ABLines.isSameWay ? -dist : dist);
-                }
-                else if (CurveLines.BtnCurveLineOn && CurveLines.Lines.Count > 0)
-                {
-                    //snap distance is in cm
-                    yt.ResetCreatedYouTurn();
-                    double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
-
-                    CurveLines.MoveLine(CurveLines.isSameWay ? -dist : dist);
-
+                    Guidance.MoveLine(Guidance.CurrentLine, Guidance.isSameWay ? Guidance.distanceFromRefLine : -Guidance.distanceFromRefLine);
+                    Guidance.distanceFromRefLine = 0;
                 }
                 else
                 {
@@ -380,12 +306,17 @@ namespace AgOpenGPS
 
         private void btnSnapRight_Click(object sender, EventArgs e)
         {
-            SnapRight();
+            yt.ResetCreatedYouTurn();
+            double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
+            Guidance.MoveLine(Guidance.CurrentLine, Guidance.isSameWay ? dist : -dist);
         }
 
         private void btnSnapLeft_Click(object sender, EventArgs e)
         {
-            SnapLeft();
+            yt.ResetCreatedYouTurn();
+            double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
+            Guidance.MoveLine(Guidance.CurrentLine, Guidance.isSameWay ? -dist : dist);
+
         }
 
         //Section Manual and Auto
@@ -453,57 +384,158 @@ namespace AgOpenGPS
         //The zoom tilt buttons
         private void btnZoomIn_MouseDown(object sender, MouseEventArgs e)
         {
-            if (camera.zoomValue <= 20) camera.zoomValue += camera.zoomValue * 0.1;
-            else camera.zoomValue += camera.zoomValue * 0.05;
-            if (camera.zoomValue > 220) camera.zoomValue = 220;
-            camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
-            SetZoom();
+            TimerMode = 0;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void btnZoomOut_MouseDown(object sender, MouseEventArgs e)
         {
-            if (camera.zoomValue <= 20)
-            { if ((camera.zoomValue -= camera.zoomValue * 0.1) < 6.0) camera.zoomValue = 6.0; }
-            else { if ((camera.zoomValue -= camera.zoomValue * 0.05) < 6.0) camera.zoomValue = 6.0; }
-            camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
-            SetZoom();
+            TimerMode = 1;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void btnpTiltUp_MouseDown(object sender, MouseEventArgs e)
         {
-            //camera.camPitch -= ((camera.camPitch * 0.012) - 1);
-            if (++camera.camPitch > 0) camera.camPitch = 0;
+            TimerMode = 2;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void btnpTiltDown_MouseDown(object sender, MouseEventArgs e)
         {
-            //if (camera.camPitch > -59) camera.camPitch = -60;
-            //camera.camPitch += ((camera.camPitch * 0.012) - 1);
-            if (--camera.camPitch < -80) camera.camPitch = -80;
+            TimerMode = 3;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void btnMoveDown_MouseDown(object sender, MouseEventArgs e)
         {
-            offX += (Math.Sin(fixHeading) * 10);
-            offY += (Math.Cos(fixHeading) * 10);
+            TimerMode = 4;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void btnMoveUp_MouseDown(object sender, MouseEventArgs e)
         {
-            offX -= (Math.Sin(fixHeading) * 10);
-            offY -= (Math.Cos(fixHeading) * 10);
+            TimerMode = 5;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
         private void btnMoveLeft_MouseDown(object sender, MouseEventArgs e)
         {
-            offY += (Math.Sin(-fixHeading) * 10);
-            offX += (Math.Cos(-fixHeading) * 10);
+            TimerMode = 6;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
         }
 
-        private void btnMoveRight_MouseDown(object sender, MouseEventArgs e)
+        private void BtnMoveRight_MouseDown(object sender, MouseEventArgs e)
         {
-            offY -= (Math.Sin(-fixHeading) * 10);
-            offX -= (Math.Cos(-fixHeading) * 10);
+            TimerMode = 7;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
+        }
+
+
+        private void Btn_MouseUp(object sender, MouseEventArgs e)
+        {
+            Timer.Enabled = false;
+        }
+
+        private void TimerRepeat_Tick(object sender, EventArgs e)
+        {
+            if (Timer.Enabled)
+            {
+                if (Timer.Interval > 50) Timer.Interval -= 50;
+            }
+            else
+                Timer.Interval = 500;
+
+            Timer.Enabled = true;
+
+            if (TimerMode == 0)
+            {
+                if (camera.zoomValue <= 20) camera.zoomValue += camera.zoomValue * 0.1;
+                else camera.zoomValue += camera.zoomValue * 0.05;
+                if (camera.zoomValue > 220) camera.zoomValue = 220;
+                camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
+                SetZoom();
+            }
+            else if (TimerMode == 1)
+            {
+                if (camera.zoomValue <= 20)
+                { if ((camera.zoomValue -= camera.zoomValue * 0.1) < 6.0) camera.zoomValue = 6.0; }
+                else { if ((camera.zoomValue -= camera.zoomValue * 0.05) < 6.0) camera.zoomValue = 6.0; }
+                camera.camSetDistance = camera.zoomValue * camera.zoomValue * -1;
+                SetZoom();
+            }
+            else if (TimerMode == 2)
+            {
+                if (++camera.camPitch > 0) camera.camPitch = 0;
+            }
+            else if (TimerMode == 3)
+            {
+                if (--camera.camPitch < -80) camera.camPitch = -80;
+            }
+            else if (TimerMode == 4)
+            {
+                offX -= (Math.Sin(fixHeading) * 10);
+                offY -= (Math.Cos(fixHeading) * 10);
+            }
+            else if (TimerMode == 5)
+            {
+                offX += (Math.Sin(fixHeading) * 10);
+                offY += (Math.Cos(fixHeading) * 10);
+            }
+            else if (TimerMode == 6)
+            {
+                offX -= (Math.Cos(fixHeading) * 10);
+                offY -= (Math.Sin(fixHeading) * 10);
+            }
+            else if (TimerMode == 7)
+            {
+                offX += (Math.Cos(fixHeading) * 10);
+                offY += (Math.Sin(fixHeading) * 10);
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            fixHeading += Math.PI;
+            if (fixHeading > Glm.twoPI) fixHeading -= Glm.twoPI;
+            gyroCorrection -= 180;
+            if (gyroCorrection < 0) gyroCorrection += 360;
+
+            if (vehicle.antennaOffset != 0)
+            {
+                for (int i = 0; i < totalFixSteps; i++)
+                {
+                    stepFixPts[i].Northing += (Math.Sin(fixHeading) * vehicle.antennaOffset *2);
+                    stepFixPts[i].Easting -= (Math.Cos(fixHeading) * vehicle.antennaOffset * 2);
+                }
+            }
+
+            if (ahrs.rollX16 != 9999 && (ahrs.isRollFromAutoSteer || ahrs.isRollFromAVR))
+            {
+                rollUsed = (ahrs.rollX16 - ahrs.rollZeroX16) * 0.0625;
+
+                //change for roll to the right is positive times -1
+                rollCorrectionDistance = Math.Sin(Glm.ToRadians(rollUsed)) * -vehicle.antennaHeight * 2;
+
+                for (int i = 0; i < totalFixSteps; i++)
+                {
+                    stepFixPts[i].Easting += (Math.Cos(-fixHeading) * rollCorrectionDistance);
+                    stepFixPts[i].Northing += (Math.Sin(-fixHeading) * rollCorrectionDistance);
+                }
+            }
+
+            for (int i = 0; i < Tools.Count; i++)
+            {
+                Tools[i].ToolFarRightSpeed = Tools[i].ToolFarRightSpeed * -1.0;
+                Tools[i].ToolFarLeftSpeed = Tools[i].ToolFarLeftSpeed * -1.0;
+            }
         }
 
         private void btnMoveHome_Click(object sender, EventArgs e)
@@ -514,7 +546,7 @@ namespace AgOpenGPS
 
         private void btnEditAB_Click(object sender, EventArgs e)
         {
-            if ((ABLines.CurrentLine > -1 && ABLines.BtnABLineOn) || (CurveLines.CurrentLine > -1 && CurveLines.BtnCurveLineOn))
+            if (Guidance.CurrentLine > -1 && Guidance.BtnGuidanceOn)
             {
                 Form fc = Application.OpenForms["FormEditAB"];
 
@@ -523,7 +555,7 @@ namespace AgOpenGPS
                     fc.Focus();
                     return;
                 }
-                Form form = new FormEditAB(this, CurveLines.CurrentLine > -1 && CurveLines.BtnCurveLineOn);
+                Form form = new FormEditAB(this);
                 form.Show(this);
                 form.Left = Left + Width / 2 - form.Width / 2;
                 form.Top = Top + Height / 2 - form.Height / 2;
@@ -537,29 +569,21 @@ namespace AgOpenGPS
 
         private void btnTramMenu_Click(object sender, EventArgs e)
         {
-            CurveLines.isOkToAddPoints = false;
+            Guidance.isOkToAddPoints = false;
+            Guidance.isEditing = false;
 
             if (ct.isContourBtnOn) { if (ct.isContourBtnOn) btnContour.PerformClick(); }
 
-            if ((ABLines.CurrentLine > -1 && ABLines.BtnABLineOn) || (CurveLines.CurrentLine > -1 && CurveLines.BtnCurveLineOn))
+            Form f = Application.OpenForms["FormTram"];
+            if (f != null)
             {
-                Form f = Application.OpenForms["FormTram"];
-                if (f != null)
-                {
-                    f.Focus();
-                    return;
-                }
-                Form form = new FormTram(this, CurveLines.CurrentLine > -1 && CurveLines.BtnCurveLineOn);
-                form.Show(this);
-                form.Left = Left + Width/2 - form.Width/2;
-                form.Top = Top + Height/2 - form.Height/2;
-            }
-            else
-            {
-                TimedMessageBox(1500, String.Get("gsNoABLineActive"), String.Get("gsPleaseEnterABLine"));
-                ABLines.isEditing = false;
+                f.Focus();
                 return;
             }
+            Form form = new FormTram(this);
+            form.Show(this);
+            form.Left = Left + Width / 2 - form.Width / 2;
+            form.Top = Top + Height / 2 - form.Height / 2;
         }
 
         private void btnFlag_Click(object sender, EventArgs e)
@@ -599,11 +623,8 @@ namespace AgOpenGPS
                     TimedMessageBox(2000, String.Get("gsNoBoundary"), String.Get("gsCreateABoundaryFirst"));
                     return;
                 }
-                if (ABLines.BtnABLineOn || CurveLines.BtnCurveLineOn)
-                {
-                    if (!isAutoSteerBtnOn) btnAutoSteer.PerformClick();
-                }
-                else return;
+                if (Guidance.BtnGuidanceOn && !isAutoSteerBtnOn)
+                    btnAutoSteer.PerformClick();
 
                 yt.isYouTurnBtnOn = true;
                 btnAutoYouTurn.Image = Properties.Resources.Youturn80;
@@ -749,17 +770,9 @@ namespace AgOpenGPS
 
         private void btnReverseDirection_Click(object sender, EventArgs e)
         {
-            ABLines.ResetABLine = true;
-            ABLines.isSameWay = !ABLines.isSameWay;
-            CurveLines.ResetABLine = true;
-            CurveLines.isSameWay = !CurveLines.isSameWay;
+            btnReverseDirection.BackgroundImage = (sim.reverse = !sim.reverse) ? Properties.Resources.DnArrow64 : Properties.Resources.UpArrow64;
+            sim.stepDistance = -sim.stepDistance;
 
-            ct.ResetLine = true;
-            ct.isSameWay = !CurveLines.isSameWay;
-
-            sim.headingTrue += Math.PI;
-            if (sim.headingTrue > Glm.twoPI) sim.headingTrue -= Glm.twoPI;
-            if (sim.headingTrue < 0) sim.headingTrue += Glm.twoPI;
             yt.ResetYouTurn();
         }
 
@@ -767,6 +780,8 @@ namespace AgOpenGPS
         {
             sim.stepDistance = 0;
             hsbarStepDistance.Value = 0;
+            sim.reverse = false;
+            btnReverseDirection.BackgroundImage = Properties.Resources.UpArrow64;
         }
 
         private void btnDayNightMode_Click(object sender, EventArgs e)
@@ -802,16 +817,6 @@ namespace AgOpenGPS
 
             }
             else { TimedMessageBox(3000, String.Get("gsFieldNotOpen"), String.Get("gsStartNewField")); }
-        }
-
-        private void toolStripBtnMakeBndContour_Click_1(object sender, EventArgs e)
-        {
-            //build all the contour guidance lines from boundaries, all of them.
-            using (var form = new FormMakeBndCon(this))
-            {
-                var result = form.ShowDialog(this);
-                if (result == DialogResult.OK) { }
-            }
         }
 
         private void deleteContourPathsToolStripMenuItem_Click_1(object sender, EventArgs e)
@@ -855,10 +860,10 @@ namespace AgOpenGPS
                         {
                             if (Tools[i].Sections[j].IsMappingOn)
                             {
-                                Tools[i].Sections[j].TurnMappingOff();
+                                Tools[i].TurnMappingOff(j);
                                 //clean out the lists
                                 Tools[i].Sections[j].triangleList.Clear();
-                                Tools[i].Sections[j].TurnMappingOn();
+                                Tools[i].TurnMappingOn(j);
                             }
                         }
                     }
@@ -885,23 +890,6 @@ namespace AgOpenGPS
             JobNewOpenResume();
         }
 
-        private void SmoothABtoolStripMenu_Click(object sender, EventArgs e)
-        {
-            if (isJobStarted && CurveLines.BtnCurveLineOn)
-            {
-                using (var form = new FormSmoothAB(this))
-                {
-                    var result = form.ShowDialog(this);
-                    if (result == DialogResult.OK) { }
-                }
-            }
-            else
-            {
-                if (!isJobStarted) TimedMessageBox(2000, String.Get("gsFieldNotOpen"), String.Get("gsStartNewField"));
-                else TimedMessageBox(2000, String.Get("gsCurveNotOn"), String.Get("gsTurnABCurveOn"));
-            }
-        }
-
         private void toolstripDisplayConfig_Click_1(object sender, EventArgs e)
         {
             Form f = Application.OpenForms["FormIMU"];
@@ -914,8 +902,8 @@ namespace AgOpenGPS
             form.Show(this);
             form.Left = Left + Width / 2 - form.Width / 2;
             form.Top = Top + Height / 2 - form.Height / 2;
-
         }
+
         private void toolstripUSBPortsConfig_Click_1(object sender, EventArgs e)
         {
             Form f = Application.OpenForms["FormCommSet"];
@@ -1145,10 +1133,10 @@ namespace AgOpenGPS
 
         private void topFieldViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (Settings.Default.setMenu_isOGLZoomOn == 1)
+            if (Properties.Settings.Default.setMenu_isOGLZoomOn == 1)
             {
-                Settings.Default.setMenu_isOGLZoomOn = 0;
-                Settings.Default.Save();
+                Properties.Settings.Default.setMenu_isOGLZoomOn = 0;
+                Properties.Settings.Default.Save();
                 topFieldViewToolStripMenuItem.Checked = false;
                 oglZoom.Width = 400;
                 oglZoom.Height = 400;
@@ -1157,8 +1145,8 @@ namespace AgOpenGPS
             }
             else
             {
-                Settings.Default.setMenu_isOGLZoomOn = 1;
-                Settings.Default.Save();
+                Properties.Settings.Default.setMenu_isOGLZoomOn = 1;
+                Properties.Settings.Default.Save();
                 topFieldViewToolStripMenuItem.Checked = true;
                 oglZoom.Visible = true;
                 oglZoom.Width = 300;
@@ -1183,7 +1171,7 @@ namespace AgOpenGPS
                 f.Focus();
                 return;
             }
-            Form form = new FormABDraw(this, true);
+            Form form = new FormGuidanceDraw(this, true);
             form.Show(this);
             form.Left = Left + Width / 2 - form.Width / 2;
             form.Top = Top + Height / 2 - form.Height / 2;
@@ -1240,8 +1228,8 @@ namespace AgOpenGPS
                 }
             }
 
-            Settings.Default.setDisplay_colorSectionsDay = sectionColorDay;
-            Settings.Default.Save();
+            Properties.Settings.Default.setDisplay_colorSectionsDay = sectionColorDay;
+            Properties.Settings.Default.Save();
 
             stripSectionColor.BackColor = sectionColorDay;
         }
@@ -1250,14 +1238,14 @@ namespace AgOpenGPS
         {
             isKeyboardOn = !isKeyboardOn;
             keyboardToolStripMenuItem1.Checked = isKeyboardOn;
-            Settings.Default.setDisplay_isKeyboardOn = isKeyboardOn;
-            Settings.Default.Save();
+            Properties.Settings.Default.setDisplay_isKeyboardOn = isKeyboardOn;
+            Properties.Settings.Default.Save();
         }
 
         private void simplifyToolStrip_Click(object sender, EventArgs e)
         {
-            Settings.Default.setDisplay_isSimple = !Settings.Default.setDisplay_isSimple;
-            Settings.Default.Save();
+            Properties.Settings.Default.setDisplay_isSimple = !Properties.Settings.Default.setDisplay_isSimple;
+            Properties.Settings.Default.Save();
 
             FixPanelsAndMenus();
         }
@@ -1273,34 +1261,25 @@ namespace AgOpenGPS
 
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             fbd.ShowNewFolderButton = true;
-            fbd.Description = "Currently: " + Settings.Default.setF_workingDirectory;
+            fbd.Description = "Currently: " + Properties.Settings.Default.setF_workingDirectory;
 
-            if (Settings.Default.setF_workingDirectory == "Default") fbd.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            else fbd.SelectedPath = Settings.Default.setF_workingDirectory;
+            if (Properties.Settings.Default.setF_workingDirectory == "Default") fbd.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            else fbd.SelectedPath = Properties.Settings.Default.setF_workingDirectory;
 
             if (fbd.ShowDialog(this) == DialogResult.OK)
             {
-                RegistryKey regKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AgOpenGPS",true);
-
                 if (fbd.SelectedPath != Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))
                 {
-                    //save the user set directory in Registry
-                    regKey.SetValue("Directory", fbd.SelectedPath);
-                    regKey.Close();
-                    Settings.Default.setF_workingDirectory = fbd.SelectedPath;
-                    Settings.Default.Save();
+                    Properties.Settings.Default.setF_workingDirectory = fbd.SelectedPath;
+                    Properties.Settings.Default.Save();
                 }
                 else
                 {
-                    regKey.SetValue("Directory", "Default");
-                    regKey.Close();
-                    Settings.Default.setF_workingDirectory = "Default";
-                    Settings.Default.Save();
+                    Properties.Settings.Default.setF_workingDirectory = "Default";
+                    Properties.Settings.Default.Save();
                 }
 
-                //restart program
-                MessageBox.Show(String.Get("gsProgramWillExitPleaseRestart"));
-                Close();
+                LoadSettings();
             }
         }
 
@@ -1347,11 +1326,10 @@ namespace AgOpenGPS
                     pn.convergenceAngle = Math.Atan(Math.Sin(Glm.ToRadians(pn.latitude))
                                                 * Math.Tan(Glm.ToRadians(pn.longitude - pn.centralMeridian)));
 
-                    //reset so it doesnt jump for program?
-
-                    stepFixPts[0].Easting = pn.fix.Easting;
-                    stepFixPts[0].Northing = pn.fix.Northing;
-                    stepFixPts[0].Heading = 0;
+                    for (int i = 0; i < totalFixSteps; i++)
+                    {
+                        stepFixPts[i] = new Vec3(pn.fix.Northing, pn.fix.Easting, 0);
+                    }
                 }
 
                 //Reset the sim
@@ -1360,77 +1338,60 @@ namespace AgOpenGPS
                 btnResetSteerAngle.Text = 0.ToString("N1");
                 sim.headingTrue = 0;
                 sim.stepDistance = 1.3889;
+                sim.reverse = false;
+                btnReverseDirection.BackgroundImage = Properties.Resources.UpArrow64;
                 sim.speed = 5.0;
-                hsbarStepDistance.Value = 5;
-            }
-        }
-
-        private void topMenuLoadVehicle_Click(object sender, EventArgs e)
-        {
-            if (isJobStarted)
-            {
-                TimedMessageBox(2000, String.Get("gsFieldIsOpen"), String.Get("gsCloseFieldFirst"));
-                return;
-            }
-
-            using (var form = new FormVehiclePicker(this))
-            {
-                var result = form.ShowDialog(this);
-                if (result == DialogResult.OK) { }
-            }
-        }
-
-        private void topMenuSaveVehicle_Click(object sender, EventArgs e)
-        {
-            using (var form = new FormVehicleSaver(this))
-            {
-                var result = form.ShowDialog(this);
-            }
-
-        }
-
-        private void topMenuLoadTool_Click(object sender, EventArgs e)
-        {
-            using (var form = new FormToolPicker(this))
-            {
-                var result = form.ShowDialog(this);
-                if (result == DialogResult.OK) { }
+                hsbarStepDistance.Value = 50;
             }
         }
 
         private void topMenuSaveTool_Click(object sender, EventArgs e)
         {
-            using (var form = new FormToolSaver(this))
+            using (var form = new FormPicker(this,0))
             {
-                var result = form.ShowDialog(this);
+                form.ShowDialog(this);
+            }
+        }
+        private void topMenuLoadTool_Click(object sender, EventArgs e)
+        {
+            using (var form = new FormPicker(this, 1))
+            {
+                form.ShowDialog(this);
+            }
+        }
+
+        private void topMenuSaveEnvironment_Click(object sender, EventArgs e)
+        {
+            using (var form = new FormPicker(this, 2))
+            {
+                form.ShowDialog(this);
             }
         }
 
         private void topMenuLoadEnvironment_Click(object sender, EventArgs e)
         {
-            if (isJobStarted)
+            using (var form = new FormPicker(this, 3))
             {
-                TimedMessageBox(2000, String.Get("gsFieldIsOpen"), String.Get("gsCloseFieldFirst"));
-                return;
-            }
-
-            using (var form = new FormEnvPicker(this))
-            {
-
                 form.ShowDialog(this);
-
-                LoadSettings();
             }
         }
-        private void topMenuSaveEnvironment_Click(object sender, EventArgs e)
+
+        private void topMenuSaveVehicle_Click(object sender, EventArgs e)
         {
-            using (var form = new FormEnvSaver(this))
+            using (var form = new FormPicker(this, 4))
+            {
+                form.ShowDialog(this);
+            }
+        }
+
+        private void topMenuLoadVehicle_Click(object sender, EventArgs e)
+        {
+            using (var form = new FormPicker(this, 5))
             {
                 var result = form.ShowDialog(this);
             }
         }
 
-        //Help menu drop down items
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var form = new Form_About(this))
@@ -1464,22 +1425,15 @@ namespace AgOpenGPS
 
                 if (result2 == DialogResult.Yes)
                 {
-                    Settings.Default.Reset();
-                    Settings.Default.Save();
+                    Properties.Settings.Default.Reset();
+                    Properties.Settings.Default.Save();
 
-                    Vehicle.Default.Reset();
-                    Vehicle.Default.Save();
+                    Properties.Vehicle.Default.Reset();
+                    Properties.Vehicle.Default.Save();
 
-                    RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AgOpenGPS");
-
-                    //storing the values
-                    key.SetValue("Language", "en");
-                    key.SetValue("Directory", "Default");
-                    key.Close();
-
-                    Settings.Default.setF_culture = "en";
-                    Settings.Default.setF_workingDirectory = "Default";
-                    Settings.Default.Save();
+                    Properties.Settings.Default.setF_culture = "en";
+                    Properties.Settings.Default.setF_workingDirectory = "Default";
+                    Properties.Settings.Default.Save();
 
                     LoadSettings();
                     LoadTools();
@@ -1491,8 +1445,8 @@ namespace AgOpenGPS
         {
             isLightbarOn = !isLightbarOn;
             lightbarToolStripMenuItem.Checked = isLightbarOn;
-            Settings.Default.setMenu_isLightbarOn = isLightbarOn;
-            Settings.Default.Save();
+            Properties.Settings.Default.setMenu_isLightbarOn = isLightbarOn;
+            Properties.Settings.Default.Save();
         }
         private void simulatorOnToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1526,8 +1480,8 @@ namespace AgOpenGPS
                 }
             }
 
-            Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
-            Settings.Default.Save();
+            Properties.Settings.Default.setMenu_isSimulatorOn = simulatorOnToolStripMenuItem.Checked;
+            Properties.Settings.Default.Save();
         }
 
 
@@ -1603,9 +1557,16 @@ namespace AgOpenGPS
             btnResetSteerAngle.Text = sim.steerAngleScrollBar.ToString("N1");
         }
 
+        private void hsbarStepDistance_ValueChanged(object sender, EventArgs e)
+        {
+            sim.stepDistance = ((double)(hsbarStepDistance.Value / 36.0));
+            if (sim.reverse) sim.stepDistance *= -1;
+        }
+
         private void hsbarStepDistance_Scroll(object sender, ScrollEventArgs e)
         {
-            sim.stepDistance = ((double)(hsbarStepDistance.Value / 3.6));
+            sim.stepDistance = ((double)(hsbarStepDistance.Value / 36.0));
+            if (sim.reverse) sim.stepDistance *= -1;
         }
 
         private void btnResetSteerAngle_Click(object sender, EventArgs e)
@@ -1622,8 +1583,12 @@ namespace AgOpenGPS
             btnResetSteerAngle.Text = 0.ToString("N1");
             sim.headingTrue = 0;
             sim.stepDistance = 1.3889;
+
+            sim.reverse = false;
+            btnReverseDirection.BackgroundImage = Properties.Resources.UpArrow64;
+
             sim.speed = 5.0;
-            hsbarStepDistance.Value = 5;
+            hsbarStepDistance.Value = 50;
 
             sim.latitude = Properties.Settings.Default.setGPS_SimLatitude;
             sim.longitude = Properties.Settings.Default.setGPS_SimLongitude;
@@ -1646,32 +1611,34 @@ namespace AgOpenGPS
             pl.Checked = false;
 
 
-            string Language = "en";
-            if (sender is ToolStripMenuItem StripItem)
+            try
             {
-                Language = StripItem.Name;
-                StripItem.Checked = true;
+                string Language = "en";
+                if (sender is ToolStripMenuItem StripItem)
+                {
+                    Language = StripItem.Name;
+                    StripItem.Checked = true;
+                }
+                else
+                {
+                    Language = sender.ToString();
+                    ToolStripMenuItem test = (ToolStripMenuItem)menustripLanguage.DropDownItems[Language];
+                    test.Checked = true;
+                }
+                String.Culture = new System.Globalization.CultureInfo(Properties.Settings.Default.setF_culture = Language);
+                Properties.Settings.Default.Save();
             }
-            else
+            catch (Exception)
             {
-                Language = sender.ToString();
-                ToolStripMenuItem test = (ToolStripMenuItem)menustripLanguage.DropDownItems[Language];
-                test.Checked = true;
+
+                Properties.Settings.Default.setF_culture = "en";
+                Properties.Settings.Default.Save();
             }
-            String.Culture = new System.Globalization.CultureInfo(Settings.Default.setF_culture = Language);
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(Properties.Settings.Default.setF_culture);
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(Properties.Settings.Default.setF_culture);
 
-            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(Settings.Default.setF_culture);
-            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(Settings.Default.setF_culture);
 
-            Settings.Default.Save();
             UpdateGuiText();
-
-            //adding or editing "Language" subkey to the "SOFTWARE" subkey  
-            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AgOpenGPS");
-
-            //storing the values  
-            key.SetValue("Language", Language);
-            key.Close();
         }
     }//end class
 }//end namespace

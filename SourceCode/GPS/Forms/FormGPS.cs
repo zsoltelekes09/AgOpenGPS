@@ -1,7 +1,4 @@
-﻿//Please, if you use this, share the improvements
-
-using AgOpenGPS.Properties;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -11,8 +8,6 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Media;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -53,7 +48,7 @@ namespace AgOpenGPS
         public bool isSavingFile = false, isLogNMEA = false, isLogElevation = false;
 
         //texture holders
-        public uint[] texture = new uint[15];
+        public uint[] texture = new uint[12];
 
         //the currentversion of software
         public string currentVersionStr, inoVersionStr;
@@ -64,6 +59,8 @@ namespace AgOpenGPS
 
         //create instance of a stopwatch for timing of frames and NMEA hz determination
         public readonly Stopwatch swHz = new Stopwatch();
+
+        private readonly Timer Timer = new Timer();
 
         //whether or not to use Stanley control
         public bool isStanleyUsed = true;
@@ -83,7 +80,7 @@ namespace AgOpenGPS
         public int TestAutoSteerAngle = 0;
         public int TotalSections = 0;
 
-        public CGuidance Guidance = new CGuidance();
+        public CGuidance Guidance;
 
         /// <summary>
         /// create the scene camera
@@ -101,11 +98,6 @@ namespace AgOpenGPS
         public CNMEA pn;
 
         /// <summary>
-        /// AB Line object
-        /// </summary>
-        public CABLine ABLines;
-
-        /// <summary>
         /// TramLine class for boundary and settings
         /// </summary>
         public CTram tram;
@@ -119,11 +111,6 @@ namespace AgOpenGPS
         /// Contour Mode Instance
         /// </summary>
         public CContour ct;
-
-        /// <summary>
-        /// ABCurve instance
-        /// </summary>
-        public CABCurve CurveLines;
 
         /// <summary>
         /// Auto Headland YouTurn
@@ -228,6 +215,7 @@ namespace AgOpenGPS
 
             //winform initialization
             InitializeComponent();
+            Timer.Tick += new EventHandler(TimerRepeat_Tick);
 
             Draggable();
 
@@ -243,14 +231,10 @@ namespace AgOpenGPS
             //our NMEA parser
             pn = new CNMEA(this);
 
-            //create the ABLine instance
-            ABLines = new CABLine(this);
+            Guidance = new CGuidance(this);
 
             //new instance of contour mode
             ct = new CContour(this);
-
-            //new instance of contour mode
-            CurveLines = new CABCurve(this);
 
             //instance of tram
             tram = new CTram(this);
@@ -339,8 +323,6 @@ namespace AgOpenGPS
 
             //Tools Menu
             treePlantToolStrip.Text = String.Get("gsTreePlanter");
-            SmoothABtoolStripMenu.Text = String.Get("gsSmoothABCurve");
-            toolStripBtnMakeBndContour.Text = String.Get("gsMakeBoundaryContours");
             boundariesToolStripMenuItem.Text = String.Get("gsBoundary");
             headlandToolStripMenuItem.Text = String.Get("gsHeadland");
             deleteContourPathsToolStripMenuItem.Text = String.Get("gsDeleteContourPaths");
@@ -402,18 +384,18 @@ namespace AgOpenGPS
 
             //remembered window position
 
-            if (Settings.Default.setWindow_Maximized)
+            if (Properties.Settings.Default.setWindow_Maximized)
                 WindowState = FormWindowState.Maximized;
-            Location = Settings.Default.setWindow_Location;
-            Size = Settings.Default.setWindow_Size;
+            Location = Properties.Settings.Default.setWindow_Location;
+            Size = Properties.Settings.Default.setWindow_Size;
 
 
-            if (Settings.Default.setDisplay_isStartFullScreen)
+            if (Properties.Settings.Default.setDisplay_isStartFullScreen)
             {
                 this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.None;
                 this.WindowState = FormWindowState.Maximized;
-                btnFullScreen.BackgroundImage = Resources.WindowNormal;
+                btnFullScreen.BackgroundImage = Properties.Resources.WindowNormal;
                 isFullScreen = true;
             }
             else
@@ -421,8 +403,8 @@ namespace AgOpenGPS
                 isFullScreen = false;
             }
 
-            vehicleFileName = Vehicle.Default.setVehicle_vehicleName;
-            toolFileName = Vehicle.Default.setVehicle_toolName;
+            vehicleFileName = Properties.Vehicle.Default.setVehicle_vehicleName;
+            toolFileName = Properties.Vehicle.Default.setVehicle_toolName;
 
 
             currentVersionStr = Application.ProductVersion.ToString(CultureInfo.InvariantCulture);
@@ -435,9 +417,9 @@ namespace AgOpenGPS
             inoVersionStr = inoV.ToString();
 
 
-            if (Settings.Default.setDisplay_isTermsOn)
+            if (Properties.Settings.Default.setDisplay_isTermsOn)
             {
-                SetLanguage((object)Settings.Default.setF_culture, null);
+                SetLanguage((object)Properties.Settings.Default.setF_culture, null);
 
                 Form form = new Form_First(this);
                 form.ShowDialog(this);
@@ -468,8 +450,8 @@ namespace AgOpenGPS
                     else
                     {
                         isUDPSendConnected = false;
-                        Settings.Default.setF_CurrentDir = currentFieldDirectory;
-                        Settings.Default.Save();
+                        Properties.Settings.Default.setF_CurrentDir = currentFieldDirectory;
+                        Properties.Settings.Default.Save();
 
                         FileSaveEverythingBeforeClosingField();
                     }
@@ -479,26 +461,26 @@ namespace AgOpenGPS
             //save window settings
             if (WindowState == FormWindowState.Normal)
             {
-                Settings.Default.setWindow_Location = Location;
-                Settings.Default.setWindow_Size = Size;
+                Properties.Settings.Default.setWindow_Location = Location;
+                Properties.Settings.Default.setWindow_Size = Size;
             }
             else
             {
-                Settings.Default.setWindow_Location = RestoreBounds.Location;
-                Settings.Default.setWindow_Size = RestoreBounds.Size;
+                Properties.Settings.Default.setWindow_Location = RestoreBounds.Location;
+                Properties.Settings.Default.setWindow_Size = RestoreBounds.Size;
             }
 
-            Settings.Default.setWindow_Maximized = WindowState == FormWindowState.Maximized;
-            Settings.Default.setWindow_Minimized = WindowState == FormWindowState.Minimized;
+            Properties.Settings.Default.setWindow_Maximized = WindowState == FormWindowState.Maximized;
+            Properties.Settings.Default.setWindow_Minimized = WindowState == FormWindowState.Minimized;
 
-            Settings.Default.setDisplay_camPitch = camera.camPitch;
-            Settings.Default.setF_UserTotalArea = fd.workedAreaTotalUser;
-            Settings.Default.setF_UserTripAlarm = fd.userSquareMetersAlarm;
+            Properties.Settings.Default.setDisplay_camPitch = camera.camPitch;
+            Properties.Settings.Default.setF_UserTotalArea = fd.workedAreaTotalUser;
+            Properties.Settings.Default.setF_UserTripAlarm = fd.userSquareMetersAlarm;
 
-            //Settings.Default.setDisplay_panelSnapLocation = panelSnap.Location;
-            Settings.Default.setDisplay_panelSimLocation = panelSim.Location;
+            //Properties.Settings.Default.setDisplay_panelSnapLocation = panelSnap.Location;
+            Properties.Settings.Default.setDisplay_panelSimLocation = panelSim.Location;
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
 
 
             List<Task> tasks = new List<Task>();
@@ -539,180 +521,36 @@ namespace AgOpenGPS
         public void LoadGLTextures()
         {
             GL.Enable(EnableCap.Texture2D);
-
-            using (Bitmap bitmap = Resources.Landscape)
+            Bitmap[] tt = new Bitmap[]
             {
-                GL.GenTextures(1, out texture[0]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[0]);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
-                bitmap.UnlockBits(bitmapData);
-            }
+               Properties.Resources.Landscape,Properties.Resources.Floor,Properties.Resources.Font,Properties.Resources.Turn,
+               Properties.Resources.TurnCancel,Properties.Resources.TurnManual,Properties.Resources.Compass,Properties.Resources.Speedo,
+               Properties.Resources.SpeedoNeedle,Properties.Resources.Lift,Properties.Resources.LandscapeNight,Properties.Resources.Steer
+            };
 
-            using (Bitmap bitmap2 = Resources.Floor)
+            for (int h = 0; h < tt.Length; h++)
             {
-                GL.GenTextures(1, out texture[1]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[1]);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-                BitmapData bitmapData2 = bitmap2.LockBits(new Rectangle(0, 0, bitmap2.Width, bitmap2.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData2.Width, bitmapData2.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData2.Scan0);
-                bitmap2.UnlockBits(bitmapData2);
-            }
-
-            using (Bitmap bitmap = Resources.Font)
-            {
-                GL.GenTextures(1, out texture[2]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[2]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-
-                font.textureWidth = bitmap.Width; font.textureHeight = bitmap.Height;
-            }
-
-            using (Bitmap bitmap = Resources.Turn)
-            {
-                GL.GenTextures(1, out texture[3]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[3]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            }
-
-            using (Bitmap bitmap = Resources.TurnCancel)
-            {
-                GL.GenTextures(1, out texture[4]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[4]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            }
-
-            using (Bitmap bitmap = Resources.TurnManual)
-            {
-                GL.GenTextures(1, out texture[5]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[5]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            }
-
-            using (Bitmap bitmap = Resources.Compass)
-            {
-                GL.GenTextures(1, out texture[6]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[6]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9726);
-            }
-
-            using (Bitmap bitmap = Resources.Speedo)
-            {
-                GL.GenTextures(1, out texture[7]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[7]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-            }
-
-            using (Bitmap bitmap = Resources.SpeedoNeedle)
-            {
-                GL.GenTextures(1, out texture[8]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[8]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            }
-
-            using (Bitmap bitmap = Resources.Lift)
-            {
-                GL.GenTextures(1, out texture[9]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[9]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            }
-
-            using (Bitmap bitmap = Resources.LandscapeNight)
-            {
-                GL.GenTextures(1, out texture[10]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[10]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
-            }
-
-            using (Bitmap bitmap = Resources.Steer)
-            {
-                GL.GenTextures(1, out texture[11]);
-                GL.BindTexture(TextureTarget.Texture2D, texture[11]);
-                BitmapData data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-                bitmap.UnlockBits(data);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
+                using (Bitmap bitmap = tt[h])
+                {
+                    GL.GenTextures(1, out texture[h]);
+                    GL.BindTexture(TextureTarget.Texture2D, texture[h]);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9729);
+                    BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData.Width, bitmapData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData.Scan0);
+                    bitmap.UnlockBits(bitmapData);
+                    if (h == 2)
+                    {
+                        font.textureWidth = bitmap.Width; font.textureHeight = bitmap.Height;
+                    }
+                    else if (h == 3 || h == 4 || h == 5 || h == 8 || h == 9)
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                    else if (h == 6)
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9726);
+                }
             }
         }// Load Bitmaps And Convert To Textures
 
-        public void StartLocalUDPServer()
-        {
-            //inter App sockets
-            try
-            {
-                // Initialise the delegate which updates the status
-                updateStatusDelegate = new UpdateStatusDelegate(UpdateAppStatus);
-
-                // Initialise the socket
-                sendToAppSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-                // Initialise the IPEndPoint for the server to send on port 15554
-                IPEndPoint server = new IPEndPoint(IPAddress.Loopback, 15554);
-                sendToAppSocket.Bind(server);
-
-                // Initialise the client socket
-                recvFromAppSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-                // Initialise the IPEndPoint for and listen on port 15555
-                IPEndPoint client = new IPEndPoint(IPAddress.Loopback, 15555);
-                recvFromAppSocket.Bind(client);
-
-                //Our external app address & port number
-                epAppOne = new IPEndPoint(IPAddress.Loopback, 17777);
-                //epAppTwo = new IPEndPoint(zeroIP, 16666);
-
-                // Initialise the IPEndPoint for the client
-                EndPoint clientEp = new IPEndPoint(IPAddress.Loopback, 0);
-
-                // Start listening for incoming data
-                recvFromAppSocket.BeginReceiveFrom(appBuffer, 0, appBuffer.Length, SocketFlags.None,
-                                                ref clientEp, new AsyncCallback(ReceiveAppData), recvFromAppSocket);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Load Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         public void SwapDirection(bool Reset = true)
         {
@@ -739,10 +577,10 @@ namespace AgOpenGPS
 
         public void CheckToolSettings()
         {
-            if (Vehicle.Default.ToolSettings == null)
+            if (Properties.Vehicle.Default.ToolSettings == null)
             {
-                Vehicle.Default.ToolSettings = new List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -4.415, -1.415, 0 }, new double[] { -1.5, 1.5, 4 }, new double[] { 1.415, 4.415, 0 } } } };
-                Vehicle.Default.Save();
+                Properties.Vehicle.Default.ToolSettings = new List<ToolSettings>() { new ToolSettings() { Sections = { new double[] { -4.415, 3.0}, new double[] { 1.415, 3.0} } }, new ToolSettings() { HitchLength = 3.0, BehindPivot = false, Sections = { new double[] { -1.5, 3.0 } } } };
+                Properties.Vehicle.Default.Save();
             }
         }
 
@@ -752,14 +590,14 @@ namespace AgOpenGPS
         {
             CheckToolSettings();
 
-            for (int i = Tools.Count - 1; i >= Vehicle.Default.ToolSettings.Count; i--)
+            for (int i = Tools.Count - 1; i >= Properties.Vehicle.Default.ToolSettings.Count; i--)
             {
                 TotalSections -= Tools[i].numOfSections;
                 Tools[i].RemoveSections();
                 Tools.RemoveAt(i);
             }
 
-            for (int i = 0; i < Vehicle.Default.ToolSettings.Count; i++)
+            for (int i = 0; i < Properties.Vehicle.Default.ToolSettings.Count; i++)
             {
                 if (Tools.Count <= i)
                 {
@@ -776,7 +614,7 @@ namespace AgOpenGPS
         //request a new job
         public void JobNew()
         {
-            if (Settings.Default.setMenu_isOGLZoomOn == 1)
+            if (Properties.Settings.Default.setMenu_isOGLZoomOn == 1)
             {
                 oglZoom.BringToFront();
                 oglZoom.Width = 300;
@@ -809,29 +647,43 @@ namespace AgOpenGPS
             snapToCurrent.Enabled = false;
 
             //CurveLine
-            btnCurve.Image = Resources.CurveOff;
-            CurveLines.BtnCurveLineOn = false;
-            CurveLines.Lines.Clear();
-            CurveLines.CurrentLine = -1;
-            CurveLines.GuidanceLines.Clear();
-            CurveLines.ResetABLine = true;
-            CurveLines.isOkToAddPoints = false;
+            btnGuidance.Image = Properties.Resources.CurveOff;
+            btnContour.Image = Properties.Resources.ContourOff;
+            btnContourPriority.Image = Properties.Resources.Snap2;
 
-            //ABLine
-            btnABLine.Image = Resources.ABLineOff;
-            ABLines.BtnABLineOn = false;
-            ABLines.ABLines.Clear();
-            ABLines.CurrentLine = -1;
-            ABLines.ResetABLine = true;
+
+
+            Guidance.BtnGuidanceOn = false;
+            Guidance.isOkToAddPoints = false;
+            Guidance.isEditing = false;
+            Guidance.GuidanceLines.Clear();
+            Guidance.Lines.Clear();
+            Guidance.CurrentLine = -1;
+            Guidance.ResetABLine = true;
+            btnCycleLines.Text = String.Get("gsOff");
+
+            //clear out contour and Lists
+            ct.ResetContour();
+
+            ct.isContourBtnOn = false;
+            ct.isContourOn = false;
+
+
+
+
+
+
+
+
 
             //TramLines
             tram.displayMode = 0;
             tram.TramList.Clear();
 
             //turn off headland
-            btnHeadlandOnOff.Image = Resources.HeadlandOff;
+            btnHeadlandOnOff.Image = Properties.Resources.HeadlandOff;
             bnd.BtnHeadLand = false;
-            btnHydLift.Image = Resources.HydraulicLiftOff;
+            btnHydLift.Image = Properties.Resources.HydraulicLiftOff;
             vehicle.BtnHydLiftOn = false;
 
             pn.latStart = 0;
@@ -857,17 +709,9 @@ namespace AgOpenGPS
             //clear the flags
             flagPts.Clear();
 
-            //clear out contour and Lists
-            btnContourPriority.Image = Resources.Snap2;
-            ct.ResetContour();
-
-            ct.isContourBtnOn = false;
-            btnContour.Image = Resources.ContourOff;
-            ct.isContourOn = false;
-
             //AutoSteer
             isAutoSteerBtnOn = false;
-            btnAutoSteer.Image = Resources.AutoSteerOff;
+            btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
 
             //auto YouTurn shutdown
             YouTurnButtons(false);
@@ -880,7 +724,7 @@ namespace AgOpenGPS
             if (recPath.isRecordOn)
             {
                 recPath.isRecordOn = false;
-                recordPathMenu.Image = Resources.BoundaryRecord;
+                recordPathMenu.Image = Properties.Resources.BoundaryRecord;
             }
 
             //reset all Port Module values
@@ -926,8 +770,8 @@ namespace AgOpenGPS
                     var result = form.ShowDialog(this);
                     if (result != DialogResult.Ignore)
                     {
-                        Settings.Default.setF_CurrentDir = currentFieldDirectory;
-                        Settings.Default.Save();
+                        Properties.Settings.Default.setF_CurrentDir = currentFieldDirectory;
+                        Properties.Settings.Default.Save();
                         FileSaveEverythingBeforeClosingField();
                         if (result == DialogResult.Yes)
                         {
@@ -956,7 +800,7 @@ namespace AgOpenGPS
                     {
                         if (!Tools[i].Sections[j].IsSectionOn)
                         {
-                            DataSend[8] = "Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State On";
+                            UpdateSendDataText("Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State On");
                             Tools[i].Sections[j].IsSectionOn = true;
                         }
                         Tools[i].Sections[j].SectionOverlapTimer = (int)(HzTime * Tools[i].TurnOffDelay + 1);
@@ -969,17 +813,17 @@ namespace AgOpenGPS
                         if (Tools[i].Sections[j].IsSectionOn && Tools[i].Sections[j].SectionOverlapTimer == 0)
                         {
                             Tools[i].Sections[j].IsSectionOn = false;
-                            DataSend[8] = "Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State Off";
+                            UpdateSendDataText("Sections Status: Tool " + (i + 1).ToString() + ", Section " + (j + 1).ToString() + ", State Off");
                         }
                     }
 
                     //MAPPING -
-
+                    
                     if (Tools[i].SuperSection)
                     {
                         if (Tools[i].Sections[j].IsMappingOn)
                         {
-                            Tools[i].Sections[j].TurnMappingOff();
+                            Tools[i].TurnMappingOff(j);
                             Tools[i].Sections[j].MappingOnTimer = 1;
                         }
                     }
@@ -990,7 +834,7 @@ namespace AgOpenGPS
                             if (Tools[i].Sections[j].MappingOnTimer > 0) Tools[i].Sections[j].MappingOnTimer--;
                             if (Tools[i].Sections[j].MappingOnTimer == 0)
                             {
-                                Tools[i].Sections[j].TurnMappingOn();
+                                Tools[i].TurnMappingOn(j);
                             }
                         }
 
@@ -1005,7 +849,7 @@ namespace AgOpenGPS
                             {
                                 if (Tools[i].Sections[j].IsMappingOn)
                                 {
-                                    Tools[i].Sections[j].TurnMappingOff();
+                                    Tools[i].TurnMappingOff(j);
                                     Tools[i].Sections[j].MappingOnTimer = 0;
                                 }
                             }
@@ -1017,31 +861,33 @@ namespace AgOpenGPS
                 {
                     if (!Tools[i].Sections[Tools[i].numOfSections].IsMappingOn)
                     {
-                        Tools[i].Sections[Tools[i].numOfSections].TurnMappingOn();
+                        Tools[i].TurnMappingOn(Tools[i].numOfSections);
                     }
                 }
-                else
+                else if (Tools[i].numOfSections > 0)
                 {
                     if (Tools[i].Sections[Tools[i].numOfSections].IsMappingOn)
                     {
-                        Tools[i].Sections[Tools[i].numOfSections].TurnMappingOff();
+                        Tools[i].TurnMappingOff(Tools[i].numOfSections);
                     }
                 }
             }
 
             if (counter > 2000) counter = 2000;
 
-            mc.Send_Sections = new byte[(int)(Math.Ceiling(counter / 8.0) + 4)];
+            mc.Send_Sections = new byte[(int)(Math.Ceiling(counter / 8.0) + 7)];
 
-            mc.Send_Sections[0] = 0x7F;
-            mc.Send_Sections[1] = 0x71;
-            mc.Send_Sections[2] = (byte)(Math.Ceiling(counter / 8.0) + 4);
-            mc.Send_Sections[3] = (byte)(counter % 8.0);
+            mc.Send_Sections[0] = 0x80;
+            mc.Send_Sections[1] = 0x81;
+            mc.Send_Sections[2] = 0x7F;
+            mc.Send_Sections[3] = 0x71;
+            mc.Send_Sections[4] = (byte)(Math.Ceiling(counter / 8.0));
+            mc.Send_Sections[5] = (byte)(counter % 8.0);
 
 
             int set = 1;
             int machine = 0;
-            int idx = 4;
+            int idx = 6;
 
             for (int i = 0; i < Tools.Count; i++)
             {
@@ -1088,12 +934,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos3, String.Get("gsTurnOff"));
-                        mc.Send_Uturn[3] &= 0b11111110;
+                        mc.Send_Uturn[5] &= 0b11111110;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos3, String.Get("gsTurnOn"));
-                        mc.Send_Uturn[3] |= 0b00000001;
+                        mc.Send_Uturn[5] |= 0b00000001;
                     }
                     break;
 
@@ -1101,12 +947,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos4, String.Get("gsTurnOff"));
-                        mc.Send_Uturn[3] &= 0b11111101;
+                        mc.Send_Uturn[5] &= 0b11111101;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos4, String.Get("gsTurnOn"));
-                        mc.Send_Uturn[3] |= 0b00000010;
+                        mc.Send_Uturn[5] |= 0b00000010;
                     }
                     break;
 
@@ -1114,12 +960,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos5, String.Get("gsTurnOff"));
-                        mc.Send_Uturn[3] &= 0b11111011;
+                        mc.Send_Uturn[5] &= 0b11111011;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos5, String.Get("gsTurnOn"));
-                        mc.Send_Uturn[3] |= 0b00000100;
+                        mc.Send_Uturn[5] |= 0b00000100;
                     }
                     break;
 
@@ -1127,12 +973,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos6, String.Get("gsTurnOff"));
-                        mc.Send_Uturn[3] &= 0b11110111;
+                        mc.Send_Uturn[5] &= 0b11110111;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos6, String.Get("gsTurnOn"));
-                        mc.Send_Uturn[3] |= 0b00001000;
+                        mc.Send_Uturn[5] |= 0b00001000;
                     }
                     break;
 
@@ -1140,12 +986,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos7, String.Get("gsTurnOff"));
-                        mc.Send_Uturn[3] &= 0b11101111;
+                        mc.Send_Uturn[5] &= 0b11101111;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos7, String.Get("gsTurnOn"));
-                        mc.Send_Uturn[3] |= 0b00010000;
+                        mc.Send_Uturn[5] |= 0b00010000;
                     }
                     break;
 
@@ -1153,12 +999,12 @@ namespace AgOpenGPS
                     if (action == 0)
                     {
                         TimedMessageBox(1000, seq.pos8, String.Get("gsTurnOff"));
-                        mc.Send_Uturn[3] &= 0b11011111;
+                        mc.Send_Uturn[5] &= 0b11011111;
                     }
                     else
                     {
                         TimedMessageBox(1000, seq.pos8, String.Get("gsTurnOn"));
-                        mc.Send_Uturn[3] |= 0b00100000;
+                        mc.Send_Uturn[5] |= 0b00100000;
                     }
                     break;
             }
@@ -1202,7 +1048,7 @@ namespace AgOpenGPS
                 {
                     for (int j = 0; j < Tools[i].Sections.Count; j++)
                     {
-                        if (Tools[i].Sections[j].IsMappingOn) Tools[i].Sections[j].TurnMappingOff();
+                        if (Tools[i].Sections[j].IsMappingOn) Tools[i].TurnMappingOff(j);
                         Tools[i].Sections[j].SectionOnRequest = false;
                     }
                 }
@@ -1273,29 +1119,34 @@ namespace AgOpenGPS
 
             for (int i = 0; i < Tools.Count; i++)
             {
-                for (int j = 0; j < Tools[i].Sections.Count; j++)
+                if (Tools[i].Sections.Count > 0)
                 {
-                    // the follow up to sections patches
-                    if (Tools[i].Sections[j].IsMappingOn && (patchCount = Tools[i].Sections[j].triangleList.Count) > 0)
-                    {
-                        if (color)
-                        {
-                            if (isDay) GL.Color4((byte)Tools[i].Sections[j].triangleList[0].Northing, (byte)Tools[i].Sections[j].triangleList[0].Easting, (byte)Tools[i].Sections[j].triangleList[0].Heading, (byte)152);
-                            else GL.Color4((byte)Tools[i].Sections[j].triangleList[0].Northing, (byte)Tools[i].Sections[j].triangleList[0].Easting, (byte)Tools[i].Sections[j].triangleList[0].Heading, (byte)(152 * 0.5));
-                        }
-                        //draw the triangle in each triangle strip
-                        GL.Begin(PrimitiveType.TriangleStrip);
+                    Vec2 diff = (Tools[i].RightPoint - Tools[i].LeftPoint) / Tools[i].ToolWidth;
 
-                        for (int k = 1; k < patchCount; k++)
+                    for (int j = 0; j < Tools[i].Sections.Count; j++)
+                    {
+                        // the follow up to sections patches
+                        if (Tools[i].Sections[j].IsMappingOn && (patchCount = Tools[i].Sections[j].triangleList.Count) > 0)
                         {
-                            GL.Vertex3(Tools[i].Sections[j].triangleList[k].Easting, Tools[i].Sections[j].triangleList[k].Northing, 0);
+                            if (color)
+                            {
+                                if (isDay) GL.Color4((byte)Tools[i].Sections[j].triangleList[0].Northing, (byte)Tools[i].Sections[j].triangleList[0].Easting, (byte)Tools[i].Sections[j].triangleList[0].Heading, (byte)152);
+                                else GL.Color4((byte)Tools[i].Sections[j].triangleList[0].Northing, (byte)Tools[i].Sections[j].triangleList[0].Easting, (byte)Tools[i].Sections[j].triangleList[0].Heading, (byte)(152 * 0.5));
+                            }
+                            //draw the triangle in each triangle strip
+                            GL.Begin(PrimitiveType.TriangleStrip);
+
+                            for (int k = 1; k < patchCount; k++)
+                            {
+                                GL.Vertex3(Tools[i].Sections[j].triangleList[k].Easting, Tools[i].Sections[j].triangleList[k].Northing, 0);
+                            }
+                            Vec2 Pos = Tools[i].LeftPoint + diff * (Tools[i].ToolWidth / 2 + Tools[i].Sections[j].positionLeft);
+                            GL.Vertex3(Pos.Easting, Pos.Northing, 0);
+                            Pos = Tools[i].LeftPoint + diff * (Tools[i].ToolWidth / 2 + Tools[i].Sections[j].positionRight);
+                            GL.Vertex3(Pos.Easting, Pos.Northing, 0);
+
+                            GL.End();
                         }
-                        if (Tools[i].Sections[j].IsMappingOn)
-                        {
-                            GL.Vertex3(Tools[i].Sections[j].leftPoint.Easting, Tools[i].Sections[j].leftPoint.Northing, 0);
-                            GL.Vertex3(Tools[i].Sections[j].rightPoint.Easting, Tools[i].Sections[j].rightPoint.Northing, 0);
-                        }
-                        GL.End();
                     }
                 }
             }

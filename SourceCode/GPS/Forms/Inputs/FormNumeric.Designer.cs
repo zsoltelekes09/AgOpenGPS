@@ -31,8 +31,8 @@
             this.tboxNumber = new System.Windows.Forms.TextBox();
             this.lblMax = new System.Windows.Forms.Label();
             this.lblMin = new System.Windows.Forms.Label();
-            this.BtnUp = new ProXoft.WinForms.RepeatButton();
-            this.BtnDn = new ProXoft.WinForms.RepeatButton();
+            this.BtnUp = new System.Windows.Forms.Button();
+            this.BtnDn = new System.Windows.Forms.Button();
             this.Btn1 = new System.Windows.Forms.Button();
             this.Btn2 = new System.Windows.Forms.Button();
             this.Btn3 = new System.Windows.Forms.Button();
@@ -61,7 +61,7 @@
             this.tboxNumber.TabIndex = 1;
             this.tboxNumber.Text = "1234.567890";
             this.tboxNumber.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.tboxNumber.Click += new System.EventHandler(this.tboxNumber_Click);
+            this.tboxNumber.Click += new System.EventHandler(this.TboxNumber_Click);
             // 
             // lblMax
             // 
@@ -99,6 +99,7 @@
             this.BtnUp.TabIndex = 148;
             this.BtnUp.UseVisualStyleBackColor = false;
             this.BtnUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnDistanceUp_MouseDown);
+            this.BtnUp.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // BtnDn
             // 
@@ -116,6 +117,7 @@
             this.BtnDn.TabIndex = 147;
             this.BtnDn.UseVisualStyleBackColor = false;
             this.BtnDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnDistanceDn_MouseDown);
+            this.BtnDn.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // Btn1
             // 
@@ -394,7 +396,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Enter a Value";
             this.Activated += new System.EventHandler(this.FormNumeric_Activated);
-            this.Load += new System.EventHandler(this.FormNumeric_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FormNumeric_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -405,8 +406,8 @@
         private System.Windows.Forms.TextBox tboxNumber;
         private System.Windows.Forms.Label lblMax;
         private System.Windows.Forms.Label lblMin;
-        private ProXoft.WinForms.RepeatButton BtnUp;
-        private ProXoft.WinForms.RepeatButton BtnDn;
+        private System.Windows.Forms.Button BtnUp;
+        private System.Windows.Forms.Button BtnDn;
         private System.Windows.Forms.Button Btn1;
         private System.Windows.Forms.Button Btn2;
         private System.Windows.Forms.Button Btn3;

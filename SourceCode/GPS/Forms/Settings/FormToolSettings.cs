@@ -1,6 +1,4 @@
-﻿//Please, if you use this, share the improvements
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -12,15 +10,22 @@ namespace AgOpenGPS
         //class variables
         private readonly FormGPS mf;
 
-        private double toolOverlap, toolOffset, toolTurnOffDelay, toolLookAheadOn, toolLookAheadOff, MappingOnDelay, MappingOffDelay;
-        private double HitchLength, TankWheelLength, TankHitchLength, ToolWheelLength, ToolHitchLength, SectionWidth, cutoffSpeed;
-        private bool isToolTrailing, isToolBehindPivot, isToolTBT;
-        public int Here = 0, numberOfSections, MinApplied;
+        private ToolSettings setting = new ToolSettings();
 
+        private double toolOverlap, toolOffset, SectionWidth;
+        public int Here = 0, numberOfSections;
 
         public List<TextBox> Section = new List<TextBox>();
+        public List<TextBox> Section2 = new List<TextBox>();
         public List<Label> SectionText = new List<Label>();
+        public Label LastText = new Label();
 
+        private bool scroll = false;
+        private int Position = 0, oldX = 0;
+        private double viewableRatio = 0, thumbWidth = 0;
+        private readonly int SliderMaxWidth = 0, startscrollY = 0, startscrollX = 0, PanelWidth, PanelHeight;
+        private int contentWidth = 0;
+        private double ScrollCalc = 0;
 
         //constructor
         public FormToolSettings(Form callingForm, int page)
@@ -68,6 +73,12 @@ namespace AgOpenGPS
                 lblDoNotExceed.Text = "* < 2952,7559 inches *";
                 lblTurnOffBelowUnits.Text = String.Get("gsMPH");
             }
+
+            SliderMaxWidth = Slider_Scroll.Size.Width;
+            startscrollY = Slider_Scroll.Location.Y;
+            startscrollX = Slider_Scroll.Location.X;
+            PanelWidth = SectionPanel.Size.Width;
+            PanelHeight = SectionPanel.Size.Height;
             //select the page as per calling menu or button from mainGPS form
             tabControl1.SelectedIndex = page;
         }
@@ -77,53 +88,54 @@ namespace AgOpenGPS
         {
             mf.CheckToolSettings();
 
+            setting = new ToolSettings(Properties.Vehicle.Default.ToolSettings[Here]);
+
             //HitchTab
-            TboxHitchLength.Text = (HitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].HitchLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxHitchLength.CheckValue(ref HitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
-            TboxTankWheelLength.Text = (TankWheelLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TankWheelLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxTankWheelLength.CheckValue(ref TankWheelLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
-            TboxTankHitchLength.Text = (TankHitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].TankHitchLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxTankHitchLength.CheckValue(ref TankHitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
-            TboxToolWheelLength.Text = (ToolWheelLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].ToolWheelLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxToolWheelLength.CheckValue(ref ToolWheelLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
-            TboxToolHitchLength.Text = (ToolHitchLength = Math.Round(Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].ToolHitchLength) * mf.m2MetImp, mf.decimals)).ToString();
-            TboxToolHitchLength.CheckValue(ref ToolHitchLength, 0, Math.Round(20 * mf.m2MetImp, mf.decimals));
+            TboxHitchLength.Text = (setting.HitchLength * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxHitchLength.CheckValue(ref setting.HitchLength, 0, 20);
+
+            TboxTankWheelLength.Text = (setting.TankWheelLength * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxTankWheelLength.CheckValue(ref setting.TankWheelLength, 0, 20);
+            TboxTankHitchLength.Text = (setting.TankHitchLength * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxTankHitchLength.CheckValue(ref setting.TankHitchLength, 0, 20);
+
+            TboxToolWheelLength.Text = (setting.ToolWheelLength * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxToolWheelLength.CheckValue(ref setting.ToolWheelLength, 0, 20);
+            TboxToolHitchLength.Text = (setting.ToolHitchLength * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxToolHitchLength.CheckValue(ref setting.ToolHitchLength, -20, 20);
 
             //SettingsTab
-            TboxOverlap.Text = (toolOverlap = Math.Round(Properties.Vehicle.Default.GuidanceOverlap * mf.m2MetImp, mf.decimals)).ToString();
-            TboxOverlap.CheckValue(ref toolOverlap, Math.Round(-25 * mf.m2MetImp, mf.decimals), Math.Round(25 * mf.m2MetImp, mf.decimals));
-            TboxOffset.Text = (toolOffset = Math.Round(Properties.Vehicle.Default.GuidanceOffset * mf.m2MetImp, mf.decimals)).ToString();
-            TboxOffset.CheckValue(ref toolOffset, Math.Round(-25 * mf.m2MetImp, mf.decimals), Math.Round(25 * mf.m2MetImp, mf.decimals));
-            TboxCutoffSpeed.Text = (cutoffSpeed = Math.Round(Properties.Vehicle.Default.ToolSettings[Here].SlowSpeedCutoff / mf.cutoffMetricImperial,3)).ToString("0.0#");
-            TboxCutoffSpeed.CheckValue(ref cutoffSpeed, 0, Math.Round(30 / mf.cutoffMetricImperial, mf.decimals));
+            TboxOverlap.Text = ((toolOverlap = Properties.Vehicle.Default.GuidanceOverlap) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxOverlap.CheckValue(ref toolOverlap, -25, 25);
+            TboxOffset.Text = ((toolOffset = Properties.Vehicle.Default.GuidanceOffset) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxOffset.CheckValue(ref toolOffset, -25, 25);
+
+
+            TboxCutoffSpeed.Text = (setting.SlowSpeedCutoff * mf.Kmh2Unit).ToString(mf.GuiFix);
+            TboxCutoffSpeed.CheckValue(ref setting.SlowSpeedCutoff, 0, 30);
 
 
 
 
-            TboxLookAheadOn.Text = (toolLookAheadOn = Properties.Vehicle.Default.ToolSettings[Here].LookAheadOn).ToString("0.0#");
-            TboxMappingOnDelay.Text = (MappingOnDelay = Properties.Vehicle.Default.ToolSettings[Here].MappingOnDelay).ToString("0.0#");
-            TboxLookAheadOff.Text = (toolLookAheadOff = Properties.Vehicle.Default.ToolSettings[Here].LookAheadOff).ToString("0.0#");
-            TboxMappingOffDelay.Text = (MappingOffDelay = Properties.Vehicle.Default.ToolSettings[Here].MappingOffDelay).ToString("0.0#");
-            TboxTurnOffDelay.Text = (toolTurnOffDelay = Properties.Vehicle.Default.ToolSettings[Here].TurnOffDelay).ToString("0.0#");
+            TboxLookAheadOn.Text = setting.LookAheadOn.ToString("0.0#");
+            TboxMappingOnDelay.Text = setting.MappingOnDelay.ToString("0.0#");
+            TboxLookAheadOff.Text = setting.LookAheadOff.ToString("0.0#");
+            TboxMappingOffDelay.Text = setting.MappingOffDelay.ToString("0.0#");
+            TboxTurnOffDelay.Text = setting.TurnOffDelay.ToString("0.0#");
 
             //SectionsTab
-            TboxSectionWidth.Text = (SectionWidth = Math.Round(Properties.Vehicle.Default.setTool_defaultSectionWidth * mf.m2MetImp, mf.decimals)).ToString();
-            TboxMinApplied.Text = (MinApplied = Properties.Vehicle.Default.ToolSettings[Here].MinApplied).ToString();
+            TboxSectionWidth.Text = ((SectionWidth = Properties.Vehicle.Default.setTool_defaultSectionWidth) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxMinApplied.Text = setting.MinApplied.ToString();
             TboxNumSections.Text = (numberOfSections = Properties.Vehicle.Default.ToolSettings[Here].Sections.Count).ToString();
-
-
-            isToolBehindPivot = Properties.Vehicle.Default.ToolSettings[Here].BehindPivot;
-            isToolTrailing = Properties.Vehicle.Default.ToolSettings[Here].Trailing;
-            isToolTBT = Properties.Vehicle.Default.ToolSettings[Here].TBT;
 
             rbtnTBT.Checked = false;
             rbtnTrailing.Checked = false;
             rbtnFixedRear.Checked = false;
             rbtnFront.Checked = false;
 
-            if (!isToolBehindPivot) rbtnFront.Checked = true;
-            else if (isToolTBT) rbtnTBT.Checked = true;
-            else if (!isToolTrailing) rbtnFixedRear.Checked = true;
+            if (!setting.BehindPivot) rbtnFront.Checked = true;
+            else if (setting.TBT) rbtnTBT.Checked = true;
+            else if (!setting.Trailing) rbtnFixedRear.Checked = true;
             else rbtnTrailing.Checked = true;
 
             btnChangeAttachment.Enabled = false;
@@ -141,52 +153,45 @@ namespace AgOpenGPS
         private void BtnOK_Click(object sender, EventArgs e)
         {
             mf.CheckToolSettings();
-            double Width = 0;
+            double ToolWidth = 0;
             for (int i = 0; i < Section.Count; i++)
             {
-                Width += Convert.ToDouble(Section[i].Text) * mf.metImp2m;//go back to meters
+                ToolWidth += Math.Round(Convert.ToDouble(Section[i].Text) * mf.Unit2Mtr, 2, MidpointRounding.AwayFromZero);
+                if (i < Section2.Count)
+                    ToolWidth += Math.Round(Convert.ToDouble(Section2[i].Text) * mf.Unit2Mtr, 2, MidpointRounding.AwayFromZero);
             }
 
-            if (Width > 75) return;
+            if (ToolWidth > 75) return;
 
-            //Tool  ------------------------------------------------------------------------------------------
+            //Tool  ---------------------------------------------------------
             if (Here > Properties.Vehicle.Default.ToolSettings.Count) Here = 0;
-            Properties.Vehicle.Default.ToolSettings[Here].LookAheadOn = toolLookAheadOn;
-            Properties.Vehicle.Default.ToolSettings[Here].LookAheadOff = toolLookAheadOff;
-            Properties.Vehicle.Default.ToolSettings[Here].TurnOffDelay = toolTurnOffDelay;
-            Properties.Vehicle.Default.ToolSettings[Here].MappingOnDelay = MappingOnDelay;
-            Properties.Vehicle.Default.ToolSettings[Here].MappingOffDelay = MappingOffDelay;
 
-            Properties.Vehicle.Default.ToolSettings[Here].HitchLength = Math.Round(HitchLength * mf.metImp2m * (isToolBehindPivot ? -1 : 1), 2);
-            Properties.Vehicle.Default.ToolSettings[Here].TankWheelLength = Math.Round(TankWheelLength * -mf.metImp2m, 2);
-            Properties.Vehicle.Default.ToolSettings[Here].TankHitchLength = Math.Round(TankHitchLength * -mf.metImp2m, 2);
-            Properties.Vehicle.Default.ToolSettings[Here].ToolWheelLength = Math.Round(ToolWheelLength * -mf.metImp2m, 2);
-            Properties.Vehicle.Default.ToolSettings[Here].ToolHitchLength = Math.Round(ToolHitchLength * -mf.metImp2m, 2);
+            Properties.Vehicle.Default.ToolSettings[Here] = setting;
 
-            Properties.Vehicle.Default.ToolSettings[Here].Trailing = isToolTrailing;
-            Properties.Vehicle.Default.ToolSettings[Here].BehindPivot = isToolBehindPivot;
-            Properties.Vehicle.Default.ToolSettings[Here].TBT = isToolTBT;
-
-            Properties.Vehicle.Default.ToolSettings[Here].MinApplied = MinApplied;
-            Properties.Vehicle.Default.ToolSettings[Here].SlowSpeedCutoff = Math.Round(cutoffSpeed * mf.cutoffMetricImperial, 2);
-            Properties.Vehicle.Default.GuidanceOverlap = mf.Guidance.GuidanceOverlap = Math.Round(toolOverlap * mf.metImp2m,2);
-            Properties.Vehicle.Default.GuidanceOffset = mf.Guidance.GuidanceOffset = Math.Round(toolOffset * mf.metImp2m,2);
-            Properties.Vehicle.Default.GuidanceWidth = mf.Guidance.GuidanceWidth = Math.Round(Width, 2);
+            Properties.Vehicle.Default.GuidanceOverlap = mf.Guidance.GuidanceOverlap = toolOverlap;
+            Properties.Vehicle.Default.GuidanceOffset = mf.Guidance.GuidanceOffset = toolOffset;
+            Properties.Vehicle.Default.GuidanceWidth = mf.Guidance.GuidanceWidth = Math.Round(ToolWidth, 2);
             mf.Guidance.WidthMinusOverlap = mf.Guidance.GuidanceWidth - mf.Guidance.GuidanceOverlap;
+
 
             List<double[]> aa = new List<double[]>();
 
-            Width /= -2;
-            Width = Math.Round(Width, 2);
-            Width += Math.Round(toolOffset * mf.metImp2m,2);
+            double LeftPos = ToolWidth / -2;
+            LeftPos = Math.Round(LeftPos + toolOffset, 2);
+
             //save the values in each spinner for section position widths in settings
             for (int i = 0; i < Section.Count; i++)
             {
-                aa.Add(new double[] { Width, Width += Math.Round(Convert.ToDouble(Section[i].Text) * mf.metImp2m,2), 0 });
+                double size = Math.Round(Convert.ToDouble(Section[i].Text) * mf.Unit2Mtr, 2, MidpointRounding.AwayFromZero);
+                aa.Add(new double[] { LeftPos, size, 0 });
+                LeftPos += size;
+                if (i < Section2.Count)
+                {
+                    LeftPos += Math.Round(Convert.ToDouble(Section2[i].Text) * mf.Unit2Mtr, 2, MidpointRounding.AwayFromZero);
+                }
             }
             Properties.Vehicle.Default.ToolSettings[Here].Sections = aa;
-
-            Properties.Vehicle.Default.setTool_defaultSectionWidth = Math.Round(SectionWidth * mf.metImp2m,2);
+            Properties.Vehicle.Default.setTool_defaultSectionWidth = SectionWidth;
 
             Properties.Vehicle.Default.Save();
 
@@ -214,9 +219,9 @@ namespace AgOpenGPS
         {
             if (rbtnTrailing.Checked)
             {
-                isToolBehindPivot = true;
-                isToolTrailing = true;
-                isToolTBT = false;
+                setting.BehindPivot = true;
+                setting.Trailing = true;
+                setting.TBT = false;
 
                 TboxTankWheelLength.Visible = false;
                 TboxTankHitchLength.Visible = false;
@@ -231,9 +236,9 @@ namespace AgOpenGPS
             }
             else if (rbtnFixedRear.Checked)
             {
-                isToolBehindPivot = true;
-                isToolTrailing = false;
-                isToolTBT = false;
+                setting.BehindPivot = true;
+                setting.Trailing = false;
+                setting.TBT = false;
 
                 TboxTankWheelLength.Visible = false;
                 TboxTankHitchLength.Visible = false;
@@ -246,9 +251,9 @@ namespace AgOpenGPS
             }
             else if (rbtnFront.Checked)
             {
-                isToolBehindPivot = false;
-                isToolTrailing = false;
-                isToolTBT = false;
+                setting.BehindPivot = false;
+                setting.Trailing = false;
+                setting.TBT = false;
 
                 TboxTankWheelLength.Visible = false;
                 TboxTankHitchLength.Visible = false;
@@ -261,9 +266,9 @@ namespace AgOpenGPS
             }
             else //TBT
             {
-                isToolBehindPivot = true;
-                isToolTrailing = true;
-                isToolTBT = true;
+                setting.BehindPivot = true;
+                setting.Trailing = true;
+                setting.TBT = true;
 
                 TboxToolWheelLength.Visible = true;
                 TboxToolHitchLength.Visible = true;
@@ -294,17 +299,20 @@ namespace AgOpenGPS
         public void UpdateSpinners()
         {
             double Width = 0;
+
             for (int i = 0; i < Section.Count; i++)
             {
-                Width += Convert.ToDouble(Section[i].Text);
+                Width += Math.Round(Convert.ToDouble(Section[i].Text) * mf.Unit2Mtr, 2, MidpointRounding.AwayFromZero);
+                if (i < Section2.Count)
+                    Width += Math.Round(Convert.ToDouble(Section2[i].Text) * mf.Unit2Mtr, 2, MidpointRounding.AwayFromZero);
             }
-            if (Math.Round(Width, mf.decimals) > Math.Round(75 * mf.m2MetImp, mf.decimals)) SectionPanel.BackColor = Color.Red;
+            if (Width > 75) SectionPanel.BackColor = Color.Red;
             else SectionPanel.BackColor = SystemColors.Window;
 
             //update in settings dialog ONLY total tool width
             if (mf.isMetric)
             {
-                lblSecTotalWidthMeters.Text = Width.ToString("0") + " cm";
+                lblSecTotalWidthMeters.Text = Width.ToString(mf.GuiFix) + " mtr";
             }
             else
             {
@@ -316,12 +324,12 @@ namespace AgOpenGPS
 
         private void TboxToolWheelLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), ToolWheelLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, 20, setting.ToolWheelLength, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxToolWheelLength.Text = (ToolWheelLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxToolWheelLength.Text = ((setting.ToolWheelLength = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -329,25 +337,71 @@ namespace AgOpenGPS
 
         private void TboxTankWheelLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), TankWheelLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, 20, setting.TankWheelLength, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxTankWheelLength.Text = (TankWheelLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxTankWheelLength.Text = ((setting.TankWheelLength = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
         }
 
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            numberOfSections = 0;
+            UpdateNumberOfSections();
+
+            Here = (Here - 1).Clamp(mf.Tools.Count);
+            FormToolSettings_Load(null, null);
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            numberOfSections = 0;
+            UpdateNumberOfSections();
+
+            Here = (Here + 1).Clamp(mf.Tools.Count);
+            FormToolSettings_Load(null, null);
+        }
+
+        private void Button3_Click(object sender, EventArgs e)
+        {
+            numberOfSections = 0;
+            UpdateNumberOfSections();
+
+            Properties.Vehicle.Default.ToolSettings.Add(new ToolSettings() {});
+            Properties.Vehicle.Default.Save();
+
+            mf.Tools.Add(new CTool(mf, mf.Tools.Count));
+            Here = (Here + 1).Clamp(mf.Tools.Count);
+            FormToolSettings_Load(null, null);
+        }
+
+        private void Button4_Click(object sender, EventArgs e)
+        {
+            if (mf.Tools.Count > 1)
+            {
+                numberOfSections = 0;
+                UpdateNumberOfSections();
+                Properties.Vehicle.Default.ToolSettings.RemoveAt(Here);
+                Properties.Vehicle.Default.Save();
+
+                mf.Tools.RemoveAt(Here);
+                Here = (Here).Clamp(mf.Tools.Count);
+                FormToolSettings_Load(null, null);
+            }
+        }
+
         private void TboxTankHitchLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), TankHitchLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, 20, setting.TankHitchLength, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxTankHitchLength.Text = (TankHitchLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxTankHitchLength.Text = ((setting.TankHitchLength = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -355,12 +409,12 @@ namespace AgOpenGPS
 
         private void TboxToolHitchLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), ToolHitchLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(-20, 20, setting.ToolHitchLength, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxToolHitchLength.Text = (ToolHitchLength = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxToolHitchLength.Text = ((setting.ToolHitchLength = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -370,12 +424,30 @@ namespace AgOpenGPS
         {
             if (sender is TextBox b)
             {
-                using (var form = new FormNumeric(Math.Round(0.05 * mf.m2MetImp, mf.decimals), Math.Round(75 * mf.m2MetImp, mf.decimals), Math.Round(Convert.ToDouble(b.Text), mf.decimals), this, mf.isMetric, mf.decimals))
+                using (var form = new FormNumeric(0.05, 75, Convert.ToDouble(b.Text) * mf.Unit2Mtr, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
                 {
                     var result = form.ShowDialog(this);
                     if (result == DialogResult.OK)
                     {
-                        b.Text = Math.Round(form.ReturnValue, mf.decimals).ToString();
+                        b.Text = (form.ReturnValue * mf.Mtr2Unit).ToString(mf.GuiFix);
+                        UpdateSpinners();
+                    }
+                }
+                btnCancel.Focus();
+            }
+        }
+
+        private void Section_Enter2(object sender, EventArgs e)
+        {
+            if (sender is TextBox b)
+            {
+                using (var form = new FormNumeric(0, 74.9, Convert.ToDouble(b.Text) * mf.Unit2Mtr, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
+                {
+                    var result = form.ShowDialog(this);
+                    if (result == DialogResult.OK)
+                    {
+                        b.Text = (form.ReturnValue * mf.Mtr2Unit).ToString(mf.GuiFix);
+
                         UpdateSpinners();
                     }
                 }
@@ -385,16 +457,16 @@ namespace AgOpenGPS
 
         private void TboxLookAheadOn_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0.2, 5, Math.Round(toolLookAheadOn,2), this, false,2))
+            using (var form = new FormNumeric(0.2, 5, setting.LookAheadOn, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxLookAheadOn.Text = (toolLookAheadOn = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                    TboxLookAheadOn.Text = (setting.LookAheadOn = form.ReturnValue).ToString("0.0#");
 
-                    if (toolLookAheadOff > (toolLookAheadOn * 0.8))
+                    if (setting.LookAheadOff > (setting.LookAheadOn * 0.8))
                     {
-                        TboxLookAheadOff.Text = (toolLookAheadOff = Math.Round(toolLookAheadOn * 0.8,2)).ToString("0.0#");
+                        TboxLookAheadOff.Text = (setting.LookAheadOff = Math.Round(setting.LookAheadOn * 0.8, 2)).ToString("0.0#");
                     }
                 }
             }
@@ -403,20 +475,20 @@ namespace AgOpenGPS
 
         private void TboxLookAheadOff_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 4, toolLookAheadOff, this, false,2))
+            using (var form = new FormNumeric(0, 4, setting.LookAheadOff, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxLookAheadOff.Text = (toolLookAheadOff = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                    TboxLookAheadOff.Text = (setting.LookAheadOff = form.ReturnValue).ToString("0.0#");
 
-                    if (toolLookAheadOff > (toolLookAheadOn * 0.8))
+                    if (setting.LookAheadOff > (setting.LookAheadOn * 0.8))
                     {
-                        TboxLookAheadOff.Text = (toolLookAheadOff = Math.Round(toolLookAheadOn * 0.8,2)).ToString("0.0#");
+                        TboxLookAheadOff.Text = (setting.LookAheadOff = Math.Round(setting.LookAheadOn * 0.8, 2)).ToString("0.0#");
                     }
-                    if (toolLookAheadOff > 0)
+                    if (setting.LookAheadOff > 0)
                     {
-                        TboxTurnOffDelay.Text = (toolTurnOffDelay = 0).ToString("0.0#");
+                        TboxTurnOffDelay.Text = (setting.TurnOffDelay = 0).ToString("0.0#");
                     }
                 }
             }
@@ -425,12 +497,12 @@ namespace AgOpenGPS
 
         private void TboxHitchLength_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(20 * mf.m2MetImp, mf.decimals), HitchLength, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0, 20, setting.HitchLength, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxHitchLength.Text = (HitchLength = Math.Round(form.ReturnValue,mf.decimals)).ToString();
+                    TboxHitchLength.Text = ((setting.HitchLength = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -438,12 +510,12 @@ namespace AgOpenGPS
 
         private void TboxMappingOnDelay_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 5, MappingOnDelay, this, false,2))
+            using (var form = new FormNumeric(0, 5, setting.MappingOnDelay, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxMappingOnDelay.Text = (MappingOnDelay = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                    TboxMappingOnDelay.Text = (setting.MappingOnDelay = form.ReturnValue).ToString("0.0#");
                 }
             }
             btnCancel.Focus();
@@ -451,12 +523,12 @@ namespace AgOpenGPS
 
         private void TboxMappingOffDelay_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 5, MappingOffDelay, this, false,2))
+            using (var form = new FormNumeric(0, 5, setting.MappingOffDelay, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxMappingOffDelay.Text = (MappingOffDelay = Math.Round(form.ReturnValue, 2)).ToString("0.0#");
+                    TboxMappingOffDelay.Text = (setting.MappingOffDelay = form.ReturnValue).ToString("0.0#");
                 }
             }
             btnCancel.Focus();
@@ -464,16 +536,16 @@ namespace AgOpenGPS
 
         private void TboxTurnOffDelay_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 5, toolTurnOffDelay, this, false,2))
+            using (var form = new FormNumeric(0, 5, setting.TurnOffDelay, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxMappingOffDelay.Text = (toolTurnOffDelay = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                    TboxMappingOffDelay.Text = (setting.TurnOffDelay = form.ReturnValue).ToString("0.0#");
 
-                    if (toolTurnOffDelay > 0)
+                    if (setting.TurnOffDelay > 0)
                     {
-                       TboxLookAheadOff.Text = (toolLookAheadOff = 0).ToString("0.0#");
+                       TboxLookAheadOff.Text = (setting.LookAheadOff = 0).ToString("0.0#");
                     }
                 }
             }
@@ -482,12 +554,12 @@ namespace AgOpenGPS
 
         private void TboxOffset_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(-25 * mf.m2MetImp, mf.decimals), Math.Round(25 * mf.m2MetImp, mf.decimals), toolOffset, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(-25, 25, toolOffset, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxOffset.Text = (toolOffset = Math.Round(form.ReturnValue,mf.decimals)).ToString();
+                    TboxOffset.Text = ((toolOffset = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -495,12 +567,12 @@ namespace AgOpenGPS
 
         private void TboxCutoffSpeed_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(30 / mf.cutoffMetricImperial, mf.decimals), cutoffSpeed, this, false,2))
+            using (var form = new FormNumeric(0, 30, setting.SlowSpeedCutoff, this, 2, true, mf.Unit2Kmh, mf.Kmh2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxCutoffSpeed.Text = (cutoffSpeed = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                    TboxCutoffSpeed.Text = ((setting.SlowSpeedCutoff = form.ReturnValue) * mf.Kmh2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -508,12 +580,12 @@ namespace AgOpenGPS
 
         private void TboxOverlap_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(-25 * mf.m2MetImp, mf.decimals), Math.Round(25 * mf.m2MetImp, mf.decimals), toolOverlap, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(-25, 25, toolOverlap, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxOverlap.Text = (toolOverlap = Math.Round(form.ReturnValue, mf.decimals)).ToString();
+                    TboxOverlap.Text = ((toolOverlap = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -525,38 +597,29 @@ namespace AgOpenGPS
 
         private void TboxSectionWidth_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(Math.Round(0.05 * mf.m2MetImp, mf.decimals), Math.Round(75 * mf.m2MetImp, mf.decimals), SectionWidth, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(0.05, 75, SectionWidth, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    SectionWidth = Math.Round(form.ReturnValue, mf.decimals);
-                    if (mf.isMetric)
+                    SectionWidth = form.ReturnValue;
+                    double a = SectionWidth;
+
+                    while (numberOfSections * SectionWidth > 75)
                     {
-                        double a = 7500.0;
-                        while (numberOfSections * SectionWidth > 7500)
-                        {
-                            SectionWidth = Math.Round(a / numberOfSections, mf.decimals);
-                            a--;
-                        }
+                        SectionWidth = Math.Round(a / numberOfSections, mf.Decimals);
+                        a -= 0.01;
                     }
-                    else
-                    {
-                        double a = 2952.755;
-                        while (numberOfSections * SectionWidth > 2952.755)
-                        {
-                            SectionWidth = Math.Round(a / numberOfSections, mf.decimals);
-                            a--;
-                        }
-                    }
-                    TboxSectionWidth.Text = SectionWidth.ToString();
+
+                    TboxSectionWidth.Text = (SectionWidth * mf.Mtr2Unit).ToString(mf.GuiFix);
 
                     for (int i = 0; i < numberOfSections; i++)
                     {
-                        Section[i].Text = SectionWidth.ToString();
+                        Section[i].Text = (SectionWidth * mf.Mtr2Unit).ToString(mf.GuiFix);
+                        if (i < Section2.Count)
+                            Section2[i].Text = "0";
                     }
                     UpdateSpinners();
-
                 }
             }
             btnCancel.Focus();
@@ -564,30 +627,117 @@ namespace AgOpenGPS
 
         private void TboxMinApplied_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 100, MinApplied, this, true, 0))
+            using (var form = new FormNumeric(0, 100, setting.MinApplied, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    MinApplied = (int)form.ReturnValue;
-                    TboxMinApplied.Text = MinApplied.ToString();
+                    TboxMinApplied.Text = (setting.MinApplied = (int)form.ReturnValue).ToString();
                 }
             }
             btnCancel.Focus();
         }
 
+        private void Slider_Scroll_MouseDown(object sender, MouseEventArgs e)
+        {
+            oldX = MousePosition.X;
+            scroll = true;
+        }
+
+        private void Slider_Scroll_Mouse(object sender, EventArgs e)
+        {
+            scroll = false;
+        }
+
+        private void Slider_Scroll_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (scroll == true && viewableRatio < 1)
+            {
+                if (oldX != MousePosition.X)
+                {
+                    int diff = MousePosition.X - oldX;
+
+                    if (Slider_Scroll.Location.X + diff > startscrollX)
+                    {
+                        if ((Slider_Scroll.Location.X + diff) < (startscrollX + SliderMaxWidth - thumbWidth))
+                        {
+                            oldX += diff;
+                            UpdateScroll(Slider_Scroll.Location.X + diff - startscrollX);
+                        }
+                        else
+                        {
+                            int tt = (int)((Slider_Scroll.Location.X + diff) - (startscrollX + SliderMaxWidth - thumbWidth));
+
+                            oldX += diff - tt;
+
+
+                            UpdateScroll(SliderMaxWidth - thumbWidth);
+                        }
+                    }
+                    else
+                    {
+                        int tt = Slider_Scroll.Location.X + diff - startscrollX;
+
+                        oldX += diff - tt;
+
+                        UpdateScroll(0);
+                    }
+                }
+            }
+        }
+
+        public void UpdateScroll(double pos)
+        {
+            if (viewableRatio >= 1)
+            {
+                Slider_Scroll.Size = new Size(SliderMaxWidth, 50);
+                Slider_Scroll.Location = new Point(startscrollX, startscrollY);
+                Position = 0;
+            }
+            else if (pos < 0)
+                Slider_Scroll.Location = new Point((int)(startscrollX + Position / ScrollCalc + 0.5), startscrollY);
+            else
+            {
+                Slider_Scroll.Location = new Point((int)(startscrollX + pos), startscrollY);
+                Position = (int)(pos * ScrollCalc + 0.5);
+            }
+
+            SectionPanel.AutoScrollPosition = new Point(Position,0);
+            SectionPanel.Invalidate();
+            SectionPanel.PerformLayout();
+        }
+
+        void MouseWheel_Scroll(object sender, MouseEventArgs e)
+        {
+            Position -= e.Delta;
+            if (Position < 0) Position = 0;
+            else if (Position > contentWidth - SectionPanel.Size.Width) Position = contentWidth - SectionPanel.Size.Width;
+            UpdateScroll(-1);
+        }
+
+        private void Right_Scroll_Click(object sender, EventArgs e)
+        {
+            Position += 150;
+            if (Position > contentWidth - SectionPanel.Size.Width) Position = contentWidth - SectionPanel.Size.Width;
+            UpdateScroll(-1);
+        }
+
+        private void Left_Scroll_Click(object sender, EventArgs e)
+        {
+            Position -= 150;
+            if (Position < 0) Position = 0;
+            UpdateScroll(-1);
+        }
+
         private void TboxNumSections_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 100, numberOfSections, this, true, 0))
+            using (var form = new FormNumeric(0, 100, numberOfSections, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    numberOfSections = (int)form.ReturnValue;
-
-                    TboxNumSections.Text = numberOfSections.ToString();
+                    TboxNumSections.Text = (numberOfSections = (int)form.ReturnValue).ToString();
                     UpdateNumberOfSections();
-
                 }
             }
             btnCancel.Focus();
@@ -602,51 +752,111 @@ namespace AgOpenGPS
                 Section.RemoveAt(Section.Count - 1);
                 SectionText.RemoveAt(SectionText.Count - 1);
             }
-
-            int Height = 55;
-            int Width = 30;
-            for (int i = 0; i < numberOfSections; i++)
+            while (Section2.Count > numberOfSections-1 && Section2.Count > 0)
             {
-                if (i >= Section.Count)
+                Section2[Section2.Count - 1].Dispose();
+                Section2.RemoveAt(Section2.Count - 1);
+            }
+
+            int StartWidth = SectionPanel.AutoScrollPosition.X;
+
+            while (Section.Count < numberOfSections)
+            {
+                Label newlabel = new Label();
+                SectionPanel.Controls.Add(newlabel);
+                newlabel.TextAlign = ContentAlignment.MiddleCenter;
+                newlabel.Size = new Size(120, 50);
+                newlabel.Font = new Font("Tahoma", 20F, FontStyle.Bold, GraphicsUnit.Point, 0);
+                newlabel.Text = (Section.Count + 1).ToString();
+                newlabel.Location = new Point(StartWidth + 30 + 150 * Section.Count, 0);
+
+                SectionText.Add(newlabel);
+
+                TextBox newTextBox = new TextBox();
+                SectionPanel.Controls.Add(newTextBox);
+                newTextBox.TextAlign = HorizontalAlignment.Center;
+                newTextBox.Size = new Size(120, 50);
+                newTextBox.Font = new Font("Tahoma", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+
+                if (Section.Count < setting.Sections.Count)
                 {
-                    SectionText.Add(new Label());
-                    SectionPanel.Controls.Add(SectionText[i]);
-                    SectionText[i].Text = (i + 1).ToString();
-
-                    SectionText[i].Font = new Font("Tahoma", 20F, FontStyle.Bold, GraphicsUnit.Point, 0);
-                    SectionText[i].Size = new Size(120, 50);
-                    SectionText[i].TextAlign = ContentAlignment.MiddleCenter;
-
-
-                    Section.Add(new TextBox());
-                    SectionPanel.Controls.Add(Section[i]);
-
-
-                    Section[i].TextAlign = HorizontalAlignment.Center;
-                    Section[i].Size = new Size(120, 52);
-                    Section[i].Font = new Font("Tahoma", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-
-
-                    if (i < Properties.Vehicle.Default.ToolSettings[Here].Sections.Count)
-                        Section[i].Text = Math.Max((Math.Abs(Properties.Vehicle.Default.ToolSettings[Here].Sections[i][1] - Properties.Vehicle.Default.ToolSettings[Here].Sections[i][0]) * mf.m2MetImp), 1).ToString();
-                    else Section[i].Text = (Properties.Vehicle.Default.setTool_defaultSectionWidth * mf.m2MetImp).ToString();
-
-                    Section[i].Enter += Section_Enter;
-                    Section[i].Name = i.ToString();
+                    newTextBox.Text = Math.Round(setting.Sections[Section.Count][1] * mf.Mtr2Unit, mf.Decimals).ToString(mf.GuiFix);
                 }
+                else
+                    newTextBox.Text = Math.Round(Properties.Vehicle.Default.setTool_defaultSectionWidth * mf.Mtr2Unit, mf.Decimals).ToString(mf.GuiFix);
 
-                SectionText[i].Location = new Point(Width, Height - 55);
-                Section[i].Location = new Point(Width, Height);
+                newTextBox.Location = new Point(StartWidth + 30 + 150 * Section.Count, 60);
 
-                Width += 150;
+                newTextBox.Enter += Section_Enter;
+                Section.Add(newTextBox);
 
-                if (Width > 900)
+                if (Section2.Count < numberOfSections - 1)
                 {
-                    Width %= 900;
-                    Height += 150;
+                    newTextBox = new TextBox();
+                    SectionPanel.Controls.Add(newTextBox);
+                    newTextBox.TextAlign = HorizontalAlignment.Center;
+                    newTextBox.Size = new Size(120, 50);
+                    newTextBox.Font = new Font("Tahoma", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+
+                    if (Section2.Count + 1 < setting.Sections.Count)
+                    {
+                        double tt2 = setting.Sections[Section2.Count + 1][0] - setting.Sections[Section2.Count][0];
+
+                        newTextBox.Text = Math.Round((tt2 - setting.Sections[Section2.Count][1]) * mf.Mtr2Unit, mf.Decimals).ToString(mf.GuiFix);
+                    }
+                    else newTextBox.Text = "0";
+
+                    newTextBox.Location = new Point(StartWidth + 105 + 150 * Section2.Count, 120);
+
+                    newTextBox.Enter += Section_Enter2;
+                    Section2.Add(newTextBox);
                 }
             }
             UpdateSpinners();
+
+            contentWidth = 150 * numberOfSections + 30;
+            viewableRatio = PanelWidth / (double)contentWidth;
+
+            thumbWidth = (SliderMaxWidth * viewableRatio < 100) ? 100 : (SliderMaxWidth * viewableRatio);
+            Slider_Scroll.Size = new Size((int)(thumbWidth + 0.5), 50);
+
+            ScrollCalc = (contentWidth - PanelWidth) / (SliderMaxWidth - thumbWidth);
+
+            if (viewableRatio >= 1)
+            {
+                Slider_Scroll.Visible = false;
+                Right_Scroll.Visible = false;
+                Left_Scroll.Visible = false;
+                Position = 0;
+                int X = (PanelWidth - contentWidth) / 2;
+                SectionPanel.Location = new Point(X, 0);
+                SectionPanel.Size = new Size(PanelWidth - X, PanelHeight);
+            }
+            else
+            {
+                Slider_Scroll.Visible = true;
+                Right_Scroll.Visible = true;
+                Left_Scroll.Visible = true;
+                SectionPanel.Location = new Point(0, 0);
+                SectionPanel.Size = new Size(PanelWidth, PanelHeight);
+            }
+
+            SectionPanel.Controls.Add(LastText);
+            LastText.Size = new Size(150, 50);
+            LastText.Location = new Point(StartWidth + 30 + 150 * Section.Count, 150);
+            LastText.Visible = true;
+
+            SectionPanel.HorizontalScroll.Value = 1;
+            SectionPanel.AutoScroll = false;
+            SectionPanel.HorizontalScroll.Visible = false;
+            SectionPanel.HorizontalScroll.Enabled = true;
+            SectionPanel.HorizontalScroll.Maximum = Math.Max(contentWidth - SectionPanel.Size.Width, SectionPanel.Size.Width);
+            SectionPanel.HorizontalScroll.Value = 0;
+
+            if (Position < 0) Position = 0;
+            else if (Position > contentWidth - SectionPanel.Size.Width) Position = contentWidth - SectionPanel.Size.Width;
+
+            UpdateScroll(-1);
         }
 
         # endregion TextBox

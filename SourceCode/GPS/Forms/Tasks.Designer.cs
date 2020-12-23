@@ -86,12 +86,12 @@ namespace AgOpenGPS
                 }
                 else if (TaskName == TaskName.TurnLine)
                 {
-                    Task NewTask = Task_BuildTurnLine(BoundaryLine, k == 0 ? yt.triggerDistanceOffset : -yt.triggerDistanceOffset, tasks, newtoken.Token);
+                    Task NewTask = Task_BuildTurnLine(BoundaryLine, k == 0 ? Properties.Vehicle.Default.UturnTriggerDistance : -Properties.Vehicle.Default.UturnTriggerDistance, tasks, newtoken.Token);
                     TaskList.Add(new TaskClass(NewTask, BoundaryLine, TaskName.TurnLine, newtoken));
                 }
                 else if (TaskName == TaskName.GeoFence)
                 {
-                    Task NewTask = Task_BuildGeoFenceLine(BoundaryLine, k == 0 ? yt.geoFenceDistance : -yt.geoFenceDistance, tasks, newtoken.Token);
+                    Task NewTask = Task_BuildGeoFenceLine(BoundaryLine, k == 0 ? Properties.Vehicle.Default.GeoFenceOffset : -Properties.Vehicle.Default.GeoFenceOffset, tasks, newtoken.Token);
                     TaskList.Add(new TaskClass(NewTask, BoundaryLine, TaskName.GeoFence, newtoken));
                 }
             }
@@ -183,11 +183,11 @@ namespace AgOpenGPS
                 TaskList.Add(new TaskClass(NewTask, BoundaryLine, TaskName.Triangulate, newtoken));
 
                 newtoken = new CancellationTokenSource();
-                NewTask = Task_BuildGeoFenceLine(BoundaryLine, k == 0 ? yt.geoFenceDistance : -yt.geoFenceDistance, tasks, newtoken.Token);
+                NewTask = Task_BuildGeoFenceLine(BoundaryLine, k == 0 ? Properties.Vehicle.Default.GeoFenceOffset : -Properties.Vehicle.Default.GeoFenceOffset, tasks, newtoken.Token);
                 TaskList.Add(new TaskClass(NewTask, BoundaryLine, TaskName.GeoFence, newtoken));
 
                 newtoken = new CancellationTokenSource();
-                NewTask = Task_BuildTurnLine(BoundaryLine, k == 0 ? yt.triggerDistanceOffset : -yt.triggerDistanceOffset, tasks, newtoken.Token);
+                NewTask = Task_BuildTurnLine(BoundaryLine, k == 0 ? Properties.Vehicle.Default.UturnTriggerDistance : -Properties.Vehicle.Default.UturnTriggerDistance, tasks, newtoken.Token);
                 TaskList.Add(new TaskClass(NewTask, BoundaryLine, TaskName.TurnLine, newtoken));
             }
         }
@@ -350,7 +350,7 @@ namespace AgOpenGPS
                     }
                     else
                     {
-                        double offset = Math.Round(Offset * metImp2m, 2) * (Boundary == 0 ? 1 : -1);
+                        double offset = Offset * (Boundary == 0 ? 1 : -1);
                         Vec3 Point;
 
                         int Start2 = start;

@@ -403,10 +403,10 @@ namespace AgOpenGPS
         private void GetTotalPath(OneDubinsPath pathData)
         {
             //Store the waypoints of the final path here
-            List<Vec2> finalPath = new List<Vec2>();
+            List<Vec3> finalPath = new List<Vec3>();
 
             //Start position of the car
-            Vec2 currentPos = startPos;
+            Vec3 currentPos = new Vec3(startPos.Northing, startPos.Easting, 0);
             //Start heading of the car
             double theta = startHeading;
 
@@ -449,10 +449,10 @@ namespace AgOpenGPS
                 pathData.segment3TurningRight);
 
             //Add the final goal coordinate
-            finalPath.Add(new Vec2(goalPos.Northing, goalPos.Easting));
+            finalPath.Add(new Vec3(goalPos.Northing, goalPos.Easting, 0));
 
             //Save the final path in the path data
-            pathData.pathCoordinates = finalPath;
+            pathData.pathCoordinates.AddRange(finalPath);
         }
     }
 
@@ -598,7 +598,7 @@ namespace AgOpenGPS
         }
 
         //Loops through segments of a path and add new coordinates to the final path
-        public static void AddCoordinatesToPath( ref Vec2 currentPos, ref double theta, List<Vec2> finalPath, int segments, bool isTurning, bool isTurningRight)
+        public static void AddCoordinatesToPath( ref Vec3 currentPos, ref double theta, List<Vec3> finalPath, int segments, bool isTurning, bool isTurningRight)
         {
             for (int i = 0; i <= segments; i++)
             {
@@ -640,7 +640,7 @@ namespace AgOpenGPS
         public PathType pathType;
 
         //The coordinates of the final path
-        public List<Vec2> pathCoordinates;
+        public List<Vec3> pathCoordinates = new List<Vec3>();
 
         //Are we turning or driving straight in segment 2?
         public bool segment2Turning;

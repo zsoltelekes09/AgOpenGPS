@@ -51,15 +51,9 @@
             this.lblCurrentAutoSteerPort = new System.Windows.Forms.Label();
             this.btnOpenSerialAutoSteer = new System.Windows.Forms.Button();
             this.btnCloseSerialAutoSteer = new System.Windows.Forms.Button();
-            this.Send = new System.Windows.Forms.GroupBox();
-            this.tBoxSend = new System.Windows.Forms.TextBox();
-            this.Recieved = new System.Windows.Forms.GroupBox();
-            this.tBoxRecieved = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.Send.SuspendLayout();
-            this.Recieved.SuspendLayout();
             this.SuspendLayout();
             // 
             // timer1
@@ -73,7 +67,7 @@
             this.btnRescan.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnRescan.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRescan.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnRescan.Location = new System.Drawing.Point(780, 430);
+            this.btnRescan.Location = new System.Drawing.Point(780, 230);
             this.btnRescan.Name = "btnRescan";
             this.btnRescan.Size = new System.Drawing.Size(150, 80);
             this.btnRescan.TabIndex = 58;
@@ -87,7 +81,7 @@
             this.btnSerialOK.Font = new System.Drawing.Font("Tahoma", 12F);
             this.btnSerialOK.ForeColor = System.Drawing.SystemColors.ControlText;
             this.btnSerialOK.Image = global::AgOpenGPS.Properties.Resources.OK64;
-            this.btnSerialOK.Location = new System.Drawing.Point(780, 520);
+            this.btnSerialOK.Location = new System.Drawing.Point(780, 330);
             this.btnSerialOK.Name = "btnSerialOK";
             this.btnSerialOK.Size = new System.Drawing.Size(150, 80);
             this.btnSerialOK.TabIndex = 59;
@@ -348,64 +342,12 @@
             this.btnCloseSerialAutoSteer.UseVisualStyleBackColor = false;
             this.btnCloseSerialAutoSteer.Click += new System.EventHandler(this.BtnCloseSerialAutoSteer_Click);
             // 
-            // Send
-            // 
-            this.Send.BackColor = System.Drawing.SystemColors.Control;
-            this.Send.Controls.Add(this.tBoxSend);
-            this.Send.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
-            this.Send.Location = new System.Drawing.Point(10, 420);
-            this.Send.Name = "Send";
-            this.Send.Size = new System.Drawing.Size(375, 180);
-            this.Send.TabIndex = 67;
-            this.Send.TabStop = false;
-            this.Send.Text = "Send";
-            // 
-            // tBoxSend
-            // 
-            this.tBoxSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.tBoxSend.BackColor = System.Drawing.SystemColors.Window;
-            this.tBoxSend.Font = new System.Drawing.Font("Tahoma", 9.75F);
-            this.tBoxSend.Location = new System.Drawing.Point(10, 30);
-            this.tBoxSend.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tBoxSend.Multiline = true;
-            this.tBoxSend.Name = "tBoxSend";
-            this.tBoxSend.ReadOnly = true;
-            this.tBoxSend.Size = new System.Drawing.Size(355, 140);
-            this.tBoxSend.TabIndex = 41;
-            // 
-            // Recieved
-            // 
-            this.Recieved.BackColor = System.Drawing.SystemColors.Control;
-            this.Recieved.Controls.Add(this.tBoxRecieved);
-            this.Recieved.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
-            this.Recieved.Location = new System.Drawing.Point(395, 420);
-            this.Recieved.Name = "Recieved";
-            this.Recieved.Size = new System.Drawing.Size(375, 180);
-            this.Recieved.TabIndex = 68;
-            this.Recieved.TabStop = false;
-            this.Recieved.Text = "Recieved";
-            // 
-            // tBoxRecieved
-            // 
-            this.tBoxRecieved.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.tBoxRecieved.BackColor = System.Drawing.SystemColors.Window;
-            this.tBoxRecieved.Font = new System.Drawing.Font("Tahoma", 9.75F);
-            this.tBoxRecieved.Location = new System.Drawing.Point(10, 30);
-            this.tBoxRecieved.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tBoxRecieved.Multiline = true;
-            this.tBoxRecieved.Name = "tBoxRecieved";
-            this.tBoxRecieved.ReadOnly = true;
-            this.tBoxRecieved.Size = new System.Drawing.Size(355, 140);
-            this.tBoxRecieved.TabIndex = 42;
-            // 
             // FormCommSet
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(940, 610);
+            this.ClientSize = new System.Drawing.Size(940, 418);
             this.ControlBox = false;
-            this.Controls.Add(this.Recieved);
-            this.Controls.Add(this.Send);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.btnRescan);
             this.Controls.Add(this.btnSerialOK);
@@ -423,10 +365,6 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.Send.ResumeLayout(false);
-            this.Send.PerformLayout();
-            this.Recieved.ResumeLayout(false);
-            this.Recieved.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -455,9 +393,5 @@
         private System.Windows.Forms.Label lblCurrentAutoSteerPort;
         private System.Windows.Forms.Button btnOpenSerialAutoSteer;
         private System.Windows.Forms.Button btnCloseSerialAutoSteer;
-        private System.Windows.Forms.GroupBox Send;
-        private System.Windows.Forms.GroupBox Recieved;
-        private System.Windows.Forms.TextBox tBoxSend;
-        private System.Windows.Forms.TextBox tBoxRecieved;
     }
 }

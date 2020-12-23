@@ -217,7 +217,7 @@
             this.TboxWheelbase.ShortcutsEnabled = false;
             this.TboxWheelbase.Size = new System.Drawing.Size(150, 70);
             this.TboxWheelbase.TabIndex = 474;
-            this.TboxWheelbase.Text = "501";
+            this.TboxWheelbase.Text = "5.01";
             this.TboxWheelbase.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxWheelbase.WordWrap = false;
             this.TboxWheelbase.Enter += new System.EventHandler(this.TboxWheelbase_Enter);
@@ -233,7 +233,7 @@
             this.TboxAntennaOffset.ShortcutsEnabled = false;
             this.TboxAntennaOffset.Size = new System.Drawing.Size(150, 70);
             this.TboxAntennaOffset.TabIndex = 473;
-            this.TboxAntennaOffset.Text = "0";
+            this.TboxAntennaOffset.Text = "0.0";
             this.TboxAntennaOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxAntennaOffset.WordWrap = false;
             this.TboxAntennaOffset.Enter += new System.EventHandler(this.TboxAntennaOffset_Enter);
@@ -249,7 +249,7 @@
             this.TboxAntennaHeight.ShortcutsEnabled = false;
             this.TboxAntennaHeight.Size = new System.Drawing.Size(150, 70);
             this.TboxAntennaHeight.TabIndex = 472;
-            this.TboxAntennaHeight.Text = "300";
+            this.TboxAntennaHeight.Text = "3.0";
             this.TboxAntennaHeight.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxAntennaHeight.WordWrap = false;
             this.TboxAntennaHeight.Enter += new System.EventHandler(this.TboxAntennaHeight_Enter);
@@ -265,7 +265,7 @@
             this.TboxAntennaPivot.ShortcutsEnabled = false;
             this.TboxAntennaPivot.Size = new System.Drawing.Size(150, 70);
             this.TboxAntennaPivot.TabIndex = 471;
-            this.TboxAntennaPivot.Text = "5.0";
+            this.TboxAntennaPivot.Text = "0.50";
             this.TboxAntennaPivot.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxAntennaPivot.WordWrap = false;
             this.TboxAntennaPivot.Enter += new System.EventHandler(this.TboxAntennaPivot_Enter);
@@ -369,7 +369,7 @@
             this.TboxMinTurnRadius.ShortcutsEnabled = false;
             this.TboxMinTurnRadius.Size = new System.Drawing.Size(150, 70);
             this.TboxMinTurnRadius.TabIndex = 471;
-            this.TboxMinTurnRadius.Text = "301";
+            this.TboxMinTurnRadius.Text = "3.01";
             this.TboxMinTurnRadius.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxMinTurnRadius.WordWrap = false;
             this.TboxMinTurnRadius.Enter += new System.EventHandler(this.TboxMinTurnRadius_Enter);
@@ -512,7 +512,7 @@
             this.TboxSnapDistance.ShortcutsEnabled = false;
             this.TboxSnapDistance.Size = new System.Drawing.Size(150, 70);
             this.TboxSnapDistance.TabIndex = 470;
-            this.TboxSnapDistance.Text = "499";
+            this.TboxSnapDistance.Text = "4.99";
             this.TboxSnapDistance.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxSnapDistance.WordWrap = false;
             this.TboxSnapDistance.Enter += new System.EventHandler(this.TboxSnapDistance_Enter);
@@ -584,7 +584,7 @@
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.bntOK);
             this.Font = new System.Drawing.Font("Tahoma", 9.75F);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;

@@ -1,7 +1,4 @@
-﻿//Please, if you use this, share the improvements
-
-using AgOpenGPS.Properties;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -47,7 +44,7 @@ namespace AgOpenGPS
             }
 
             Properties.Settings.Default.setDisplay_colorDayMode = mf.dayColor;
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
 
             mf.SwapDayNightMode();
             mf.SwapDayNightMode();
@@ -67,7 +64,7 @@ namespace AgOpenGPS
             }
 
             Properties.Settings.Default.setDisplay_colorNightMode = mf.nightColor;
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
 
             mf.SwapDayNightMode();
             mf.SwapDayNightMode();
@@ -87,8 +84,8 @@ namespace AgOpenGPS
             }
 
 
-            Settings.Default.setDisplay_colorFieldDay = mf.fieldColorDay;
-            Settings.Default.Save();
+            Properties.Settings.Default.setDisplay_colorFieldDay = mf.fieldColorDay;
+            Properties.Settings.Default.Save();
         }
 
         private void BtnFieldNight_Click(object sender, EventArgs e)
@@ -104,8 +101,8 @@ namespace AgOpenGPS
                 }
             }
 
-            Settings.Default.setDisplay_colorFieldNight = mf.fieldColorNight;
-            Settings.Default.Save();
+            Properties.Settings.Default.setDisplay_colorFieldNight = mf.fieldColorNight;
+            Properties.Settings.Default.Save();
         }
 
         private void BtnSwap_Click(object sender, EventArgs e)

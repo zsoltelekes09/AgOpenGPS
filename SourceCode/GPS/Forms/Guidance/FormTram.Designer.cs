@@ -38,8 +38,8 @@
             this.btnMode = new System.Windows.Forms.Button();
             this.btnLeft = new System.Windows.Forms.Button();
             this.btnRight = new System.Windows.Forms.Button();
-            this.btnTriggerDistanceDn = new ProXoft.WinForms.RepeatButton();
-            this.btnTriggerDistanceUp = new ProXoft.WinForms.RepeatButton();
+            this.btnTriggerDistanceDn = new System.Windows.Forms.Button();
+            this.btnTriggerDistanceUp = new System.Windows.Forms.Button();
             this.btnSwapAB = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnAdjLeft = new System.Windows.Forms.Button();
@@ -52,28 +52,32 @@
             this.TboxOffset = new System.Windows.Forms.TextBox();
             this.TboxTramWidth = new System.Windows.Forms.TextBox();
             this.TboxPasses = new System.Windows.Forms.TextBox();
+            this.ChangeTramLine = new System.Windows.Forms.Button();
+            this.lblGuidanceName = new System.Windows.Forms.Label();
+            this.CurrentLineIdx = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // lblSmallSnapRight
             // 
             this.lblSmallSnapRight.BackColor = System.Drawing.Color.Transparent;
             this.lblSmallSnapRight.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSmallSnapRight.Location = new System.Drawing.Point(10, 240);
+            this.lblSmallSnapRight.Location = new System.Drawing.Point(10, 375);
             this.lblSmallSnapRight.Name = "lblSmallSnapRight";
-            this.lblSmallSnapRight.Size = new System.Drawing.Size(145, 30);
+            this.lblSmallSnapRight.Size = new System.Drawing.Size(190, 30);
             this.lblSmallSnapRight.TabIndex = 424;
-            this.lblSmallSnapRight.Text = "Width (cm)";
+            this.lblSmallSnapRight.Text = "Width";
             this.lblSmallSnapRight.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label1
             // 
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(10, 150);
+            this.label1.Location = new System.Drawing.Point(12, 295);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(145, 30);
+            this.label1.Size = new System.Drawing.Size(190, 30);
             this.label1.TabIndex = 425;
-            this.label1.Text = "Track (cm)";
+            this.label1.Text = "Track";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label5
@@ -90,9 +94,9 @@
             // label3
             // 
             this.label3.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(130, 330);
+            this.label3.Location = new System.Drawing.Point(136, 457);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(140, 30);
+            this.label3.Size = new System.Drawing.Size(120, 30);
             this.label3.TabIndex = 435;
             this.label3.Text = "Passes";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -101,17 +105,17 @@
             // 
             this.label7.BackColor = System.Drawing.Color.Transparent;
             this.label7.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(255, 240);
+            this.label7.Location = new System.Drawing.Point(210, 375);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(145, 30);
+            this.label7.Size = new System.Drawing.Size(190, 30);
             this.label7.TabIndex = 437;
-            this.label7.Text = "Offset (cm)";
+            this.label7.Text = "Offset";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.SystemColors.HotTrack;
-            this.panel3.Location = new System.Drawing.Point(0, 410);
+            this.panel3.Location = new System.Drawing.Point(0, 545);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(410, 5);
             this.panel3.TabIndex = 458;
@@ -119,7 +123,7 @@
             // label2
             // 
             this.label2.BackColor = System.Drawing.Color.Transparent;
-            this.label2.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(100, 100);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(210, 40);
@@ -133,7 +137,7 @@
             this.btnMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMode.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnMode.Image = global::AgOpenGPS.Properties.Resources.TramOff;
-            this.btnMode.Location = new System.Drawing.Point(165, 150);
+            this.btnMode.Location = new System.Drawing.Point(10, 150);
             this.btnMode.Name = "btnMode";
             this.btnMode.Size = new System.Drawing.Size(80, 80);
             this.btnMode.TabIndex = 460;
@@ -178,13 +182,15 @@
             this.btnTriggerDistanceDn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTriggerDistanceDn.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTriggerDistanceDn.Image = global::AgOpenGPS.Properties.Resources.DnArrow64;
-            this.btnTriggerDistanceDn.Location = new System.Drawing.Point(50, 330);
+            this.btnTriggerDistanceDn.Location = new System.Drawing.Point(10, 455);
             this.btnTriggerDistanceDn.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnTriggerDistanceDn.Name = "btnTriggerDistanceDn";
-            this.btnTriggerDistanceDn.Size = new System.Drawing.Size(70, 70);
+            this.btnTriggerDistanceDn.Size = new System.Drawing.Size(80, 80);
             this.btnTriggerDistanceDn.TabIndex = 439;
             this.btnTriggerDistanceDn.UseVisualStyleBackColor = false;
             this.btnTriggerDistanceDn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceDn_MouseDown);
+            this.btnTriggerDistanceDn.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
+            
             // 
             // btnTriggerDistanceUp
             // 
@@ -194,13 +200,14 @@
             this.btnTriggerDistanceUp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTriggerDistanceUp.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTriggerDistanceUp.Image = global::AgOpenGPS.Properties.Resources.UpArrow64;
-            this.btnTriggerDistanceUp.Location = new System.Drawing.Point(290, 330);
+            this.btnTriggerDistanceUp.Location = new System.Drawing.Point(320, 455);
             this.btnTriggerDistanceUp.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btnTriggerDistanceUp.Name = "btnTriggerDistanceUp";
-            this.btnTriggerDistanceUp.Size = new System.Drawing.Size(70, 70);
+            this.btnTriggerDistanceUp.Size = new System.Drawing.Size(80, 80);
             this.btnTriggerDistanceUp.TabIndex = 440;
             this.btnTriggerDistanceUp.UseVisualStyleBackColor = false;
             this.btnTriggerDistanceUp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BtnTriggerDistanceUp_MouseDown);
+            this.btnTriggerDistanceUp.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Btn_MouseUp);
             // 
             // btnSwapAB
             // 
@@ -209,7 +216,7 @@
             this.btnSwapAB.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSwapAB.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSwapAB.Image = global::AgOpenGPS.Properties.Resources.ABSwapPoints;
-            this.btnSwapAB.Location = new System.Drawing.Point(165, 240);
+            this.btnSwapAB.Location = new System.Drawing.Point(320, 150);
             this.btnSwapAB.Name = "btnSwapAB";
             this.btnSwapAB.Size = new System.Drawing.Size(80, 80);
             this.btnSwapAB.TabIndex = 438;
@@ -226,7 +233,7 @@
             this.btnCancel.Font = new System.Drawing.Font("Tahoma", 14.25F);
             this.btnCancel.Image = global::AgOpenGPS.Properties.Resources.SwitchOff;
             this.btnCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.btnCancel.Location = new System.Drawing.Point(40, 425);
+            this.btnCancel.Location = new System.Drawing.Point(10, 560);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(80, 80);
             this.btnCancel.TabIndex = 421;
@@ -258,7 +265,7 @@
             this.btnExit.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnExit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.btnExit.Image = global::AgOpenGPS.Properties.Resources.OK64;
-            this.btnExit.Location = new System.Drawing.Point(290, 425);
+            this.btnExit.Location = new System.Drawing.Point(320, 560);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(80, 80);
             this.btnExit.TabIndex = 234;
@@ -284,11 +291,11 @@
             // 
             this.label4.BackColor = System.Drawing.Color.Transparent;
             this.label4.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(255, 150);
+            this.label4.Location = new System.Drawing.Point(210, 295);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(145, 30);
+            this.label4.Size = new System.Drawing.Size(190, 30);
             this.label4.TabIndex = 461;
-            this.label4.Text = "WheelWidth (cm)";
+            this.label4.Text = "WheelWidth";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // TboxSnapAdj
@@ -310,10 +317,10 @@
             this.TboxWheelWidth.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxWheelWidth.BackColor = System.Drawing.SystemColors.Control;
             this.TboxWheelWidth.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxWheelWidth.Location = new System.Drawing.Point(255, 190);
+            this.TboxWheelWidth.Location = new System.Drawing.Point(210, 325);
             this.TboxWheelWidth.Name = "TboxWheelWidth";
             this.TboxWheelWidth.ShortcutsEnabled = false;
-            this.TboxWheelWidth.Size = new System.Drawing.Size(145, 40);
+            this.TboxWheelWidth.Size = new System.Drawing.Size(190, 40);
             this.TboxWheelWidth.TabIndex = 464;
             this.TboxWheelWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxWheelWidth.WordWrap = false;
@@ -324,10 +331,10 @@
             this.TboxWheelTrack.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxWheelTrack.BackColor = System.Drawing.SystemColors.Control;
             this.TboxWheelTrack.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxWheelTrack.Location = new System.Drawing.Point(10, 190);
+            this.TboxWheelTrack.Location = new System.Drawing.Point(10, 325);
             this.TboxWheelTrack.Name = "TboxWheelTrack";
             this.TboxWheelTrack.ShortcutsEnabled = false;
-            this.TboxWheelTrack.Size = new System.Drawing.Size(145, 40);
+            this.TboxWheelTrack.Size = new System.Drawing.Size(190, 40);
             this.TboxWheelTrack.TabIndex = 465;
             this.TboxWheelTrack.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxWheelTrack.WordWrap = false;
@@ -338,10 +345,10 @@
             this.TboxOffset.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxOffset.BackColor = System.Drawing.SystemColors.Control;
             this.TboxOffset.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxOffset.Location = new System.Drawing.Point(255, 280);
+            this.TboxOffset.Location = new System.Drawing.Point(210, 405);
             this.TboxOffset.Name = "TboxOffset";
             this.TboxOffset.ShortcutsEnabled = false;
-            this.TboxOffset.Size = new System.Drawing.Size(145, 40);
+            this.TboxOffset.Size = new System.Drawing.Size(190, 40);
             this.TboxOffset.TabIndex = 466;
             this.TboxOffset.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxOffset.WordWrap = false;
@@ -352,10 +359,10 @@
             this.TboxTramWidth.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxTramWidth.BackColor = System.Drawing.SystemColors.Control;
             this.TboxTramWidth.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxTramWidth.Location = new System.Drawing.Point(10, 280);
+            this.TboxTramWidth.Location = new System.Drawing.Point(10, 405);
             this.TboxTramWidth.Name = "TboxTramWidth";
             this.TboxTramWidth.ShortcutsEnabled = false;
-            this.TboxTramWidth.Size = new System.Drawing.Size(145, 40);
+            this.TboxTramWidth.Size = new System.Drawing.Size(190, 40);
             this.TboxTramWidth.TabIndex = 467;
             this.TboxTramWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxTramWidth.WordWrap = false;
@@ -366,22 +373,72 @@
             this.TboxPasses.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.TboxPasses.BackColor = System.Drawing.SystemColors.Control;
             this.TboxPasses.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TboxPasses.Location = new System.Drawing.Point(130, 360);
+            this.TboxPasses.Location = new System.Drawing.Point(136, 487);
             this.TboxPasses.Name = "TboxPasses";
             this.TboxPasses.ShortcutsEnabled = false;
-            this.TboxPasses.Size = new System.Drawing.Size(140, 40);
+            this.TboxPasses.Size = new System.Drawing.Size(120, 40);
             this.TboxPasses.TabIndex = 468;
             this.TboxPasses.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxPasses.WordWrap = false;
             this.TboxPasses.Enter += new System.EventHandler(this.TboxPasses_Enter);
+            // 
+            // ChangeTramLine
+            // 
+            this.ChangeTramLine.BackColor = System.Drawing.SystemColors.Control;
+            this.ChangeTramLine.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlText;
+            this.ChangeTramLine.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ChangeTramLine.Font = new System.Drawing.Font("Tahoma", 14.25F);
+            this.ChangeTramLine.Image = global::AgOpenGPS.Properties.Resources.ABLineCycle;
+            this.ChangeTramLine.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.ChangeTramLine.Location = new System.Drawing.Point(210, 143);
+            this.ChangeTramLine.Name = "ChangeTramLine";
+            this.ChangeTramLine.Size = new System.Drawing.Size(80, 80);
+            this.ChangeTramLine.TabIndex = 469;
+            this.ChangeTramLine.UseVisualStyleBackColor = false;
+            this.ChangeTramLine.Click += new System.EventHandler(this.ChangeTramLine_Click);
+            // 
+            // lblGuidanceName
+            // 
+            this.lblGuidanceName.Enabled = false;
+            this.lblGuidanceName.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblGuidanceName.Location = new System.Drawing.Point(10, 240);
+            this.lblGuidanceName.Margin = new System.Windows.Forms.Padding(0);
+            this.lblGuidanceName.Name = "lblGuidanceName";
+            this.lblGuidanceName.Size = new System.Drawing.Size(390, 30);
+            this.lblGuidanceName.TabIndex = 472;
+            this.lblGuidanceName.Text = "Name";
+            this.lblGuidanceName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // CurrentLineIdx
+            // 
+            this.CurrentLineIdx.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CurrentLineIdx.Location = new System.Drawing.Point(120, 150);
+            this.CurrentLineIdx.Margin = new System.Windows.Forms.Padding(0);
+            this.CurrentLineIdx.Name = "CurrentLineIdx";
+            this.CurrentLineIdx.Size = new System.Drawing.Size(80, 80);
+            this.CurrentLineIdx.TabIndex = 471;
+            this.CurrentLineIdx.Text = "9 of 99";
+            this.CurrentLineIdx.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.panel1.Location = new System.Drawing.Point(0, 280);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(410, 5);
+            this.panel1.TabIndex = 459;
             // 
             // FormTram
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.ClientSize = new System.Drawing.Size(410, 515);
+            this.ClientSize = new System.Drawing.Size(410, 650);
             this.ControlBox = false;
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.lblGuidanceName);
+            this.Controls.Add(this.CurrentLineIdx);
+            this.Controls.Add(this.ChangeTramLine);
             this.Controls.Add(this.TboxPasses);
             this.Controls.Add(this.TboxTramWidth);
             this.Controls.Add(this.TboxOffset);
@@ -406,7 +463,7 @@
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnAdjRight);
             this.Controls.Add(this.lblSmallSnapRight);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormTram";
@@ -430,8 +487,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button btnSwapAB;
-        private ProXoft.WinForms.RepeatButton btnTriggerDistanceDn;
-        private ProXoft.WinForms.RepeatButton btnTriggerDistanceUp;
+        private System.Windows.Forms.Button btnTriggerDistanceDn;
+        private System.Windows.Forms.Button btnTriggerDistanceUp;
         private System.Windows.Forms.Button btnLeft;
         private System.Windows.Forms.Button btnRight;
         private System.Windows.Forms.Panel panel3;
@@ -444,5 +501,9 @@
         private System.Windows.Forms.TextBox TboxOffset;
         private System.Windows.Forms.TextBox TboxTramWidth;
         private System.Windows.Forms.TextBox TboxPasses;
+        private System.Windows.Forms.Button ChangeTramLine;
+        private System.Windows.Forms.Label lblGuidanceName;
+        private System.Windows.Forms.Label CurrentLineIdx;
+        private System.Windows.Forms.Panel panel1;
     }
 }

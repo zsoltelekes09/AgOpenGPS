@@ -10,7 +10,8 @@ namespace AgOpenGPS
         private readonly FormGPS mf;
 
         public bool isSteerAxleAhead;
-        public bool isPivotBehindAntenna;
+        public int isPivotBehindAntenna;
+        public bool isReverse = false;
 
         public double antennaHeight;
         public double antennaPivot;
@@ -54,7 +55,7 @@ namespace AgOpenGPS
             stanleyGain = Properties.Vehicle.Default.setVehicle_stanleyGain;
             stanleyHeadingErrorGain = Properties.Vehicle.Default.setVehicle_stanleyHeadingErrorGain;
 
-            integralDistanceAway = (double)Properties.Vehicle.Default.setSteer_integralDistanceAway * 0.01;
+            integralDistanceAway = Properties.Vehicle.Default.setSteer_integralDistanceAway;
             integralHeadingLimit = Properties.Vehicle.Default.setSteer_integralHeading;
             stanleyIntegralGain = Properties.Vehicle.Default.setSteer_integralGain;
             avgXTE = Properties.Vehicle.Default.setSteer_averageXTE;
@@ -100,7 +101,7 @@ namespace AgOpenGPS
                 if (mf.Tools[i].isToolBehindPivot)
                 {
                     //hitch pin
-                    GL.Vertex3(0, mf.Tools[i].HitchLength, 0);
+                    GL.Vertex3(0, -mf.Tools[i].HitchLength, 0);
                 }
             }
             GL.End();
@@ -142,7 +143,7 @@ namespace AgOpenGPS
             //antenna
             GL.Color3(0.0f, 0.95f, 0.95f);
             GL.Begin(PrimitiveType.Points);
-            GL.Vertex3(antennaOffset, antennaPivot, 0);
+            GL.Vertex3(antennaOffset, antennaPivot * isPivotBehindAntenna, 0);
             GL.End();
 
 
@@ -220,20 +221,13 @@ namespace AgOpenGPS
             //    GL.End();
             //}
 
-            if (mf.CurveLines.BtnCurveLineOn && !mf.ct.isContourBtnOn)
+            if (!mf.ct.isContourBtnOn && mf.Guidance.BtnGuidanceOn)
             {
-                GL.Color4(0.969, 0.95, 0.9510, 0.87);
-                if (mf.CurveLines.HowManyPathsAway == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
-                else  if (mf.CurveLines.HowManyPathsAway > 0) mf.font.DrawTextVehicle(0, wheelbase, (mf.CurveLines.HowManyPathsAway) + "R", 1.5);
-                else mf.font.DrawTextVehicle(0, wheelbase, mf.CurveLines.HowManyPathsAway.ToString() + "L", 1.5);
-            }
-            else if (mf.ABLines.BtnABLineOn && !mf.ct.isContourBtnOn)
-            {
-                GL.Color4(0.96, 0.95, 0.9510, 0.87);
+                GL.Color4(0.95, 0.95, 0.95, 0.87);
 
-                if (mf.ABLines.HowManyPathsAway == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
-                else if (mf.ABLines.HowManyPathsAway >= 0) mf.font.DrawTextVehicle(0, wheelbase, mf.ABLines.HowManyPathsAway + "R", 1.5);
-                else mf.font.DrawTextVehicle(0, wheelbase, mf.ABLines.HowManyPathsAway.ToString() + "L", 1.5);
+                if (mf.Guidance.HowManyPathsAway == 0) mf.font.DrawTextVehicle(0, wheelbase, "0", 1.5);
+                else if (mf.Guidance.HowManyPathsAway >= 0) mf.font.DrawTextVehicle(0, wheelbase, mf.Guidance.HowManyPathsAway + "R", 1.5);
+                else mf.font.DrawTextVehicle(0, wheelbase, mf.Guidance.HowManyPathsAway.ToString() + "L", 1.5);
             }
 
             //draw the rigid hitch
@@ -245,7 +239,7 @@ namespace AgOpenGPS
                 {
                     GL.Begin(PrimitiveType.Lines);
                     GL.Vertex3(0, A, 0);
-                    GL.Vertex3(0, mf.Tools[i].HitchLength, 0);
+                    GL.Vertex3(0, -mf.Tools[i].HitchLength, 0);
                     GL.End();
                 }
             }

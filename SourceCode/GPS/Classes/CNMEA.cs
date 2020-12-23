@@ -399,6 +399,8 @@ Field	Meaning
                 double.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
                 speed = Math.Round(speed * 1.852, 3);
 
+                if (mf.vehicle.isReverse && speed > 0) speed *= -1;
+
                 //True heading
                 double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
             }
@@ -459,6 +461,7 @@ Field	Meaning
                 //kph for speed - knots read
                 double.TryParse(words[11], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
                 speed = Math.Round(speed * 1.852, 3);
+                if (mf.vehicle.isReverse && speed > 0) speed *= -1;
 
                 //Dual antenna derived heading
                 double.TryParse(words[12], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);
@@ -648,6 +651,7 @@ Field	Meaning
                 //Convert from knots to kph for speed
                 double.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
                 speed = Math.Round(speed * 1.852, 3);
+                if (mf.vehicle.isReverse && speed > 0) speed *= -1;
 
                 //True heading
                 double.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out HeadingForced);

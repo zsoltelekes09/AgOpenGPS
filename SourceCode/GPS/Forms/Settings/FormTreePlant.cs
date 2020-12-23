@@ -73,49 +73,40 @@ namespace AgOpenGPS
         {
             if (isRunning)
             {
-                lastDist = 0;
-                mf.treeSpacingCounter = 0;
                 if (mf.autoBtnState != FormGPS.btnStates.Off)
                 {
                     mf.autoBtnState = FormGPS.btnStates.Off;
                     mf.btnSection_Update();
                 }
-
-                mf.distanceCurrentStepFix = 0;
-                lblDistanceTree.Text = ((UInt16)mf.treeSpacingCounter).ToString();
-                lblStepDistance.Text = (mf.distanceCurrentStepFix * 100).ToString("N1");
                 btnZeroDistance.BackColor = Color.OrangeRed;
-                //mf.vehicle.treeSpacing = Properties.Settings.Default.setDistance_TreeSpacing;
             }
             else
             {
-                lastDist = 0;
                 trees = 0;
-                mf.treeSpacingCounter = 0;
                 if (mf.autoBtnState != FormGPS.btnStates.On)
                 {
                     mf.autoBtnState = FormGPS.btnStates.On;
                     mf.btnSection_Update();
                 }
-
-                mf.distanceCurrentStepFix = 0;
-                lblDistanceTree.Text = ((UInt16)mf.treeSpacingCounter).ToString();
-                lblStepDistance.Text = (mf.distanceCurrentStepFix * 100).ToString("N1");
                 btnZeroDistance.BackColor = Color.LightGreen;
-                //mf.vehicle.treeSpacing = Properties.Settings.Default.setDistance_TreeSpacing;
             }
+            lastDist = 0;
+            mf.treeSpacingCounter = 0;
+            mf.distanceCurrentStepFix = 0;
+            lblDistanceTree.Text = 0.ToString();
+            lblStepDistance.Text = (mf.distanceCurrentStepFix * 100).ToString("N1");
 
             isRunning = !isRunning;
         }
 
         private void TboxTreeSpacing_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 5000, mf.vehicle.treeSpacing, this, mf.isMetric, mf.decimals))
+            using (var form = new FormNumeric(1, 50, mf.vehicle.treeSpacing, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxTreeSpacing.Text = (mf.vehicle.treeSpacing = form.ReturnValue).ToString();
+                    TboxTreeSpacing.Text = ((mf.vehicle.treeSpacing = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnStop.Focus();
@@ -128,8 +119,6 @@ namespace AgOpenGPS
                 mf.autoBtnState = FormGPS.btnStates.Off;
                 mf.btnSection_Update();
             }
-
-            //mf.vehicle.treeSpacing = Properties.Settings.Default.setDistance_TreeSpacing;
 
             TboxTreeSpacing.Text = mf.vehicle.treeSpacing.ToString();
 

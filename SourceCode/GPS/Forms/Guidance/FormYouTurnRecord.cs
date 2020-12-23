@@ -1,7 +1,5 @@
-﻿using AgOpenGPS.Properties;
-using System;
+﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -53,7 +51,7 @@ namespace AgOpenGPS
             mf.yt.youFileList.Clear();
 
             //rotate pattern to match AB Line heading
-            double head = (mf.ABLines.CurrentLine < mf.ABLines.ABLines.Count && mf.ABLines.CurrentLine > -1) ? mf.ABLines.ABLines[mf.ABLines.CurrentLine].Heading : 0;
+            double head = (mf.Guidance.CurrentLine < mf.Guidance.Lines.Count && mf.Guidance.CurrentLine > -1) ? mf.Guidance.Lines[mf.Guidance.CurrentLine].Heading : 0;
             for (i = 0; i < pt.Length; i++)
             {
                 //since we want to unwind the heading, we go not negative for heading unlike GPS circle
@@ -94,10 +92,10 @@ namespace AgOpenGPS
             for (i = 1; i < mf.yt.youFileList.Count; i++)
                 Data += "\r\n" + mf.yt.youFileList[i].Easting + "," + mf.yt.youFileList[i].Northing;
 
-            Settings.Default.Custom = Data;
-            Settings.Default.Save();
+            Properties.Settings.Default.Custom = Data;
+            Properties.Settings.Default.Save();
 
-            mf.yt.LoadYouTurnShapeFromData(Settings.Default.Custom);
+            mf.yt.LoadYouTurnShapeFromData(Properties.Settings.Default.Custom);
             Close();
         }
 

@@ -28,7 +28,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -66,9 +66,6 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\Inputs\FormNumeric.resx">
-      <DependentUpon>FormNumeric.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Language\Stringaf.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -116,11 +113,6 @@
       <Private>False</Private>
     </Reference>
     <EmbeddedResource Include="References\OpenTK.GLControl.dll" />
-    <Reference Include="RepeatButtonControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>References\RepeatButtonControl.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <EmbeddedResource Include="References\RepeatButtonControl.dll" />
     <Reference Include="Tinkerforge, Version=2.1.16.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -146,19 +138,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AgIO\FormCommPicker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AgIO\FormCommPicker.designer.cs">
+      <DependentUpon>FormCommPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AgIO\FormCommSaver.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AgIO\FormCommSaver.designer.cs">
+      <DependentUpon>FormCommSaver.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AgIO\FormLoop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AgIO\FormLoop.Designer.cs">
+      <DependentUpon>FormLoop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AgIO\NTRIPComm.Designer.cs">
+      <DependentUpon>FormLoop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AgIO\SerialComm.Designer.cs">
+      <DependentUpon>FormLoop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AgIO\UDP.designer.cs">
+      <DependentUpon>FormLoop.cs</DependentUpon>
+    </Compile>
     <Compile Include="Classes\CHeadLand.cs" />
     <Compile Include="Language\Language.cs" />
-    <Compile Include="Classes\CAutoLoadField.cs" />
-    <Compile Include="Classes\Guidance.cs" />
+    <Compile Include="Classes\CGuidance.cs" />
     <Compile Include="Classes\CSunTimes.cs" />
     <Compile Include="Classes\CFieldData.cs" />
-    <Compile Include="Classes\CBoundaryLines.cs" />
     <Compile Include="Classes\CDubins.cs" />
     <Compile Include="Classes\CAHRS.cs" />
-    <Compile Include="Classes\CABCurve.cs" />
     <Compile Include="Classes\CFont.cs" />
     <Compile Include="Classes\CGeoFence.cs" />
-    <Compile Include="Classes\CGeoFenceLines.cs" />
     <Compile Include="Classes\CMazeGrid.cs" />
     <Compile Include="Classes\CMazePath.cs" />
     <Compile Include="Classes\CRecordedPath.cs" />
@@ -167,12 +182,10 @@
     <Compile Include="Classes\CYouTurn.cs" />
     <Compile Include="Classes\CBoundary.cs" />
     <Compile Include="Classes\CFlag.cs" />
-    <Compile Include="Classes\CABLine.cs" />
     <Compile Include="Classes\CCamera.cs" />
     <Compile Include="Classes\CContour.cs" />
     <Compile Include="Classes\CModuleComm.cs" />
     <Compile Include="Classes\CNMEA.cs" />
-    <Compile Include="Classes\CSection.cs" />
     <Compile Include="Classes\CPointData.cs" />
     <Compile Include="Classes\CVehicle.cs" />
     <Compile Include="Classes\CWorldGrid.cs" />
@@ -222,41 +235,11 @@
     <Compile Include="Forms\Pickers\FormDrivePicker.Designer.cs">
       <DependentUpon>FormDrivePicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Pickers\FormToolPicker.cs">
+    <Compile Include="Forms\Pickers\FormPicker.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Pickers\FormToolPicker.Designer.cs">
-      <DependentUpon>FormToolPicker.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormEnvPicker.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormEnvPicker.Designer.cs">
-      <DependentUpon>FormEnvPicker.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormEnvSaver.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormEnvSaver.Designer.cs">
-      <DependentUpon>FormEnvSaver.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormToolSaver.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormToolSaver.Designer.cs">
-      <DependentUpon>FormToolSaver.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormVehicleSaver.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormVehicleSaver.Designer.cs">
-      <DependentUpon>FormVehicleSaver.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormVehiclePicker.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Pickers\FormVehiclePicker.Designer.cs">
-      <DependentUpon>FormVehiclePicker.cs</DependentUpon>
+    <Compile Include="Forms\Pickers\FormPicker.Designer.cs">
+      <DependentUpon>FormPicker.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormModules.cs">
       <SubType>Form</SubType>
@@ -264,11 +247,11 @@
     <Compile Include="Forms\FormModules.Designer.cs">
       <DependentUpon>FormModules.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Guidance\FormEditAB.cs">
+    <Compile Include="Forms\Guidance\FormGuidanceEdit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Guidance\FormEditAB.Designer.cs">
-      <DependentUpon>FormEditAB.cs</DependentUpon>
+    <Compile Include="Forms\Guidance\FormGuidanceEdit.Designer.cs">
+      <DependentUpon>FormGuidanceEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Pickers\FormFilePicker.cs">
       <SubType>Form</SubType>
@@ -281,12 +264,6 @@
     </Compile>
     <Compile Include="Forms\Inputs\FormNumeric.Designer.cs">
       <DependentUpon>FormNumeric.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Guidance\FormMakeBndCon.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Guidance\FormMakeBndCon.Designer.cs">
-      <DependentUpon>FormMakeBndCon.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Settings\FormColor.cs">
       <SubType>Form</SubType>
@@ -306,11 +283,11 @@
     <Compile Include="Forms\Settings\FormNtrip.Designer.cs">
       <DependentUpon>FormNtrip.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Guidance\FormABDraw.cs">
+    <Compile Include="Forms\Guidance\FormGuidanceDraw.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Guidance\FormABDraw.Designer.cs">
-      <DependentUpon>FormABDraw.cs</DependentUpon>
+    <Compile Include="Forms\Guidance\FormGuidanceDraw.Designer.cs">
+      <DependentUpon>FormGuidanceDraw.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Settings\FormArduinoSettings.cs">
       <SubType>Form</SubType>
@@ -348,35 +325,23 @@
     <Compile Include="Forms\FormShiftPos.Designer.cs">
       <DependentUpon>FormShiftPos.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Guidance\FormSmoothAB.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Guidance\FormSmoothAB.Designer.cs">
-      <DependentUpon>FormSmoothAB.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\Settings\FormIMU.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\FormIMU.Designer.cs">
       <DependentUpon>FormIMU.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Guidance\FormABCurve.cs">
+    <Compile Include="Forms\Guidance\FormGuidance.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Guidance\FormABCurve.Designer.cs">
-      <DependentUpon>FormABCurve.cs</DependentUpon>
+    <Compile Include="Forms\Guidance\FormGuidance.Designer.cs">
+      <DependentUpon>FormGuidance.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormBoundary.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormBoundary.Designer.cs">
       <DependentUpon>FormBoundary.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FormBoundaryPlayer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormBoundaryPlayer.Designer.cs">
-      <DependentUpon>FormBoundaryPlayer.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormFieldDir.cs">
       <SubType>Form</SubType>
@@ -575,6 +540,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="aChangeLog.txt" />
+    <None Include="btnImages\Menu.png" />
+    <None Include="btnImages\File.png" />
+    <None Include="btnImages\FileLoadPrevious.png" />
+    <None Include="btnImages\FileLoad.png" />
+    <None Include="btnImages\GuidanceBoundary.png" />
+    <None Include="btnImages\GuidanceCurve.png" />
+    <None Include="btnImages\GuidanceAB.png" />
     <None Include="btnImages\ColorPicker.png" />
     <None Include="btnImages\AppIcon.ico" />
     <None Include="btnImages\Reload.png" />
@@ -585,7 +557,6 @@
     <None Include="btnImages\SwitchOff.png" />
     <None Include="btnImages\SwitchOn.png" />
     <None Include="btnImages\AddNew.png" />
-    <None Include="btnImages\FileNewAndGo.png" />
     <None Include="btnImages\OK64.png" />
     <None Include="btnImages\GPSSignalGood.png" />
     <None Include="btnImages\GPSSignalPoor.png" />
@@ -614,7 +585,6 @@
     <None Include="btnImages\HeadlandOn.png" />
     <None Include="btnImages\PointAdd.png" />
     <None Include="btnImages\ToolMenu.png" />
-    <None Include="btnImages\ToolPage1.jpg" />
     <None Include="btnImages\ToolChkTBT.png" />
     <None Include="btnImages\ToolChkFront.png" />
     <None Include="btnImages\ToolChkRear.png" />
@@ -657,22 +627,16 @@
     <None Include="btnImages\LandscapeNight.png" />
     <None Include="btnImages\Steer.png" />
     <None Include="btnImages\Landscape.png" />
-    <None Include="btnImages\ToolSettings.jpg" />
     <None Include="btnImages\ImplementSettings.png" />
-    <None Include="btnImages\SteerAhead.png" />
-    <None Include="btnImages\SteerBehind.png" />
     <None Include="btnImages\ManualOff.png" />
     <None Include="btnImages\ManualOn.png" />
     <None Include="btnImages\JobActive.png" />
     <None Include="btnImages\JobClosed.png" />
     <None Include="btnImages\FileSave.png" />
     <None Include="btnImages\Play.png" />
-    <None Include="btnImages\Stop.png" />
     <None Include="btnImages\back-button.png" />
     <None Include="btnImages\FileDontSave.png" />
     <None Include="btnImages\FileNew.png" />
-    <None Include="btnImages\FileOpen.png" />
-    <None Include="btnImages\FilePrevious.png" />
     <None Include="btnImages\ContourOff.png" />
     <None Include="btnImages\ContourOn.png" />
     <None Include="btnImages\ZoomIn48.png" />
@@ -692,7 +656,6 @@
     <None Include="btnImages\WorkSwitch.jpg" />
     <None Include="btnImages\AutoSteerOff.png" />
     <None Include="btnImages\AutoSteerOn.png" />
-    <None Include="btnImages\ZeroPitchRoll.png" />
     <None Include="btnImages\ComPorts.png" />
     <None Include="btnImages\TripOdometer.png" />
     <None Include="btnImages\ArrowLeft.png" />
@@ -705,7 +668,6 @@
     <None Include="btnImages\BoundaryDelete.png" />
     <None Include="btnImages\BoundaryOuter.png" />
     <None Include="btnImages\BoundaryRecord.png" />
-    <None Include="btnImages\FileExplorerWindows.png" />
     <None Include="btnImages\tire.jpg" />
     <None Include="btnImages\gyro.png" />
     <None Include="btnImages\KeyHole.png" />
@@ -725,11 +687,9 @@
     <None Include="btnImages\Settings48.png" />
     <None Include="btnImages\SettingsGear32.png" />
     <None Include="btnImages\AutoSteerConf.png" />
-    <None Include="btnImages\Help.png" />
     <None Include="btnImages\Webcam.png" />
     <None Include="btnImages\skull.png" />
     <None Include="btnImages\CurveOff.png" />
-    <None Include="btnImages\CurveOn.png" />
     <None Include="btnImages\AutoGo.png" />
     <None Include="btnImages\AutoStop.png" />
     <None Include="btnImages\Chart.png" />
@@ -750,11 +710,9 @@
     <None Include="btnImages\tree.png" />
     <None Include="btnImages\FileDelete.png" />
     <None Include="btnImages\FileUse.png" />
-    <None Include="btnImages\radar-icon.png" />
     <None Include="btnImages\MakeBoundaryContour.jpg" />
     <Content Include="ALicense.txt" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

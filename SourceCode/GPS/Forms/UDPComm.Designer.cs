@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Text;
-using System.Net;
-using System.Net.Sockets;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using System.Drawing;
 using System.Globalization;
+using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Security.Permissions;
+using System.Text;
+using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
@@ -24,23 +24,17 @@ namespace AgOpenGPS
         // Data stream
         private byte[] buffer = new byte[1024];
 
-        // Status delegate
-        private delegate void UpdateRecvMessageDelegate(int port, byte[] msg);
-        private UpdateRecvMessageDelegate updateRecvMessageDelegate = null;
-
         // - App Sockets  -----------------------------------------------------
-        private Socket sendToAppSocket;
-        private Socket recvFromAppSocket;
+        private Socket sendTo_App_Socket;
+        private Socket recvFrom_App_Socket;
+        
+        EndPoint recvFrom_App_EndPoint, SendTo_App_EndPoint, epNTRIP;
 
-        //endpoints of modules
-        IPEndPoint epAppOne, epAutoSteer, epNTRIP;
-        EndPoint epSender;
         // Data stream
         private byte[] appBuffer = new byte[1024];
 
         // Status delegate
         private delegate void UpdateStatusDelegate(string status);
-        private UpdateStatusDelegate updateStatusDelegate = null;
 
         //start the UDP server
         public void StartUDPServer()
@@ -49,13 +43,11 @@ namespace AgOpenGPS
             {
                 if (isUDPSendConnected) StopUDPServer();
 
-                epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
+                //epAutoSteer = new IPEndPoint(epIP, Properties.Settings.Default.setIP_autoSteerPort);
 
                 // Initialise the IPEndPoint for the client
-                epSender = new IPEndPoint(IPAddress.Any, 0);
+                //epSender = new IPEndPoint(IPAddress.Any, 0);
 
-                // Initialise the delegate which updates the message received
-                updateRecvMessageDelegate = UpdateRecvMessage;
 
                 // Initialise the socket
                 sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -64,20 +56,12 @@ namespace AgOpenGPS
                 sendSocket.EnableBroadcast = true;
                 recvSocket.EnableBroadcast = true;
 
-                // Initialise the IPEndPoint for the server and listen on port 9999
-                IPEndPoint recv = new IPEndPoint(IPAddress.Any, Properties.Settings.Default.setIP_thisPort);
-
                 // Associate the socket with this IP address and port
-                recvSocket.Bind(recv);
+                recvSocket.Bind(new IPEndPoint(IPAddress.Any, Properties.Settings.Default.setIP_thisPort));
+                sendSocket.Bind(new IPEndPoint(IPAddress.Any, 9998));
 
-                // Initialise the IPEndPoint for the server to send on port 9998
-                IPEndPoint server = new IPEndPoint(IPAddress.Any, 9998);
-                sendSocket.Bind(server);
-
-                // Initialise the IPEndPoint for the client - async listner client only!
                 EndPoint client = new IPEndPoint(IPAddress.Any, 0);
 
-                // Start listening for incoming data
                 recvSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref client, new AsyncCallback(ReceiveData), recvSocket);
                 isUDPSendConnected = true;
             }
@@ -93,7 +77,6 @@ namespace AgOpenGPS
             {
                 if (isUDPSendConnected)
                 {
-                    epAutoSteer = null;
                     sendSocket.Shutdown(SocketShutdown.Both);
                     sendSocket.Close();
                     recvSocket.Shutdown(SocketShutdown.Both);
@@ -165,6 +148,8 @@ namespace AgOpenGPS
 
                             pn.speed = (Data[66] | (Data[67] << 8) | (Data[68] << 16) | (Data[69] << 24)) * 0.0036;//to km/h
 
+                            if (vehicle.isReverse && pn.speed > 0) pn.speed *= -1;
+
                             //average the speed
                             pn.AverageTheSpeed();
 
@@ -197,7 +182,7 @@ namespace AgOpenGPS
                         {
                             int relposlength = Data[26] | (Data[27] << 8) | (Data[28] << 16) | (Data[29] << 24);//in cm!
 
-                            if (DualAntennaDistance - 5 < relposlength && relposlength < DualAntennaDistance + 5)
+                            if ((DualAntennaDistance - 0.05)*100.0 < relposlength && relposlength < (DualAntennaDistance + 0.05) * 100.0)
                             {
                                 double RelPosN = ((Data[14] | (Data[15] << 8) | (Data[16] << 16) | (Data[17] << 24)) + Data[38] * 0.01);
                                 double RelPosE = ((Data[18] | (Data[19] << 8) | (Data[20] << 16) | (Data[21] << 24)) + Data[39] * 0.01);
@@ -277,16 +262,12 @@ namespace AgOpenGPS
                 {
                     if (Data.Length < Data[2]) return;
 
-
                     for (int i = 7; i > 0; i--) DataRecieved[i] = DataRecieved[i - 1];
 
 
                     if (Data[1] == 0xC0 && Data.Length > 5)
                     {
                         if (port != 5) autoSteerUDPActivity++;
-                        mc.Recieve_AutoSteer[3] = Data[3];
-                        mc.Recieve_AutoSteer[4] = Data[4];
-                        mc.Recieve_AutoSteer[5] = Data[5];
                         int steer = (Int16)((Data[3] << 8) + Data[4]);
                         actualSteerAngleDisp = steer;
 
@@ -296,9 +277,6 @@ namespace AgOpenGPS
                     else if (Data[1] == 0xC1 && Data.Length > 5)//Section Control
                     {
                         if (port != 5) machineUDPActivity++;
-                        mc.Recieve_SectionsStatus[3] = Data[3];//tool index; do all if 255
-                        mc.Recieve_SectionsStatus[4] = Data[4];//Section Index; do all if 255
-                        mc.Recieve_SectionsStatus[5] = Data[5];//On Off Auto
 
                         DataRecieved[8] = "Sections Control: Tool " + (Data[3] + 1).ToString() + ", Section " + (Data[4] + 1).ToString() + ", State " + ((Data[5] & 2) == 2 ? "On" : (Data[5] & 1) == 1 ? "Auto" : "Off");
 
@@ -385,16 +363,12 @@ namespace AgOpenGPS
                         int Heading = ((Data[3] << 8) + Data[4]);
                         if (Heading != 9999)
                         {
-                            mc.Recieve_Heading[3] = Data[3];
-                            mc.Recieve_Heading[4] = Data[4];
                             ahrs.correctionHeadingX16 = Heading;
                         }
 
                         int Roll = ((Data[5] << 8) + Data[6]);
                         if (Roll != 9999)
                         {
-                            mc.Recieve_Roll[3] = Data[5];
-                            mc.Recieve_Roll[4] = Data[6];
                             ahrs.rollX16 = Roll;
                         }
 
@@ -407,16 +381,14 @@ namespace AgOpenGPS
                         {
                             DataRecieved[0] = "Steer Sensor Trigger";
 
-                            mc.Recieve_AutoSteerButton[3] = Data[3];
                             isAutoSteerBtnOn = false;
                             btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
                         }
                         else if (mc.RemoteAutoSteer)
                         {
                             DataRecieved[0] = "Remote Auto Steer: State " + ((Data[3] & 2) == 2 ? "On" : "Off");
-                            mc.Recieve_AutoSteerButton[3] = Data[3];
 
-                            isAutoSteerBtnOn = (isJobStarted && !recPath.isDrivingRecordedPath && (ABLines.BtnABLineOn || ct.isContourBtnOn || CurveLines.BtnCurveLineOn) && (Data[3] & 2) == 2) ? true : false;
+                            isAutoSteerBtnOn = (isJobStarted && !recPath.isDrivingRecordedPath && (ct.isContourBtnOn || Guidance.BtnGuidanceOn) && (Data[3] & 2) == 2) ? true : false;
                             btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
                         }
                         else DataRecieved[0] = "Remote Auto Steer not turned on!";
@@ -427,7 +399,6 @@ namespace AgOpenGPS
                         if (isJobStarted && mc.isWorkSwitchEnabled)
                         {
                             DataRecieved[0] = "Remote Work Switch: State " + ((Data[3] & 3) == 3 ? "On" : (Data[3] & 1) == 1 ? "Auto" : "Off");
-                            mc.Recieve_WorkSwitch[3] = Data[3];
                             if ((Data[3] & 3) == 3)
                             {
                                 if (autoBtnState != FormGPS.btnStates.On) autoBtnState = FormGPS.btnStates.On;
@@ -445,7 +416,6 @@ namespace AgOpenGPS
                     else if (Data[1] == 0xC6 && Data.Length > 3)
                     {
                         DataRecieved[0] = "Checksum";
-                        mc.Recieve_Checksum[3] = Data[3];
                         checksumRecd = Data[3];
 
                         if (checksumRecd != checksumSent)
@@ -511,7 +481,7 @@ namespace AgOpenGPS
         private void ReceiveData(IAsyncResult asyncResult)
         {
             try
-            {
+            {/*
                 // Receive all data
                 int msgLen = recvSocket.EndReceiveFrom(asyncResult, ref epSender);
 
@@ -521,32 +491,26 @@ namespace AgOpenGPS
                 // Listen for more connections again...
                 recvSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref epSender, new AsyncCallback(ReceiveData), epSender);
 
-                //string text =  Encoding.ASCII.GetString(localMsg);
-                
                 int port = ((IPEndPoint)epSender).Port;
                 // Update status through a delegate
-                Invoke(updateRecvMessageDelegate, new object[] { port, localMsg });
+
+                int Length = Math.Max((localMsg[4] + (localMsg[5] << 8)) + 8, 8);
+                int CK_A = 0;
+                int CK_B = 0;
+                for (int j = 2; j < Length - 2; j++)// start with Class and end by Checksum
+                {
+                    CK_A = (CK_A + localMsg[j]) & 0xFF;
+                    CK_B = (CK_B + CK_A) & 0xFF;
+                }
+
+                if (localMsg.Length >= Length && localMsg[Length - 2] == CK_A && localMsg[Length - 1] == CK_B)
+                    BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(port, localMsg)));
+                */
             }
             catch (Exception)
             {
                 //WriteErrorLog("UDP Recv data " + e.ToString());
                 //MessageBox.Show("ReceiveData Error: " + e.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        //sends byte array
-        public void SendUDPMessage(byte[] byteData)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    if (byteData.Length != 0)
-                    {
-                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epAutoSteer, new AsyncCallback(SendData), null);
-                    }
-                }
-                catch (Exception) {}
             }
         }
 
@@ -559,31 +523,116 @@ namespace AgOpenGPS
             catch (Exception) {}
         }
 
-        //sends byte array
-        public void SendUDPMessageNTRIP(byte[] byteData)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    if (byteData.Length != 0)
-                        sendSocket.BeginSendTo(byteData, 0, byteData.Length, SocketFlags.None, epNTRIP, new AsyncCallback(SendData), null);
-                }
-                catch (Exception){}
-            }
-        }
-
         // ------------------------------------------------------------------
 
         public void SendAppData(IAsyncResult asyncResult)
         {
             try
             {
-                sendToAppSocket.EndSend(asyncResult);
+                sendTo_App_Socket.EndSend(asyncResult);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("SendData Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void UpdateSendDataText(string Text)
+        {
+            for (int i = DataSend.Length - 1; i > 0; i--) DataSend[i] = DataSend[i - 1];
+            DataSend[0] = Text;
+        }
+
+        public void SendData(byte[] Data, bool Checksum)
+        {
+            if (sendTo_App_Socket != null)
+            {
+                try
+                {
+                    int crc = 0;
+                    for (int i = 2; i+1 < Data.Length; i++)
+                    {
+                        crc += Data[i];
+                    }
+                    Data[Data.Length - 1] = (byte)crc;
+
+                    if (Data.Length != 0)
+                        sendTo_App_Socket.BeginSendTo(Data, 0, Data.Length, SocketFlags.None, SendTo_App_EndPoint, new AsyncCallback(SendAppData), null);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Send Error: " + ex.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            if (spAutoSteer.IsOpen)
+            {
+                try { spAutoSteer.Write(Data, 0, Data.Length); }
+                catch (Exception e)
+                {
+                    WriteErrorLog("Out Steer Port " + e.ToString());
+                    SerialPortAutoSteerClose();
+                }
+            }
+
+            if (spMachine.IsOpen)
+            {
+                try { spMachine.Write(Data, 0, Data.Length); }
+                catch (Exception e)
+                {
+                    WriteErrorLog("Out Machine Port " + e.ToString());
+                    SerialPortMachineClose();
+                }
+            }
+
+            //send out to udp network
+            if (Properties.Settings.Default.setUDP_isOn)
+            {
+                if (isUDPSendConnected)
+                {
+                    try
+                    {
+                        if (Data.Length != 0)
+                        {
+                            //sendSocket.BeginSendTo(Data, 0, Data.Length, 0, epAutoSteer, new AsyncCallback(SendData), null);
+                        }
+                    }
+                    catch (Exception) { }
+                }
+            }
+
+            if (Checksum)
+            {
+                int tt = Data[2];
+                checksumSent = 0;
+                for (int i = 3; i < Data[2]; i++)
+                {
+                    checksumSent += Data[i];
+                }
+            }
+        }
+
+        public void StartLocalUDPServer()
+        {
+            try
+            {
+                sendTo_App_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                sendTo_App_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                sendTo_App_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                sendTo_App_Socket.Bind(new IPEndPoint(IPAddress.Loopback, 15550));
+                SendTo_App_EndPoint = new IPEndPoint(IPAddress.Loopback, 17777);
+                //15550 --> 17777
+
+                recvFrom_App_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                recvFrom_App_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                recvFrom_App_Socket.Bind(new IPEndPoint(IPAddress.Loopback, 15555));
+                recvFrom_App_EndPoint = new IPEndPoint(IPAddress.Loopback, 17770);
+                recvFrom_App_Socket.BeginReceiveFrom(appBuffer, 0, appBuffer.Length, SocketFlags.None, ref recvFrom_App_EndPoint, new AsyncCallback(ReceiveAppData), recvFrom_App_Socket);
+                //17770 --> 15555
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Load Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -592,68 +641,43 @@ namespace AgOpenGPS
             try
             {
                 // Receive all data
-                int msgLen = recvFromAppSocket.EndReceiveFrom(asyncResult, ref epSender);
+                int msgLen = recvFrom_App_Socket.EndReceiveFrom(asyncResult, ref recvFrom_App_EndPoint);
 
                 byte[] localMsg = new byte[msgLen];
                 Array.Copy(appBuffer, localMsg, msgLen);
 
                 // Listen for more connections again...
-                recvFromAppSocket.BeginReceiveFrom(appBuffer, 0, appBuffer.Length, SocketFlags.None, ref epSender, new AsyncCallback(ReceiveAppData), epSender);
+                recvFrom_App_Socket.BeginReceiveFrom(appBuffer, 0, appBuffer.Length, SocketFlags.None, ref recvFrom_App_EndPoint, new AsyncCallback(ReceiveAppData), recvFrom_App_Socket);
 
-                string text = Encoding.ASCII.GetString(localMsg);
+                int port = ((IPEndPoint)recvFrom_App_EndPoint).Port;
+                if (localMsg.Length > 5)
+                {
+                    int Length = Math.Max((localMsg[4]) + 6, 6);
+                    if (localMsg.Length >= Length)
+                    {
+                        int CK_A = 0;
+                        int CK_B = 0;
+                        for (int j = 2; j < Length - 2; j++)
+                        {
+                            CK_A = (CK_A + localMsg[j]) & 0xFF;
+                            CK_B = (CK_B + CK_A) & 0xFF;
+                        }
 
-                // Update status through a delegate
-                Invoke(updateStatusDelegate, new object[] { text + " IP: " + epSender.ToString() + "\r\n" });
+                        if (InvokeRequired)
+                        {
+                        
+                        
+                        }
+                        if (localMsg[Length - 1] == CK_A)// && localMsg[Length - 1] == CK_B)
+                            BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(port, localMsg)));
+                    }
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("ReceiveData Error: " + ex.Message, "UDP Server", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private void SendToApp()
-        {
-            try
-            {
-                // Get packet as byte array
-                byte[] byteData = Encoding.ASCII.GetBytes("98,43,26");
-
-                if (byteData.Length != 0)
-                    sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length, 
-                        SocketFlags.None, epAppOne, new AsyncCallback(SendAppData), null);
-
-                    //sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length, 
-                        //SocketFlags.None, epAppTwo, new AsyncCallback(SendAppData), null);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Send Error: " + ex.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        public void SendPgnToApp(byte[] byteData)
-        {
-            if (isUDPSendConnected)
-            {
-                try
-                {
-                    if (byteData.Length != 0)
-                        sendToAppSocket.BeginSendTo(byteData, 0, byteData.Length,
-                            SocketFlags.None, epAppOne, new AsyncCallback(SendAppData), null);
-                }
-                catch (Exception)
-                {
-                    //WriteErrorLog("Sending UDP Message" + e.ToString());
-                    //MessageBox.Show("Send Error: " + e.Message, "UDP Client", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void UpdateAppStatus(string status)
-        {
-            //rtxtStatus.Text = (status);
-        }
-
 
         #region keystrokes
         //keystrokes for easy and quick startup
@@ -669,20 +693,20 @@ namespace AgOpenGPS
             //speed up
             if (keyData == Keys.Up)
             {
-                if (sim.stepDistance < 1) sim.stepDistance += 0.04;
-                else sim.stepDistance += 0.055;
-                if (sim.stepDistance > 27.77) sim.stepDistance = 27.77;
-                hsbarStepDistance.Value = (int)(sim.stepDistance * 3.6);
+                if (sim.stepDistance < 10) sim.stepDistance += 0.4;
+                else sim.stepDistance += 0.55;
+                if (sim.stepDistance > 27.7777777778) sim.stepDistance = 27.7777777778;
+                hsbarStepDistance.Value = (int)(sim.stepDistance * 36);
                 return true;
             }
 
             //slow down
             if (keyData == Keys.Down)
             {
-                if (sim.stepDistance < 1) sim.stepDistance -= 0.04;
+                if (sim.stepDistance < 10) sim.stepDistance -= 0.04;
                 else sim.stepDistance -= 0.055;
-                if (sim.stepDistance < -4.44) sim.stepDistance = -4.44;
-                hsbarStepDistance.Value = (int)(sim.stepDistance * 3.6);
+                if (sim.stepDistance < 0) sim.stepDistance = 0;
+                hsbarStepDistance.Value = (int)(sim.stepDistance * 36);
                 return true;
             }
 
@@ -691,6 +715,9 @@ namespace AgOpenGPS
             {
                 sim.stepDistance = 0;
                 hsbarStepDistance.Value = 0;
+
+                sim.reverse = false;
+                btnReverseDirection.BackgroundImage = Properties.Resources.UpArrow64;
                 return true;
             }
 
@@ -839,8 +866,6 @@ namespace AgOpenGPS
                     BeginInvoke((MethodInvoker)(() => UpdateRecvMessage(5, spAutoSteerBytes)));
                     spAutoSteerIdx = 0;
                 }
-
-
 
 
                 return true;    // indicate that you handled this keystroke

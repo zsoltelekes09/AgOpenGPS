@@ -1,5 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -106,15 +105,6 @@ namespace AgOpenGPS
                 }
             }
             return oddNodes; //true means inside.
-        }
-
-        public void DrawTurnLine()
-        {
-            ////draw the turn line oject
-            if (turnLine.Count < 1) return;
-            GL.Begin(PrimitiveType.LineLoop);
-            for (int h = 0; h < turnLine.Count; h++) GL.Vertex3(turnLine[h].Easting, turnLine[h].Northing, 0);
-            GL.End();
         }
     }
 }

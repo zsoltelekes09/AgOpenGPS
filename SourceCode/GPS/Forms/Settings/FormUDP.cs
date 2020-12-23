@@ -10,6 +10,7 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf;
+        int AutoSteerPort = 8888, AogPort = 9999;
 
         public FormUDP(Form callingForm)
         {
@@ -35,10 +36,10 @@ namespace AgOpenGPS
 
         private void BtnSerialOK_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.setIP_thisPort = (int)nudThisPort.Value;
+            Properties.Settings.Default.setIP_thisPort = AogPort;
 
             Properties.Settings.Default.setIP_autoSteerIP = tboxAutoSteerIP.Text;
-            Properties.Settings.Default.setIP_autoSteerPort = (int)nudAutoSteerPort.Value;
+            Properties.Settings.Default.setIP_autoSteerPort = AutoSteerPort;
 
             Properties.Settings.Default.setUDP_isOn = cboxIsUDPOn.Checked;
             Properties.Settings.Default.setUDP_isInterAppOn = cboxIsInterAppOn.Checked;
@@ -62,11 +63,9 @@ namespace AgOpenGPS
 
             //IPAddress[] ipaddress = Dns.GetHostAddresses(hostName);
             tboxThisIP.Text = GetIP4Address();
-
-            nudThisPort.Value = Properties.Settings.Default.setIP_thisPort;
-
             tboxAutoSteerIP.Text = Properties.Settings.Default.setIP_autoSteerIP;
-            nudAutoSteerPort.Value = Properties.Settings.Default.setIP_autoSteerPort;
+            TboxAogPort.Text = (AogPort = Properties.Settings.Default.setIP_thisPort).ToString();
+            TboxAutoSteerPort.Text = (AutoSteerPort = Properties.Settings.Default.setIP_autoSteerPort).ToString();
 
             cboxIsUDPOn.Checked = Properties.Settings.Default.setUDP_isOn;
             cboxIsInterAppOn.Checked = Properties.Settings.Default.setUDP_isInterAppOn;
@@ -89,7 +88,7 @@ namespace AgOpenGPS
             return IP4Address;
         }
 
-        public Boolean CheckIPValid(string strIP)
+        public bool CheckIPValid(string strIP)
         {
             //  Split string by ".", check that array length is 3
             string[] arrOctets = strIP.Split('.');
@@ -98,8 +97,8 @@ namespace AgOpenGPS
             if (arrOctets.Length != 4) return false;
 
             //  Check each substring checking that the int value is less than 255 and that is char[] length is !> 2
-            const Int16 MAXVALUE = 255;
-            Int32 temp; // Parse returns Int32
+            const short MAXVALUE = 255;
+            int temp; // Parse returns Int32
             foreach (string strOctet in arrOctets)
             {
                 //check if at least 3 digits but not more OR 0 length
@@ -134,15 +133,30 @@ namespace AgOpenGPS
             }
         }
 
+        private void TboxAutoSteerPort_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(1025, 65535, AutoSteerPort, this, 0, false))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxAutoSteerPort.Text = (AutoSteerPort = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnSerialOK.Focus();
+        }
 
-        //private void tboxRateMachineIP_Validating(object sender, CancelEventArgs e)
-        //{
-        //    if (!CheckIPValid(tboxRateMachineIP.Text))
-        //    {
-        //        tboxRateMachineIP.Text = "127.0.0.1";
-        //        tboxRateMachineIP.Focus();
-        //        mf.TimedMessageBox(2000, "Invalid IP Address", "Set to Default Local 127.0.0.1");
-        //    }
-        //}
+        private void TboxAogPort_Enter(object sender, EventArgs e)
+        {
+            using (var form = new FormNumeric(1025, 65535, AogPort, this, 0, false))
+            {
+                var result = form.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    TboxAogPort.Text = (AogPort = (int)form.ReturnValue).ToString();
+                }
+            }
+            btnSerialOK.Focus();
+        }
     }
 }

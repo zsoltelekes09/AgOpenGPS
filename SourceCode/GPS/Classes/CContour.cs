@@ -96,88 +96,15 @@ namespace AgOpenGPS
             isContourOn = false;
         }
 
-        //build contours for boundaries
-        public void BuildBoundaryContours(double pass, double spacingInt)
-        {
-            Vec3 point = new Vec3();
-            double totalHeadWidth = (mf.Guidance.WidthMinusOverlap * (pass - 0.5)) + spacingInt;
-
-            for (int j = 0; j < mf.bnd.bndArr.Count; j++)
-            {
-                int ChangeDirection = j == 0 ? 1 : -1;
-
-                //count the points from the boundary
-                int ptCount = mf.bnd.bndArr[j].bndLine.Count;
-
-                stripList.Add(new List<Vec3>());
-
-                for (int i = ptCount - 1; i >= 0; i--)
-                {
-                    //calculate the point inside the boundary
-                    point.Northing = mf.bnd.bndArr[j].bndLine[i].Northing + (Math.Sin(mf.bnd.bndArr[j].bndLine[i].Heading) * -totalHeadWidth * ChangeDirection);
-                    point.Easting = mf.bnd.bndArr[j].bndLine[i].Easting + (Math.Cos(mf.bnd.bndArr[j].bndLine[i].Heading) * totalHeadWidth * ChangeDirection);
-                    point.Heading = mf.bnd.bndArr[j].bndLine[i].Heading;
-
-                    //only add if inside actual field boundary
-                    stripList[stripList.Count - 1].Add(point);
-                }
-
-                FixContourLine(totalHeadWidth, ref mf.bnd.bndArr[j].bndLine);
-            }
-        }
-
-        public void FixContourLine(double totalHeadWidth, ref List<Vec3> curBnd)
-        {
-            double distance;
-            for (int i = 0; i < stripList[stripList.Count - 1].Count; i++)
-            {
-                for (int k = 0; k < curBnd.Count; k++)
-                {
-                    //remove the points too close to boundary
-                    distance = Glm.Distance(curBnd[k], stripList[stripList.Count - 1][i]);
-                    if (distance < totalHeadWidth - 0.001)
-                    {
-                        stripList[stripList.Count - 1].RemoveAt(i);
-                        i--;
-                        break;
-                    }
-                }
-            }
-
-            for (int i = 0; i < stripList[stripList.Count - 1].Count; i++)
-            {
-                int j = (i == stripList[stripList.Count - 1].Count - 1) ? 0 : i + 1;
-                //make sure distance isn't too small between points on turnLine
-                distance = Glm.Distance(stripList[stripList.Count - 1][i], stripList[stripList.Count - 1][j]);
-                if (distance < 2)
-                {
-                    stripList[stripList.Count - 1].RemoveAt(j);
-                    i--;
-                }
-                else if (distance > 4)//make sure distance isn't too big between points on turnLine
-                {
-                    double northing = stripList[stripList.Count - 1][i].Northing / 2 + stripList[stripList.Count - 1][j].Northing / 2;
-                    double easting = stripList[stripList.Count - 1][i].Easting / 2 + stripList[stripList.Count - 1][j].Easting / 2;
-                    double heading = stripList[stripList.Count - 1][i].Heading / 2 + stripList[stripList.Count - 1][j].Heading / 2;
-                    if (j == 0) stripList[stripList.Count - 1].Add(new Vec3(northing, easting, heading));
-                    stripList[stripList.Count - 1].Insert(j, new Vec3(northing, easting, heading));
-                    i--;
-                }
-            }
-
-            stripList[stripList.Count - 1].CalculateRoundedCorner(0.5, true, 0.0436332, CancellationToken.None);
-        }
-
         //determine distance from contour guidance line
         public void DistanceFromContourLine(Vec3 PivotAxlePos, Vec3 SteerAxlePos)
         {
             bool UseSteer = mf.isStanleyUsed;
 
             if (!mf.vehicle.isSteerAxleAhead) UseSteer = !UseSteer;
-            bool isreversedriving = mf.pn.speed < -0.09;
-            if (isreversedriving) UseSteer = !UseSteer;
+            if (mf.vehicle.isReverse) UseSteer = !UseSteer;
 
-            Vec3 Point = (UseSteer) ? SteerAxlePos : PivotAxlePos;
+            Vec3 Point = UseSteer ? SteerAxlePos : PivotAxlePos;
 
             if (!mf.isAutoSteerBtnOn || ctList.Count < 5 || ResetLine)
             {
@@ -396,14 +323,14 @@ namespace AgOpenGPS
             ////draw the guidance line
             int ptCount = ctList.Count;
             if (ptCount < 2) return;
-            GL.LineWidth(mf.ABLines.lineWidth);
+            GL.LineWidth(mf.lineWidth);
             GL.Color3(0.98f, 0.2f, 0.980f);
             GL.Begin(PrimitiveType.LineStrip);
             for (int h = 0; h < ptCount; h++) GL.Vertex3(ctList[h].Easting, ctList[h].Northing, 0);
             GL.End();
 
             //draw points
-            GL.PointSize(mf.ABLines.lineWidth);
+            GL.PointSize(mf.lineWidth);
             GL.Color3(0.87f, 08.7f, 0.25f);
             GL.Begin(PrimitiveType.Points);
             for (int h = 0; h < ptCount; h++) GL.Vertex3(ctList[h].Easting, ctList[h].Northing, 0);

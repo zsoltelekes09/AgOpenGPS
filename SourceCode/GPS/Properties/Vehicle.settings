@@ -11,8 +11,8 @@
     <Setting Name="setVehicle_wheelbase" Type="System.Double" Scope="User">
       <Value Profile="(Default)">2.5</Value>
     </Setting>
-    <Setting Name="setVehicle_isPivotBehindAntenna" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="setVehicle_isPivotBehindAntenna" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="setVehicle_isSteerAxleAhead" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -89,7 +89,7 @@
     <Setting Name="setVehicle_antennaOffset" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="set_youTriggerDistance" Type="System.Double" Scope="User">
+    <Setting Name="UturnTriggerDistance" Type="System.Double" Scope="User">
       <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="setVehicle_lookAheadDistanceFromLine" Type="System.Double" Scope="User">
@@ -101,7 +101,7 @@
     <Setting Name="setVehicle_goalPointLookAheadUturnMult" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.8</Value>
     </Setting>
-    <Setting Name="set_geoFenceDistance" Type="System.Double" Scope="User">
+    <Setting Name="GeoFenceOffset" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="setVehicle_stanleyGain" Type="System.Double" Scope="User">
@@ -198,7 +198,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="setSteer_averageXTE" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.9</Value>
+      <Value Profile="(Default)">0.01</Value>
     </Setting>
     <Setting Name="setSteer_integralGain" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -207,7 +207,7 @@
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="setSteer_integralDistanceAway" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">30</Value>
+      <Value Profile="(Default)">0.3</Value>
     </Setting>
   </Settings>
 </SettingsFile>

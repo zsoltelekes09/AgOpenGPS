@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace AgOpenGPS
@@ -8,17 +7,15 @@ namespace AgOpenGPS
     {
         //class variables
         private readonly FormGPS mf;
+        private readonly Timer Timer = new Timer();
+        private byte TimerMode = 0;
 
         public FormFlags(Form callingForm)
         {
             //get copy of the calling main form
             Owner = mf = callingForm as FormGPS;
             InitializeComponent();
-
-            //this.bntOK.Text = gStr.gsForNow;
-            //this.btnSave.Text = gStr.gsToFile;
-
-            //this.Text = gStr.gsSmoothABCurve;
+            Timer.Tick += new EventHandler(TimerRepeat_Tick);
         }
 
         private void UpdateLabels()
@@ -31,22 +28,9 @@ namespace AgOpenGPS
             lblFlagSelected.Text = mf.flagPts[mf.flagNumberPicked - 1].ID.ToString();
             tboxFlagNotes.Text = mf.flagPts[mf.flagNumberPicked - 1].notes;
         }
+
         private void FormFlags_Load(object sender, EventArgs e)
         {
-            UpdateLabels();
-        }
-
-        private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
-        {
-            mf.flagNumberPicked++;
-            if (mf.flagNumberPicked > mf.flagPts.Count) mf.flagNumberPicked = 1;
-            UpdateLabels();
-        }
-
-        private void BtnSouth_MouseDown(object sender, MouseEventArgs e)
-        {
-            mf.flagNumberPicked--;
-            if (mf.flagNumberPicked < 1) mf.flagNumberPicked = mf.flagPts.Count;
             UpdateLabels();
         }
 
@@ -103,7 +87,9 @@ namespace AgOpenGPS
                     mf.flagPts[mf.flagNumberPicked - 1].Easting, mf.flagPts[mf.flagNumberPicked - 1].Northing).ToString("N2") + " m";
             else lblDistanceToFlag.Text = (Glm.Distance(steerAxlePosRP,
                 mf.flagPts[mf.flagNumberPicked - 1].Easting, mf.flagPts[mf.flagNumberPicked - 1].Northing) * Glm.m2ft).ToString("N2") + " m";
-        
+
+            bool tt = false;
+            if (tt) MakeDubinsLineFromPivotToFlag();
         }
 
         private void MakeDubinsLineFromPivotToFlag()
@@ -150,7 +136,49 @@ namespace AgOpenGPS
                 mf.KeyboardToText((TextBox)sender, this);
                 btnExit.Focus();
             }
+        }
 
+        private void BtnNorth_MouseDown(object sender, MouseEventArgs e)
+        {
+            TimerMode = 0;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
+        }
+
+        private void BtnSouth_MouseDown(object sender, MouseEventArgs e)
+        {
+            TimerMode = 1;
+            Timer.Enabled = false;
+            TimerRepeat_Tick(null, EventArgs.Empty);
+        }
+
+        private void Btn_MouseUp(object sender, MouseEventArgs e)
+        {
+            Timer.Enabled = false;
+        }
+
+        private void TimerRepeat_Tick(object sender, EventArgs e)
+        {
+            if (Timer.Enabled)
+            {
+                if (Timer.Interval > 50) Timer.Interval -= 50;
+            }
+            else
+                Timer.Interval = 500;
+
+            Timer.Enabled = true;
+
+            if (TimerMode == 0)
+            {
+                mf.flagNumberPicked++;
+                if (mf.flagNumberPicked > mf.flagPts.Count) mf.flagNumberPicked = 1;
+            }
+            else if (TimerMode == 1)
+            {
+                mf.flagNumberPicked--;
+                if (mf.flagNumberPicked < 1) mf.flagNumberPicked = mf.flagPts.Count;
+            }
+            UpdateLabels();
         }
     }
 }

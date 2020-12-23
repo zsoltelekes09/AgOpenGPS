@@ -1525,10 +1525,10 @@ namespace AgOpenGPS.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public int DualAntennaDistance {
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2")]
+        public double DualAntennaDistance {
             get {
-                return ((int)(this["DualAntennaDistance"]));
+                return ((double)(this["DualAntennaDistance"]));
             }
             set {
                 this["DualAntennaDistance"] = value;
@@ -1538,24 +1538,60 @@ namespace AgOpenGPS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-1")]
-        public int LastABLine {
+        public int LastGuidanceLine {
             get {
-                return ((int)(this["LastABLine"]));
+                return ((int)(this["LastGuidanceLine"]));
             }
             set {
-                this["LastABLine"] = value;
+                this["LastGuidanceLine"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
-        public int LastCurveLine {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string setComm_commName {
             get {
-                return ((int)(this["LastCurveLine"]));
+                return ((string)(this["setComm_commName"]));
             }
             set {
-                this["LastCurveLine"] = value;
+                this["setComm_commName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public int setPort_baudRateGPS {
+            get {
+                return ((int)(this["setPort_baudRateGPS"]));
+            }
+            set {
+                this["setPort_baudRateGPS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public int setPort_baudRateGPS2 {
+            get {
+                return ((int)(this["setPort_baudRateGPS2"]));
+            }
+            set {
+                this["setPort_baudRateGPS2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string setPort_portNameGPS2 {
+            get {
+                return ((string)(this["setPort_portNameGPS2"]));
+            }
+            set {
+                this["setPort_portNameGPS2"] = value;
             }
         }
     }

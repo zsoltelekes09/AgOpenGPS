@@ -7,7 +7,6 @@ namespace AgOpenGPS
     public class CSim
     {
         private readonly FormGPS mf;
-
         #region properties sim
 
         //Our two new nmea strings
@@ -38,7 +37,7 @@ namespace AgOpenGPS
         public double steerAngleScrollBar = 0;
         private double degrees;
         public double LastSteerAngle = 0;
-
+        public bool reverse = false;
         //The checksum of an NMEA line
         private string sumStr = "";
 
@@ -74,8 +73,9 @@ namespace AgOpenGPS
 
             if (mf.isSimNoisy)
             {
-                double noiseLat = RandomNumber(-1, 1) * 0.0000001295;
-                double noiseLon = RandomNumber(-1, 1) * 0.0000001295;
+                //if you have noise like this trow away your GPS!
+                double noiseLat = RandomNumber(-3, 3) * 0.0000001295;//about 6 cm!
+                double noiseLon = RandomNumber(-3, 3) * 0.0000001295;
                 CalculateNewPostionFromBearingDistance(latitude + noiseLat, longitude + noiseLon, degrees, (stepDistance / mf.HzTime) / 1000.0);
                 latitude -= noiseLat;
                 longitude -= noiseLon;
@@ -86,7 +86,7 @@ namespace AgOpenGPS
             }
 
             //calc the speed
-            speed = Math.Round(1.944 * stepDistance, 1);
+            speed = Math.Abs(Math.Round(1.944 * stepDistance, 1));//testing for backing up
             //lblSpeed.Text = (Math.Round(1.852 * speed, 1)).ToString();
 
             //BuildOGI();

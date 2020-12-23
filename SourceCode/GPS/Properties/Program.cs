@@ -1,6 +1,5 @@
-﻿using AgOpenGPS.Properties;
-using Microsoft.Win32;
-using System;
+﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -8,41 +7,51 @@ namespace AgOpenGPS
 {
     internal static class Program
     {
+        [DllImport("shell32.dll", SetLastError = true)]
+        private static extern void SetCurrentProcessExplicitAppUserModelID([MarshalAs(UnmanagedType.LPWStr)] string AppID);
+        
         [STAThread]
         private static void Main()
         {
-            ////opening the subkey
-            RegistryKey regKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AgOpenGPS");
-
-            ////create default keys if not existing
-            if (regKey == null)
+            bool trystatus = false;
+            Mutex mutex = new Mutex(false, "{8F6F0AC4-B9A1-55fd-A8CF-72F04E6BDE8F}");
+            try
             {
-                RegistryKey Key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AgOpenGPS");
+                if (mutex.WaitOne(TimeSpan.Zero))
+                {
+                    //ungroup in taskbar
+                    string AppID = "AgOpenGPS";
+                    SetCurrentProcessExplicitAppUserModelID(AppID);
 
-                //storing the values
-                Key.SetValue("Language", "en");
-                Key.SetValue("Directory", "Default");
-                Key.Close();
-
-                Settings.Default.setF_culture = "en";
-                Settings.Default.setF_workingDirectory = "Default";
-                Settings.Default.Save();
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new FormGPS());
+                    mutex.ReleaseMutex();
+                }
+                else
+                    trystatus = true;
             }
-            else
+            catch (AbandonedMutexException)
             {
-                Settings.Default.setF_culture = regKey.GetValue("Language").ToString();
-                Settings.Default.setF_workingDirectory = regKey.GetValue("Directory").ToString();
-                Settings.Default.Save();
-                regKey.Close();
+                trystatus = true;
             }
+            if (trystatus && false)
+            {
+                Mutex mutex2 = new Mutex(false, "{8F6F0AC4-B9A1-55fd-A8CF-72F04E6BDE8G}");
+                if (mutex2.WaitOne(TimeSpan.Zero))
+                {
 
-            //if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
-            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(Settings.Default.setF_culture);
-            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(Settings.Default.setF_culture);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormGPS());
+                    //ungroup in taskbar
+                    string AppID = "AgIO";
+                    SetCurrentProcessExplicitAppUserModelID(AppID);
 
+
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new FormLoop());
+                    mutex2.ReleaseMutex();
+                }
+            }
         }
     }
 }

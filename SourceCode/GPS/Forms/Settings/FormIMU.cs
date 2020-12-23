@@ -8,8 +8,7 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        private double minFixStepDistance, HeadingCorrection;
-        private int DualAntennaDistance;
+        private double minFixStepDistance, HeadingCorrection, DualAntennaDistance;
 
         public FormIMU(Form callingForm)
         {
@@ -101,14 +100,14 @@ namespace AgOpenGPS
 
         private void FormDisplaySettings_Load(object sender, EventArgs e)
         {
-            TboxFixStepDistance.Text = (minFixStepDistance = Properties.Settings.Default.setF_minFixStep).ToString("0.0#");
+            TboxFixStepDistance.Text = ((minFixStepDistance = Properties.Settings.Default.setF_minFixStep) * mf.Mtr2Unit).ToString(mf.GuiFix);
             TboxFixStepDistance.CheckValue(ref minFixStepDistance, 0.1, 5);
 
-            TBoxHeadingCorrection.Text = (HeadingCorrection = Properties.Settings.Default.HeadingCorrection).ToString("0.0#");
+            TBoxHeadingCorrection.Text = (HeadingCorrection = Properties.Settings.Default.HeadingCorrection).ToString("N3");
             TBoxHeadingCorrection.CheckValue(ref HeadingCorrection, -180, 180);
 
-            TboxDualAntennaDistance.Text = (DualAntennaDistance = Properties.Settings.Default.DualAntennaDistance).ToString();
-            TboxDualAntennaDistance.CheckValue(ref DualAntennaDistance, 0, 500);
+            TboxDualAntennaDistance.Text = ((DualAntennaDistance = Properties.Settings.Default.DualAntennaDistance) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxDualAntennaDistance.CheckValue(ref DualAntennaDistance, 0, 15);
 
             tboxTinkerUID.Text = Properties.Settings.Default.setIMU_UID;
 
@@ -202,12 +201,12 @@ namespace AgOpenGPS
 
         private void TboxFixStepDistance_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0.1, 5, minFixStepDistance, this, false, 2))
+            using (var form = new FormNumeric(0.1, 5, minFixStepDistance, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxFixStepDistance.Text = (minFixStepDistance = Math.Round(form.ReturnValue,2)).ToString("0.0#");
+                    TboxFixStepDistance.Text = ((minFixStepDistance = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -215,12 +214,12 @@ namespace AgOpenGPS
 
         private void TboxDualAntennaDistance_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 500, DualAntennaDistance, this, true, 0))
+            using (var form = new FormNumeric(0, 15, DualAntennaDistance, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxDualAntennaDistance.Text = (DualAntennaDistance = (int)form.ReturnValue).ToString();
+                    TboxDualAntennaDistance.Text = ((DualAntennaDistance = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -228,12 +227,12 @@ namespace AgOpenGPS
 
         private void TBoxHeadingCorrection_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(-180, 180, HeadingCorrection, this, false, 2))
+            using (var form = new FormNumeric(-180, 180, HeadingCorrection, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TBoxHeadingCorrection.Text = (HeadingCorrection = Math.Round(form.ReturnValue, 2)).ToString("0.0#");
+                    TBoxHeadingCorrection.Text = (HeadingCorrection = form.ReturnValue).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();

@@ -113,8 +113,8 @@ namespace AgOpenGPS
                     break;
             }
 
-            TboxMinSpeed.Text = Math.Round(minspeed = Properties.Vehicle.Default.setArdSteer_minSpeed / 5 / mf.cutoffMetricImperial,2).ToString("0.0");
-            TboxMaxSpeed.Text = Math.Round(maxspeed = Properties.Vehicle.Default.setArdSteer_maxSpeed / 5 / mf.cutoffMetricImperial,2).ToString("0.0");
+            TboxMinSpeed.Text = ((minspeed = Properties.Vehicle.Default.setArdSteer_minSpeed / 5) * mf.Kmh2Unit).ToString(mf.GuiFix);
+            TboxMaxSpeed.Text = ((maxspeed = Properties.Vehicle.Default.setArdSteer_maxSpeed / 5) * mf.Kmh2Unit).ToString(mf.GuiFix);
             TboxAckerman.Text = (ackerman = Properties.Vehicle.Default.setArdSteer_ackermanFix).ToString();
             TboxMaxSensorCounts.Text = (maxpulsecounts = Properties.Vehicle.Default.setArdSteer_maxPulseCounts).ToString();
 
@@ -171,8 +171,6 @@ namespace AgOpenGPS
                     break;
             }
 
-
-
             int sett = 0;
 
             if (chkInvertWAS.Checked) sett |= 1;
@@ -196,8 +194,8 @@ namespace AgOpenGPS
 
             Properties.Vehicle.Default.setArdSteer_setting1 = (byte)sett;
 
-            Properties.Vehicle.Default.setArdSteer_minSpeed = (byte)Math.Round(minspeed * 5 * mf.cutoffMetricImperial, 2);
-            Properties.Vehicle.Default.setArdSteer_maxSpeed = (byte)Math.Round(maxspeed * 5 * mf.cutoffMetricImperial, 2);
+            Properties.Vehicle.Default.setArdSteer_minSpeed = (byte)(minspeed * 5);
+            Properties.Vehicle.Default.setArdSteer_maxSpeed = (byte)(maxspeed * 5);
             
             Properties.Vehicle.Default.setArdSteer_maxPulseCounts = maxpulsecounts;
             Properties.Vehicle.Default.setArdSteer_ackermanFix = ackerman;
@@ -247,12 +245,12 @@ namespace AgOpenGPS
 
             if (tabcArduino.SelectedTab.Name == "tabAutoSteer")
             {
-                mf.DataSend[8] = "Auto Steer: Config Settings";
+                mf.UpdateSendDataText("Auto Steer: Config Settings");
                 mf.SendData(mf.mc.Config_ardSteer, true);
             }
             else if (tabcArduino.SelectedTab.Name == "tabMachine")
             {
-                mf.DataSend[8] = "Auto Steer: Config Hydraulic Lift";
+                mf.UpdateSendDataText("Auto Steer: Config Hydraulic Lift");
                 mf.SendData(mf.mc.Config_ardMachine, false);
             }
         }
@@ -286,12 +284,12 @@ namespace AgOpenGPS
 
         private void TboxMinSpeed_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(50 / mf.cutoffMetricImperial, mf.decimals), minspeed, this, false, 1, 0.2M))
+            using (var form = new FormNumeric(0, 50, minspeed, this, 1, true, mf.Unit2Kmh, mf.Kmh2Unit, 0.2M))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxMinSpeed.Text = (minspeed = Math.Round(form.ReturnValue,2)).ToString("0.0");
+                    TboxMinSpeed.Text = ((minspeed = form.ReturnValue) * mf.Kmh2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -299,12 +297,12 @@ namespace AgOpenGPS
 
         private void TboxLowerTime_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 20, lowertime, this, false, 1))
+            using (var form = new FormNumeric(0, 20, lowertime, this, 1, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxLowerTime.Text = (lowertime = Math.Round(form.ReturnValue, 2)).ToString("0.0");
+                    TboxLowerTime.Text = (lowertime = form.ReturnValue).ToString("0.0");
                 }
             }
             btnCancel.Focus();
@@ -312,12 +310,12 @@ namespace AgOpenGPS
 
         private void TboxRaiseTime_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, 20, raisetime, this, false,1))
+            using (var form = new FormNumeric(0, 20, raisetime, this, 1, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxRaiseTime.Text = (raisetime = Math.Round(form.ReturnValue, 2)).ToString("0.0");
+                    TboxRaiseTime.Text = (raisetime = form.ReturnValue).ToString("0.0");
                 }
             }
             btnCancel.Focus();
@@ -325,12 +323,12 @@ namespace AgOpenGPS
 
         private void TboxMaxSpeed_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0, Math.Round(50 / mf.cutoffMetricImperial, mf.decimals), maxspeed, this, false, 1, 0.2M))
+            using (var form = new FormNumeric(0, 50, maxspeed, this, 1, true, mf.Unit2Kmh, mf.Kmh2Unit, 0.2M))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxMaxSpeed.Text = (maxspeed = Math.Round(form.ReturnValue, 2)).ToString("0.0");
+                    TboxMaxSpeed.Text = ((maxspeed = form.ReturnValue) * mf.Kmh2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -338,7 +336,7 @@ namespace AgOpenGPS
 
         private void TboxAckerman_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(50, 200, ackerman, this, true, 0))
+            using (var form = new FormNumeric(50, 200, ackerman, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
@@ -351,7 +349,7 @@ namespace AgOpenGPS
 
         private void TboxMaxSensorCounts_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 60, maxpulsecounts, this, true, 0))
+            using (var form = new FormNumeric(1, 60, maxpulsecounts, this, 0, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)

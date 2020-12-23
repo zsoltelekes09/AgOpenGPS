@@ -40,7 +40,7 @@
             // btnJobOpen
             // 
             this.btnJobOpen.Font = new System.Drawing.Font("Tahoma", 20.25F);
-            this.btnJobOpen.Image = global::AgOpenGPS.Properties.Resources.FileOpen;
+            this.btnJobOpen.Image = global::AgOpenGPS.Properties.Resources.FileLoad;
             this.btnJobOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnJobOpen.Location = new System.Drawing.Point(39, 334);
             this.btnJobOpen.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
@@ -82,7 +82,7 @@
             // btnJobResume
             // 
             this.btnJobResume.Font = new System.Drawing.Font("Tahoma", 20.25F);
-            this.btnJobResume.Image = global::AgOpenGPS.Properties.Resources.FilePrevious;
+            this.btnJobResume.Image = global::AgOpenGPS.Properties.Resources.FileLoadPrevious;
             this.btnJobResume.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnJobResume.Location = new System.Drawing.Point(39, 120);
             this.btnJobResume.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
@@ -115,7 +115,7 @@
             // btnInField
             // 
             this.btnInField.Font = new System.Drawing.Font("Tahoma", 20.25F);
-            this.btnInField.Image = global::AgOpenGPS.Properties.Resources.AutoManualIsAuto;
+            this.btnInField.Image = global::AgOpenGPS.Properties.Resources.AutoGo;
             this.btnInField.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnInField.Location = new System.Drawing.Point(39, 442);
             this.btnInField.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
@@ -141,7 +141,7 @@
             this.Controls.Add(this.btnJobNew);
             this.Controls.Add(this.btnJobOpen);
             this.Font = new System.Drawing.Font("Tahoma", 14.25F);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormJob";
