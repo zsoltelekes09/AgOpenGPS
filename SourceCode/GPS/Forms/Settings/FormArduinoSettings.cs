@@ -38,8 +38,6 @@ namespace AgOpenGPS
             cboxEncoder.Text = String.Get("gsEncoder");
             label7.Text = String.Get("gsEncoderCounts");
             label9.Text = String.Get("gsSendToModule");
-            groupBox5.Text = String.Get("gsToAutoSteer");
-            cboxIsSendMachineControlToAutoSteer.Text = String.Get("gsMachinePGN");
             groupBox1.Text = String.Get("gsHydraulicToolLift");
 
             chkWorkSwitchManual.Text = String.Get("gsWorkSwitchControlsManual");
@@ -135,8 +133,6 @@ namespace AgOpenGPS
             lowertime = Properties.Vehicle.Default.setArdMac_hydLowerTime;
             TboxLowerTime.Text = (lowertime /= 10).ToString();
             cboxIsHydOn.Checked = Properties.Vehicle.Default.setArdMac_isHydEnabled > 0;
-
-            cboxIsSendMachineControlToAutoSteer.Checked = Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer;
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
@@ -182,7 +178,7 @@ namespace AgOpenGPS
             if (cboxMMAAxis.Text == "X Axis") sett |= 64;
             if (cboxEncoder.Checked) sett |= 128;
 
-            Properties.Vehicle.Default.setArdSteer_setting0 = (byte)sett;
+            Properties.Vehicle.Default.setArdSteer_setting0 = mf.mc.Config_ardSteer[mf.mc.arSet0] = (byte)sett;
 
             sett = 0;
 
@@ -192,24 +188,15 @@ namespace AgOpenGPS
             if (chkWorkSwActiveLow.Checked) sett |= 4;
             if (chkWorkSwitchManual.Checked) sett |= 8;
 
-            Properties.Vehicle.Default.setArdSteer_setting1 = (byte)sett;
+            Properties.Vehicle.Default.setArdSteer_setting1 = mf.mc.Config_ardSteer[mf.mc.arSet1] = (byte)sett;
 
-            Properties.Vehicle.Default.setArdSteer_minSpeed = (byte)(minspeed * 5);
-            Properties.Vehicle.Default.setArdSteer_maxSpeed = (byte)(maxspeed * 5);
+            Properties.Vehicle.Default.setArdSteer_minSpeed = mf.mc.Config_ardSteer[mf.mc.arMinSpd] = (byte)(minspeed * 5);
+            Properties.Vehicle.Default.setArdSteer_maxSpeed = mf.mc.Config_ardSteer[mf.mc.arMaxSpd] = (byte)(maxspeed * 5);
             
             Properties.Vehicle.Default.setArdSteer_maxPulseCounts = maxpulsecounts;
-            Properties.Vehicle.Default.setArdSteer_ackermanFix = ackerman;
-
-            mf.mc.isMachineDataSentToAutoSteer = cboxIsSendMachineControlToAutoSteer.Checked;
-            Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer = mf.mc.isMachineDataSentToAutoSteer;
+            Properties.Vehicle.Default.setArdSteer_ackermanFix = mf.mc.Config_ardSteer[mf.mc.arAckermanFix] = ackerman;
 
             Properties.Vehicle.Default.Save();
-
-            mf.mc.Config_ardSteer[mf.mc.arSet0] = Properties.Vehicle.Default.setArdSteer_setting0;
-            mf.mc.Config_ardSteer[mf.mc.arSet1] = Properties.Vehicle.Default.setArdSteer_setting1;
-            mf.mc.Config_ardSteer[mf.mc.arMaxSpd] = Properties.Vehicle.Default.setArdSteer_maxSpeed;
-            mf.mc.Config_ardSteer[mf.mc.arMinSpd] = Properties.Vehicle.Default.setArdSteer_minSpeed;
-            mf.mc.Config_ardSteer[mf.mc.arAckermanFix] = Properties.Vehicle.Default.setArdSteer_ackermanFix;
 
             byte inc = (byte)(Properties.Vehicle.Default.setArdSteer_inclinometer << 6);            
             mf.mc.Config_ardSteer[mf.mc.arIncMaxPulse] = (byte)(inc + (byte)Properties.Vehicle.Default.setArdSteer_maxPulseCounts);
@@ -257,14 +244,6 @@ namespace AgOpenGPS
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            tboxSerialFromAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;
-            tboxSerialFromMachine.Text = mf.mc.serialRecvMachineStr;
-            if (Properties.Settings.Default.setUDP_isOn)
-            {
-                tboxSerialFromAutoSteer.Text = "UDP";
-                tboxSerialFromMachine.Text = "UDP";
-            }
-
             if (mf.checksumSent - mf.checksumRecd == 0)
             {
                 lblSent.BackColor = Color.LightGreen;

@@ -111,7 +111,7 @@ namespace AgOpenGPS
                 {
                     mf.Guidance.ResetABLine = true;
                     mf.Guidance.CurrentLine = -1;
-                    mf.Guidance.GuidanceLines.Clear();
+                    mf.Guidance.ExtraGuidanceLines.Clear();
                 }
                 mf.Guidance.CurrentEditLine--;
 

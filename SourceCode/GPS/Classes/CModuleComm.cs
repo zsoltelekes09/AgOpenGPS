@@ -8,13 +8,7 @@
         //Critical Safety Properties
         public bool isOutOfBounds = true;
 
-        //receive strings
-        public string serialRecvAutoSteerStr;
-        public string serialRecvMachineStr;
-
         public static int pgnSentenceLength = 10;
-
-        public bool isMachineDataSentToAutoSteer;
 
         //AutoSteer PGN - 32624 - 127.112 - 0x7F70             Header index Length Speed HiLo,  Dist HiLo, Angle HiLo
         public byte[] Send_AutoSteer = new byte[] { 0x80, 0x81, 0x7F, 0x70, 0x06, 0x00, 0x00, 0x7D, 0x14, 0x7D, 0x14, 0x00 };
@@ -49,8 +43,6 @@
         public CModuleComm(FormGPS _f)
         {
             mf = _f;
-            serialRecvAutoSteerStr = " ** Steer Module Not Connected";
-            serialRecvMachineStr = " ** Machine Module Not Connected";
 
             //WorkSwitch logic
             isWorkSwitchEnabled = false;
@@ -58,7 +50,6 @@
             //does a low, grounded out, mean on
             isWorkSwitchActiveLow = true;
 
-            isMachineDataSentToAutoSteer = Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer;
             ResetAllModuleCommValues(false);
 
 

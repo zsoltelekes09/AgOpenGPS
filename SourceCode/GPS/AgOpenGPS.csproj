@@ -183,7 +183,6 @@
     <Compile Include="Classes\CBoundary.cs" />
     <Compile Include="Classes\CFlag.cs" />
     <Compile Include="Classes\CCamera.cs" />
-    <Compile Include="Classes\CContour.cs" />
     <Compile Include="Classes\CModuleComm.cs" />
     <Compile Include="Classes\CNMEA.cs" />
     <Compile Include="Classes\CPointData.cs" />
@@ -713,6 +712,7 @@
     <None Include="btnImages\MakeBoundaryContour.jpg" />
     <Content Include="ALicense.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

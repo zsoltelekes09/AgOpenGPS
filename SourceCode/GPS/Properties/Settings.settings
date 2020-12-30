@@ -50,17 +50,8 @@
     <Setting Name="setPort_wasAutoSteerConnected" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="setIMU_pitchZeroX16" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="setIMU_rollZeroX16" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
     <Setting Name="setMenu_isLogNMEA" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="setF_minFixStep" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="setF_UserTotalArea" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -98,15 +89,6 @@
     <Setting Name="setF_workingDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">Default</Value>
     </Setting>
-    <Setting Name="setIMU_UID" Type="System.String" Scope="User">
-      <Value Profile="(Default)">68wESU</Value>
-    </Setting>
-    <Setting Name="setIMU_isRollFromAutoSteer" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="setIMU_isHeadingCorrectionFromAutoSteer" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="setPort_NMEAHz" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
@@ -118,12 +100,6 @@
     </Setting>
     <Setting Name="setUDP_isOn" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="setGPS_fixFromWhichSentence" Type="System.String" Scope="User">
-      <Value Profile="(Default)">GGA</Value>
-    </Setting>
-    <Setting Name="setGPS_headingFromWhichSource" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Fix</Value>
     </Setting>
     <Setting Name="setGPS_SimLatitude" Type="System.Double" Scope="User">
       <Value Profile="(Default)">53.4360564</Value>
@@ -166,9 +142,6 @@
     </Setting>
     <Setting Name="setNTRIP_isGGAManual" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="setAS_snapDistance" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">40</Value>
     </Setting>
     <Setting Name="setDistance_TreeSpacing" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -248,9 +221,6 @@
     <Setting Name="setGPS_isRTK" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="setIMU_isHeadingCorrectionFromBrick" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="setDisplay_isStartFullScreen" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -262,9 +232,6 @@
     </Setting>
     <Setting Name="setNTRIP_isHTTP10" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="setIMU_fusionWeight" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.25</Value>
     </Setting>
     <Setting Name="Tram_wheelWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.6</Value>
@@ -1021,12 +988,6 @@
 10.0230998941312,-3.2556874479393
 10.0116001208862,-3.38172945632946
 10,-3.50798661272705</Value>
-    </Setting>
-    <Setting Name="HeadingCorrection" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="DualAntennaDistance" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1.2</Value>
     </Setting>
     <Setting Name="LastGuidanceLine" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>

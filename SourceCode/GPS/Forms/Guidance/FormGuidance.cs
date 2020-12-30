@@ -198,13 +198,11 @@ namespace AgOpenGPS
             mf.Guidance.isEditing = false;
             mf.Guidance.tryoutcurve = -1;
             mf.Guidance.BtnGuidanceOn = false;
-            mf.Guidance.GuidanceLines.Clear();
+            mf.Guidance.ExtraGuidanceLines.Clear();
             mf.btnGuidance.Image = Properties.Resources.CurveOff;
 
 
-            mf.snapLeftBigStrip.Enabled = false;
-            mf.snapRightBigStrip.Enabled = false;
-            mf.snapToCurrent.Enabled = mf.ct.isContourBtnOn;
+            mf.snapLeftBigStrip.Enabled = mf.snapRightBigStrip.Enabled = mf.snapToCurrent.Enabled = false;
 
             mf.YouTurnButtons(false);
 
@@ -231,7 +229,7 @@ namespace AgOpenGPS
                 {
                     mf.Guidance.ResetABLine = true;
                     mf.Guidance.CurrentLine = -1;
-                    mf.Guidance.GuidanceLines.Clear();
+                    mf.Guidance.ExtraGuidanceLines.Clear();
                 }
                 else if (mf.Guidance.CurrentLine > num)
                     mf.Guidance.CurrentLine--;
@@ -257,7 +255,7 @@ namespace AgOpenGPS
 
                 mf.Guidance.ResetABLine = true;
                 mf.Guidance.CurrentLine = idx;
-                mf.Guidance.GuidanceLines.Clear();
+                mf.Guidance.ExtraGuidanceLines.Clear();
                 mf.Guidance.tryoutcurve = -1;
                 Properties.Settings.Default.LastGuidanceLine = idx;
                 Properties.Settings.Default.Save();
@@ -402,7 +400,7 @@ namespace AgOpenGPS
                 {
                     mf.Guidance.ResetABLine = true;
                     mf.Guidance.CurrentLine = -1;
-                    mf.Guidance.GuidanceLines.Clear();
+                    mf.Guidance.ExtraGuidanceLines.Clear();
                 }
                 else if (mf.Guidance.CurrentLine > mf.Guidance.CurrentEditLine)
                     mf.Guidance.CurrentLine--;
@@ -488,7 +486,7 @@ namespace AgOpenGPS
                 mf.Guidance.CurrentLine = mf.Guidance.CurrentEditLine;
 
                 mf.Guidance.ResetABLine = true;
-                mf.Guidance.GuidanceLines.Clear();
+                mf.Guidance.ExtraGuidanceLines.Clear();
                 Properties.Settings.Default.LastGuidanceLine = mf.Guidance.CurrentLine;
                 Properties.Settings.Default.Save();
                 mf.Guidance.CurrentEditLine = -1;

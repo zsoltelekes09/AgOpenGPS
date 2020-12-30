@@ -1,8 +1,9 @@
-﻿using System;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.Windows.Forms;
+using System;
+using System.Diagnostics;
 using System.Text;
+using System.Windows.Forms;
 
 namespace AgOpenGPS
 {
@@ -247,12 +248,9 @@ namespace AgOpenGPS
                     }
 
                     //draw the turnLines
-                    if (yt.isYouTurnBtnOn || isUTurnAlwaysOn)
+                    if ((yt.isYouTurnBtnOn || isUTurnAlwaysOn) && Guidance.CurrentEditLine == -1)
                     {
-                        if (Guidance.CurrentEditLine == -1 && !ct.isContourBtnOn)
-                        {
-                            turn.DrawTurnLines();
-                        }
+                        turn.DrawTurnLines();
                     }
 
                     if (mc.isOutOfBounds) gf.DrawGeoFenceLines();
@@ -270,9 +268,7 @@ namespace AgOpenGPS
                         }
                     }
 
-                    //draw contour line if button on 
-                    if (ct.isContourBtnOn) ct.DrawContourLine();
-                    else if (Guidance.BtnGuidanceOn) Guidance.DrawLine();
+                    if (Guidance.BtnGuidanceOn) Guidance.DrawLine();
 
 
                     GL.Color4(0.8630f, 0.73692f, 0.60f, 0.25);
@@ -361,7 +357,7 @@ namespace AgOpenGPS
 
                     if (bnd.bndArr.Count > 0 && yt.isYouTurnBtnOn) DrawUTurnBtn();
 
-                    if (isAutoSteerBtnOn && !ct.isContourBtnOn) DrawManUTurnBtn();
+                    if (isAutoSteerBtnOn) DrawManUTurnBtn();
 
                     if (isCompassOn) DrawCompass(isSpeedoOn);
 
@@ -521,7 +517,6 @@ namespace AgOpenGPS
 
                     for (int k = 1; k < bnd.bndArr.Count; k++)
                     {
-
                         if (bnd.BtnHeadLand && bnd.bndArr[k].HeadLine.Count > 0)
                         {
                             GL.Color3(0.0f, 1.0f, 0.0f);
@@ -1210,7 +1205,7 @@ namespace AgOpenGPS
         {
             GL.Disable(EnableCap.DepthTest);
 
-            if (ct.isContourBtnOn || Guidance.BtnGuidanceOn)
+            if (Guidance.BtnGuidanceOn)
             {
                 double dist = distanceDisplay * 0.1;
 

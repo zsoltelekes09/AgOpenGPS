@@ -10,10 +10,10 @@ namespace AgOpenGPS
         //class variables
         private readonly FormGPS mf;
 
-        private double antennaHeight, antennaOffset, antennaPivot, wheelbase, minTurningRadius, hydliftsecs;
+        private double antennaHeight, antennaOffset, antennaPivot, wheelbase, minTurningRadius, hydliftsecs, snapDistance;
 
         private bool isSteerAxleAhead;
-        private int isPivotBehindAntenna, snapDistance, vehicleType, lightbarCmPerPixie, linewidth;
+        private int isPivotBehindAntenna, vehicleType, lightbarCmPerPixie, linewidth;
 
         //constructor
         public FormSettings(Form callingForm, int page)
@@ -57,7 +57,7 @@ namespace AgOpenGPS
             isSteerAxleAhead = Properties.Vehicle.Default.setVehicle_isSteerAxleAhead;
 
 
-            vehicleType = Properties.Vehicle.Default.setVehicle_vehicleType;
+            vehicleType = Properties.Vehicle.Default.VehicleType;
 
             //front page
             if (vehicleType == 0) rbtnTractor.Checked = true;
@@ -86,8 +86,8 @@ namespace AgOpenGPS
             TboxHydLiftSecs.CheckValue(ref hydliftsecs, 0, 20);
 
             //GuidanceTab
-            TboxSnapDistance.Text = (snapDistance = Properties.Settings.Default.setAS_snapDistance).ToString();
-            TboxSnapDistance.CheckValue(ref snapDistance, 1, 500);
+            TboxSnapDistance.Text = (snapDistance = Properties.Vehicle.Default.SnapOffsetDistance).ToString();
+            TboxSnapDistance.CheckValue(ref snapDistance, 1, 50);
             TboxLightbarCmPerPixel.Text = (lightbarCmPerPixie = Properties.Settings.Default.setDisplay_lightbarCmPerPixel).ToString();
             TboxLightbarCmPerPixel.CheckValue(ref lightbarCmPerPixie, 1, 20);
             TboxLineWidth.Text = (linewidth = Properties.Settings.Default.setDisplay_lineWidth).ToString();
@@ -100,7 +100,7 @@ namespace AgOpenGPS
             //TypeTab
             Properties.Vehicle.Default.setVehicle_isPivotBehindAntenna = mf.vehicle.isPivotBehindAntenna = isPivotBehindAntenna;
             Properties.Vehicle.Default.setVehicle_isSteerAxleAhead = mf.vehicle.isSteerAxleAhead = isSteerAxleAhead;
-            Properties.Vehicle.Default.setVehicle_vehicleType = mf.vehicle.vehicleType = vehicleType;
+            Properties.Vehicle.Default.VehicleType = mf.vehicle.VehicleType = vehicleType;
 
             //SettingsTab
             Properties.Vehicle.Default.setVehicle_antennaPivot = mf.vehicle.antennaPivot = antennaPivot * isPivotBehindAntenna;
@@ -124,7 +124,7 @@ namespace AgOpenGPS
             }
 
             //GuidanceTab
-            Properties.Settings.Default.setAS_snapDistance = snapDistance;
+            Properties.Vehicle.Default.SnapOffsetDistance = snapDistance;
             Properties.Settings.Default.setDisplay_lightbarCmPerPixel = mf.lightbarCmPerPixel = lightbarCmPerPixie;
             Properties.Settings.Default.setDisplay_lineWidth = mf.lineWidth = linewidth;
 
@@ -272,12 +272,12 @@ namespace AgOpenGPS
         #region GuidanceTab
         private void TboxSnapDistance_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(1, 500, snapDistance, this, 0, false))
+            using (var form = new FormNumeric(1, 50, snapDistance, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxSnapDistance.Text = (snapDistance = (int)form.ReturnValue).ToString();
+                    TboxSnapDistance.Text = ((snapDistance = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();

@@ -119,7 +119,7 @@
     <Setting Name="setVehicle_envName" Type="System.String" Scope="User">
       <Value Profile="(Default)">Env</Value>
     </Setting>
-    <Setting Name="setVehicle_vehicleType" Type="System.Int32" Scope="User">
+    <Setting Name="VehicleType" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="set_youSkipWidth" Type="System.Int32" Scope="User">
@@ -139,9 +139,6 @@
     </Setting>
     <Setting Name="setVehicle_hydraulicLiftLookAhead" Type="System.Double" Scope="User">
       <Value Profile="(Default)">2</Value>
-    </Setting>
-    <Setting Name="setVehicle_isMachineControlToAutoSteer" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="setArdSteer_inclinometer" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -208,6 +205,42 @@
     </Setting>
     <Setting Name="setSteer_integralDistanceAway" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.3</Value>
+    </Setting>
+    <Setting Name="FixStepDist" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="DualHeadingCorrection" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">90</Value>
+    </Setting>
+    <Setting Name="DualAntennaDistance" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">1.2</Value>
+    </Setting>
+    <Setting Name="SnapOffsetDistance" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.1</Value>
+    </Setting>
+    <Setting Name="HeadingFromSource" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Fix</Value>
+    </Setting>
+    <Setting Name="FixFromSentence" Type="System.String" Scope="User">
+      <Value Profile="(Default)">GGA</Value>
+    </Setting>
+    <Setting Name="HeadingCorrectionFromBrick" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="RollFromAutoSteer" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="HeadingCorrectionFromAutoSteer" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="IMU_UID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">68wESU</Value>
+    </Setting>
+    <Setting Name="FusionWeight" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.25</Value>
+    </Setting>
+    <Setting Name="RollZeroX16" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -191,7 +191,7 @@ namespace AgOpenGPS
                                 ahrs.rollX16 = (int)(Math.Atan2(relPosD, Math.Sqrt(RelPosN * RelPosN + RelPosE * RelPosE)) * 916.732472209);
                             }
 
-                            pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001 + HeadingCorrection;
+                            pn.HeadingForced = (Data[30] | (Data[31] << 8) | (Data[32] << 16) | (Data[33] << 24)) * 0.00001 + DualHeadingCorrection;
 
                             recvSentenceSettings[3] = recvSentenceSettings[1];
                             recvSentenceSettings[1] = "$UBX-RELPOSNED, Heading = " + pn.HeadingForced.ToString("N4", CultureInfo.InvariantCulture) + ", Roll = " + (ahrs.rollX16 / 16.0).ToString("N4", CultureInfo.InvariantCulture) + ", itow = " + itow.ToString();
@@ -388,7 +388,7 @@ namespace AgOpenGPS
                         {
                             DataRecieved[0] = "Remote Auto Steer: State " + ((Data[3] & 2) == 2 ? "On" : "Off");
 
-                            isAutoSteerBtnOn = (isJobStarted && !recPath.isDrivingRecordedPath && (ct.isContourBtnOn || Guidance.BtnGuidanceOn) && (Data[3] & 2) == 2) ? true : false;
+                            isAutoSteerBtnOn = (isJobStarted && !recPath.isDrivingRecordedPath && Guidance.BtnGuidanceOn && (Data[3] & 2) == 2) ? true : false;
                             btnAutoSteer.Image = isAutoSteerBtnOn ? Properties.Resources.AutoSteerOn : Properties.Resources.AutoSteerOff;
                         }
                         else DataRecieved[0] = "Remote Auto Steer not turned on!";

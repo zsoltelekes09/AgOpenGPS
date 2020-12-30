@@ -105,21 +105,21 @@ namespace AgOpenGPS
             string dirNewField = mf.fieldsDirectory + mf.currentFieldDirectory + "\\";
 
             //if no template set just make a new file.
-                try
+            try
+            {
+                //start a new job
+                mf.JobNew();
+
+                //create it for first save
+                string directoryName = Path.GetDirectoryName(dirNewField);
+
+                if ((!string.IsNullOrEmpty(directoryName)) && (Directory.Exists(directoryName)))
                 {
-                    //start a new job
-                    mf.JobNew();
-
-                    //create it for first save
-                    string directoryName = Path.GetDirectoryName(dirNewField);
-
-                    if ((!string.IsNullOrEmpty(directoryName)) && (Directory.Exists(directoryName)))
-                    {
-                        MessageBox.Show(String.Get("gsChooseADifferentName"), String.Get("gsDirectoryExists"), MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                        return;
-                    }
-                    else
-                    {
+                    MessageBox.Show(String.Get("gsChooseADifferentName"), String.Get("gsDirectoryExists"), MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    return;
+                }
+                else
+                {
                         //reset the offsets
                         mf.pn.utmEast = (int)mf.pn.actualEasting;
                         mf.pn.utmNorth = (int)mf.pn.actualNorthing;
@@ -132,24 +132,23 @@ namespace AgOpenGPS
                         //Azimuth Error - utm declination
                         mf.pn.convergenceAngle = Math.Atan(Math.Sin(Glm.ToRadians(mf.pn.latitude))
                                                     * Math.Tan(Glm.ToRadians(mf.pn.longitude - mf.pn.centralMeridian)));
+                    
+                    //make sure directory exists, or create it
+                    if ((!string.IsNullOrEmpty(directoryName)) && (!Directory.Exists(directoryName)))
+                    { Directory.CreateDirectory(directoryName); }
 
-                        //make sure directory exists, or create it
-                        if ((!string.IsNullOrEmpty(directoryName)) && (!Directory.Exists(directoryName)))
-                        { Directory.CreateDirectory(directoryName); }
-
-                        //create the field file header info
-                        mf.FileCreateField();
-                        mf.FileCreateSections();
-                        mf.FileCreateContour();
-                    }
+                    //create the field file header info
+                    mf.FileCreateField();
+                    mf.FileCreateSections();
                 }
-                catch (Exception ex)
-                {
-                    mf.WriteErrorLog("Creating new field " + ex);
+            }
+            catch (Exception ex)
+            {
+                mf.WriteErrorLog("Creating new field " + ex);
 
-                    MessageBox.Show(String.Get("gsError"), ex.ToString());
-                    mf.currentFieldDirectory = "";
-                }            
+                MessageBox.Show(String.Get("gsError"), ex.ToString());
+                mf.currentFieldDirectory = "";
+            }       
 
             DialogResult = DialogResult.OK;
             Close();

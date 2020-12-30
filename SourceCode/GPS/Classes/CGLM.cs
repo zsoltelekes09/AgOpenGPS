@@ -203,13 +203,14 @@ namespace AgOpenGPS
                     CurrentVertex = Polygons[i];
                     StopVertex = CurrentVertex;
                     double ccw = 0;
+                    int count = 0;
 
                     while (true)
                     {
                         if (ct.IsCancellationRequested) break;
                         if (!start && CurrentVertex == StopVertex)
                         {
-                            if (ccw > 0)
+                            if (ccw > 0 || count < 7)
                             {
                                 Polygons.RemoveAt(i);
                                 i--;
@@ -217,6 +218,7 @@ namespace AgOpenGPS
                             break;
                         }
                         start = false;
+                        count++;
 
                         ccw += (CurrentVertex.Next.Coords.Northing - CurrentVertex.Coords.Northing) * (CurrentVertex.Next.Coords.Easting + CurrentVertex.Coords.Easting);
 
@@ -520,20 +522,20 @@ namespace AgOpenGPS
                 C = (B + 1 == Points.Count) ? 0 : B + 1;
                 bool stop = false;
                 double dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0, angle = 0, segment = 0, length1 = 0, length2 = 0;
-
                 while (true)
                 {
+                    Vec3 tt3 = Points[B];
                     if (ct.IsCancellationRequested) break;
                     if (GetLineIntersection(Points[A], Points[(A + 1).Clamp(Points.Count)], Points[C], Points[(C - 1).Clamp(Points.Count)], out Vec3 Crossing, out double Time, true))
                     {
                         if (Time > -100 && Time < 100)
-                            Points[B] = Crossing;
+                            tt3 = Crossing;
                     }
 
-                    dx1 = Points[B].Northing - Points[A].Northing;
-                    dy1 = Points[B].Easting - Points[A].Easting;
-                    dx2 = Points[B].Northing - Points[C].Northing;
-                    dy2 = Points[B].Easting - Points[C].Easting;
+                    dx1 = tt3.Northing - Points[A].Northing;
+                    dy1 = tt3.Easting - Points[A].Easting;
+                    dx2 = tt3.Northing - Points[C].Northing;
+                    dy2 = tt3.Easting - Points[C].Easting;
 
                     angle = (Math.Atan2(dy1, dx1) - Math.Atan2(dy2, dx2));
 
@@ -593,7 +595,11 @@ namespace AgOpenGPS
                             break;
                         }
                     }
-                    else if (segment < length1) break;
+                    else if (segment < length1)
+                    {
+                        Points[B] = tt3;
+                        break;
+                    }
 
                     if (!Loop && A == 0 && C == Points.Count - 1 || (oldA == A && OldC == C))
                     {

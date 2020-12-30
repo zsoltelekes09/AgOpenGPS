@@ -18,7 +18,7 @@ namespace AgOpenGPS
 
         public static string HOST = "localhost";
         public static int PORT = 4223;
-        public static readonly string UID = Properties.Settings.Default.setIMU_UID; // "68wESU"; // Change XXYYZZ to the UID of your IMU Brick 2.0
+        public static readonly string UID = Properties.Vehicle.Default.IMU_UID; // "68wESU"; // Change XXYYZZ to the UID of your IMU Brick 2.0
 
         //flags for desired sources
         public bool isHeadingCorrectionFromAutoSteer, isHeadingCorrectionFromBrick, isHeadingCorrectionFromExtUDP;
@@ -29,7 +29,7 @@ namespace AgOpenGPS
         public int correctionHeadingX16 = 9999, rollX16 = 9999;
 
         //actual value in degrees* 16 to modify the imu*16 values
-        public int rollZeroX16, pitchZeroX16;
+        public int rollZeroX16;
 
         //is the auto steer in auto turn on mode or not
         public bool RemoteAutoSteer;
@@ -43,18 +43,16 @@ namespace AgOpenGPS
             mf = _f;
 
             //non GPS AHRS sensors
-            isHeadingCorrectionFromAutoSteer = Properties.Settings.Default.setIMU_isHeadingCorrectionFromAutoSteer;
-            isHeadingCorrectionFromBrick = Properties.Settings.Default.setIMU_isHeadingCorrectionFromBrick;
-            //isHeadingCorrectionFromExtUDP = Properties.Settings.Default.setIMU_isHeadingCorrectionFromExtUDP;
+            isHeadingCorrectionFromAutoSteer = Properties.Vehicle.Default.HeadingCorrectionFromAutoSteer;
+            isHeadingCorrectionFromBrick = Properties.Vehicle.Default.HeadingCorrectionFromBrick;
 
-            isRollFromAutoSteer = Properties.Settings.Default.setIMU_isRollFromAutoSteer;
+            isRollFromAutoSteer = Properties.Vehicle.Default.RollFromAutoSteer;
             isRollFromAVR = Properties.Settings.Default.setIMU_isRollFromAVR;
             isRollFromOGI = Properties.Settings.Default.setIMU_isRollFromOGI;
 
-            rollZeroX16 = Properties.Settings.Default.setIMU_rollZeroX16;
-            pitchZeroX16 = Properties.Settings.Default.setIMU_pitchZeroX16;
+            rollZeroX16 = Properties.Vehicle.Default.RollZeroX16;
 
-            fusionWeight = Properties.Settings.Default.setIMU_fusionWeight;
+            fusionWeight = Properties.Vehicle.Default.FusionWeight;
 
             //usb IMU Tinker
             if (isHeadingCorrectionFromBrick)

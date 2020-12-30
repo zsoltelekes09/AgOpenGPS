@@ -27,9 +27,6 @@ namespace AgOpenGPS
                 return;
             }
 
-            //if contour is on, turn it off
-            if (ct.isContourBtnOn) { if (ct.isContourBtnOn) btnContour.PerformClick(); }
-
             isAutoSteerBtnOn = false;
             btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
             if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
@@ -136,7 +133,7 @@ namespace AgOpenGPS
             }
             else
             {
-                if (ct.isContourBtnOn || Guidance.BtnGuidanceOn)
+                if (Guidance.BtnGuidanceOn)
                 {
                     isAutoSteerBtnOn = true;
                     btnAutoSteer.Image = Properties.Resources.AutoSteerOn;
@@ -153,8 +150,6 @@ namespace AgOpenGPS
 
         private void BtnMakeLinesFromBoundary_Click(object sender, EventArgs e)
         {
-            if (ct.isContourBtnOn) { if (ct.isContourBtnOn) btnContour.PerformClick(); }
-
             if (bnd.bndArr.Count == 0)
             {
                 TimedMessageBox(2000, String.Get("gsNoBoundary"), String.Get("gsCreateABoundaryFirst"));
@@ -180,13 +175,10 @@ namespace AgOpenGPS
         {
             if (Guidance.Lines.Count > 0)
             {
-                //if contour is on, turn it off
-                if (ct.isContourBtnOn) btnContour.PerformClick();
-
                 Guidance.ResetABLine = true;
                 Guidance.CurrentLine = (Guidance.CurrentLine + 1 >= Guidance.Lines.Count) ? -1 : Guidance.CurrentLine + 1;
                 
-                Guidance.GuidanceLines.Clear();
+                Guidance.ExtraGuidanceLines.Clear();
                 Properties.Settings.Default.LastGuidanceLine = Guidance.CurrentLine;
                 Properties.Settings.Default.Save();
                 yt.ResetYouTurn();
@@ -205,17 +197,12 @@ namespace AgOpenGPS
                 }
 
                 YouTurnButtons(Guidance.BtnGuidanceOn);
-                snapLeftBigStrip.Enabled = Guidance.BtnGuidanceOn;
-                snapRightBigStrip.Enabled = Guidance.BtnGuidanceOn;
-                snapToCurrent.Enabled = ct.isContourBtnOn || Guidance.BtnGuidanceOn;
+                snapLeftBigStrip.Enabled = snapRightBigStrip.Enabled = snapToCurrent.Enabled = Guidance.BtnGuidanceOn;
             }
         }
 
         private void btnGuidance_Click(object sender, EventArgs e)
         {
-            //if contour is on, turn it off
-            if (ct.isContourBtnOn) btnContour.PerformClick();
-
             //check if window already exists
             Form f = Application.OpenForms["FormABCurve"];
 
@@ -230,7 +217,7 @@ namespace AgOpenGPS
                 {
                     Guidance.ResetABLine = true;
                     Guidance.CurrentLine = Properties.Settings.Default.LastGuidanceLine;
-                    Guidance.GuidanceLines.Clear();
+                    Guidance.ExtraGuidanceLines.Clear();
                     btnGuidance.Image = Properties.Resources.GuidanceCurve;
                     Guidance.BtnGuidanceOn = true;
 
@@ -245,76 +232,45 @@ namespace AgOpenGPS
                     form.Left = Left + Width / 2 - form.Width / 2;
                     form.Top = Top + Height / 2 - form.Height / 2;
                 }
-                snapLeftBigStrip.Enabled = Guidance.BtnGuidanceOn;
-                snapRightBigStrip.Enabled = Guidance.BtnGuidanceOn;
-                snapToCurrent.Enabled = ct.isContourBtnOn || Guidance.BtnGuidanceOn;
+                snapLeftBigStrip.Enabled = snapRightBigStrip.Enabled = snapToCurrent.Enabled = Guidance.BtnGuidanceOn;
             }
             YouTurnButtons(true);
         }
 
         private void btnContour_Click(object sender, EventArgs e)
         {
-            ct.isContourBtnOn = !ct.isContourBtnOn;
-            btnContour.Image = ct.isContourBtnOn ? Properties.Resources.ContourOn : Properties.Resources.ContourOff;
+            snapToCurrent.Enabled = Guidance.BtnGuidanceOn;
 
-            snapToCurrent.Enabled = ct.isContourBtnOn || Guidance.BtnGuidanceOn;
-
-            if (ct.isContourBtnOn)
+            if (Guidance.BtnGuidanceOn)
             {
-                //turn off youturn...
-                YouTurnButtons(false);
-                if (ct.isRightPriority)
-                {
-                    btnContourPriority.Image = Properties.Resources.ContourPriorityRight;
-                }
-                else
-                {
-                    btnContourPriority.Image = Properties.Resources.ContourPriorityLeft;
-                }
-            }
-
-            else
-            {
-                if (Guidance.BtnGuidanceOn)
-                {
-                    YouTurnButtons(true);
-                }
-                btnContourPriority.Image = Properties.Resources.Snap2;
+                YouTurnButtons(true);
             }
         }
 
         private void btnContourPriority_Click(object sender, EventArgs e)
         {
-            if (ct.isContourBtnOn)
+            if (Guidance.BtnGuidanceOn)
             {
-                ct.isRightPriority = !ct.isRightPriority;
-                btnContourPriority.Image = ct.isRightPriority ? Properties.Resources.ContourPriorityRight : Properties.Resources.ContourPriorityLeft;
+                Guidance.MoveLine(Guidance.CurrentLine, Guidance.isSameWay ? Guidance.distanceFromRefLine : -Guidance.distanceFromRefLine);
+                Guidance.distanceFromRefLine = 0;
             }
             else
             {
-                if (Guidance.BtnGuidanceOn)
-                {
-                    Guidance.MoveLine(Guidance.CurrentLine, Guidance.isSameWay ? Guidance.distanceFromRefLine : -Guidance.distanceFromRefLine);
-                    Guidance.distanceFromRefLine = 0;
-                }
-                else
-                {
-                    TimedMessageBox(2000, String.Get("gsNoGuidanceLines"), String.Get("gsTurnOnContourOrMakeABLine"));
-                }
+                TimedMessageBox(2000, String.Get("gsNoGuidanceLines"), String.Get("gsTurnOnContourOrMakeABLine"));
             }
         }
 
         private void btnSnapRight_Click(object sender, EventArgs e)
         {
             yt.ResetCreatedYouTurn();
-            double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
+            double dist = 0.01 * Properties.Vehicle.Default.SnapOffsetDistance;
             Guidance.MoveLine(Guidance.CurrentLine, Guidance.isSameWay ? dist : -dist);
         }
 
         private void btnSnapLeft_Click(object sender, EventArgs e)
         {
             yt.ResetCreatedYouTurn();
-            double dist = 0.01 * Properties.Settings.Default.setAS_snapDistance;
+            double dist = 0.01 * Properties.Vehicle.Default.SnapOffsetDistance;
             Guidance.MoveLine(Guidance.CurrentLine, Guidance.isSameWay ? -dist : dist);
 
         }
@@ -572,8 +528,6 @@ namespace AgOpenGPS
             Guidance.isOkToAddPoints = false;
             Guidance.isEditing = false;
 
-            if (ct.isContourBtnOn) { if (ct.isContourBtnOn) btnContour.PerformClick(); }
-
             Form f = Application.OpenForms["FormTram"];
             if (f != null)
             {
@@ -819,14 +773,6 @@ namespace AgOpenGPS
             else { TimedMessageBox(3000, String.Get("gsFieldNotOpen"), String.Get("gsStartNewField")); }
         }
 
-        private void deleteContourPathsToolStripMenuItem_Click_1(object sender, EventArgs e)
-        {
-            //FileCreateContour();
-            ct.stripList.Clear();
-            ct.ctList.Clear();
-            ContourSaveList.Clear();
-        }
-
         private void fileExplorerToolStripItem_Click(object sender, EventArgs e)
         {
             if (isJobStarted)
@@ -868,14 +814,9 @@ namespace AgOpenGPS
                         }
                     }
 
-                    //clear out the contour Lists
-                    ct.StopContourLine(pivotAxlePos);
-                    ct.ResetContour();
                     fd.workedAreaTotal = 0;
                     PatchSaveList.Clear();
                     PatchDrawList.Clear();
-
-                    FileCreateContour();
                     FileCreateSections();
                 }
                 else
@@ -1299,10 +1240,10 @@ namespace AgOpenGPS
                 }
                 else
                 {
-
+                    
                     pn.latitude = sim.latitude;
                     pn.longitude = sim.longitude;
-
+                    
                     double[] xy = pn.DecDeg2UTM(pn.latitude, pn.longitude);
 
                     pn.actualEasting = xy[0];
@@ -1323,8 +1264,9 @@ namespace AgOpenGPS
                     pn.centralMeridian = -177 + ((pn.zone - 1) * 6);
 
                     //Azimuth Error - utm declination
-                    pn.convergenceAngle = Math.Atan(Math.Sin(Glm.ToRadians(pn.latitude))
-                                                * Math.Tan(Glm.ToRadians(pn.longitude - pn.centralMeridian)));
+                    pn.convergenceAngle = Math.Atan(Math.Sin(Glm.ToRadians(pn.latitude)) * Math.Tan(Glm.ToRadians(pn.longitude - pn.centralMeridian)));
+                    
+
 
                     for (int i = 0; i < totalFixSteps; i++)
                     {

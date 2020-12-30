@@ -38,7 +38,7 @@ namespace AgOpenGPS
         public bool isTurnCreationTooClose = false, isTurnCreationNotCrossingError = false;
 
         //pure pursuit values
-        private Vec4 ExitPoint = new Vec4(0, 0, 0, 0, 0);
+        private Vec4 ExitPoint = new Vec4(0, 0, 0, 0, 0), EntryPoint = new Vec4(0, 0, 0, 0, 0);
         private List<Vec3> OffsetList = new List<Vec3>();
 
         public double rEastYT, rNorthYT;
@@ -420,10 +420,10 @@ namespace AgOpenGPS
             else if (youTurnPhase == 1)
             {
                 OffsetList.Clear();
-                mf.Guidance.CalculateCurList(out OffsetList, mf.Guidance.WidthMinusOverlap * (mf.Guidance.HowManyPathsAway + rowSkipsWidth * (mf.Guidance.isSameWay ? (isYouTurnRight? 1 : -1) : (isYouTurnRight ? -1 : 1))));
 
+                mf.Guidance.CalculateOffsetList(out List<List<Vec3>> ttt, mf.Guidance.WidthMinusOverlap * (mf.Guidance.HowManyPathsAway + rowSkipsWidth * (mf.Guidance.isSameWay ? (isYouTurnRight? 1 : -1) : (isYouTurnRight ? -1 : 1))) + (mf.Guidance.isSameWay ? mf.Guidance.GuidanceOffset : -mf.Guidance.GuidanceOffset), true);
 
-
+                OffsetList = ttt[0];
 
                 double turnOffset = (mf.Guidance.WidthMinusOverlap * rowSkipsWidth) + (isYouTurnRight ? mf.Guidance.GuidanceOffset * 2.0 : -mf.Guidance.GuidanceOffset * 2.0);
 
@@ -470,6 +470,7 @@ namespace AgOpenGPS
                 if (Crossings.Count > 0)
                 {
                     Crossings.Sort((x, y) => x.Time.CompareTo(y.Time));//Now we have te closest crossing! most of the time its just 1;
+                    EntryPoint = Crossings[0];
                     youTurnPhase = 2;
                 }
                 else
@@ -477,14 +478,10 @@ namespace AgOpenGPS
                     isTurnCreationNotCrossingError = true;
                     youTurnPhase = -1;
                 }
-
-
-
                 youTurnPhase = 2;
             }
             else if (youTurnPhase == 2)
             {
-
 
 
             }
@@ -630,8 +627,6 @@ namespace AgOpenGPS
 
 
                         Start = new Vec3(ytList[ytList.Count - 2].Northing, ytList[ytList.Count - 2].Easting, 0);
-
-
 
                         ytList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, false, 0.0836332, CancellationToken.None);
                         ytList.RemoveAt(0);
@@ -1536,7 +1531,7 @@ namespace AgOpenGPS
                 else if (isOutOfBounds) GL.Color3(0.9495f, 0.395f, 0.325f);
                 else GL.Color3(0.395f, 0.925f, 0.30f);
 
-                GL.Begin(PrimitiveType.Points);
+                GL.Begin(PrimitiveType.LineStrip);
                 for (int i = 0; i < ptCount; i++)
                 {
                     GL.Vertex3(ytList[i].Easting, ytList[i].Northing, 0);
@@ -1560,10 +1555,11 @@ namespace AgOpenGPS
                 }
                 GL.End();
             }
+            
             GL.PointSize(5);
             GL.Begin(PrimitiveType.Points);
             GL.Vertex3(ExitPoint.Easting, ExitPoint.Northing, 0);
-            GL.Vertex3(EnterPoint.Easting, EnterPoint.Northing, 0);
+            GL.Vertex3(EntryPoint.Easting, EntryPoint.Northing, 0);
             GL.End();
             */
         }

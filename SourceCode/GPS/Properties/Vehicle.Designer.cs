@@ -494,12 +494,12 @@ namespace AgOpenGPS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int setVehicle_vehicleType {
+        public int VehicleType {
             get {
-                return ((int)(this["setVehicle_vehicleType"]));
+                return ((int)(this["VehicleType"]));
             }
             set {
-                this["setVehicle_vehicleType"] = value;
+                this["VehicleType"] = value;
             }
         }
         
@@ -572,18 +572,6 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setVehicle_hydraulicLiftLookAhead"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool setVehicle_isMachineControlToAutoSteer {
-            get {
-                return ((bool)(this["setVehicle_isMachineControlToAutoSteer"]));
-            }
-            set {
-                this["setVehicle_isMachineControlToAutoSteer"] = value;
             }
         }
         
@@ -847,6 +835,150 @@ namespace AgOpenGPS.Properties {
             }
             set {
                 this["setSteer_integralDistanceAway"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double FixStepDist {
+            get {
+                return ((double)(this["FixStepDist"]));
+            }
+            set {
+                this["FixStepDist"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public double DualHeadingCorrection {
+            get {
+                return ((double)(this["DualHeadingCorrection"]));
+            }
+            set {
+                this["DualHeadingCorrection"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2")]
+        public double DualAntennaDistance {
+            get {
+                return ((double)(this["DualAntennaDistance"]));
+            }
+            set {
+                this["DualAntennaDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.1")]
+        public double SnapOffsetDistance {
+            get {
+                return ((double)(this["SnapOffsetDistance"]));
+            }
+            set {
+                this["SnapOffsetDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Fix")]
+        public string HeadingFromSource {
+            get {
+                return ((string)(this["HeadingFromSource"]));
+            }
+            set {
+                this["HeadingFromSource"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GGA")]
+        public string FixFromSentence {
+            get {
+                return ((string)(this["FixFromSentence"]));
+            }
+            set {
+                this["FixFromSentence"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HeadingCorrectionFromBrick {
+            get {
+                return ((bool)(this["HeadingCorrectionFromBrick"]));
+            }
+            set {
+                this["HeadingCorrectionFromBrick"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RollFromAutoSteer {
+            get {
+                return ((bool)(this["RollFromAutoSteer"]));
+            }
+            set {
+                this["RollFromAutoSteer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HeadingCorrectionFromAutoSteer {
+            get {
+                return ((bool)(this["HeadingCorrectionFromAutoSteer"]));
+            }
+            set {
+                this["HeadingCorrectionFromAutoSteer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("68wESU")]
+        public string IMU_UID {
+            get {
+                return ((string)(this["IMU_UID"]));
+            }
+            set {
+                this["IMU_UID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.25")]
+        public double FusionWeight {
+            get {
+                return ((double)(this["FusionWeight"]));
+            }
+            set {
+                this["FusionWeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int RollZeroX16 {
+            get {
+                return ((int)(this["RollZeroX16"]));
+            }
+            set {
+                this["RollZeroX16"] = value;
             }
         }
     }

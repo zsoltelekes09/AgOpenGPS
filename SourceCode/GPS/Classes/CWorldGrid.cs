@@ -39,6 +39,44 @@ namespace AgOpenGPS
             GL.Vertex3(EastingMin, NorthingMax, 0.0);
 
             GL.End();
+
+
+
+            /*
+            
+            string fileAndDirectory = mf.baseDirectory + "VR.PNG";
+
+            if (mf.texture[12] != 0)
+            {
+                GL.Enable(EnableCap.Texture2D);
+                GL.Color3(0.96f, .96f, 0.96f);
+                GL.BindTexture(TextureTarget.Texture2D, mf.texture[12]);
+                GL.Begin(PrimitiveType.TriangleStrip);
+                GL.TexCoord2(0, 0);
+                GL.Vertex3(mf.minFieldX, mf.maxFieldY, 0.0);
+                GL.TexCoord2(1.0, 0.0);
+                GL.Vertex3(mf.maxFieldX, mf.maxFieldY, 0.0);
+                GL.TexCoord2(0.0, 1.0);
+                GL.Vertex3(mf.minFieldX, mf.minFieldY, 0.0);
+                GL.TexCoord2(1.0, 1.0);
+                GL.Vertex3(mf.maxFieldX, mf.minFieldY, 0.0);
+                GL.End();
+            }
+            else if (File.Exists(fileAndDirectory))
+            {
+                using (Bitmap bitmap2 = new Bitmap(fileAndDirectory))
+                {
+                    GL.GenTextures(1, out mf.texture[12]);
+                    GL.BindTexture(TextureTarget.Texture2D, mf.texture[12]);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9729);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                    BitmapData bitmapData2 = bitmap2.LockBits(new Rectangle(0, 0, bitmap2.Width, bitmap2.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmapData2.Width, bitmapData2.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bitmapData2.Scan0);
+                    bitmap2.UnlockBits(bitmapData2);
+                }
+            }
+            */
+
             GL.Disable(EnableCap.Texture2D);
         }
 
@@ -67,9 +105,8 @@ namespace AgOpenGPS
 
         public void CheckWorldGrid(double northing, double easting)
         {
-            double n = Math.Round(northing / (GridSize / Count) * 2, MidpointRounding.AwayFromZero) * (GridSize / Count) * 2;
-            double e = Math.Round(easting / (GridSize / Count) * 2, MidpointRounding.AwayFromZero) * (GridSize / Count) * 2;
-
+            double n = Math.Round(northing / (GridSize / Count * 2) , MidpointRounding.AwayFromZero) * (GridSize / Count * 2);
+            double e = Math.Round(easting / (GridSize / Count * 2), MidpointRounding.AwayFromZero) * (GridSize / Count * 2);
 
             NorthingMax = n + GridSize;
             NorthingMin = n - GridSize;

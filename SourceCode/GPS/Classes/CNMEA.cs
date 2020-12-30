@@ -139,7 +139,7 @@ Field	Meaning
         public string rawBuffer = "";
         private string[] words;
         private string nextNMEASentence = "";
-        public string fixFrom;
+        public string FixFromSentence;
 
         //UTM coordinates
         //public double northing, easting;
@@ -173,7 +173,7 @@ Field	Meaning
         {
             //constructor, grab the main form reference
             mf = f;
-            fixFrom = Properties.Settings.Default.setGPS_fixFromWhichSentence;
+            FixFromSentence = Properties.Vehicle.Default.FixFromSentence;
         }
 
         //ParseNMEA
@@ -339,7 +339,7 @@ Field	Meaning
             if (!string.IsNullOrEmpty(words[2]) && !string.IsNullOrEmpty(words[3])
                 && !string.IsNullOrEmpty(words[4]) && !string.IsNullOrEmpty(words[5]))
             {
-                if (fixFrom == "GGA")
+                if (FixFromSentence == "GGA")
                 {
                     //get latitude and convert to decimal degrees
                     int decim = words[2].IndexOf(".", StringComparison.Ordinal);
@@ -417,7 +417,7 @@ Field	Meaning
             if (!string.IsNullOrEmpty(words[2]) && !string.IsNullOrEmpty(words[3])
                 && !string.IsNullOrEmpty(words[4]) && !string.IsNullOrEmpty(words[5]))
             {
-                if (fixFrom == "OGI")
+                if (FixFromSentence == "OGI")
                 {
                     //get latitude and convert to decimal degrees
                     double.TryParse(words[2].Substring(0, 2), NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
@@ -623,7 +623,7 @@ Field	Meaning
             if (!string.IsNullOrEmpty(words[3]) && !string.IsNullOrEmpty(words[4])
                 && !string.IsNullOrEmpty(words[5]) && !string.IsNullOrEmpty(words[6]))
             {
-                if (fixFrom == "RMC")
+                if (FixFromSentence == "RMC")
                 {
                     //get latitude and convert to decimal degrees
                     double.TryParse(words[3].Substring(0, 2), NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);

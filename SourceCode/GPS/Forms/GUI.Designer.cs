@@ -158,7 +158,7 @@ namespace AgOpenGPS
             SetZoom();
 
             //which heading source is being used
-            headingFromSource = Properties.Settings.Default.setGPS_headingFromWhichSource;
+            HeadingFromSource = Properties.Vehicle.Default.HeadingFromSource;
 
             StartLocalUDPServer();
 
@@ -173,9 +173,9 @@ namespace AgOpenGPS
             mc.isWorkSwitchManual = Properties.Vehicle.Default.setF_IsWorkSwitchManual;
             mc.RemoteAutoSteer = Properties.Vehicle.Default.setAS_isAutoSteerAutoOn;
 
-            minFixStepDist = Properties.Settings.Default.setF_minFixStep;
-            HeadingCorrection = Properties.Settings.Default.HeadingCorrection;
-            DualAntennaDistance = Properties.Settings.Default.DualAntennaDistance;
+            FixStepDist = Properties.Vehicle.Default.FixStepDist;
+            DualHeadingCorrection = Properties.Vehicle.Default.DualHeadingCorrection;
+            DualAntennaDistance = Properties.Vehicle.Default.DualAntennaDistance;
 
             fd.workedAreaTotalUser = Properties.Settings.Default.setF_UserTotalArea;
             fd.userSquareMetersAlarm = Properties.Settings.Default.setF_UserTripAlarm;
@@ -680,11 +680,11 @@ namespace AgOpenGPS
 
             if (isMetric)  //metric or imperial
             {
-                btnContour.Text = (crossTrackError / 10 + String.Get("gsCM")); //cross track error
+                btnEditHeading.Text = (crossTrackError / 10 + String.Get("gsCM")); //cross track error
             }
             else  //Imperial Measurements
             {
-                btnContour.Text = ((int)(crossTrackError / 25.54) + " in"); //cross track errorss
+                btnEditHeading.Text = ((int)(crossTrackError / 25.54) + " in"); //cross track errorss
             }
 
             lblHz.Text = Math.Round(HzTime, 1) + " Hz " + Math.Round(FrameTime, 0) + " ms\r\n" + FixQuality;
@@ -695,11 +695,10 @@ namespace AgOpenGPS
                 MinuteCounter++;
 
                 //Make sure it is off when it should
-                if ((!ct.isContourBtnOn && !Guidance.BtnGuidanceOn && isAutoSteerBtnOn) || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn))
+                if ((!Guidance.BtnGuidanceOn && isAutoSteerBtnOn) || (recPath.isDrivingRecordedPath && isAutoSteerBtnOn))
                 {
                     isAutoSteerBtnOn = false;
                     btnAutoSteer.Image = Properties.Resources.AutoSteerOff;
-                    //if (yt.isYouTurnBtnOn) btnAutoYouTurn.PerformClick();
                 }
 
                 //do all the NTRIP routines

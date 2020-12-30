@@ -83,10 +83,6 @@ namespace AgOpenGPS
                 tboxUDPMachine.Text = "NC";
                 tboxUDPSwitch.Text = "NC";
             }
-
-
-            txtBoxRecvAutoSteer.Text = mf.mc.serialRecvAutoSteerStr;
-            txtBoxRecvMachine.Text = mf.mc.serialRecvMachineStr;
         }
 
         private void FormGPSData_Load(object sender, EventArgs e)

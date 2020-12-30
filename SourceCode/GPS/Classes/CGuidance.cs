@@ -28,7 +28,7 @@ namespace AgOpenGPS
         public List<Vec3> smooList = new List<Vec3>();
         public List<CGuidanceLine> Lines = new List<CGuidanceLine>();
         public bool isEditing;
-        public List<List<List<Vec3>>> GuidanceLines = new List<List<List<Vec3>>>();
+        public List<List<List<Vec3>>> ExtraGuidanceLines = new List<List<List<Vec3>>>();
 
         public CGuidance(FormGPS _f)
         {
@@ -147,15 +147,15 @@ namespace AgOpenGPS
 
                         GL.LineWidth(mf.lineWidth);
 
-                        for (int i = 0; i < GuidanceLines.Count; i++)
+                        for (int i = 0; i < ExtraGuidanceLines.Count; i++)
                         {
-                            for (int j = 0; j < GuidanceLines[i].Count; j++)
+                            for (int j = 0; j < ExtraGuidanceLines[i].Count; j++)
                             {
-                                if (GuidanceLines[i][j].Count > 0)
+                                if (ExtraGuidanceLines[i][j].Count > 0)
                                 {
                                     if (Lines[CurrentLine].Mode == Gmode.Boundary) GL.Begin(PrimitiveType.LineLoop);
                                     else GL.Begin(PrimitiveType.LineStrip);
-                                    for (int h = 0; h < GuidanceLines[i][j].Count; h++) GL.Vertex3(GuidanceLines[i][j][h].Easting, GuidanceLines[i][j][h].Northing, 0);
+                                    for (int h = 0; h < ExtraGuidanceLines[i][j].Count; h++) GL.Vertex3(ExtraGuidanceLines[i][j][h].Easting, ExtraGuidanceLines[i][j][h].Northing, 0);
                                     GL.End();
                                 }
                             }
@@ -620,83 +620,7 @@ namespace AgOpenGPS
             }
         }
 
-        public void CalculateExtraGuides(int Idx, double PathsAway)
-        {
-            double Offset = WidthMinusOverlap * PathsAway;
-
-            if (Lines[CurrentLine].Mode == Gmode.AB || Lines[CurrentLine].Mode == Gmode.Heading)
-            {
-                double cosHeading = Math.Cos(Lines[CurrentLine].Heading);
-                double sinHeading = Math.Sin(Lines[CurrentLine].Heading);
-
-                GuidanceLines[Idx][0].Add(new Vec3(Lines[CurrentLine].Segments[0].Northing + cosHeading * -mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[0].Easting + sinHeading * -mf.maxCrossFieldLength + cosHeading * Offset, Lines[CurrentLine].Heading));
-                GuidanceLines[Idx][0].Add(new Vec3(Lines[CurrentLine].Segments[1].Northing + cosHeading * mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[1].Easting + sinHeading * mf.maxCrossFieldLength + cosHeading * Offset, Lines[CurrentLine].Heading));
-            }
-            else
-            {
-                for (int j = 0; j < Lines[CurrentLine].Segments.Count; j++)
-                {
-                    var point2 = new Vec3(
-                        Lines[CurrentLine].Segments[j].Northing + (Math.Sin(Lines[CurrentLine].Segments[j].Heading) * -Offset),
-                        Lines[CurrentLine].Segments[j].Easting + (Math.Cos(Lines[CurrentLine].Segments[j].Heading) * Offset),
-                        Lines[CurrentLine].Segments[j].Heading);
-
-                    bool Add = true;
-                    for (int t = 0; t < Lines[CurrentLine].Segments.Count; t++)
-                    {
-                        double dist = ((point2.Easting - Lines[CurrentLine].Segments[t].Easting) * (point2.Easting - Lines[CurrentLine].Segments[t].Easting)) + ((point2.Northing - Lines[CurrentLine].Segments[t].Northing) * (point2.Northing - Lines[CurrentLine].Segments[t].Northing));
-                        if (dist < (Offset * Offset) - 0.001)
-                        {
-                            Add = false;
-                            break;
-                        }
-                    }
-                    if (Add)
-                    {
-                        if (GuidanceLines[Idx][0].Count > 0)
-                        {
-                            double dist = ((point2.Easting - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Easting) * (point2.Easting - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Easting)) + ((point2.Northing - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Northing) * (point2.Northing - GuidanceLines[Idx][0][GuidanceLines[Idx][0].Count - 1].Northing));
-                            if (dist > 1) GuidanceLines[Idx][0].Add(point2);
-                        }
-                        else GuidanceLines[Idx][0].Add(point2);
-                    }
-                }
-
-                if (Lines[CurrentLine].Mode == Gmode.Boundary)
-                {
-                    bool first = true;
-                    int testa = -1;
-                    int l = 0;
-                    int m = 1;
-
-                    for (int k = 1; k + 1 < GuidanceLines[Idx][0].Count; l = k++)
-                    {
-                        double Nort = GuidanceLines[Idx][0][k].Northing - GuidanceLines[Idx][0][l].Northing;
-                        double East = GuidanceLines[Idx][0][k].Easting - GuidanceLines[Idx][0][l].Easting;
-                        double dist = (East * East) + (Nort * Nort);
-                        if (dist > Offset * Offset + Offset * Offset)
-                        {
-                            if (first)
-                            {
-                                first = false;
-                                testa = k;
-                            }
-                            else
-                            {
-                                GuidanceLines[Idx].Add(new List<Vec3>());
-
-                                GuidanceLines[Idx][m].AddRange(GuidanceLines[Idx][0].GetRange(testa, k - testa));
-                                GuidanceLines[Idx][0].RemoveRange(testa, k - testa);
-                                first = true;
-                                m++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public void GetCurrentCurveLine(Vec3 pivot, Vec3 steer)
+        public void GetCurrentLine(Vec3 pivot, Vec3 steer)
         {
             double minDistance;
 
@@ -852,52 +776,55 @@ namespace AgOpenGPS
 
                                 int Up = HowManyPathsAway - OldHowManyPathsAway;
 
-                                if (Up < -5 || Up > 5) GuidanceLines.Clear();
+                                if (Up < -5 || Up > 5) ExtraGuidanceLines.Clear();
 
-                                int Count = GuidanceLines.Count;
+                                int Count = ExtraGuidanceLines.Count;
 
                                 if (Count < 6 || Up == 0)
                                 {
-                                    if (Count > 0) GuidanceLines.Clear();
+                                    if (Count > 0) ExtraGuidanceLines.Clear();
                                     for (double i = -2.5; i < 3; i++)
                                     {
-                                        GuidanceLines.Add(new List<List<Vec3>>());
-                                        Gcnt = GuidanceLines.Count - 1;
-                                        GuidanceLines[Gcnt].Add(new List<Vec3>());
-                                        CalculateExtraGuides(Gcnt, HowManyPathsAway + i);
+                                        ExtraGuidanceLines.Add(new List<List<Vec3>>());
+                                        Gcnt = ExtraGuidanceLines.Count - 1;
+                                        CalculateOffsetList(out List<List<Vec3>> ttt, WidthMinusOverlap * (HowManyPathsAway + i), false);
+                                        ExtraGuidanceLines[Gcnt] = ttt;
                                     }
                                 }
                                 else if (Up < 0)
                                 {
-                                    for (double i = -3.5; i >= Up - 2.5; i--)
+                                    for (int i = -1; i >= Up; i--)
                                     {
-                                        GuidanceLines.RemoveAt(5);
-                                        GuidanceLines.Insert(0, new List<List<Vec3>>());
+                                        ExtraGuidanceLines.RemoveAt(5);
+                                        ExtraGuidanceLines.Insert(0, new List<List<Vec3>>());
                                         Gcnt = 0;
-                                        GuidanceLines[Gcnt].Add(new List<Vec3>());
-                                        CalculateExtraGuides(Gcnt, OldHowManyPathsAway + i);
+                                        CalculateOffsetList(out List<List<Vec3>> ttt, WidthMinusOverlap * (OldHowManyPathsAway - 2.5 + i), false);
+                                        ExtraGuidanceLines[Gcnt] = ttt;
                                     }
                                 }
                                 else
                                 {
-                                    for (double i = 3.5; i <= Up + 2.5; i++)
+                                    for (int i = 1; i <= Up; i++)
                                     {
-                                        GuidanceLines.RemoveAt(0);
-                                        GuidanceLines.Insert(5, new List<List<Vec3>>());
+                                        ExtraGuidanceLines.RemoveAt(0);
+                                        ExtraGuidanceLines.Insert(5, new List<List<Vec3>>());
                                         Gcnt = 5;
-                                        GuidanceLines[Gcnt].Add(new List<Vec3>());
-                                        CalculateExtraGuides(Gcnt, OldHowManyPathsAway + i);
+                                        CalculateOffsetList(out List<List<Vec3>> ttt, WidthMinusOverlap * (OldHowManyPathsAway + 2.5 + i), false);
+                                        ExtraGuidanceLines[Gcnt] = ttt;
                                     }
                                 }
                             }
                         }
-                        else GuidanceLines.Clear();
+                        else ExtraGuidanceLines.Clear();
 
                         ResetABLine = false;
                         OldisSameWay = isSameWay;
                         OldHowManyPathsAway = HowManyPathsAway;
 
-                        CalculateCurList(out curList, WidthMinusOverlap * HowManyPathsAway);
+                        CalculateOffsetList(out List<List<Vec3>> tttt, WidthMinusOverlap * HowManyPathsAway + (isSameWay ? -GuidanceOffset : GuidanceOffset), true);
+
+
+                        curList = tttt[0];
                     }
                 }
                 mf.CalculateSteerAngle(ref curList, isSameWay, Lines[CurrentLine].Mode == Gmode.Boundary);
@@ -910,74 +837,76 @@ namespace AgOpenGPS
             }
         }
 
-        public void CalculateCurList(out List<Vec3> OffsetList, double Offset)
+        public void CalculateOffsetList(out List<List<Vec3>> OffsetList, double Offset, bool RoundCorner)
         {
-            OffsetList = new List<Vec3>();
-
-            if (isSameWay) Offset -= GuidanceOffset;
-            else Offset += GuidanceOffset;
+            OffsetList = new List<List<Vec3>>();
 
             if (Lines[CurrentLine].Mode == Gmode.AB || Lines[CurrentLine].Mode == Gmode.Heading)
             {
                 double cosHeading = Math.Cos(Lines[CurrentLine].Heading);
                 double sinHeading = Math.Sin(Lines[CurrentLine].Heading);
-
-                OffsetList.Add(new Vec3(Lines[CurrentLine].Segments[0].Northing + cosHeading * -mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[0].Easting + sinHeading * -mf.maxCrossFieldLength + cosHeading * Offset, Lines[CurrentLine].Heading));
-                OffsetList.Add(new Vec3(Lines[CurrentLine].Segments[1].Northing + cosHeading * mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[1].Easting + sinHeading * mf.maxCrossFieldLength + cosHeading * Offset, Lines[CurrentLine].Heading));
+                OffsetList.Add(new List<Vec3>());
+                OffsetList[0].Add(new Vec3(Lines[CurrentLine].Segments[0].Northing + cosHeading * -mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[0].Easting + sinHeading * -mf.maxCrossFieldLength + cosHeading * Offset, Lines[CurrentLine].Heading));
+                OffsetList[0].Add(new Vec3(Lines[CurrentLine].Segments[1].Northing + cosHeading * mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[1].Easting + sinHeading * mf.maxCrossFieldLength + cosHeading * Offset, Lines[CurrentLine].Heading));
             }
             else
             {
                 if (Lines[CurrentLine].Segments.Count > 1)
                 {
+                    List<Vec3> BuildList = new List<Vec3>();
+
                     Vec3 LastVec = Lines[CurrentLine].Segments[0];
+                    double OffsetSq = Offset * Offset - 0.005;
 
                     for (int i = 1; i < Lines[CurrentLine].Segments.Count; i++)
                     {
                         double dx1 = Lines[CurrentLine].Segments[i].Northing - LastVec.Northing;
                         double dy1 = Lines[CurrentLine].Segments[i].Easting - LastVec.Easting;
-                        
+
+                        if (i == 1 && Lines[CurrentLine].Mode != Gmode.Boundary)
+                        {
+                            double Heading = Math.Atan2(dy1, dx1);
+                            double cosHeading = Math.Cos(Heading);
+                            double sinHeading = Math.Sin(Heading);
+                            BuildList.Add(new Vec3(Lines[CurrentLine].Segments[0].Northing + cosHeading * -mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[0].Easting + sinHeading * -mf.maxCrossFieldLength + cosHeading * Offset, Heading));
+                        }
+                        if (i == Lines[CurrentLine].Segments.Count - 1 && Lines[CurrentLine].Mode != Gmode.Boundary)
+                        {
+                            double Heading = Math.Atan2(dy1, dx1);
+                            double cosHeading = Math.Cos(Heading);
+                            double sinHeading = Math.Sin(Heading);
+                            BuildList.Add(new Vec3(Lines[CurrentLine].Segments[Lines[CurrentLine].Segments.Count - 1].Northing + cosHeading * mf.maxCrossFieldLength + sinHeading * -Offset, Lines[CurrentLine].Segments[Lines[CurrentLine].Segments.Count - 1].Easting + sinHeading * mf.maxCrossFieldLength + cosHeading * Offset, Heading));
+                        }
+
                         double dist = (dy1 * dy1) + (dx1 * dx1);
                         if (dist > 0.0001)
                         {
                             double Heading = Math.Atan2(dy1, dx1);
-
                             var point2 = new Vec3(LastVec.Northing + (Math.Sin(Heading) * -Offset), LastVec.Easting + (Math.Cos(Heading) * Offset), Heading);
-                            bool Add = true;
-
-                            for (int t = 0; t < Lines[CurrentLine].Segments.Count; t++)
-                            {
-                                double dist2 = ((point2.Easting - Lines[CurrentLine].Segments[t].Easting) * (point2.Easting - Lines[CurrentLine].Segments[t].Easting)) + ((point2.Northing - Lines[CurrentLine].Segments[t].Northing) * (point2.Northing - Lines[CurrentLine].Segments[t].Northing));
-                                if (dist2 < (Offset * Offset) - 0.003)
-                                {
-                                    Add = false;
-                                    break;
-                                }
-                            }
-                            if (Add)
-                            {
-                                if (OffsetList.Count > 0)
-                                {
-                                    double dist2 = ((point2.Easting - OffsetList[OffsetList.Count - 1].Easting) * (point2.Easting - OffsetList[OffsetList.Count - 1].Easting)) + ((point2.Northing - OffsetList[OffsetList.Count - 1].Northing) * (point2.Northing - OffsetList[OffsetList.Count - 1].Northing));
-                                    if (dist2 > 1) OffsetList.Add(point2);
-                                }
-                                else OffsetList.Add(point2);
-                            }
                             LastVec = Lines[CurrentLine].Segments[i];
+                            BuildList.Add(point2);
                         }
                     }
-                    OffsetList.CalculateRoundedCorner(mf.vehicle.minTurningRadius, Lines[CurrentLine].Mode == Gmode.Boundary, 0.0436332, CancellationToken.None);
 
-                    if (OffsetList.Count > 1 && Lines[CurrentLine].Mode == Gmode.Curve)
+                    int ctCount = BuildList.Count;
+                    if (ctCount < 6) return;
+
+                    OffsetList.AddRange(BuildList.ClipPolyLine(null, Lines[CurrentLine].Mode == Gmode.Boundary, OffsetSq, CancellationToken.None));
+
+                    if (OffsetList.Count < 1) return;
+                    for (int s = 0; s < OffsetList.Count; s++)
                     {
-                        double cosHeading = Math.Cos(OffsetList[0].Heading);
-                        double sinHeading = Math.Sin(OffsetList[0].Heading);
-
-                        OffsetList.Insert(0, new Vec3(OffsetList[0].Northing + cosHeading * -mf.maxCrossFieldLength, OffsetList[0].Easting + sinHeading * -mf.maxCrossFieldLength, OffsetList[0].Heading));
-
-                        cosHeading = Math.Cos(OffsetList[OffsetList.Count - 1].Heading);
-                        sinHeading = Math.Sin(OffsetList[OffsetList.Count - 1].Heading);
-
-                        OffsetList.Add(new Vec3(OffsetList[OffsetList.Count - 1].Northing + cosHeading * mf.maxCrossFieldLength, OffsetList[OffsetList.Count - 1].Easting + sinHeading * mf.maxCrossFieldLength, OffsetList[OffsetList.Count - 1].Heading));
+                        if (RoundCorner)
+                        {
+                            if (OffsetList[s].Count < 4) return;
+                            double distance = Glm.Distance(OffsetList[s][0], OffsetList[s][OffsetList[s].Count - 1]);
+                            bool loop = distance < 5;
+                            OffsetList[s].CalculateRoundedCorner(mf.vehicle.minTurningRadius, loop, 0.0436332, CancellationToken.None);
+                        }
+                        else
+                        {
+                        
+                        }
                     }
                 }
             }
@@ -1051,9 +980,6 @@ namespace AgOpenGPS
             }
         }
     }
-
-
-
 
     public enum Gmode { Spiral, Circle, AB, Heading, Curve, Boundary };
 

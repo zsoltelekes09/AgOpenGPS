@@ -73,7 +73,7 @@ namespace AgOpenGPS
             mf.FileLoadGuidanceLines();
             mf.Guidance.ResetABLine = true;
             mf.Guidance.CurrentLine = last;
-            mf.Guidance.GuidanceLines.Clear();
+            mf.Guidance.ExtraGuidanceLines.Clear();
             Properties.Settings.Default.LastGuidanceLine = last;
             Properties.Settings.Default.Save();
             mf.Guidance.CurrentEditLine = -1;
@@ -274,7 +274,7 @@ namespace AgOpenGPS
                 mf.Guidance.CurrentLine = idx;
 
                 mf.Guidance.ResetABLine = true;
-                mf.Guidance.GuidanceLines.Clear();
+                mf.Guidance.ExtraGuidanceLines.Clear();
                 Properties.Settings.Default.LastGuidanceLine = mf.Guidance.CurrentLine;
                 Properties.Settings.Default.Save();
                 mf.Guidance.CurrentEditLine = -1;

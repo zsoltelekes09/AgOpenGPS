@@ -72,7 +72,7 @@
             this.label8 = new System.Windows.Forms.Label();
             this.TboxDualAntennaDistance = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.TBoxHeadingCorrection = new System.Windows.Forms.TextBox();
+            this.TBoxDualHeadingCorrection = new System.Windows.Forms.TextBox();
             this.lblFusionIMU = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -648,7 +648,7 @@
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.TboxDualAntennaDistance);
             this.groupBox2.Controls.Add(this.label7);
-            this.groupBox2.Controls.Add(this.TBoxHeadingCorrection);
+            this.groupBox2.Controls.Add(this.TBoxDualHeadingCorrection);
             this.groupBox2.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(672, 20);
             this.groupBox2.Name = "groupBox2";
@@ -695,19 +695,19 @@
             this.label7.Text = "Degrees";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // TBoxHeadingCorrection
+            // TBoxDualHeadingCorrection
             // 
-            this.TBoxHeadingCorrection.BackColor = System.Drawing.SystemColors.Control;
-            this.TBoxHeadingCorrection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.TBoxHeadingCorrection.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TBoxHeadingCorrection.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.TBoxHeadingCorrection.Location = new System.Drawing.Point(10, 80);
-            this.TBoxHeadingCorrection.Name = "TBoxHeadingCorrection";
-            this.TBoxHeadingCorrection.Size = new System.Drawing.Size(190, 40);
-            this.TBoxHeadingCorrection.TabIndex = 89;
-            this.TBoxHeadingCorrection.Text = "-90.00";
-            this.TBoxHeadingCorrection.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.TBoxHeadingCorrection.Enter += new System.EventHandler(this.TBoxHeadingCorrection_Enter);
+            this.TBoxDualHeadingCorrection.BackColor = System.Drawing.SystemColors.Control;
+            this.TBoxDualHeadingCorrection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TBoxDualHeadingCorrection.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TBoxDualHeadingCorrection.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.TBoxDualHeadingCorrection.Location = new System.Drawing.Point(10, 80);
+            this.TBoxDualHeadingCorrection.Name = "TBoxDualHeadingCorrection";
+            this.TBoxDualHeadingCorrection.Size = new System.Drawing.Size(190, 40);
+            this.TBoxDualHeadingCorrection.TabIndex = 89;
+            this.TBoxDualHeadingCorrection.Text = "-90.00";
+            this.TBoxDualHeadingCorrection.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TBoxDualHeadingCorrection.Enter += new System.EventHandler(this.TBoxHeadingCorrection_Enter);
             // 
             // lblFusionIMU
             // 
@@ -881,7 +881,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label lblFusionIMU;
         private System.Windows.Forms.TextBox TboxFixStepDistance;
-        private System.Windows.Forms.TextBox TBoxHeadingCorrection;
+        private System.Windows.Forms.TextBox TBoxDualHeadingCorrection;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label8;

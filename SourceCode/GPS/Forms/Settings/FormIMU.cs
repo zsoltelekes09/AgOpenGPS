@@ -8,7 +8,7 @@ namespace AgOpenGPS
     {
         private readonly FormGPS mf;
 
-        private double minFixStepDistance, HeadingCorrection, DualAntennaDistance;
+        private double FixStepDist, DualHeadingCorrection, DualAntennaDistance;
 
         public FormIMU(Form callingForm)
         {
@@ -54,28 +54,16 @@ namespace AgOpenGPS
         private void BntOK_Click(object sender, EventArgs e)
         {
             ////Display ---load the delay slides --------------------------------------------------------------------
-            Properties.Settings.Default.setIMU_UID = tboxTinkerUID.Text.Trim();
+            Properties.Vehicle.Default.IMU_UID = tboxTinkerUID.Text.Trim();
 
 
-            Properties.Settings.Default.setF_minFixStep = mf.minFixStepDist = minFixStepDistance;
-            Properties.Settings.Default.HeadingCorrection = mf.HeadingCorrection = HeadingCorrection;
-            Properties.Settings.Default.DualAntennaDistance = mf.DualAntennaDistance = DualAntennaDistance;
-            
-            Properties.Settings.Default.setIMU_isHeadingCorrectionFromAutoSteer = rbtnHeadingCorrAutoSteer.Checked;
-            mf.ahrs.isHeadingCorrectionFromAutoSteer =  rbtnHeadingCorrAutoSteer.Checked;
-
-            Properties.Settings.Default.setIMU_isHeadingCorrectionFromBrick =  rbtnHeadingCorrBrick.Checked;
-            mf.ahrs.isHeadingCorrectionFromBrick = rbtnHeadingCorrBrick.Checked;
-
-            //Properties.Settings.Default.setIMU_isHeadingCorrectionFromExtUDP = rbtnHeadingCorrUDP.Checked;
-            //mf.ahrs.isHeadingCorrectionFromExtUDP = rbtnHeadingCorrUDP.Checked;
-
-
-            Properties.Settings.Default.setIMU_isRollFromAutoSteer = rbtnRollAutoSteer.Checked;
-            mf.ahrs.isRollFromAutoSteer = rbtnRollAutoSteer.Checked;
-
-            Properties.Settings.Default.setIMU_isRollFromAVR = rbtnRollAVR.Checked;
-            mf.ahrs.isRollFromAVR = rbtnRollAVR.Checked;
+            Properties.Vehicle.Default.FixStepDist = mf.FixStepDist = FixStepDist;
+            Properties.Vehicle.Default.DualHeadingCorrection = mf.DualHeadingCorrection = DualHeadingCorrection;
+            Properties.Vehicle.Default.DualAntennaDistance = mf.DualAntennaDistance = DualAntennaDistance;
+            Properties.Vehicle.Default.HeadingCorrectionFromAutoSteer = mf.ahrs.isHeadingCorrectionFromAutoSteer = rbtnHeadingCorrAutoSteer.Checked;
+            Properties.Vehicle.Default.HeadingCorrectionFromBrick = mf.ahrs.isHeadingCorrectionFromBrick = rbtnHeadingCorrBrick.Checked;
+            Properties.Vehicle.Default.RollFromAutoSteer = mf.ahrs.isRollFromAutoSteer = rbtnRollAutoSteer.Checked;
+            Properties.Settings.Default.setIMU_isRollFromAVR = mf.ahrs.isRollFromAVR = rbtnRollAVR.Checked;
 
             Properties.Settings.Default.setIMU_isRollFromOGI = rbtnRollOGI.Checked;
             mf.ahrs.isRollFromOGI = rbtnRollOGI.Checked;
@@ -83,10 +71,9 @@ namespace AgOpenGPS
             Properties.Settings.Default.setGPS_isRTK = cboxIsRTK.Checked;
             mf.isRTK = cboxIsRTK.Checked;
 
-            Properties.Settings.Default.setIMU_fusionWeight = (double)(hsbarFusion.Value) * 0.01;
+            Properties.Vehicle.Default.FusionWeight = (double)(hsbarFusion.Value) * 0.01;
             mf.ahrs.fusionWeight = (double)(hsbarFusion.Value) * 0.01;
 
-            Properties.Settings.Default.Save();
             Properties.Vehicle.Default.Save();
 
             //back to FormGPS
@@ -100,45 +87,45 @@ namespace AgOpenGPS
 
         private void FormDisplaySettings_Load(object sender, EventArgs e)
         {
-            TboxFixStepDistance.Text = ((minFixStepDistance = Properties.Settings.Default.setF_minFixStep) * mf.Mtr2Unit).ToString(mf.GuiFix);
-            TboxFixStepDistance.CheckValue(ref minFixStepDistance, 0.1, 5);
+            TboxFixStepDistance.Text = ((FixStepDist = Properties.Vehicle.Default.FixStepDist) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxFixStepDistance.CheckValue(ref FixStepDist, 0.1, 5);
 
-            TBoxHeadingCorrection.Text = (HeadingCorrection = Properties.Settings.Default.HeadingCorrection).ToString("N3");
-            TBoxHeadingCorrection.CheckValue(ref HeadingCorrection, -180, 180);
+            TBoxDualHeadingCorrection.Text = (DualHeadingCorrection = Properties.Vehicle.Default.DualHeadingCorrection).ToString("N3");
+            TBoxDualHeadingCorrection.CheckValue(ref DualHeadingCorrection, -180, 180);
 
-            TboxDualAntennaDistance.Text = ((DualAntennaDistance = Properties.Settings.Default.DualAntennaDistance) * mf.Mtr2Unit).ToString(mf.GuiFix);
+            TboxDualAntennaDistance.Text = ((DualAntennaDistance = Properties.Vehicle.Default.DualAntennaDistance) * mf.Mtr2Unit).ToString(mf.GuiFix);
             TboxDualAntennaDistance.CheckValue(ref DualAntennaDistance, 0, 15);
 
-            tboxTinkerUID.Text = Properties.Settings.Default.setIMU_UID;
+            tboxTinkerUID.Text = Properties.Vehicle.Default.IMU_UID;
 
             //heading correction
-            rbtnHeadingCorrAutoSteer.Checked = Properties.Settings.Default.setIMU_isHeadingCorrectionFromAutoSteer;
-            rbtnHeadingCorrBrick.Checked = Properties.Settings.Default.setIMU_isHeadingCorrectionFromBrick;
+            rbtnHeadingCorrAutoSteer.Checked = Properties.Vehicle.Default.HeadingCorrectionFromAutoSteer;
+            rbtnHeadingCorrBrick.Checked = Properties.Vehicle.Default.HeadingCorrectionFromBrick;
             //rbtnHeadingCorrUDP.Checked = Properties.Settings.Default.setIMU_isHeadingCorrectionFromExtUDP;
             if (!rbtnHeadingCorrAutoSteer.Checked && !rbtnHeadingCorrBrick.Checked)
                 rbtnHeadingCorrNone.Checked = true;   //&& !rbtnHeadingCorrUDP.Checked
 
             //Roll
-            rbtnRollAutoSteer.Checked = Properties.Settings.Default.setIMU_isRollFromAutoSteer;
+            rbtnRollAutoSteer.Checked = Properties.Vehicle.Default.RollFromAutoSteer;
             rbtnRollAVR.Checked = Properties.Settings.Default.setIMU_isRollFromAVR;
             rbtnRollOGI.Checked = Properties.Settings.Default.setIMU_isRollFromOGI;
             if (!rbtnRollAutoSteer.Checked && !rbtnRollAVR.Checked && !rbtnRollOGI.Checked) rbtnRollNone.Checked = true;
 
-            lblRollZeroOffset.Text = ((double)Properties.Settings.Default.setIMU_rollZeroX16 / 16).ToString("N2");
+            lblRollZeroOffset.Text = ((double)Properties.Vehicle.Default.RollZeroX16 / 16).ToString("N2");
 
             //Fix
-            if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "GGA") rbtnGGA.Checked = true;
-            else if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "RMC") rbtnRMC.Checked = true;
-            else if (Properties.Settings.Default.setGPS_fixFromWhichSentence == "OGI") rbtnOGI.Checked = true;
+            if (Properties.Vehicle.Default.FixFromSentence == "GGA") rbtnGGA.Checked = true;
+            else if (Properties.Vehicle.Default.FixFromSentence == "RMC") rbtnRMC.Checked = true;
+            else if (Properties.Vehicle.Default.FixFromSentence == "OGI") rbtnOGI.Checked = true;
 
             //heading
-            if (Properties.Settings.Default.setGPS_headingFromWhichSource == "Fix") rbtnHeadingFix.Checked = true;
-            else if (Properties.Settings.Default.setGPS_headingFromWhichSource == "GPS") rbtnHeadingGPS.Checked = true;
-            else if (Properties.Settings.Default.setGPS_headingFromWhichSource == "Dual") rbtnHeadingHDT.Checked = true;
+            if (Properties.Vehicle.Default.HeadingFromSource == "Fix") rbtnHeadingFix.Checked = true;
+            else if (Properties.Vehicle.Default.HeadingFromSource == "GPS") rbtnHeadingGPS.Checked = true;
+            else if (Properties.Vehicle.Default.HeadingFromSource == "Dual") rbtnHeadingHDT.Checked = true;
 
             cboxIsRTK.Checked = Properties.Settings.Default.setGPS_isRTK;
 
-            hsbarFusion.Value = (int)(Properties.Settings.Default.setIMU_fusionWeight * 100);
+            hsbarFusion.Value = (int)(Properties.Vehicle.Default.FusionWeight * 100);
             lblFusion.Text = (hsbarFusion.Value).ToString();
             lblFusionIMU.Text = (50 - hsbarFusion.Value).ToString();
         }
@@ -149,17 +136,17 @@ namespace AgOpenGPS
         {
             mf.ahrs.rollZeroX16 = 0;
             lblRollZeroOffset.Text = "0.00";
-            Properties.Settings.Default.setIMU_rollZeroX16 = 0;
-            Properties.Settings.Default.Save();
+            Properties.Vehicle.Default.RollZeroX16 = 0;
+            Properties.Vehicle.Default.Save();
         }
 
         private void BtnZeroRoll_Click(object sender, EventArgs e)
         {
-            if ((mf.ahrs.isRollFromAutoSteer || mf.ahrs.isRollFromAVR || mf.ahrs.isRollFromOGI))
+            if (mf.ahrs.isRollFromAutoSteer || mf.ahrs.isRollFromAVR || mf.ahrs.isRollFromOGI)
             {
                 mf.ahrs.rollZeroX16 = mf.ahrs.rollX16;
                 lblRollZeroOffset.Text = ((double)mf.ahrs.rollZeroX16 / 16).ToString("N2");
-                Properties.Settings.Default.setIMU_rollZeroX16 = mf.ahrs.rollX16;
+                Properties.Vehicle.Default.RollZeroX16 = mf.ahrs.rollX16;
                 Properties.Settings.Default.Save();
             }
             else
@@ -171,17 +158,17 @@ namespace AgOpenGPS
         private void RbtnGGA_CheckedChanged(object sender, EventArgs e)
         {
             var checkedButton = groupBox4.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked);
-            Properties.Settings.Default.setGPS_fixFromWhichSentence = checkedButton.Text;
-            Properties.Settings.Default.Save();
-            mf.pn.fixFrom = checkedButton.Text;
+            Properties.Vehicle.Default.FixFromSentence = checkedButton.Text;
+            Properties.Vehicle.Default.Save();
+            mf.pn.FixFromSentence = checkedButton.Text;
         }
 
         private void RbtnHeadingFix_CheckedChanged(object sender, EventArgs e)
         {
             var checkedButton = headingGroupBox.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked);
-            Properties.Settings.Default.setGPS_headingFromWhichSource = checkedButton.Text;
-            Properties.Settings.Default.Save();
-            mf.headingFromSource = checkedButton.Text;
+            Properties.Vehicle.Default.HeadingFromSource = checkedButton.Text;
+            Properties.Vehicle.Default.Save();
+            mf.HeadingFromSource = checkedButton.Text;
         }
 
         private void TboxTinkerUID_Click(object sender, EventArgs e)
@@ -201,12 +188,12 @@ namespace AgOpenGPS
 
         private void TboxFixStepDistance_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(0.1, 5, minFixStepDistance, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
+            using (var form = new FormNumeric(0.1, 5, FixStepDist, this, mf.Decimals, true, mf.Unit2Mtr, mf.Mtr2Unit))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TboxFixStepDistance.Text = ((minFixStepDistance = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
+                    TboxFixStepDistance.Text = ((FixStepDist = form.ReturnValue) * mf.Mtr2Unit).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();
@@ -227,12 +214,12 @@ namespace AgOpenGPS
 
         private void TBoxHeadingCorrection_Enter(object sender, EventArgs e)
         {
-            using (var form = new FormNumeric(-180, 180, HeadingCorrection, this, 2, false))
+            using (var form = new FormNumeric(-180, 180, DualHeadingCorrection, this, 2, false))
             {
                 var result = form.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
-                    TBoxHeadingCorrection.Text = (HeadingCorrection = form.ReturnValue).ToString(mf.GuiFix);
+                    TBoxDualHeadingCorrection.Text = (DualHeadingCorrection = form.ReturnValue).ToString(mf.GuiFix);
                 }
             }
             btnCancel.Focus();

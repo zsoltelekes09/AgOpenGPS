@@ -14,11 +14,8 @@ namespace AgOpenGPS
 
         public List<CSection> Sections = new List<CSection>();
 
-        public Vec2 HitchPos;
-        public Vec3 ToolWheelPos;
-        public Vec2 ToolHitchPos;
-        public Vec3 TankWheelPos;
-        public Vec2 TankHitchPos;
+        public Vec2 HitchPos, ToolHitchPos, TankHitchPos;
+        public Vec3 ToolWheelPos, TankWheelPos;
 
         public double HitchLength;
         public int ToolNum;
@@ -26,8 +23,7 @@ namespace AgOpenGPS
         public double ToolFarLeftSpeed = 0, ToolFarRightSpeed = 0;
 
         //points in world space that start and end of tool are in
-        public Vec2 LeftPoint;
-        public Vec2 RightPoint;
+        public Vec2 LeftPoint, RightPoint;
 
         public double ToolWheelLength, TankWheelLength, ToolHitchLength, TankHitchLength;
         public double ToolOffset, SlowSpeedCutoff, ToolWidth;
@@ -391,7 +387,7 @@ namespace AgOpenGPS
             }
 
             //GL.End();
-            
+
             //draw section markers if close enough
             if (mf.camera.camSetDistance > 250)
             {

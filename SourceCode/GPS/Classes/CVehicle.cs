@@ -18,7 +18,7 @@ namespace AgOpenGPS
         public double wheelbase;
         public double minTurningRadius;
         public double antennaOffset;
-        public int vehicleType;
+        public int VehicleType;
 
 
         //autosteer values
@@ -63,7 +63,7 @@ namespace AgOpenGPS
             maxAngularVelocity = Properties.Vehicle.Default.setVehicle_maxAngularVelocity;
             maxSteerAngle = Properties.Vehicle.Default.setVehicle_maxSteerAngle;
 
-            vehicleType = Properties.Vehicle.Default.setVehicle_vehicleType;
+            VehicleType = Properties.Vehicle.Default.VehicleType;
 
             hydLiftLookAheadTime = Properties.Vehicle.Default.setVehicle_hydraulicLiftLookAhead;
         }
@@ -207,21 +207,7 @@ namespace AgOpenGPS
                 }
             }
 
-            //if (mf.camera.camSetDistance > -150)
-            //{
-            //    GL.LineWidth(2);
-            //    //Svenn Arrow
-            //    GL.Color3(0.9, 0.95, 0.10);
-            //    GL.Begin(PrimitiveType.LineStrip);
-            //    {
-            //        GL.Vertex3(0.6, wheelbase + 6, 0.0);
-            //        GL.Vertex3(0, wheelbase + 8, 0.0);
-            //        GL.Vertex3(-0.6, wheelbase + 6, 0.0);
-            //    }
-            //    GL.End();
-            //}
-
-            if (!mf.ct.isContourBtnOn && mf.Guidance.BtnGuidanceOn)
+            if (mf.Guidance.BtnGuidanceOn)
             {
                 GL.Color4(0.95, 0.95, 0.95, 0.87);
 
@@ -243,8 +229,6 @@ namespace AgOpenGPS
                     GL.End();
                 }
             }
-
-
 
             GL.LineWidth(1);
 

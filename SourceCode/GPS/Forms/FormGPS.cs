@@ -48,7 +48,7 @@ namespace AgOpenGPS
         public bool isSavingFile = false, isLogNMEA = false, isLogElevation = false;
 
         //texture holders
-        public uint[] texture = new uint[12];
+        public uint[] texture = new uint[13];
 
         //the currentversion of software
         public string currentVersionStr, inoVersionStr;
@@ -106,11 +106,6 @@ namespace AgOpenGPS
         /// The grid for collision Avoidance
         /// </summary>
         public CMazeGrid mazeGrid;
-
-        /// <summary>
-        /// Contour Mode Instance
-        /// </summary>
-        public CContour ct;
 
         /// <summary>
         /// Auto Headland YouTurn
@@ -212,7 +207,6 @@ namespace AgOpenGPS
                 }
                 else return null;
             };
-
             //winform initialization
             InitializeComponent();
             Timer.Tick += new EventHandler(TimerRepeat_Tick);
@@ -232,9 +226,6 @@ namespace AgOpenGPS
             pn = new CNMEA(this);
 
             Guidance = new CGuidance(this);
-
-            //new instance of contour mode
-            ct = new CContour(this);
 
             //instance of tram
             tram = new CTram(this);
@@ -325,7 +316,6 @@ namespace AgOpenGPS
             treePlantToolStrip.Text = String.Get("gsTreePlanter");
             boundariesToolStripMenuItem.Text = String.Get("gsBoundary");
             headlandToolStripMenuItem.Text = String.Get("gsHeadland");
-            deleteContourPathsToolStripMenuItem.Text = String.Get("gsDeleteContourPaths");
             deleteAppliedAreaToolStripMenuItem.Text = String.Get("gsDeleteAppliedArea");
             deleteForSureToolStripMenuItem.Text = String.Get("gsAreYouSure");
             webcamToolStrip.Text = String.Get("gsWebCam");
@@ -648,30 +638,16 @@ namespace AgOpenGPS
 
             //CurveLine
             btnGuidance.Image = Properties.Resources.CurveOff;
-            btnContour.Image = Properties.Resources.ContourOff;
-            btnContourPriority.Image = Properties.Resources.Snap2;
-
 
 
             Guidance.BtnGuidanceOn = false;
             Guidance.isOkToAddPoints = false;
             Guidance.isEditing = false;
-            Guidance.GuidanceLines.Clear();
+            Guidance.ExtraGuidanceLines.Clear();
             Guidance.Lines.Clear();
             Guidance.CurrentLine = -1;
             Guidance.ResetABLine = true;
             btnCycleLines.Text = String.Get("gsOff");
-
-            //clear out contour and Lists
-            ct.ResetContour();
-
-            ct.isContourBtnOn = false;
-            ct.isContourOn = false;
-
-
-
-
-
 
 
 
@@ -1039,11 +1015,7 @@ namespace AgOpenGPS
         {
             if (isJobStarted)
             {
-                //turn off contour line if on
-                if (ct.isContourOn) ct.StopContourLine(pivotAxlePos);
-
                 //turn off all the sections
-
                 for (int i = 0; i < Tools.Count; i++)
                 {
                     for (int j = 0; j < Tools[i].Sections.Count; j++)

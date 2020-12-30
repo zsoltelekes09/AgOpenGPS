@@ -42,13 +42,9 @@
             this.TboxAckerman = new System.Windows.Forms.TextBox();
             this.TboxMaxSpeed = new System.Windows.Forms.TextBox();
             this.TboxMinSpeed = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
             this.cboxSteerInvertRelays = new System.Windows.Forms.CheckBox();
-            this.lblSent = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
-            this.lblRecd = new System.Windows.Forms.Label();
             this.cboxMotorDrive = new System.Windows.Forms.ComboBox();
-            this.tboxSerialFromAutoSteer = new System.Windows.Forms.TextBox();
             this.cboxSteerEnable = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.cboxMMAAxis = new System.Windows.Forms.ComboBox();
@@ -68,21 +64,20 @@
             this.chkBNOInstalled = new System.Windows.Forms.CheckBox();
             this.tabMachine = new System.Windows.Forms.TabPage();
             this.cboxMachInvertRelays = new System.Windows.Forms.CheckBox();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.cboxIsSendMachineControlToAutoSteer = new System.Windows.Forms.CheckBox();
-            this.tboxSerialFromMachine = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.TboxLowerTime = new System.Windows.Forms.TextBox();
             this.TboxRaiseTime = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.cboxIsHydOn = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.lblSent = new System.Windows.Forms.Label();
+            this.lblRecd = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
             this.bntOK = new System.Windows.Forms.Button();
             this.tabcArduino.SuspendLayout();
             this.tabAutoSteer.SuspendLayout();
             this.tabMachine.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -130,7 +125,7 @@
             this.tabcArduino.Location = new System.Drawing.Point(0, 0);
             this.tabcArduino.Name = "tabcArduino";
             this.tabcArduino.SelectedIndex = 0;
-            this.tabcArduino.Size = new System.Drawing.Size(900, 610);
+            this.tabcArduino.Size = new System.Drawing.Size(900, 551);
             this.tabcArduino.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.tabcArduino.TabIndex = 315;
             // 
@@ -145,13 +140,9 @@
             this.tabAutoSteer.Controls.Add(this.TboxAckerman);
             this.tabAutoSteer.Controls.Add(this.TboxMaxSpeed);
             this.tabAutoSteer.Controls.Add(this.TboxMinSpeed);
-            this.tabAutoSteer.Controls.Add(this.label12);
             this.tabAutoSteer.Controls.Add(this.cboxSteerInvertRelays);
-            this.tabAutoSteer.Controls.Add(this.lblSent);
             this.tabAutoSteer.Controls.Add(this.label13);
-            this.tabAutoSteer.Controls.Add(this.lblRecd);
             this.tabAutoSteer.Controls.Add(this.cboxMotorDrive);
-            this.tabAutoSteer.Controls.Add(this.tboxSerialFromAutoSteer);
             this.tabAutoSteer.Controls.Add(this.cboxSteerEnable);
             this.tabAutoSteer.Controls.Add(this.label5);
             this.tabAutoSteer.Controls.Add(this.cboxMMAAxis);
@@ -172,7 +163,7 @@
             this.tabAutoSteer.Location = new System.Drawing.Point(4, 54);
             this.tabAutoSteer.Name = "tabAutoSteer";
             this.tabAutoSteer.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAutoSteer.Size = new System.Drawing.Size(892, 552);
+            this.tabAutoSteer.Size = new System.Drawing.Size(892, 493);
             this.tabAutoSteer.TabIndex = 0;
             this.tabAutoSteer.Text = "Auto Steer";
             // 
@@ -303,17 +294,6 @@
             this.TboxMinSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TboxMinSpeed.Enter += new System.EventHandler(this.TboxMinSpeed_Enter);
             // 
-            // label12
-            // 
-            this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label12.AutoSize = true;
-            this.label12.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(415, 517);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(67, 23);
-            this.label12.TabIndex = 320;
-            this.label12.Text = "Check:";
-            // 
             // cboxSteerInvertRelays
             // 
             this.cboxSteerInvertRelays.Appearance = System.Windows.Forms.Appearance.Button;
@@ -330,16 +310,6 @@
             this.cboxSteerInvertRelays.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.cboxSteerInvertRelays.UseVisualStyleBackColor = true;
             // 
-            // lblSent
-            // 
-            this.lblSent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblSent.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSent.Location = new System.Drawing.Point(485, 517);
-            this.lblSent.Name = "lblSent";
-            this.lblSent.Size = new System.Drawing.Size(68, 26);
-            this.lblSent.TabIndex = 319;
-            this.lblSent.Text = "Sent";
-            // 
             // label13
             // 
             this.label13.BackColor = System.Drawing.Color.Transparent;
@@ -351,16 +321,6 @@
             this.label13.TabIndex = 316;
             this.label13.Text = "Ackerman %";
             this.label13.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            // 
-            // lblRecd
-            // 
-            this.lblRecd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblRecd.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblRecd.Location = new System.Drawing.Point(565, 517);
-            this.lblRecd.Name = "lblRecd";
-            this.lblRecd.Size = new System.Drawing.Size(68, 26);
-            this.lblRecd.TabIndex = 318;
-            this.lblRecd.Text = "Recd";
             // 
             // cboxMotorDrive
             // 
@@ -376,17 +336,6 @@
             this.cboxMotorDrive.Name = "cboxMotorDrive";
             this.cboxMotorDrive.Size = new System.Drawing.Size(220, 38);
             this.cboxMotorDrive.TabIndex = 252;
-            // 
-            // tboxSerialFromAutoSteer
-            // 
-            this.tboxSerialFromAutoSteer.BackColor = System.Drawing.SystemColors.Control;
-            this.tboxSerialFromAutoSteer.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tboxSerialFromAutoSteer.Location = new System.Drawing.Point(7, 516);
-            this.tboxSerialFromAutoSteer.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.tboxSerialFromAutoSteer.Name = "tboxSerialFromAutoSteer";
-            this.tboxSerialFromAutoSteer.ReadOnly = true;
-            this.tboxSerialFromAutoSteer.Size = new System.Drawing.Size(372, 27);
-            this.tboxSerialFromAutoSteer.TabIndex = 314;
             // 
             // cboxSteerEnable
             // 
@@ -634,13 +583,11 @@
             // 
             this.tabMachine.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.tabMachine.Controls.Add(this.cboxMachInvertRelays);
-            this.tabMachine.Controls.Add(this.groupBox5);
-            this.tabMachine.Controls.Add(this.tboxSerialFromMachine);
             this.tabMachine.Controls.Add(this.groupBox1);
             this.tabMachine.Location = new System.Drawing.Point(4, 54);
             this.tabMachine.Name = "tabMachine";
             this.tabMachine.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMachine.Size = new System.Drawing.Size(892, 552);
+            this.tabMachine.Size = new System.Drawing.Size(892, 493);
             this.tabMachine.TabIndex = 1;
             this.tabMachine.Text = "Machine";
             // 
@@ -658,45 +605,6 @@
             this.cboxMachInvertRelays.Text = "Invert Relays";
             this.cboxMachInvertRelays.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.cboxMachInvertRelays.UseVisualStyleBackColor = true;
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.cboxIsSendMachineControlToAutoSteer);
-            this.groupBox5.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox5.Location = new System.Drawing.Point(396, 46);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(279, 168);
-            this.groupBox5.TabIndex = 316;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "To AutoSteer Port";
-            // 
-            // cboxIsSendMachineControlToAutoSteer
-            // 
-            this.cboxIsSendMachineControlToAutoSteer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cboxIsSendMachineControlToAutoSteer.Appearance = System.Windows.Forms.Appearance.Button;
-            this.cboxIsSendMachineControlToAutoSteer.BackColor = System.Drawing.Color.Transparent;
-            this.cboxIsSendMachineControlToAutoSteer.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cboxIsSendMachineControlToAutoSteer.FlatAppearance.CheckedBackColor = System.Drawing.Color.PaleGreen;
-            this.cboxIsSendMachineControlToAutoSteer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cboxIsSendMachineControlToAutoSteer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cboxIsSendMachineControlToAutoSteer.Location = new System.Drawing.Point(26, 66);
-            this.cboxIsSendMachineControlToAutoSteer.Name = "cboxIsSendMachineControlToAutoSteer";
-            this.cboxIsSendMachineControlToAutoSteer.Size = new System.Drawing.Size(230, 61);
-            this.cboxIsSendMachineControlToAutoSteer.TabIndex = 312;
-            this.cboxIsSendMachineControlToAutoSteer.Text = "Machine Control \r\nPGN";
-            this.cboxIsSendMachineControlToAutoSteer.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.cboxIsSendMachineControlToAutoSteer.UseVisualStyleBackColor = false;
-            // 
-            // tboxSerialFromMachine
-            // 
-            this.tboxSerialFromMachine.BackColor = System.Drawing.SystemColors.Control;
-            this.tboxSerialFromMachine.Font = new System.Drawing.Font("Tahoma", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tboxSerialFromMachine.Location = new System.Drawing.Point(7, 434);
-            this.tboxSerialFromMachine.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.tboxSerialFromMachine.Name = "tboxSerialFromMachine";
-            this.tboxSerialFromMachine.ReadOnly = true;
-            this.tboxSerialFromMachine.Size = new System.Drawing.Size(559, 40);
-            this.tboxSerialFromMachine.TabIndex = 315;
             // 
             // groupBox1
             // 
@@ -785,6 +693,37 @@
             this.label11.Text = "Lower Time (secs)";
             this.label11.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
+            // label12
+            // 
+            this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(421, 557);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(67, 23);
+            this.label12.TabIndex = 320;
+            this.label12.Text = "Check:";
+            // 
+            // lblSent
+            // 
+            this.lblSent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblSent.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSent.Location = new System.Drawing.Point(491, 557);
+            this.lblSent.Name = "lblSent";
+            this.lblSent.Size = new System.Drawing.Size(68, 26);
+            this.lblSent.TabIndex = 319;
+            this.lblSent.Text = "Sent";
+            // 
+            // lblRecd
+            // 
+            this.lblRecd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblRecd.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblRecd.Location = new System.Drawing.Point(571, 557);
+            this.lblRecd.Name = "lblRecd";
+            this.lblRecd.Size = new System.Drawing.Size(68, 26);
+            this.lblRecd.TabIndex = 318;
+            this.lblRecd.Text = "Recd";
+            // 
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -827,6 +766,9 @@
             this.Controls.Add(this.bntOK);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.btnChangeAttachment);
+            this.Controls.Add(this.lblRecd);
+            this.Controls.Add(this.lblSent);
+            this.Controls.Add(this.label12);
             this.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4);
@@ -841,11 +783,10 @@
             this.tabAutoSteer.ResumeLayout(false);
             this.tabAutoSteer.PerformLayout();
             this.tabMachine.ResumeLayout(false);
-            this.tabMachine.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -859,9 +800,6 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox tboxSerialFromMachine;
-        private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.CheckBox cboxIsSendMachineControlToAutoSteer;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button bntOK;
         private System.Windows.Forms.CheckBox cboxMachInvertRelays;
@@ -881,7 +819,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label lblRecd;
         private System.Windows.Forms.ComboBox cboxMotorDrive;
-        private System.Windows.Forms.TextBox tboxSerialFromAutoSteer;
         private System.Windows.Forms.ComboBox cboxSteerEnable;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox cboxMMAAxis;

@@ -319,7 +319,6 @@ namespace AgOpenGPS
                 if (t == 1 || t == 6) FileSaveBoundary();
                 if (t == 2 || t == 6) FileSaveHeadland();
                 if (t == 0 || t == 3 || t == 7) FileSaveSections();
-                if (t == 0 || t == 4 || t == 7) FileSaveContour();
                 if (t == 0 || t == 5) FileSaveFieldKML();
             });
         }

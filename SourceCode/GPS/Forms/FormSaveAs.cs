@@ -187,24 +187,12 @@ namespace AgOpenGPS
 
                 if (chkApplied.Checked)
                 {
-                     fileToCopy = templateDirectoryName + "\\Contour.txt";
-                     destinationDirectory = directoryName + "\\Contour.txt";
-                    if (File.Exists(fileToCopy))
-                        File.Copy(fileToCopy, destinationDirectory);
-
                      fileToCopy = templateDirectoryName + "\\Sections.txt";
                      destinationDirectory = directoryName + "\\Sections.txt";
                     if (File.Exists(fileToCopy))
                         File.Copy(fileToCopy, destinationDirectory);
                 }
-
-                else
-                {
-                    //create blank Contour and Section files
-                    mf.FileCreateSections();
-                    mf.FileCreateContour();
-                    //mf.FileCreateElevation();
-                }
+                else mf.FileCreateSections();
 
                  fileToCopy = templateDirectoryName + "\\Boundary.txt";
                  destinationDirectory = directoryName + "\\Boundary.txt";
