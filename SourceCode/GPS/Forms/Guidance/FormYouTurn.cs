@@ -169,7 +169,7 @@ namespace AgOpenGPS
                 btnYouTurnSemiCircle.BackColor = Color.Silver;
                 btnYouTurnCustom.BackColor = Color.LimeGreen;
             }
-
+            //forgás hiba
             cboxRowWidth.SelectedIndex = mf.yt.rowSkipsWidth - 1;
 
             //populate the Enter and Exit pages.

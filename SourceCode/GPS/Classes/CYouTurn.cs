@@ -481,12 +481,8 @@ namespace AgOpenGPS
 
                 turnRadius *= rowSkipsWidth;
                 turnOffset *= rowSkipsWidth;
-
+               
                 //forgás
-                if (mf.yt.isCircle)
-                {
-                    rowSkipsWidth += 1;
-                }
 
                 //move the cross line calc to not include first turn
                 goal.easting = rEastYT + (Math.Sin(head) * distanceTurnBeforeLine);
@@ -570,11 +566,12 @@ namespace AgOpenGPS
                 //generate the turn points
                 ytList = dubYouTurnPath.GenerateDubins(start, goal);
                 AddSequenceLines(head);
-          
+                
+
                 if (ytList.Count == 0) return false;
                 else youTurnPhase = 1;
             }
-
+            
             if (youTurnPhase == 3) return true;
 
             // Phase 0 - back up the turn till it is out of bounds.
@@ -634,6 +631,7 @@ namespace AgOpenGPS
                         if (isOutOfBounds && mf.distancePivotToTurnLine > 3)
                         {
                             isTurnCreationTooClose = false;
+                           
                         }
                         else
                         {
@@ -645,6 +643,7 @@ namespace AgOpenGPS
                     }
                     break;
             }
+            
             return true;
         }
 
@@ -1358,6 +1357,12 @@ namespace AgOpenGPS
         {
             isYouTurnTriggered = false;
             ResetCreatedYouTurn();
+            //forgás
+            if (mf.yt.isCircle)
+            {
+                
+                rowSkipsWidth += 1;
+            }
             mf.seq.ResetSequenceEventTriggers();
             mf.seq.isSequenceTriggered = false;
             mf.isBoundAlarming = false;
