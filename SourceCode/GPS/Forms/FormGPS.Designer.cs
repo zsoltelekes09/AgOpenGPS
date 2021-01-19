@@ -868,7 +868,9 @@
             this.cboxpRowWidth.Name = "cboxpRowWidth";
             this.cboxpRowWidth.Size = new System.Drawing.Size(64, 53);
             this.cboxpRowWidth.TabIndex = 247;
+            this.cboxpRowWidth.DropDownWidth = 130;
             this.cboxpRowWidth.SelectedIndexChanged += new System.EventHandler(this.cboxpRowWidth_SelectedIndexChanged);
+            
             // 
             // oglZoom
             // 

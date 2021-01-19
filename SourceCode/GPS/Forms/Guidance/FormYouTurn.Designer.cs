@@ -1844,6 +1844,7 @@
             this.cboxRowWidth.Name = "cboxRowWidth";
             this.cboxRowWidth.Size = new System.Drawing.Size(104, 56);
             this.cboxRowWidth.TabIndex = 65;
+            this.cboxRowWidth.DropDownWidth = 130;
             this.cboxRowWidth.SelectedIndexChanged += new System.EventHandler(this.cboxRowWidth_SelectedIndexChanged);
             // 
             // label1
