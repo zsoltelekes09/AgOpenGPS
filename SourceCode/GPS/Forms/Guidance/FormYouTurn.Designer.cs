@@ -139,6 +139,7 @@
             this.btnTriggerDistanceUp = new ProXoft.WinForms.RepeatButton();
             this.lblTriggerDistance = new System.Windows.Forms.Label();
             this.tabYouTurn = new System.Windows.Forms.TabPage();
+            this.checkBoxCircle = new System.Windows.Forms.CheckBox();
             this.btnGeoFenceDistanceDn = new ProXoft.WinForms.RepeatButton();
             this.btnGeoFenceDistanceUp = new ProXoft.WinForms.RepeatButton();
             this.label49 = new System.Windows.Forms.Label();
@@ -268,7 +269,7 @@
             this.label21.Location = new System.Drawing.Point(52, 538);
             this.label21.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(28, 23);
+            this.label21.Size = new System.Drawing.Size(36, 29);
             this.label21.TabIndex = 81;
             this.label21.Text = "8.";
             // 
@@ -279,7 +280,7 @@
             this.label22.Location = new System.Drawing.Point(52, 396);
             this.label22.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(28, 23);
+            this.label22.Size = new System.Drawing.Size(36, 29);
             this.label22.TabIndex = 80;
             this.label22.Text = "6.";
             // 
@@ -290,7 +291,7 @@
             this.label23.Location = new System.Drawing.Point(52, 465);
             this.label23.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(28, 23);
+            this.label23.Size = new System.Drawing.Size(36, 29);
             this.label23.TabIndex = 79;
             this.label23.Text = "7.";
             // 
@@ -301,7 +302,7 @@
             this.label38.Location = new System.Drawing.Point(52, 325);
             this.label38.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(28, 23);
+            this.label38.Size = new System.Drawing.Size(36, 29);
             this.label38.TabIndex = 78;
             this.label38.Text = "5.";
             // 
@@ -312,7 +313,7 @@
             this.label39.Location = new System.Drawing.Point(52, 256);
             this.label39.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(28, 23);
+            this.label39.Size = new System.Drawing.Size(36, 29);
             this.label39.TabIndex = 77;
             this.label39.Text = "4.";
             // 
@@ -323,7 +324,7 @@
             this.label40.Location = new System.Drawing.Point(52, 186);
             this.label40.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label40.Name = "label40";
-            this.label40.Size = new System.Drawing.Size(28, 23);
+            this.label40.Size = new System.Drawing.Size(36, 29);
             this.label40.TabIndex = 76;
             this.label40.Text = "3.";
             // 
@@ -334,7 +335,7 @@
             this.label41.Location = new System.Drawing.Point(52, 116);
             this.label41.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label41.Name = "label41";
-            this.label41.Size = new System.Drawing.Size(28, 23);
+            this.label41.Size = new System.Drawing.Size(36, 29);
             this.label41.TabIndex = 75;
             this.label41.Text = "2.";
             // 
@@ -345,7 +346,7 @@
             this.label42.Location = new System.Drawing.Point(52, 45);
             this.label42.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label42.Name = "label42";
-            this.label42.Size = new System.Drawing.Size(28, 23);
+            this.label42.Size = new System.Drawing.Size(36, 29);
             this.label42.TabIndex = 74;
             this.label42.Text = "1.";
             // 
@@ -355,7 +356,7 @@
             this.tboxPos8.Location = new System.Drawing.Point(85, 530);
             this.tboxPos8.MaxLength = 14;
             this.tboxPos8.Name = "tboxPos8";
-            this.tboxPos8.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos8.Size = new System.Drawing.Size(238, 48);
             this.tboxPos8.TabIndex = 7;
             this.tboxPos8.Text = "XXXXX XXXXX XX";
             // 
@@ -365,7 +366,7 @@
             this.tboxPos7.Location = new System.Drawing.Point(85, 460);
             this.tboxPos7.MaxLength = 14;
             this.tboxPos7.Name = "tboxPos7";
-            this.tboxPos7.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos7.Size = new System.Drawing.Size(238, 48);
             this.tboxPos7.TabIndex = 6;
             this.tboxPos7.Text = "XXXXX XXXXX XX";
             // 
@@ -375,7 +376,7 @@
             this.tboxPos6.Location = new System.Drawing.Point(85, 390);
             this.tboxPos6.MaxLength = 14;
             this.tboxPos6.Name = "tboxPos6";
-            this.tboxPos6.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos6.Size = new System.Drawing.Size(238, 48);
             this.tboxPos6.TabIndex = 5;
             this.tboxPos6.Text = "XXXXX XXXXX XX";
             // 
@@ -385,7 +386,7 @@
             this.tboxPos5.Location = new System.Drawing.Point(85, 320);
             this.tboxPos5.MaxLength = 14;
             this.tboxPos5.Name = "tboxPos5";
-            this.tboxPos5.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos5.Size = new System.Drawing.Size(238, 48);
             this.tboxPos5.TabIndex = 4;
             this.tboxPos5.Text = "XXXXX XXXXX XX";
             // 
@@ -395,7 +396,7 @@
             this.tboxPos4.Location = new System.Drawing.Point(85, 250);
             this.tboxPos4.MaxLength = 14;
             this.tboxPos4.Name = "tboxPos4";
-            this.tboxPos4.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos4.Size = new System.Drawing.Size(238, 48);
             this.tboxPos4.TabIndex = 3;
             this.tboxPos4.Text = "XXXXX XXXXX XX";
             // 
@@ -405,7 +406,7 @@
             this.tboxPos3.Location = new System.Drawing.Point(85, 180);
             this.tboxPos3.MaxLength = 14;
             this.tboxPos3.Name = "tboxPos3";
-            this.tboxPos3.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos3.Size = new System.Drawing.Size(238, 48);
             this.tboxPos3.TabIndex = 2;
             this.tboxPos3.Text = "XXXXX XXXXX XX";
             // 
@@ -416,7 +417,7 @@
             this.tboxPos2.MaxLength = 14;
             this.tboxPos2.Name = "tboxPos2";
             this.tboxPos2.ReadOnly = true;
-            this.tboxPos2.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos2.Size = new System.Drawing.Size(238, 48);
             this.tboxPos2.TabIndex = 1;
             this.tboxPos2.Text = "XXXXX XXXXX XX";
             // 
@@ -427,7 +428,7 @@
             this.tboxPos1.MaxLength = 14;
             this.tboxPos1.Name = "tboxPos1";
             this.tboxPos1.ReadOnly = true;
-            this.tboxPos1.Size = new System.Drawing.Size(238, 40);
+            this.tboxPos1.Size = new System.Drawing.Size(238, 48);
             this.tboxPos1.TabIndex = 0;
             this.tboxPos1.Text = "XXXXX XXXXX XX";
             // 
@@ -518,7 +519,7 @@
             0,
             0});
             this.nudExit7.Name = "nudExit7";
-            this.nudExit7.Size = new System.Drawing.Size(90, 50);
+            this.nudExit7.Size = new System.Drawing.Size(90, 60);
             this.nudExit7.TabIndex = 86;
             // 
             // cboxExitAction7
@@ -532,7 +533,7 @@
             this.cboxExitAction7.Location = new System.Drawing.Point(414, 546);
             this.cboxExitAction7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction7.Name = "cboxExitAction7";
-            this.cboxExitAction7.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction7.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction7.TabIndex = 85;
             // 
             // cboxExitFunc7
@@ -545,7 +546,7 @@
             this.cboxExitFunc7.Location = new System.Drawing.Point(47, 545);
             this.cboxExitFunc7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc7.Name = "cboxExitFunc7";
-            this.cboxExitFunc7.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc7.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc7.TabIndex = 84;
             this.cboxExitFunc7.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc7_SelectedIndexChanged);
             // 
@@ -556,7 +557,7 @@
             this.label19.Location = new System.Drawing.Point(13, 556);
             this.label19.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(28, 23);
+            this.label19.Size = new System.Drawing.Size(36, 29);
             this.label19.TabIndex = 83;
             this.label19.Text = "8.";
             // 
@@ -572,7 +573,7 @@
             0,
             0});
             this.nudExit5.Name = "nudExit5";
-            this.nudExit5.Size = new System.Drawing.Size(90, 50);
+            this.nudExit5.Size = new System.Drawing.Size(90, 60);
             this.nudExit5.TabIndex = 82;
             // 
             // nudExit6
@@ -587,7 +588,7 @@
             0,
             0});
             this.nudExit6.Name = "nudExit6";
-            this.nudExit6.Size = new System.Drawing.Size(90, 50);
+            this.nudExit6.Size = new System.Drawing.Size(90, 60);
             this.nudExit6.TabIndex = 81;
             // 
             // cboxExitAction5
@@ -601,7 +602,7 @@
             this.cboxExitAction5.Location = new System.Drawing.Point(415, 402);
             this.cboxExitAction5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction5.Name = "cboxExitAction5";
-            this.cboxExitAction5.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction5.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction5.TabIndex = 80;
             // 
             // cboxExitAction6
@@ -615,7 +616,7 @@
             this.cboxExitAction6.Location = new System.Drawing.Point(415, 472);
             this.cboxExitAction6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction6.Name = "cboxExitAction6";
-            this.cboxExitAction6.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction6.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction6.TabIndex = 79;
             // 
             // cboxExitFunc5
@@ -628,7 +629,7 @@
             this.cboxExitFunc5.Location = new System.Drawing.Point(47, 402);
             this.cboxExitFunc5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc5.Name = "cboxExitFunc5";
-            this.cboxExitFunc5.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc5.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc5.TabIndex = 78;
             this.cboxExitFunc5.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc5_SelectedIndexChanged);
             // 
@@ -642,7 +643,7 @@
             this.cboxExitFunc6.Location = new System.Drawing.Point(47, 471);
             this.cboxExitFunc6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc6.Name = "cboxExitFunc6";
-            this.cboxExitFunc6.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc6.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc6.TabIndex = 77;
             this.cboxExitFunc6.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc6_SelectedIndexChanged);
             // 
@@ -653,7 +654,7 @@
             this.label31.Location = new System.Drawing.Point(14, 413);
             this.label31.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(28, 23);
+            this.label31.Size = new System.Drawing.Size(36, 29);
             this.label31.TabIndex = 76;
             this.label31.Text = "6.";
             // 
@@ -664,7 +665,7 @@
             this.label32.Location = new System.Drawing.Point(14, 482);
             this.label32.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(28, 23);
+            this.label32.Size = new System.Drawing.Size(36, 29);
             this.label32.TabIndex = 75;
             this.label32.Text = "7.";
             // 
@@ -675,7 +676,7 @@
             this.label33.Location = new System.Drawing.Point(14, 342);
             this.label33.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(28, 23);
+            this.label33.Size = new System.Drawing.Size(36, 29);
             this.label33.TabIndex = 74;
             this.label33.Text = "5.";
             // 
@@ -686,7 +687,7 @@
             this.label34.Location = new System.Drawing.Point(14, 273);
             this.label34.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(28, 23);
+            this.label34.Size = new System.Drawing.Size(36, 29);
             this.label34.TabIndex = 73;
             this.label34.Text = "4.";
             // 
@@ -697,7 +698,7 @@
             this.label35.Location = new System.Drawing.Point(14, 203);
             this.label35.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(28, 23);
+            this.label35.Size = new System.Drawing.Size(36, 29);
             this.label35.TabIndex = 72;
             this.label35.Text = "3.";
             // 
@@ -708,7 +709,7 @@
             this.label36.Location = new System.Drawing.Point(14, 133);
             this.label36.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(28, 23);
+            this.label36.Size = new System.Drawing.Size(36, 29);
             this.label36.TabIndex = 71;
             this.label36.Text = "2.";
             // 
@@ -719,7 +720,7 @@
             this.label37.Location = new System.Drawing.Point(14, 62);
             this.label37.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label37.Name = "label37";
-            this.label37.Size = new System.Drawing.Size(28, 23);
+            this.label37.Size = new System.Drawing.Size(36, 29);
             this.label37.TabIndex = 70;
             this.label37.Text = "1.";
             // 
@@ -766,7 +767,7 @@
             this.cboxExitFunc4.Location = new System.Drawing.Point(47, 332);
             this.cboxExitFunc4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc4.Name = "cboxExitFunc4";
-            this.cboxExitFunc4.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc4.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc4.TabIndex = 48;
             this.cboxExitFunc4.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc4_SelectedIndexChanged);
             // 
@@ -781,7 +782,7 @@
             this.cboxExitAction4.Location = new System.Drawing.Point(414, 332);
             this.cboxExitAction4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction4.Name = "cboxExitAction4";
-            this.cboxExitAction4.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction4.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction4.TabIndex = 47;
             // 
             // nudExit4
@@ -796,7 +797,7 @@
             0,
             0});
             this.nudExit4.Name = "nudExit4";
-            this.nudExit4.Size = new System.Drawing.Size(90, 50);
+            this.nudExit4.Size = new System.Drawing.Size(90, 60);
             this.nudExit4.TabIndex = 46;
             // 
             // cboxExitFunc3
@@ -809,7 +810,7 @@
             this.cboxExitFunc3.Location = new System.Drawing.Point(47, 262);
             this.cboxExitFunc3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc3.Name = "cboxExitFunc3";
-            this.cboxExitFunc3.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc3.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc3.TabIndex = 45;
             this.cboxExitFunc3.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc3_SelectedIndexChanged);
             // 
@@ -824,7 +825,7 @@
             this.cboxExitAction3.Location = new System.Drawing.Point(414, 262);
             this.cboxExitAction3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction3.Name = "cboxExitAction3";
-            this.cboxExitAction3.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction3.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction3.TabIndex = 44;
             // 
             // nudExit3
@@ -839,7 +840,7 @@
             0,
             0});
             this.nudExit3.Name = "nudExit3";
-            this.nudExit3.Size = new System.Drawing.Size(90, 50);
+            this.nudExit3.Size = new System.Drawing.Size(90, 60);
             this.nudExit3.TabIndex = 43;
             // 
             // cboxExitFunc2
@@ -852,7 +853,7 @@
             this.cboxExitFunc2.Location = new System.Drawing.Point(47, 192);
             this.cboxExitFunc2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc2.Name = "cboxExitFunc2";
-            this.cboxExitFunc2.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc2.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc2.TabIndex = 42;
             this.cboxExitFunc2.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc2_SelectedIndexChanged);
             // 
@@ -867,7 +868,7 @@
             this.cboxExitAction2.Location = new System.Drawing.Point(414, 192);
             this.cboxExitAction2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction2.Name = "cboxExitAction2";
-            this.cboxExitAction2.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction2.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction2.TabIndex = 41;
             // 
             // nudExit2
@@ -882,7 +883,7 @@
             0,
             0});
             this.nudExit2.Name = "nudExit2";
-            this.nudExit2.Size = new System.Drawing.Size(90, 50);
+            this.nudExit2.Size = new System.Drawing.Size(90, 60);
             this.nudExit2.TabIndex = 40;
             // 
             // cboxExitFunc1
@@ -895,7 +896,7 @@
             this.cboxExitFunc1.Location = new System.Drawing.Point(47, 122);
             this.cboxExitFunc1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc1.Name = "cboxExitFunc1";
-            this.cboxExitFunc1.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc1.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc1.TabIndex = 39;
             this.cboxExitFunc1.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc1_SelectedIndexChanged);
             // 
@@ -910,7 +911,7 @@
             this.cboxExitAction1.Location = new System.Drawing.Point(414, 122);
             this.cboxExitAction1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction1.Name = "cboxExitAction1";
-            this.cboxExitAction1.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction1.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction1.TabIndex = 38;
             // 
             // nudExit1
@@ -925,7 +926,7 @@
             0,
             0});
             this.nudExit1.Name = "nudExit1";
-            this.nudExit1.Size = new System.Drawing.Size(90, 50);
+            this.nudExit1.Size = new System.Drawing.Size(90, 60);
             this.nudExit1.TabIndex = 37;
             // 
             // cboxExitFunc0
@@ -938,7 +939,7 @@
             this.cboxExitFunc0.Location = new System.Drawing.Point(47, 52);
             this.cboxExitFunc0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitFunc0.Name = "cboxExitFunc0";
-            this.cboxExitFunc0.Size = new System.Drawing.Size(250, 41);
+            this.cboxExitFunc0.Size = new System.Drawing.Size(250, 49);
             this.cboxExitFunc0.TabIndex = 36;
             this.cboxExitFunc0.SelectedIndexChanged += new System.EventHandler(this.cboxExitFunc0_SelectedIndexChanged);
             // 
@@ -953,7 +954,7 @@
             this.cboxExitAction0.Location = new System.Drawing.Point(414, 52);
             this.cboxExitAction0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxExitAction0.Name = "cboxExitAction0";
-            this.cboxExitAction0.Size = new System.Drawing.Size(162, 41);
+            this.cboxExitAction0.Size = new System.Drawing.Size(162, 49);
             this.cboxExitAction0.TabIndex = 35;
             // 
             // nudExit0
@@ -968,7 +969,7 @@
             0,
             0});
             this.nudExit0.Name = "nudExit0";
-            this.nudExit0.Size = new System.Drawing.Size(90, 50);
+            this.nudExit0.Size = new System.Drawing.Size(90, 60);
             this.nudExit0.TabIndex = 34;
             // 
             // tabEnter
@@ -1025,7 +1026,7 @@
             this.label20.Location = new System.Drawing.Point(14, 554);
             this.label20.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(28, 23);
+            this.label20.Size = new System.Drawing.Size(36, 29);
             this.label20.TabIndex = 73;
             this.label20.Text = "8.";
             // 
@@ -1041,7 +1042,7 @@
             0,
             0});
             this.nudEnter7.Name = "nudEnter7";
-            this.nudEnter7.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter7.Size = new System.Drawing.Size(90, 60);
             this.nudEnter7.TabIndex = 72;
             // 
             // cboxEnterAction7
@@ -1055,7 +1056,7 @@
             this.cboxEnterAction7.Location = new System.Drawing.Point(415, 545);
             this.cboxEnterAction7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction7.Name = "cboxEnterAction7";
-            this.cboxEnterAction7.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction7.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction7.TabIndex = 71;
             // 
             // cboxEnterFunc7
@@ -1068,7 +1069,7 @@
             this.cboxEnterFunc7.Location = new System.Drawing.Point(46, 545);
             this.cboxEnterFunc7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc7.Name = "cboxEnterFunc7";
-            this.cboxEnterFunc7.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc7.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc7.TabIndex = 70;
             this.cboxEnterFunc7.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc7_SelectedIndexChanged);
             // 
@@ -1079,7 +1080,7 @@
             this.label30.Location = new System.Drawing.Point(14, 412);
             this.label30.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(28, 23);
+            this.label30.Size = new System.Drawing.Size(36, 29);
             this.label30.TabIndex = 69;
             this.label30.Text = "6.";
             // 
@@ -1090,7 +1091,7 @@
             this.label29.Location = new System.Drawing.Point(14, 481);
             this.label29.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(28, 23);
+            this.label29.Size = new System.Drawing.Size(36, 29);
             this.label29.TabIndex = 68;
             this.label29.Text = "7.";
             // 
@@ -1106,7 +1107,7 @@
             0,
             0});
             this.nudEnter5.Name = "nudEnter5";
-            this.nudEnter5.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter5.Size = new System.Drawing.Size(90, 60);
             this.nudEnter5.TabIndex = 67;
             // 
             // nudEnter6
@@ -1121,7 +1122,7 @@
             0,
             0});
             this.nudEnter6.Name = "nudEnter6";
-            this.nudEnter6.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter6.Size = new System.Drawing.Size(90, 60);
             this.nudEnter6.TabIndex = 66;
             // 
             // cboxEnterAction5
@@ -1135,7 +1136,7 @@
             this.cboxEnterAction5.Location = new System.Drawing.Point(415, 402);
             this.cboxEnterAction5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction5.Name = "cboxEnterAction5";
-            this.cboxEnterAction5.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction5.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction5.TabIndex = 65;
             // 
             // cboxEnterAction6
@@ -1149,7 +1150,7 @@
             this.cboxEnterAction6.Location = new System.Drawing.Point(415, 472);
             this.cboxEnterAction6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction6.Name = "cboxEnterAction6";
-            this.cboxEnterAction6.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction6.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction6.TabIndex = 64;
             // 
             // cboxEnterFunc5
@@ -1162,7 +1163,7 @@
             this.cboxEnterFunc5.Location = new System.Drawing.Point(46, 402);
             this.cboxEnterFunc5.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc5.Name = "cboxEnterFunc5";
-            this.cboxEnterFunc5.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc5.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc5.TabIndex = 63;
             this.cboxEnterFunc5.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc5_SelectedIndexChanged);
             // 
@@ -1176,7 +1177,7 @@
             this.cboxEnterFunc6.Location = new System.Drawing.Point(46, 472);
             this.cboxEnterFunc6.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc6.Name = "cboxEnterFunc6";
-            this.cboxEnterFunc6.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc6.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc6.TabIndex = 62;
             this.cboxEnterFunc6.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc6_SelectedIndexChanged);
             // 
@@ -1187,7 +1188,7 @@
             this.label24.Location = new System.Drawing.Point(14, 341);
             this.label24.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(28, 23);
+            this.label24.Size = new System.Drawing.Size(36, 29);
             this.label24.TabIndex = 61;
             this.label24.Text = "5.";
             // 
@@ -1198,7 +1199,7 @@
             this.label25.Location = new System.Drawing.Point(14, 272);
             this.label25.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(28, 23);
+            this.label25.Size = new System.Drawing.Size(36, 29);
             this.label25.TabIndex = 60;
             this.label25.Text = "4.";
             // 
@@ -1209,7 +1210,7 @@
             this.label26.Location = new System.Drawing.Point(14, 202);
             this.label26.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(28, 23);
+            this.label26.Size = new System.Drawing.Size(36, 29);
             this.label26.TabIndex = 59;
             this.label26.Text = "3.";
             // 
@@ -1220,7 +1221,7 @@
             this.label27.Location = new System.Drawing.Point(14, 132);
             this.label27.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(28, 23);
+            this.label27.Size = new System.Drawing.Size(36, 29);
             this.label27.TabIndex = 58;
             this.label27.Text = "2.";
             // 
@@ -1231,7 +1232,7 @@
             this.label28.Location = new System.Drawing.Point(14, 61);
             this.label28.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(28, 23);
+            this.label28.Size = new System.Drawing.Size(36, 29);
             this.label28.TabIndex = 57;
             this.label28.Text = "1.";
             // 
@@ -1278,7 +1279,7 @@
             this.cboxEnterFunc4.Location = new System.Drawing.Point(46, 332);
             this.cboxEnterFunc4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc4.Name = "cboxEnterFunc4";
-            this.cboxEnterFunc4.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc4.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc4.TabIndex = 33;
             this.cboxEnterFunc4.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc4_SelectedIndexChanged);
             // 
@@ -1293,7 +1294,7 @@
             this.cboxEnterAction4.Location = new System.Drawing.Point(415, 332);
             this.cboxEnterAction4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction4.Name = "cboxEnterAction4";
-            this.cboxEnterAction4.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction4.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction4.TabIndex = 32;
             // 
             // nudEnter4
@@ -1308,7 +1309,7 @@
             0,
             0});
             this.nudEnter4.Name = "nudEnter4";
-            this.nudEnter4.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter4.Size = new System.Drawing.Size(90, 60);
             this.nudEnter4.TabIndex = 31;
             // 
             // cboxEnterFunc3
@@ -1321,7 +1322,7 @@
             this.cboxEnterFunc3.Location = new System.Drawing.Point(46, 262);
             this.cboxEnterFunc3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc3.Name = "cboxEnterFunc3";
-            this.cboxEnterFunc3.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc3.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc3.TabIndex = 30;
             this.cboxEnterFunc3.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc3_SelectedIndexChanged);
             // 
@@ -1336,7 +1337,7 @@
             this.cboxEnterAction3.Location = new System.Drawing.Point(415, 262);
             this.cboxEnterAction3.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction3.Name = "cboxEnterAction3";
-            this.cboxEnterAction3.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction3.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction3.TabIndex = 29;
             // 
             // nudEnter3
@@ -1351,7 +1352,7 @@
             0,
             0});
             this.nudEnter3.Name = "nudEnter3";
-            this.nudEnter3.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter3.Size = new System.Drawing.Size(90, 60);
             this.nudEnter3.TabIndex = 28;
             // 
             // cboxEnterFunc2
@@ -1364,7 +1365,7 @@
             this.cboxEnterFunc2.Location = new System.Drawing.Point(46, 192);
             this.cboxEnterFunc2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc2.Name = "cboxEnterFunc2";
-            this.cboxEnterFunc2.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc2.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc2.TabIndex = 27;
             this.cboxEnterFunc2.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc2_SelectedIndexChanged);
             // 
@@ -1379,7 +1380,7 @@
             this.cboxEnterAction2.Location = new System.Drawing.Point(415, 192);
             this.cboxEnterAction2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction2.Name = "cboxEnterAction2";
-            this.cboxEnterAction2.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction2.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction2.TabIndex = 26;
             // 
             // nudEnter2
@@ -1394,7 +1395,7 @@
             0,
             0});
             this.nudEnter2.Name = "nudEnter2";
-            this.nudEnter2.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter2.Size = new System.Drawing.Size(90, 60);
             this.nudEnter2.TabIndex = 25;
             // 
             // cboxEnterFunc1
@@ -1407,7 +1408,7 @@
             this.cboxEnterFunc1.Location = new System.Drawing.Point(46, 122);
             this.cboxEnterFunc1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc1.Name = "cboxEnterFunc1";
-            this.cboxEnterFunc1.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc1.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc1.TabIndex = 24;
             this.cboxEnterFunc1.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc1_SelectedIndexChanged);
             // 
@@ -1422,7 +1423,7 @@
             this.cboxEnterAction1.Location = new System.Drawing.Point(415, 122);
             this.cboxEnterAction1.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction1.Name = "cboxEnterAction1";
-            this.cboxEnterAction1.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction1.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction1.TabIndex = 23;
             // 
             // nudEnter1
@@ -1437,7 +1438,7 @@
             0,
             0});
             this.nudEnter1.Name = "nudEnter1";
-            this.nudEnter1.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter1.Size = new System.Drawing.Size(90, 60);
             this.nudEnter1.TabIndex = 22;
             // 
             // cboxEnterFunc0
@@ -1450,7 +1451,7 @@
             this.cboxEnterFunc0.Location = new System.Drawing.Point(46, 52);
             this.cboxEnterFunc0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterFunc0.Name = "cboxEnterFunc0";
-            this.cboxEnterFunc0.Size = new System.Drawing.Size(250, 41);
+            this.cboxEnterFunc0.Size = new System.Drawing.Size(250, 49);
             this.cboxEnterFunc0.TabIndex = 0;
             this.cboxEnterFunc0.SelectedIndexChanged += new System.EventHandler(this.cboxEnterFunc0_SelectedIndexChanged);
             // 
@@ -1466,7 +1467,7 @@
             this.cboxEnterAction0.Location = new System.Drawing.Point(415, 52);
             this.cboxEnterAction0.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxEnterAction0.Name = "cboxEnterAction0";
-            this.cboxEnterAction0.Size = new System.Drawing.Size(162, 41);
+            this.cboxEnterAction0.Size = new System.Drawing.Size(162, 49);
             this.cboxEnterAction0.TabIndex = 20;
             // 
             // nudEnter0
@@ -1481,7 +1482,7 @@
             0,
             0});
             this.nudEnter0.Name = "nudEnter0";
-            this.nudEnter0.Size = new System.Drawing.Size(90, 50);
+            this.nudEnter0.Size = new System.Drawing.Size(90, 60);
             this.nudEnter0.TabIndex = 19;
             // 
             // btnTurnAllOff
@@ -1628,7 +1629,7 @@
             this.lblDistance.Location = new System.Drawing.Point(710, 456);
             this.lblDistance.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblDistance.Name = "lblDistance";
-            this.lblDistance.Size = new System.Drawing.Size(95, 45);
+            this.lblDistance.Size = new System.Drawing.Size(121, 57);
             this.lblDistance.TabIndex = 144;
             this.lblDistance.Text = "XXX";
             // 
@@ -1688,13 +1689,14 @@
             this.lblTriggerDistance.Location = new System.Drawing.Point(394, 456);
             this.lblTriggerDistance.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblTriggerDistance.Name = "lblTriggerDistance";
-            this.lblTriggerDistance.Size = new System.Drawing.Size(95, 45);
+            this.lblTriggerDistance.Size = new System.Drawing.Size(121, 57);
             this.lblTriggerDistance.TabIndex = 160;
             this.lblTriggerDistance.Text = "XXX";
             // 
             // tabYouTurn
             // 
             this.tabYouTurn.BackColor = System.Drawing.Color.AliceBlue;
+            this.tabYouTurn.Controls.Add(this.checkBoxCircle);
             this.tabYouTurn.Controls.Add(this.btnGeoFenceDistanceDn);
             this.tabYouTurn.Controls.Add(this.btnGeoFenceDistanceUp);
             this.tabYouTurn.Controls.Add(this.label49);
@@ -1726,6 +1728,17 @@
             this.tabYouTurn.Size = new System.Drawing.Size(894, 615);
             this.tabYouTurn.TabIndex = 0;
             this.tabYouTurn.Text = "U Turn";
+            // 
+            // checkBoxCircle
+            // 
+            this.checkBoxCircle.Location = new System.Drawing.Point(136, 313);
+            this.checkBoxCircle.Name = "checkBoxCircle";
+            this.checkBoxCircle.Size = new System.Drawing.Size(150, 45);
+            this.checkBoxCircle.TabIndex = 167;
+            this.checkBoxCircle.Text = "Circle";
+            this.checkBoxCircle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.checkBoxCircle.UseVisualStyleBackColor = true;
+            this.checkBoxCircle.Click += new System.EventHandler(this.checkBoxCircle_CheckedChanged);
             // 
             // btnGeoFenceDistanceDn
             // 
@@ -1772,7 +1785,7 @@
             this.lblGeoFenceDistance.Location = new System.Drawing.Point(78, 456);
             this.lblGeoFenceDistance.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblGeoFenceDistance.Name = "lblGeoFenceDistance";
-            this.lblGeoFenceDistance.Size = new System.Drawing.Size(95, 45);
+            this.lblGeoFenceDistance.Size = new System.Drawing.Size(121, 57);
             this.lblGeoFenceDistance.TabIndex = 165;
             this.lblGeoFenceDistance.Text = "XXX";
             // 
@@ -1800,17 +1813,17 @@
             "4",
             "5",
             "6"});
-            this.cboxRowWidth.Location = new System.Drawing.Point(182, 251);
+            this.cboxRowWidth.Location = new System.Drawing.Point(179, 220);
             this.cboxRowWidth.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxRowWidth.Name = "cboxRowWidth";
-            this.cboxRowWidth.Size = new System.Drawing.Size(52, 47);
+            this.cboxRowWidth.Size = new System.Drawing.Size(52, 56);
             this.cboxRowWidth.TabIndex = 65;
             this.cboxRowWidth.SelectedIndexChanged += new System.EventHandler(this.cboxRowWidth_SelectedIndexChanged);
             // 
             // label1
             // 
             this.label1.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(159, 173);
+            this.label1.Location = new System.Drawing.Point(154, 143);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(110, 65);
@@ -1940,7 +1953,7 @@
             // 
             // FormYouTurn
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 28F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(995, 698);
             this.ControlBox = false;
@@ -2113,5 +2126,6 @@
         private ProXoft.WinForms.RepeatButton btnGeoFenceDistanceUp;
         private System.Windows.Forms.Label label49;
         private System.Windows.Forms.Label lblGeoFenceDistance;
+        private System.Windows.Forms.CheckBox checkBoxCircle;
     }
 }

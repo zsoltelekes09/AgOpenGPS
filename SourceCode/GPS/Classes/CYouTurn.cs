@@ -34,6 +34,9 @@ namespace AgOpenGPS
         //Patterns or Dubins
         public bool isUsingDubinsTurn;
 
+        //Circle usage
+        public bool isCircle;
+
         public double boundaryAngleOffPerpendicular;
         public double distanceTurnBeforeLine = 0, tangencyAngle;
 
@@ -91,6 +94,10 @@ namespace AgOpenGPS
             rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;
 
             isUsingDubinsTurn = Properties.Vehicle.Default.set_youUseDubins;
+
+            isCircle = Properties.Vehicle.Default.set_Circle;
+
+       
         }
 
         //Finds the point where an AB Curve crosses the turn line
@@ -474,6 +481,12 @@ namespace AgOpenGPS
 
                 turnRadius *= rowSkipsWidth;
                 turnOffset *= rowSkipsWidth;
+
+                //forgás
+                if (mf.yt.isCircle)
+                {
+                    rowSkipsWidth += 1;
+                }
 
                 //move the cross line calc to not include first turn
                 goal.easting = rEastYT + (Math.Sin(head) * distanceTurnBeforeLine);
@@ -1145,6 +1158,9 @@ namespace AgOpenGPS
                 turnRadius *= rowSkipsWidth;
                 turnOffset *= rowSkipsWidth;
 
+               
+                
+
                 //move the cross line calc to not include first turn
                 goal.easting = crossingCurvePoint.easting + (Math.Sin(head) * distanceTurnBeforeLine);
                 goal.northing = crossingCurvePoint.northing + (Math.Cos(head) * distanceTurnBeforeLine);
@@ -1328,8 +1344,13 @@ namespace AgOpenGPS
             mf.seq.isSequenceTriggered = true;
 
             //just do the opposite of last turn
-            isYouTurnRight = !isLastYouTurnRight;
-            isLastYouTurnRight = !isLastYouTurnRight;
+            //forgás 
+            if (!mf.yt.isCircle)
+            {
+                isYouTurnRight = !isLastYouTurnRight;
+                isLastYouTurnRight = !isLastYouTurnRight;
+            }
+           
         }
 
         //Normal copmpletion of youturn

@@ -1,3 +1,4 @@
+using AgOpenGPS.Properties;
 using System;
 using System.Drawing;
 using System.Text;
@@ -208,6 +209,18 @@ namespace AgOpenGPS
                 btnYouTurnWideReturn.Enabled = false;
                 btnYouTurnSemiCircle.Enabled = false;
             }
+
+            if (!mf.yt.isCircle)
+            {
+                checkBoxCircle.Checked= false;
+
+            }
+            else
+            {
+                checkBoxCircle.Checked = true;
+
+            }
+            
         }
 
         #region Procedures
@@ -1168,8 +1181,10 @@ namespace AgOpenGPS
 
             //Properties.Vehicle.Default.set_youSkipHeight = mf.yt.rowSkipsHeight;
             Properties.Vehicle.Default.set_youSkipWidth = mf.yt.rowSkipsWidth;
+            
             Properties.Vehicle.Default.set_youUseDubins = mf.yt.isUsingDubinsTurn;
-
+            Properties.Vehicle.Default.set_Circle = mf.yt.isCircle;
+            
             Properties.Vehicle.Default.set_youTurnDistance = mf.yt.youTurnStartOffset;
             Properties.Vehicle.Default.set_youTriggerDistance = mf.yt.triggerDistanceOffset;
             Properties.Vehicle.Default.set_geoFenceDistance = mf.yt.geoFenceDistance;
@@ -1313,6 +1328,32 @@ namespace AgOpenGPS
 
             if (IsBitSet(mf.mc.machineData[mf.mc.mdUTurn], 5)) btnToggle8.BackColor = Color.LightGreen;
             else btnToggle8.BackColor = Color.LightSalmon;
+        }
+
+        private void checkBoxCircle_CheckedChanged(object sender, EventArgs e)
+        {
+
+            if (mf.yt.isCircle)
+            {
+             
+                    mf.yt.isCircle = false;
+
+                  //  cboxRowWidth.Hide();
+                    cboxRowWidth.SelectedIndex = 0;
+                   // label1.Text = "Pipálva";
+               
+                
+
+               // Settings.Default.setCircle = checkBoxCircle.Checked;
+                //Settings.Default.Save();
+            }
+            else
+            {
+                mf.yt.isCircle = true;
+             //   cboxRowWidth.Show();
+               // label1.Text = "Skips";
+            }
+
         }
     }
 }

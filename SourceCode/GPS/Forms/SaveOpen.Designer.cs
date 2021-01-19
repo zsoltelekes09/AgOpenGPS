@@ -317,6 +317,7 @@ namespace AgOpenGPS
                 writer.WriteLine("YouTurnDistance," + Properties.Vehicle.Default.set_youTurnDistance.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("youTriggerDistance," + Properties.Vehicle.Default.set_youTriggerDistance.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("YouTurnUseDubins," + Properties.Vehicle.Default.set_youUseDubins.ToString(CultureInfo.InvariantCulture));
+                writer.WriteLine("YouTurnCircle," + Properties.Vehicle.Default.set_Circle.ToString(CultureInfo.InvariantCulture));
                 writer.WriteLine("IsMachineControlToAS," + Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer.ToString(CultureInfo.InvariantCulture));
 
                 //AutoSteer
@@ -505,6 +506,8 @@ namespace AgOpenGPS
                         line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.set_youUseDubins = bool.Parse(words[1]);
                         line = reader.ReadLine(); words = line.Split(',');
+                        Properties.Vehicle.Default.set_Circle = bool.Parse(words[1]);
+                        line = reader.ReadLine(); words = line.Split(',');
                         Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer = bool.Parse(words[1]);
 
                         line = reader.ReadLine(); words = line.Split(',');
@@ -660,6 +663,7 @@ namespace AgOpenGPS
                         yt.youTurnStartOffset = Properties.Vehicle.Default.set_youTurnDistance;
                         yt.triggerDistanceOffset = Properties.Vehicle.Default.set_youTriggerDistance;
                         yt.isUsingDubinsTurn = Properties.Vehicle.Default.set_youUseDubins;
+                        yt.isCircle = Properties.Vehicle.Default.set_Circle;
                         mc.isMachineDataSentToAutoSteer = Properties.Vehicle.Default.setVehicle_isMachineControlToAutoSteer;
 
                         mc.autoSteerSettings[mc.ssKp] = Properties.Settings.Default.setAS_Kp;
