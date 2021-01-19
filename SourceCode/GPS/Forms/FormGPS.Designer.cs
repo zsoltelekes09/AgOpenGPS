@@ -830,6 +830,7 @@
             this.cboxpRowWidth.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.cboxpRowWidth.Font = new System.Drawing.Font("Tahoma", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxpRowWidth.FormattingEnabled = true;
+            this.cboxpRowWidth.IntegralHeight = false;
             this.cboxpRowWidth.Items.AddRange(new object[] {
             "0",
             "1",
@@ -841,7 +842,27 @@
             "7",
             "8",
             "9",
-            "10"});
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30"});
             this.cboxpRowWidth.Location = new System.Drawing.Point(13, 280);
             this.cboxpRowWidth.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxpRowWidth.Name = "cboxpRowWidth";

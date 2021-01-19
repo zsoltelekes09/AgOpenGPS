@@ -404,7 +404,15 @@ namespace AgOpenGPS
             LineUpManualBtns();
 
             yt.rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;
-            cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
+            try
+            {
+                cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
+            
 
             //default to come up in mini panel, exit remembers 
 

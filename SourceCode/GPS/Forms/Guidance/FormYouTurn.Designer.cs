@@ -1802,9 +1802,11 @@
             // 
             // cboxRowWidth
             // 
+            this.cboxRowWidth.DropDownHeight = 300;
             this.cboxRowWidth.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxRowWidth.Font = new System.Drawing.Font("Tahoma", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboxRowWidth.FormattingEnabled = true;
+            this.cboxRowWidth.IntegralHeight = false;
             this.cboxRowWidth.Items.AddRange(new object[] {
             "0",
             "1",
@@ -1812,11 +1814,35 @@
             "3",
             "4",
             "5",
-            "6"});
-            this.cboxRowWidth.Location = new System.Drawing.Point(179, 220);
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30"});
+            this.cboxRowWidth.Location = new System.Drawing.Point(160, 220);
             this.cboxRowWidth.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cboxRowWidth.Name = "cboxRowWidth";
-            this.cboxRowWidth.Size = new System.Drawing.Size(52, 56);
+            this.cboxRowWidth.Size = new System.Drawing.Size(104, 56);
             this.cboxRowWidth.TabIndex = 65;
             this.cboxRowWidth.SelectedIndexChanged += new System.EventHandler(this.cboxRowWidth_SelectedIndexChanged);
             // 

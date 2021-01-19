@@ -1360,9 +1360,10 @@ namespace AgOpenGPS
             //forgás
             if (mf.yt.isCircle)
             {
-                
                 rowSkipsWidth += 1;
+
             }
+            
             mf.seq.ResetSequenceEventTriggers();
             mf.seq.isSequenceTriggered = false;
             mf.isBoundAlarming = false;

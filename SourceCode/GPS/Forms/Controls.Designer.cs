@@ -1380,7 +1380,15 @@ namespace AgOpenGPS
         {
             var form = new FormYouTurn(this);
             form.ShowDialog();
-            cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
+            
+            try
+            {
+                cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
         }
         private void toolstripAutoSteerConfig_Click_1(object sender, EventArgs e)
         {
@@ -1513,7 +1521,15 @@ namespace AgOpenGPS
         {
             var form = new FormYouTurn(this);
             form.ShowDialog();
-            cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
+           
+            try
+            {
+                cboxpRowWidth.SelectedIndex = yt.rowSkipsWidth - 1;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
         }
         private void toolStripBtnGPSStength_Click(object sender, EventArgs e)
         {

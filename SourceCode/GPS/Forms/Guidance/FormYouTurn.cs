@@ -170,7 +170,15 @@ namespace AgOpenGPS
                 btnYouTurnCustom.BackColor = Color.LimeGreen;
             }
             //forgás hiba
-            cboxRowWidth.SelectedIndex = mf.yt.rowSkipsWidth - 1;
+            
+            try
+            {
+                cboxRowWidth.SelectedIndex = mf.yt.rowSkipsWidth - 1;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
 
             //populate the Enter and Exit pages.
             PopulateSequencePages();
